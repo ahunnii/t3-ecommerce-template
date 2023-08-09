@@ -1,9 +1,6 @@
 import { type GetServerSidePropsContext } from "next";
-import { getSession, signIn, signOut, useSession } from "next-auth/react";
-import Head from "next/head";
-import Link from "next/link";
-import { redirect, useParams } from "next/navigation";
-import { ReactElement, useEffect } from "react";
+
+import { useEffect } from "react";
 import { useStoreModal } from "~/hooks/use-store-modal";
 
 import { getServerAuthSession } from "~/server/auth";

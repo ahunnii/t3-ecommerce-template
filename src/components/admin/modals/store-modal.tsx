@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -28,7 +26,7 @@ const formSchema = z.object({
 
 export const StoreModal = () => {
   const storeModal = useStoreModal();
-  const router = useRouter();
+
   const { mutate } = api.store.createStore.useMutation({
     onSuccess: ({ id }) => {
       window.location.assign(`/${id}`);
@@ -53,17 +51,6 @@ export const StoreModal = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // try {
-    //   setLoading(true);
-
-    //   const response = await axios.post("/api/stores", values);
-    //   window.location.assign(`/${response.data.id}`);
-    // } catch (error) {
-    //   toast.error("Something went wrong");
-    // } finally {
-    //   setLoading(false);
-    // }
-
     mutate(values);
   };
 

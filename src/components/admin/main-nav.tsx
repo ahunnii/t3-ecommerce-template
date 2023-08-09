@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 
 import { cn } from "~/utils/styles";
 
@@ -11,48 +12,55 @@ export function MainNav({
 }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
   const params = useParams();
+  const router = useRouter();
 
-  if (!params.storeId) return null;
+  console.log();
+
+  if (!router?.query?.storeId) return null;
   const routes = [
     {
-      href: `/${params.storeId.toString()}`,
+      href: `/admin/${router?.query?.storeId.toString()}`,
       label: "Overview",
-      active: pathname === `/${params?.storeId.toString()}`,
+      active: pathname === `/admin/${router?.query?.storeId.toString()}`,
     },
     {
-      href: `/${params?.storeId.toString()}/billboards`,
+      href: `/admin/${router?.query?.storeId.toString()}/billboards`,
       label: "Billboards",
-      active: pathname === `/${params?.storeId.toString()}/billboards`,
+      active:
+        pathname === `/admin/${router?.query?.storeId.toString()}/billboards`,
     },
     {
-      href: `/${params?.storeId.toString()}/categories`,
+      href: `/admin/${router?.query?.storeId.toString()}/categories`,
       label: "Categories",
-      active: pathname === `/${params?.storeId.toString()}/categories`,
+      active:
+        pathname === `/admin/${router?.query?.storeId.toString()}/categories`,
     },
     {
-      href: `/${params?.storeId.toString()}/sizes`,
+      href: `/admin/${router?.query?.storeId.toString()}/sizes`,
       label: "Sizes",
-      active: pathname === `/${params?.storeId.toString()}/sizes`,
+      active: pathname === `/admin/${router?.query?.storeId.toString()}/sizes`,
     },
     {
-      href: `/${params?.storeId.toString()}/colors`,
+      href: `/admin/${router?.query?.storeId.toString()}/colors`,
       label: "Colors",
-      active: pathname === `/${params?.storeId.toString()}/colors`,
+      active: pathname === `/admin/${router?.query?.storeId.toString()}/colors`,
     },
     {
-      href: `/${params?.storeId.toString()}/products`,
+      href: `/admin/${router?.query?.storeId.toString()}/products`,
       label: "Products",
-      active: pathname === `/${params?.storeId.toString()}/products`,
+      active:
+        pathname === `/admin/${router?.query?.storeId.toString()}/products`,
     },
     {
-      href: `/${params?.storeId.toString()}/orders`,
+      href: `/admin/${router?.query?.storeId.toString()}/orders`,
       label: "Orders",
-      active: pathname === `/${params?.storeId.toString()}/orders`,
+      active: pathname === `/admin/${router?.query?.storeId.toString()}/orders`,
     },
     {
-      href: `/${params?.storeId.toString()}/settings`,
+      href: `/admin/${router?.query?.storeId.toString()}/settings`,
       label: "Settings",
-      active: pathname === `/${params?.storeId.toString()}/settings`,
+      active:
+        pathname === `/admin/${router?.query?.storeId.toString()}/settings`,
     },
   ];
 

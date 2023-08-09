@@ -1,9 +1,7 @@
-"use client";
-
 import { Check, ChevronsUpDown, PlusCircle, Store } from "lucide-react";
+import { redirect, useRouter as useNavigationRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import * as React from "react";
-
-import { useParams, useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import {
   Command,
@@ -35,8 +33,9 @@ export default function StoreSwitcher({
   items = [],
 }: StoreSwitcherProps) {
   const storeModal = useStoreModal();
-  const params = useParams();
+  // const params = useParams();
   const router = useRouter();
+  const navigate = useNavigationRouter();
 
   const formattedItems = items.map((item) => ({
     label: item.name,
@@ -44,14 +43,15 @@ export default function StoreSwitcher({
   }));
 
   const currentStore = formattedItems.find(
-    (item) => item.value === params.storeId
+    (item) => item.value === router.query?.storeId
   );
 
   const [open, setOpen] = React.useState(false);
 
   const onStoreSelect = (store: { value: string; label: string }) => {
     setOpen(false);
-    router.push(`/${store.value}`);
+
+    navigate.push(`/admin/${store.value.toString()}`);
   };
 
   return (

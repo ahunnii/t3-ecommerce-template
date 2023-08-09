@@ -22,6 +22,25 @@ export const storeRouter = createTRPCRouter({
     return "you can now see this secret message!";
   }),
 
+  getAllSizes: protectedProcedure
+    .input(z.object({ storeId: z.string() }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.size.findMany({
+        where: {
+          storeId: input.storeId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+  getAllStores: protectedProcedure.query(({ ctx }) => {
+    return ctx.prisma.store.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+    });
+  }),
   createStore: protectedProcedure
     .input(z.object({ name: z.string() }))
     .mutation(({ ctx, input }) => {

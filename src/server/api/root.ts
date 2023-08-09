@@ -1,4 +1,5 @@
 import { exampleRouter } from "~/server/api/routers/example";
+import { sizesRouter } from "~/server/api/routers/sizes";
 import { storeRouter } from "~/server/api/routers/stores";
 import { createTRPCRouter } from "~/server/api/trpc";
 
@@ -10,6 +11,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   store: storeRouter,
+  sizes: sizesRouter,
 });
 
 // export type definition of API
