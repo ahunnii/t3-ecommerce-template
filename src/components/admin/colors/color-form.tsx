@@ -1,13 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Size } from "@prisma/client";
-
+import type { Color } from "@prisma/client";
+import axios from "axios";
 import { Trash } from "lucide-react";
-import { useRouter as useNavigationRouter } from "next/navigation";
-
+import { useRouter as useNavigationRouter, useParams } from "next/navigation";
 import { useRouter } from "next/router";
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -26,31 +24,32 @@ import { Heading } from "~/components/ui/heading";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { api } from "~/utils/api";
-
 const formSchema = z.object({
-  name: z.string().min(1),
-  value: z.string().min(1),
+  name: z.string().min(2),
+  value: z.string().min(4).max(9).regex(/^#/, {
+    message: "String must be a valid hex code",
+  }),
 });
 
-type SizeFormValues = z.infer<typeof formSchema>;
+type ColorFormValues = z.infer<typeof formSchema>;
 
-interface SizeFormProps {
-  initialData: Size | null;
+interface ColorFormProps {
+  initialData: Color | null;
 }
 
-export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
+export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? "Edit size" : "Create size";
-  const description = initialData ? "Edit a size." : "Add a new size";
-  const toastMessage = initialData ? "Size updated." : "Size created.";
+  const title = initialData ? "Edit color" : "Create color";
+  const description = initialData ? "Edit a color." : "Add a new color";
+  const toastMessage = initialData ? "Color updated." : "Color created.";
   const action = initialData ? "Save changes" : "Create";
 
-  const form = useForm<SizeFormValues>({
+  const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ?? {
       name: "",
@@ -58,9 +57,9 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     },
   });
 
-  const { mutate: patchSize } = api.sizes.updateSize.useMutation({
+  const { mutate: patchColor } = api.colors.updateColor.useMutation({
     onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/sizes`);
+      router.push(`/admin/${params.query.storeId as string}/colors`);
       toast.success(toastMessage);
     },
     onError: (error) => {
@@ -75,9 +74,9 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     },
   });
 
-  const { mutate: createSize } = api.sizes.createSize.useMutation({
+  const { mutate: createColor } = api.colors.createColor.useMutation({
     onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/sizes/`);
+      router.push(`/admin/${params.query.storeId as string}/colors/`);
       toast.success(toastMessage);
     },
     onError: (error) => {
@@ -92,13 +91,13 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     },
   });
 
-  const { mutate: deleteSize } = api.sizes.deleteSize.useMutation({
+  const { mutate: deleteColor } = api.colors.deleteColor.useMutation({
     onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/sizes`);
-      toast.success("Size deleted.");
+      router.push(`/admin/${params.query.storeId as string}/colors`);
+      toast.success("Color deleted.");
     },
     onError: (error) => {
-      toast.error("Make sure you removed all products using this size first.");
+      toast.error("Make sure you removed all products using this color first.");
       console.error(error);
     },
     onMutate: () => {
@@ -110,16 +109,16 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     },
   });
 
-  const onSubmit = (data: SizeFormValues) => {
+  const onSubmit = (data: ColorFormValues) => {
     if (initialData) {
-      patchSize({
+      patchColor({
         storeId: params?.query?.storeId as string,
-        sizeId: params?.query?.sizeId as string,
+        colorId: params?.query?.colorId as string,
         name: data.name,
         value: data.value,
       });
     } else {
-      createSize({
+      createColor({
         storeId: params?.query?.storeId as string,
         name: data.name,
         value: data.value,
@@ -128,9 +127,9 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   };
 
   const onDelete = () => {
-    deleteSize({
+    deleteColor({
       storeId: params?.query?.storeId as string,
-      sizeId: params?.query?.sizeId as string,
+      colorId: params?.query?.sizeId as string,
     });
   };
 
@@ -171,7 +170,7 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Size name"
+                      placeholder="Color name"
                       {...field}
                     />
                   </FormControl>
@@ -186,11 +185,17 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
                 <FormItem>
                   <FormLabel>Value</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Size value"
-                      {...field}
-                    />
+                    <div className="flex items-center gap-x-4">
+                      <Input
+                        disabled={loading}
+                        placeholder="Color value"
+                        {...field}
+                      />
+                      <div
+                        className="rounded-full border p-4"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

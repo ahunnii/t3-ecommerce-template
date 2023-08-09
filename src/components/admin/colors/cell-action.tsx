@@ -5,8 +5,6 @@ import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { api } from "~/utils/api";
-
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
@@ -17,10 +15,11 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-import type { SizeColumn } from "~/components/admin/sizes/columns";
+import { api } from "~/utils/api";
+import type { ColorColumn } from "./columns";
 
 interface CellActionProps {
-  data: SizeColumn;
+  data: ColorColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -29,14 +28,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { mutate: deleteSize } = api.sizes.deleteSize.useMutation({
+  const { mutate: deleteSize } = api.colors.deleteColor.useMutation({
     onSuccess: () => {
       router.refresh();
-      router.push(`/admin/${params.query.storeId as string}/sizes`);
-      toast.success("Size deleted.");
+      toast.success("Color deleted.");
     },
     onError: (error) => {
-      toast.error("Make sure you removed all products using this size first.");
+      toast.error("Make sure you removed all products using this color first.");
       console.error(error);
     },
     onMutate: () => {
@@ -51,7 +49,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirm = () => {
     deleteSize({
       storeId: params?.query?.storeId as string,
-      sizeId: data.id,
+      colorId: data.id,
     });
   };
 
@@ -59,10 +57,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     navigator.clipboard
       .writeText(id)
       .then(() => {
-        toast.success("Size ID copied to clipboard.");
+        toast.success("Color ID copied to clipboard.");
       })
       .catch(() => {
-        toast.error("Failed to copy size ID to clipboard.");
+        toast.error("Failed to copy color ID to clipboard.");
       });
   };
 
@@ -89,7 +87,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem
             onClick={() =>
               router.push(
-                `/admin/${params.query.storeId as string}/sizes/${data.id}`
+                `/admin/${params.query.storeId as string}/colors/${data.id}`
               )
             }
           >

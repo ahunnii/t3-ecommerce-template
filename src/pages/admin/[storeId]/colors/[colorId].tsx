@@ -1,13 +1,10 @@
-import { api } from "~/utils/api";
-
 import type { GetServerSidePropsContext } from "next";
-
 import type { FC } from "react";
-import { SizeForm } from "~/components/admin/sizes/size-form";
+import { ColorForm } from "~/components/admin/colors/color-form";
 import AdminLayout from "~/layouts/AdminLayout";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
-
+import { api } from "~/utils/api";
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const session = await getServerAuthSession(ctx);
 
@@ -40,30 +37,28 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      sizeId: ctx.query.sizeId,
+      colorId: ctx.query.colorId,
     },
   };
 }
 
 interface IProps {
-  sizeId: string;
+  colorId: string;
 }
-
-const SizePage: FC<IProps> = ({ sizeId }) => {
-  const { data: size } = api.sizes.getSize.useQuery({
-    sizeId: sizeId,
+const ColorPage: FC<IProps> = ({ colorId }) => {
+  const { data: color } = api.colors.getColor.useQuery({
+    colorId,
   });
-
   return (
     <AdminLayout>
       <div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {size && <SizeForm initialData={size} />}
-          {!size && <SizeForm initialData={null} />}
+          {color && <ColorForm initialData={color} />}
+          {!color && <ColorForm initialData={null} />}
         </div>
       </div>
     </AdminLayout>
   );
 };
 
-export default SizePage;
+export default ColorPage;

@@ -2,12 +2,12 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
-export const sizesRouter = createTRPCRouter({
-  getAllSizes: protectedProcedure
+export const colorsRouter = createTRPCRouter({
+  getAllColors: protectedProcedure
 
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
-      return ctx.prisma.size.findMany({
+      return ctx.prisma.color.findMany({
         where: {
           storeId: input.storeId,
         },
@@ -16,23 +16,23 @@ export const sizesRouter = createTRPCRouter({
         },
       });
     }),
-  getSize: protectedProcedure
-    .input(z.object({ sizeId: z.string() }))
+  getColor: protectedProcedure
+    .input(z.object({ colorId: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.sizeId) {
+      if (!input.colorId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Size id is required",
+          message: "Color id is required",
         });
       }
 
-      return ctx.prisma.size.findUnique({
+      return ctx.prisma.color.findUnique({
         where: {
-          id: input.sizeId,
+          id: input.colorId,
         },
       });
     }),
-  createSize: protectedProcedure
+  createColor: protectedProcedure
     .input(
       z.object({
         storeId: z.string(),
@@ -66,12 +66,12 @@ export const sizesRouter = createTRPCRouter({
           if (!storeByUserId) {
             throw new TRPCError({
               code: "UNAUTHORIZED",
-              message: "Size id does not belong to current user",
+              message: "Color id does not belong to current user",
             });
           }
         })
         .then(() => {
-          return ctx.prisma.size.create({
+          return ctx.prisma.color.create({
             data: {
               name: input.name,
               value: input.value,
@@ -88,10 +88,10 @@ export const sizesRouter = createTRPCRouter({
         });
     }),
 
-  updateSize: protectedProcedure
+  updateColor: protectedProcedure
     .input(
       z.object({
-        sizeId: z.string(),
+        colorId: z.string(),
         storeId: z.string(),
         name: z.string(),
         value: z.string(),
@@ -114,13 +114,13 @@ export const sizesRouter = createTRPCRouter({
         // return new NextResponse("Value is required", { status: 400 });
       }
 
-      if (!input.sizeId) {
+      if (!input.colorId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Size id is required",
+          message: "Color id is required",
         });
 
-        // return new NextResponse("Size id is required", { status: 400 });
+        // return new NextResponse("Color id is required", { status: 400 });
       }
 
       return ctx.prisma.store
@@ -134,14 +134,14 @@ export const sizesRouter = createTRPCRouter({
           if (!storeByUserId) {
             throw new TRPCError({
               code: "UNAUTHORIZED",
-              message: "Size id does not belong to current user",
+              message: "Color id does not belong to current user",
             });
           }
         })
         .then(() => {
-          return ctx.prisma.size.update({
+          return ctx.prisma.color.update({
             where: {
-              id: input.sizeId,
+              id: input.colorId,
             },
             data: {
               name: input.name,
@@ -158,21 +158,21 @@ export const sizesRouter = createTRPCRouter({
         });
     }),
 
-  deleteSize: protectedProcedure
+  deleteColor: protectedProcedure
     .input(
       z.object({
-        sizeId: z.string(),
+        colorId: z.string(),
         storeId: z.string(),
       })
     )
     .mutation(({ ctx, input }) => {
-      if (!input.sizeId) {
+      if (!input.colorId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Size id is required",
+          message: "Color id is required",
         });
 
-        // return new NextResponse("Size id is required", { status: 400 });
+        // return new NextResponse("Color id is required", { status: 400 });
       }
 
       return ctx.prisma.store
@@ -186,14 +186,14 @@ export const sizesRouter = createTRPCRouter({
           if (!storeByUserId) {
             throw new TRPCError({
               code: "UNAUTHORIZED",
-              message: "Size id does not belong to current user",
+              message: "Color id does not belong to current user",
             });
           }
         })
         .then(() => {
-          return ctx.prisma.size.delete({
+          return ctx.prisma.color.delete({
             where: {
-              id: input.sizeId,
+              id: input.colorId,
             },
           });
         })

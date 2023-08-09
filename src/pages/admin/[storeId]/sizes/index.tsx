@@ -2,7 +2,7 @@
 
 import type { Size } from "@prisma/client";
 import { format } from "date-fns";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 
 import { SizesClient } from "~/components/admin/sizes/client";
