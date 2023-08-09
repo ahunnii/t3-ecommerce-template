@@ -1,6 +1,8 @@
+import { BillboardForm } from "~/components/admin/billboards/billboard-form";
+
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
-import { ColorForm } from "~/components/admin/colors/color-form";
+
 import AdminLayout from "~/layouts/AdminLayout";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
@@ -38,28 +40,28 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      colorId: ctx.query.colorId,
+      billboardId: ctx.query.billboardId,
     },
   };
 }
-
 interface IProps {
-  colorId: string;
+  billboardId: string;
 }
-const ColorPage: FC<IProps> = ({ colorId }) => {
-  const { data: color } = api.colors.getColor.useQuery({
-    colorId,
+
+const BillboardPage: FC<IProps> = ({ billboardId }) => {
+  const { data: billboard } = api.billboards.getBillboard.useQuery({
+    billboardId,
   });
   return (
     <AdminLayout>
       <div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {color && <ColorForm initialData={color} />}
-          {!color && <ColorForm initialData={null} />}
+          {billboard && <BillboardForm initialData={billboard} />}
+          {!billboard && <BillboardForm initialData={null} />}
         </div>
       </div>
     </AdminLayout>
   );
 };
 
-export default ColorPage;
+export default BillboardPage;

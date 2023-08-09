@@ -1,8 +1,10 @@
+import { billboardsRouter } from "~/server/api/routers/billboards";
+import { categoriesRouter } from "~/server/api/routers/categories";
+import { colorsRouter } from "~/server/api/routers/colors";
 import { exampleRouter } from "~/server/api/routers/example";
 import { sizesRouter } from "~/server/api/routers/sizes";
 import { storeRouter } from "~/server/api/routers/stores";
 import { createTRPCRouter } from "~/server/api/trpc";
-import { colorsRouter } from "./routers/colors";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +16,8 @@ export const appRouter = createTRPCRouter({
   store: storeRouter,
   sizes: sizesRouter,
   colors: colorsRouter,
+  categories: categoriesRouter,
+  billboards: billboardsRouter,
 });
 
 // export type definition of API
