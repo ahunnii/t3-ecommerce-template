@@ -1,9 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const colorsRouter = createTRPCRouter({
-  getAllColors: protectedProcedure
+  getAllColors: publicProcedure
 
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
@@ -16,7 +20,7 @@ export const colorsRouter = createTRPCRouter({
         },
       });
     }),
-  getColor: protectedProcedure
+  getColor: publicProcedure
     .input(z.object({ colorId: z.string() }))
     .query(({ ctx, input }) => {
       if (!input.colorId) {
