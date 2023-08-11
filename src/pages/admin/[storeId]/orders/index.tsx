@@ -7,6 +7,7 @@ import type { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import { OrderClient } from "~/components/admin/orders/client";
 import type { OrderColumn } from "~/components/admin/orders/columns";
+import AdminLayout from "~/layouts/AdminLayout";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/utils/api";
 
@@ -76,11 +77,13 @@ const OrdersPage = ({ params }: { params: { storeId: string } }) => {
   }, [orders]);
 
   return (
-    <div className="flex-col">
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <OrderClient data={formattedOrders} />
+    <AdminLayout>
+      <div className="flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          <OrderClient data={formattedOrders} />
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

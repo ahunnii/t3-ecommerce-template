@@ -5,7 +5,8 @@ import { type AppType } from "next/app";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
-import { ModalProvider } from "~/providers/modal-provider";
+import { ModalProvider } from "~/providers/admin/modal-provider";
+import StorefrontModalProvider from "~/providers/app/modal-provider";
 // import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/providers/toast-provider";
 
@@ -17,6 +18,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <ToastProvider />
       <ModalProvider />
+      <StorefrontModalProvider />
       <Component {...pageProps} />
     </SessionProvider>
   );

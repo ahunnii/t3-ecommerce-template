@@ -1,9 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const productsRouter = createTRPCRouter({
-  getAllProducts: protectedProcedure
+  getAllProducts: publicProcedure
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.product.findMany({
@@ -20,7 +24,7 @@ export const productsRouter = createTRPCRouter({
         },
       });
     }),
-  getProduct: protectedProcedure
+  getProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
       if (!input.productId) {
@@ -100,7 +104,7 @@ export const productsRouter = createTRPCRouter({
         });
       }
 
-      if (!input.images || !input.images.length) {
+      if (!input.images ?? !input.images.length) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Images is required",

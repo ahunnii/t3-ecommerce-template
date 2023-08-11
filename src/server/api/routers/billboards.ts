@@ -1,9 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const billboardsRouter = createTRPCRouter({
-  getAllBillboards: protectedProcedure
+  getAllBillboards: publicProcedure
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.billboard.findMany({
@@ -16,7 +20,7 @@ export const billboardsRouter = createTRPCRouter({
       });
     }),
 
-  getBillboard: protectedProcedure
+  getBillboard: publicProcedure
     .input(z.object({ billboardId: z.string() }))
     .query(({ ctx, input }) => {
       if (!input.billboardId) {

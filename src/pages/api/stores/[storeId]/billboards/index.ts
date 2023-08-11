@@ -4,14 +4,14 @@ import { type NextApiRequest, type NextApiResponse } from "next";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
 
-const sizesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const billboardsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   // Create context and caller
   const ctx = await createTRPCContext({ req, res });
   const caller = appRouter.createCaller(ctx);
 
   const userId = ctx.session?.user.id;
   const { storeId } = req.query;
-  const { name, value } = req.body;
+  const { label, imageUrl } = req.body;
 
   const storeByUserId = await ctx.prisma.store.findFirst({
     where: {
@@ -26,26 +26,27 @@ const sizesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!storeId)
           return res.status(400).json({ message: "Store id is required" });
 
-        const getAllSizes = await caller.sizes.getAllSizes({
+        const getAllBillboards = await caller.billboards.getAllBillboards({
           storeId: storeId as string,
         });
-        return res.status(200).json(getAllSizes);
+        return res.status(200).json(getAllBillboards);
 
       case "POST":
         if (!userId)
           return res.status(403).json({ message: "Unauthenticated" });
-        if (!name) return res.status(400).json({ message: "Name is required" });
-        if (!value)
-          return res.status(400).json({ message: "Value is required" });
+        if (!label)
+          return res.status(400).json({ message: "Label is required" });
+        if (!imageUrl)
+          return res.status(400).json({ message: "imageUrl is required" });
         if (!storeByUserId)
           return res.status(405).json({ message: "Unauthorized" });
 
-        const createSize = await caller.sizes.createSize({
+        const createBillboard = await caller.billboards.createBillboard({
           storeId: storeId as string,
-          name,
-          value,
+          label,
+          imageUrl,
         });
-        return res.status(200).json(createSize);
+        return res.status(200).json(createBillboard);
 
       default:
         res.setHeader("Allow", "GET, POST");
@@ -63,4 +64,4 @@ const sizesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default sizesHandler;
+export default billboardsHandler;

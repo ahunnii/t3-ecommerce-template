@@ -15,10 +15,10 @@ export const config = {
 
 const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
 
-export default async function handleStripeWebhookEvent(
+const handleStripeWebhookEvent = async (
   req: NextApiRequest,
   res: NextApiResponse
-) {
+) => {
   if (req.method === "POST") {
     const buf = await buffer(req);
     const sig = req.headers["stripe-signature"];
@@ -27,7 +27,7 @@ export default async function handleStripeWebhookEvent(
 
     try {
       event = stripe.webhooks.constructEvent(
-        buf.toString() as string,
+        buf.toString(),
         sig as string,
         webhookSecret
       );
@@ -79,7 +79,6 @@ export default async function handleStripeWebhookEvent(
             },
           });
           console.log(`Payment successful for session ID: ${session.id}`);
-
           break;
 
         default:
@@ -96,4 +95,5 @@ export default async function handleStripeWebhookEvent(
     res.setHeader("Allow", "POST");
     res.status(405).end("Method Not Allowed");
   }
-}
+};
+export default handleStripeWebhookEvent;

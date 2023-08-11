@@ -4,14 +4,14 @@ import { type NextApiRequest, type NextApiResponse } from "next";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
 
-const sizesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const colorsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   // Create context and caller
   const ctx = await createTRPCContext({ req, res });
   const caller = appRouter.createCaller(ctx);
 
   const userId = ctx.session?.user.id;
   const { storeId } = req.query;
-  const { name, value } = req.body;
+  const { name, billboardId } = req.body;
 
   const storeByUserId = await ctx.prisma.store.findFirst({
     where: {
@@ -26,26 +26,26 @@ const sizesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!storeId)
           return res.status(400).json({ message: "Store id is required" });
 
-        const getAllSizes = await caller.sizes.getAllSizes({
+        const getAllCategories = await caller.categories.getAllCategories({
           storeId: storeId as string,
         });
-        return res.status(200).json(getAllSizes);
+        return res.status(200).json(getAllCategories);
 
       case "POST":
         if (!userId)
           return res.status(403).json({ message: "Unauthenticated" });
         if (!name) return res.status(400).json({ message: "Name is required" });
-        if (!value)
-          return res.status(400).json({ message: "Value is required" });
+        if (!billboardId)
+          return res.status(400).json({ message: "Billboard id is required" });
         if (!storeByUserId)
           return res.status(405).json({ message: "Unauthorized" });
 
-        const createSize = await caller.sizes.createSize({
+        const createCategory = await caller.categories.createCategory({
           storeId: storeId as string,
           name,
-          value,
+          billboardId,
         });
-        return res.status(200).json(createSize);
+        return res.status(200).json(createCategory);
 
       default:
         res.setHeader("Allow", "GET, POST");
@@ -63,4 +63,4 @@ const sizesHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default sizesHandler;
+export default colorsHandler;

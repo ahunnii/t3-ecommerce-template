@@ -1,9 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const categoriesRouter = createTRPCRouter({
-  getAllCategories: protectedProcedure
+  getAllCategories: publicProcedure
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.category.findMany({
@@ -19,7 +23,7 @@ export const categoriesRouter = createTRPCRouter({
       });
     }),
 
-  getCategory: protectedProcedure
+  getCategory: publicProcedure
     .input(z.object({ categoryId: z.string() }))
     .query(({ ctx, input }) => {
       if (!input.categoryId) {
@@ -32,6 +36,9 @@ export const categoriesRouter = createTRPCRouter({
       return ctx.prisma.category.findUnique({
         where: {
           id: input.categoryId,
+        },
+        include: {
+          billboard: true,
         },
       });
     }),

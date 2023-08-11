@@ -7,6 +7,7 @@ import { prisma } from "~/server/db";
 
 import type { Stripe } from "stripe";
 import { stripe } from "~/server/stripe/client";
+
 const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
