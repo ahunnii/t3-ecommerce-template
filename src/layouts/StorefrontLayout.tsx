@@ -10,10 +10,9 @@ export default function StorefrontLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="h-full">
+    <main className="flex h-screen flex-col">
       <Navbar />
       <Container>{children}</Container>
-
       <Footer />
     </main>
   );
