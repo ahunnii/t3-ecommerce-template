@@ -30,6 +30,7 @@
     "@trpc/next": "^10.26.0",
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
+    "@types/recharts": "^1.8.24",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",

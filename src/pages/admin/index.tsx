@@ -1,10 +1,24 @@
+import { useEffect } from "react";
+
 import { type GetServerSidePropsContext } from "next";
 
-import { useEffect } from "react";
 import { useStoreModal } from "~/hooks/use-store-modal";
 
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+
+const Admin = () => {
+  const onOpen = useStoreModal((state) => state.onOpen);
+  const isOpen = useStoreModal((state) => state.isOpen);
+
+  useEffect(() => {
+    if (!isOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
+
+  return null;
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const session = await getServerAuthSession(ctx);
@@ -35,7 +49,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         permanent: false,
       },
     };
-    // redirect(`/admin/${store.id.toString()}`);
   }
 
   return {
@@ -43,15 +56,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export default function Admin() {
-  const onOpen = useStoreModal((state) => state.onOpen);
-  const isOpen = useStoreModal((state) => state.isOpen);
-
-  useEffect(() => {
-    if (!isOpen) {
-      onOpen();
-    }
-  }, [isOpen, onOpen]);
-
-  return null;
-}
+export default Admin;

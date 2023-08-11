@@ -8,9 +8,9 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <main className="flex h-screen flex-col">
       <Navbar />
       {children}
-    </>
+    </main>
   );
 }

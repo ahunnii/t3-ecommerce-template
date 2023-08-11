@@ -1,32 +1,55 @@
-import { Size } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
-import { ProductForm } from "~/components/admin/products/product-form";
-import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+import { type FC } from "react";
 
 import { api } from "~/utils/api";
+import { authenticateSession } from "~/utils/auth";
+
+import { ProductForm } from "~/components/admin/products/product-form";
+import PageLoader from "~/components/ui/page-loader";
+import AdminLayout from "~/layouts/AdminLayout";
+
+interface IProps {
+  storeId: string;
+  productId: string;
+}
+
+const ProductPage: FC<IProps> = ({ storeId, productId }) => {
+  const { data: product } = api.products.getProduct.useQuery({
+    productId,
+  });
+
+  const { data: categories } = api.categories.getAllCategories.useQuery({
+    storeId,
+  });
+  const { data: sizes } = api.sizes.getAllSizes.useQuery({
+    storeId,
+  });
+
+  const { data: colors } = api.colors.getAllColors.useQuery({
+    storeId,
+  });
+
+  return (
+    <AdminLayout>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {typeof product === "undefined" && <PageLoader />}
+          {typeof product === "object" && (
+            <ProductForm
+              categories={categories ?? []}
+              colors={colors ?? []}
+              sizes={sizes ?? []}
+              initialData={product ?? null}
+            />
+          )}
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
-  });
+  const store = await authenticateSession(ctx);
 
   if (!store) {
     return {
@@ -39,55 +62,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      params: ctx.query,
+      storeId: ctx.query.storeId,
+      productId: ctx.query.productId,
     },
   };
 }
-
-const ProductPage = ({
-  params,
-}: {
-  params: { productId: string; storeId: string };
-}) => {
-  const { data: product } = api.products.getProduct.useQuery({
-    productId: params?.productId,
-  });
-
-  const { data: categories } = api.categories.getAllCategories.useQuery({
-    storeId: params?.storeId,
-  });
-  const { data: sizes } = api.sizes.getAllSizes.useQuery({
-    storeId: params?.storeId,
-  });
-
-  const { data: colors } = api.colors.getAllColors.useQuery({
-    storeId: params?.storeId,
-  });
-
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {product && (
-            <ProductForm
-              categories={categories ?? []}
-              colors={colors ?? []}
-              sizes={sizes ?? []}
-              initialData={product}
-            />
-          )}
-          {!product && (
-            <ProductForm
-              categories={categories ?? []}
-              colors={colors ?? []}
-              sizes={sizes ?? []}
-              initialData={null}
-            />
-          )}
-        </div>
-      </div>
-    </AdminLayout>
-  );
-};
 
 export default ProductPage;

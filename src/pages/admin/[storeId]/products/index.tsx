@@ -1,35 +1,69 @@
 import { format } from "date-fns";
-import type { GetServerSidePropsContext } from "next";
-import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+import { useCallback, useEffect, useState, type FC } from "react";
 
-import { useEffect, useState } from "react";
-import { ProductsClient } from "~/components/admin/products/client";
+import type { Category, Color, Product, Size } from "@prisma/client";
+import type { GetServerSidePropsContext } from "next";
 import type { ProductColumn } from "~/components/admin/products/columns";
+
 import { api } from "~/utils/api";
+import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
+import { ProductsClient } from "~/components/admin/products/client";
+import PageLoader from "~/components/ui/page-loader";
+import AdminLayout from "~/layouts/AdminLayout";
 
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
+interface IProps {
+  storeId: string;
+}
 
-  const userId = session.user.id;
+interface ExtendedProduct extends Product {
+  category: Category;
+  size: Size;
+  color: Color;
+}
 
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
+const ProductsPage: FC<IProps> = ({ storeId }) => {
+  const [formattedProducts, setFormattedProducts] = useState<ProductColumn[]>(
+    []
+  );
+  const { data: products } = api.products.getAllProducts.useQuery({
+    storeId,
   });
+
+  const formatProducts = useCallback((products: ExtendedProduct[]) => {
+    return products.map((item: ExtendedProduct) => ({
+      id: item.id,
+      name: item.name,
+      isFeatured: item.isFeatured,
+      isArchived: item.isArchived,
+      price: formatter.format(parseFloat(item.price.toString())),
+      category: item.category.name,
+      size: item.size.name,
+      color: item.color.value,
+      createdAt: format(item.createdAt, "MMMM do, yyyy"),
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (products)
+      setFormattedProducts(formatProducts(products) as ProductColumn[]);
+  }, [products, formatProducts]);
+
+  return (
+    <AdminLayout>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {!products && <PageLoader />}
+          {products && <ProductsClient data={formattedProducts} />}
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const store = await authenticateSession(ctx);
 
   if (!store) {
     return {
@@ -42,46 +76,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      params: ctx.query,
+      storeId: ctx.query.storeId,
     },
   };
 }
 
-const ProductsPage = ({ params }: { params: { storeId: string } }) => {
-  const [formattedProducts, setFormattedProducts] = useState<ProductColumn[]>(
-    []
-  );
-  const { data: products } = api.products.getAllProducts.useQuery({
-    storeId: params?.storeId,
-  });
-
-  useEffect(() => {
-    if (products) {
-      setFormattedProducts(
-        products.map((item) => ({
-          id: item.id,
-          name: item.name,
-          isFeatured: item.isFeatured,
-          isArchived: item.isArchived,
-          price: formatter.format(parseFloat(item.price.toString())),
-          category: item.category.name,
-          size: item.size.name,
-          color: item.color.value,
-          createdAt: format(item.createdAt, "MMMM do, yyyy"),
-        }))
-      );
-    }
-  }, [products]);
-
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <ProductsClient data={formattedProducts} />
-        </div>
-      </div>
-      ;
-    </AdminLayout>
-  );
-};
 export default ProductsPage;

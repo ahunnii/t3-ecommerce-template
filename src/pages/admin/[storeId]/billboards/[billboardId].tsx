@@ -1,33 +1,37 @@
-import { BillboardForm } from "~/components/admin/billboards/billboard-form";
-
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
+import { authenticateSession } from "~/utils/auth";
+
+import { BillboardForm } from "~/components/admin/billboards/billboard-form";
+import PageLoader from "~/components/ui/page-loader";
+import AdminLayout from "~/layouts/AdminLayout";
+
+interface IProps {
+  billboardId: string;
+}
+
+const BillboardPage: FC<IProps> = ({ billboardId }) => {
+  const { data: billboard } = api.billboards.getBillboard.useQuery({
+    billboardId,
+  });
+  return (
+    <AdminLayout>
+      <div className="flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {typeof billboard === "undefined" && <PageLoader />}
+          {typeof billboard === "object" && (
+            <BillboardForm initialData={billboard && null} />
+          )}
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
-  });
+  const store = await authenticateSession(ctx);
 
   if (!store) {
     return {
@@ -44,24 +48,5 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-interface IProps {
-  billboardId: string;
-}
-
-const BillboardPage: FC<IProps> = ({ billboardId }) => {
-  const { data: billboard } = api.billboards.getBillboard.useQuery({
-    billboardId,
-  });
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {billboard && <BillboardForm initialData={billboard} />}
-          {!billboard && <BillboardForm initialData={null} />}
-        </div>
-      </div>
-    </AdminLayout>
-  );
-};
 
 export default BillboardPage;

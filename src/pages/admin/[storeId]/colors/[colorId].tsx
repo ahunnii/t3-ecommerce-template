@@ -1,31 +1,37 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
-import { ColorForm } from "~/components/admin/colors/color-form";
-import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+
 import { api } from "~/utils/api";
+import { authenticateSession } from "~/utils/auth";
+
+import { ColorForm } from "~/components/admin/colors/color-form";
+import PageLoader from "~/components/ui/page-loader";
+import AdminLayout from "~/layouts/AdminLayout";
+
+interface IProps {
+  colorId: string;
+}
+const ColorPage: FC<IProps> = ({ colorId }) => {
+  const { data: color } = api.colors.getColor.useQuery({
+    colorId,
+  });
+
+  return (
+    <AdminLayout>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {typeof color === "undefined" && <PageLoader />}
+          {typeof color === "object" && (
+            <ColorForm initialData={color ?? null} />
+          )}
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
-  });
+  const store = await authenticateSession(ctx);
 
   if (!store) {
     return {
@@ -42,24 +48,5 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-
-interface IProps {
-  colorId: string;
-}
-const ColorPage: FC<IProps> = ({ colorId }) => {
-  const { data: color } = api.colors.getColor.useQuery({
-    colorId,
-  });
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {color && <ColorForm initialData={color} />}
-          {!color && <ColorForm initialData={null} />}
-        </div>
-      </div>
-    </AdminLayout>
-  );
-};
 
 export default ColorPage;

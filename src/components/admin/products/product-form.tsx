@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
+import ImageLoader from "~/components/ui/image-loader";
 import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import {
@@ -176,9 +177,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
-      />
+      />{" "}
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
+
         {initialData && (
           <Button
             disabled={loading}
@@ -203,6 +205,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <FormItem>
                 <FormLabel>Images</FormLabel>
                 <FormControl>
+                  {/* <>
+                    {!initialData?.images && <ImageLoader />} */}
                   <ImageUpload
                     value={field.value.map((image) => image.url)}
                     disabled={loading}
@@ -215,11 +219,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       ])
                     }
                   />
+                  {/* </> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />
+          />{" "}
           <div className="gap-8 md:grid md:grid-cols-3">
             <FormField
               control={form.control}

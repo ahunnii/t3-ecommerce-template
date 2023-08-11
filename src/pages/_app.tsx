@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 
 import { ModalProvider } from "~/providers/admin/modal-provider";
 import StorefrontModalProvider from "~/providers/app/modal-provider";
-// import { ThemeProvider } from "~/providers/theme-provider";
+import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/providers/toast-provider";
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -16,10 +16,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <ToastProvider />
-      <ModalProvider />
-      <StorefrontModalProvider />
-      <Component {...pageProps} />
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ToastProvider />
+        <ModalProvider />
+        <StorefrontModalProvider />
+        <Component {...pageProps} />
+      </ThemeProvider>
     </SessionProvider>
   );
 };

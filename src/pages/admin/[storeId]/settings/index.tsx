@@ -1,33 +1,32 @@
-import { redirect } from "next/navigation";
-import { prisma } from "~/server/db";
+import type { Store } from "@prisma/client";
+import type { GetServerSidePropsContext } from "next";
+import type { FC } from "react";
 
-import { Store } from "@prisma/client";
-import { GetServerSidePropsContext } from "next";
-import { FC } from "react";
+import { authenticateSession } from "~/utils/auth";
+
 import { SettingsForm } from "~/components/admin/settings/settings-form";
+import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
+
+interface IProps {
+  store: Store;
+}
+const SettingsPage: FC<IProps> = ({ store }) => {
+  return (
+    <AdminLayout>
+      <div className="flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {!store && <PageLoader />}
+
+          {store && <SettingsForm initialData={store} />}
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
-  });
+  const store = (await authenticateSession(ctx)) as Store;
 
   if (!store) {
     return {
@@ -48,20 +47,5 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-
-interface IProps {
-  store: Store;
-}
-const SettingsPage: FC<IProps> = ({ store }) => {
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <SettingsForm initialData={store} />
-        </div>
-      </div>
-    </AdminLayout>
-  );
-};
 
 export default SettingsPage;

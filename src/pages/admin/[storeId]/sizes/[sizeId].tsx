@@ -1,33 +1,36 @@
-import { api } from "~/utils/api";
-
 import type { GetServerSidePropsContext } from "next";
-
 import type { FC } from "react";
+
+import { api } from "~/utils/api";
+import { authenticateSession } from "~/utils/auth";
+
 import { SizeForm } from "~/components/admin/sizes/size-form";
+import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+
+interface IProps {
+  sizeId: string;
+}
+
+const SizePage: FC<IProps> = ({ sizeId }) => {
+  const { data: size } = api.sizes.getSize.useQuery({
+    sizeId: sizeId,
+  });
+
+  return (
+    <AdminLayout>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {typeof size === "undefined" && <PageLoader />}
+          {typeof size === "object" && <SizeForm initialData={size && null} />}
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
-  });
+  const store = await authenticateSession(ctx);
 
   if (!store) {
     return {
@@ -44,26 +47,5 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-
-interface IProps {
-  sizeId: string;
-}
-
-const SizePage: FC<IProps> = ({ sizeId }) => {
-  const { data: size } = api.sizes.getSize.useQuery({
-    sizeId: sizeId,
-  });
-
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {size && <SizeForm initialData={size} />}
-          {!size && <SizeForm initialData={null} />}
-        </div>
-      </div>
-    </AdminLayout>
-  );
-};
 
 export default SizePage;

@@ -1,38 +1,57 @@
 import { format } from "date-fns";
-
-import { BillboardClient } from "~/components/admin/billboards/client";
-import type { BillboardColumn } from "~/components/admin/billboards/columns";
-import { api } from "~/utils/api";
-
-import type { GetServerSidePropsContext } from "next";
+import { useCallback, useEffect, useState, type FC } from "react";
 
 import type { Billboard } from "@prisma/client";
-import { useEffect, useState } from "react";
+import type { GetServerSidePropsContext } from "next";
+import type { BillboardColumn } from "~/components/admin/billboards/columns";
 
+import { api } from "~/utils/api";
+import { authenticateSession } from "~/utils/auth";
+
+import { BillboardClient } from "~/components/admin/billboards/client";
+import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+
+interface IProps {
+  storeId: string;
+}
+
+const BillboardsPage: FC<IProps> = ({ storeId }) => {
+  const [formattedBillboards, setFormattedBillboards] = useState<
+    BillboardColumn[]
+  >([]);
+  const { data: billboards } = api.billboards.getAllBillboards.useQuery({
+    storeId,
+  });
+
+  const formatBillboards = useCallback((billboards: Billboard[]) => {
+    return billboards.map((item: Billboard) => ({
+      id: item.id,
+      label: item.label,
+      createdAt: format(item.createdAt, "MMMM do, yyyy"),
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (billboards) {
+      setFormattedBillboards(formatBillboards(billboards) as BillboardColumn[]);
+    }
+  }, [billboards, formatBillboards]);
+
+  return (
+    <AdminLayout>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 space-y-4 p-8 pt-6">
+          {!billboards && <PageLoader />}
+          {billboards && <BillboardClient data={formattedBillboards} />}
+        </div>
+      </div>{" "}
+    </AdminLayout>
+  );
+};
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-
-  const store = await prisma.store.findFirst({
-    where: {
-      id: ctx.query.storeId as string,
-      userId,
-    },
-  });
+  const store = await authenticateSession(ctx);
 
   if (!store) {
     return {
@@ -45,53 +64,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      params: ctx.query,
+      storeId: ctx.query.storeId,
     },
   };
 }
-
-const BillboardsPage = ({ params }: { params: { storeId: string } }) => {
-  const [formattedBillboards, setFormattedBillboards] = useState<
-    BillboardColumn[]
-  >([]);
-  const { data: billboards } = api.billboards.getAllBillboards.useQuery({
-    storeId: params?.storeId,
-  });
-
-  // const billboards = await prismadb.billboard.findMany({
-  //   where: {
-  //     storeId: params.storeId,
-  //   },
-  //   orderBy: {
-  //     createdAt: "desc",
-  //   },
-  // });
-
-  // const formattedBillboards: BillboardColumn[] = billboards.map((item) => ({
-  //   id: item.id,
-  //   label: item.label,
-  //   createdAt: format(item.createdAt, "MMMM do, yyyy"),
-  // }));
-  useEffect(() => {
-    if (billboards) {
-      setFormattedBillboards(
-        billboards?.map((item: Billboard) => ({
-          id: item.id,
-          label: item.label,
-          createdAt: format(item.createdAt, "MMMM do, yyyy"),
-        }))
-      );
-    }
-  }, [billboards]);
-  return (
-    <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <BillboardClient data={formattedBillboards} />
-        </div>
-      </div>{" "}
-    </AdminLayout>
-  );
-};
 
 export default BillboardsPage;
