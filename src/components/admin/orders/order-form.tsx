@@ -2,23 +2,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import {
-  useEffect,
-  useState,
-  type MouseEvent,
-  type MouseEventHandler,
-} from "react";
-import { TwitterPicker } from "react-color";
+import { useState } from "react";
+
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
 
-import type { Color } from "@prisma/client";
+import type { Order, OrderItem } from "@prisma/client";
 
 import { api } from "~/utils/api";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -30,46 +26,53 @@ import {
 import { Heading } from "~/components/ui/heading";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
+import { ItemDetailsCardGrid } from "./item-details-card";
 
 const formSchema = z.object({
-  name: z.string().min(2),
-  value: z.string().min(4).max(9).regex(/^#/, {
-    message: "String must be a valid hex code",
-  }),
+  isPaid: z.boolean(),
+  phone: z.string().min(9).max(12),
+  address: z.string().min(2),
+  orderItem: z.array(
+    z.object({
+      productId: z.string(),
+    })
+  ),
 });
 
 type ColorFormValues = z.infer<typeof formSchema>;
 
-interface ColorFormProps {
-  initialData: Color | null;
+interface FetchedOrder extends Order {
+  orderItems: OrderItem[];
+}
+interface OrderFormProps {
+  initialData: FetchedOrder | null;
 }
 
-export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
+export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const utils = api.useContext();
 
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedColor, setSelectedColor] = useState<string>("#000000");
-  const [displayColorPicker, setDisplayColorPicker] = useState<boolean>(false);
 
-  const title = initialData ? "Edit color" : "Create color";
-  const description = initialData ? "Edit a color." : "Add a new color";
-  const toastMessage = initialData ? "Color updated." : "Color created.";
+  const title = initialData ? "Edit order" : "Create order";
+  const description = initialData ? "Edit a order." : "Add a new order";
+  const toastMessage = initialData ? "Order updated." : "Order created.";
   const action = initialData ? "Save changes" : "Create";
 
   const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ?? {
-      name: "",
-      value: "",
+      isPaid: false,
+      phone: "",
+      address: "",
     },
   });
 
-  const { mutate: patchColor } = api.colors.updateColor.useMutation({
+  const { mutate: updateOrder } = api.orders.updateOrder.useMutation({
     onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/colors`);
+      router.push(`/admin/${params.query.storeId as string}/orders`);
       toast.success(toastMessage);
     },
     onError: (error) => {
@@ -81,13 +84,13 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
     },
     onSettled: () => {
       setLoading(false);
-      void utils.colors.getColor.invalidate();
+      void utils.orders.getOrder.invalidate();
     },
   });
 
-  const { mutate: createColor } = api.colors.createColor.useMutation({
+  const { mutate: createOrder } = api.orders.createOrder.useMutation({
     onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/colors/`);
+      router.push(`/admin/${params.query.storeId as string}/orders`);
       toast.success(toastMessage);
     },
     onError: (error) => {
@@ -99,17 +102,19 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
     },
     onSettled: () => {
       setLoading(false);
-      void utils.colors.getColor.invalidate();
+      void utils.orders.getOrder.invalidate();
     },
   });
 
-  const { mutate: deleteColor } = api.colors.deleteColor.useMutation({
+  const { mutate: deleteOrder } = api.orders.deleteOrder.useMutation({
     onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/colors`);
+      router.push(`/admin/${params.query.storeId as string}/orders`);
       toast.success("Color deleted.");
     },
     onError: (error) => {
-      toast.error("Make sure you removed all products using this color first.");
+      toast.error(
+        "Make sure you removed all order items using this order first."
+      );
       console.error(error);
     },
     onMutate: () => {
@@ -118,47 +123,36 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
     onSettled: () => {
       setLoading(false);
       setOpen(false);
-      void utils.colors.getColor.invalidate();
+      void utils.orders.getOrder.invalidate();
     },
   });
 
   const onSubmit = (data: ColorFormValues) => {
     if (initialData) {
-      patchColor({
+      updateOrder({
         storeId: params?.query?.storeId as string,
-        colorId: params?.query?.colorId as string,
-        name: data.name,
-        value: data.value,
+        orderId: params?.query?.orderId as string,
+        isPaid: data.isPaid,
+        phone: data.phone,
+        address: data.address,
       });
     } else {
-      createColor({
+      createOrder({
         storeId: params?.query?.storeId as string,
-        name: data.name,
-        value: data.value,
+        isPaid: data.isPaid,
+        phone: data.phone,
+        address: data.address,
       });
     }
   };
 
   const onDelete = () => {
-    deleteColor({
+    deleteOrder({
       storeId: params?.query?.storeId as string,
-      colorId: params?.query?.sizeId as string,
+      orderId: params?.query?.orderId as string,
     });
   };
 
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setDisplayColorPicker(!displayColorPicker);
-  };
-
-  const handleClose = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setDisplayColorPicker(false);
-  };
-
-  useEffect(() => {
-    if (initialData) setSelectedColor(initialData.value);
-  }, [open, initialData]);
   return (
     <>
       <AlertModal
@@ -181,6 +175,11 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
         )}
       </div>
       <Separator />
+      {params.query.mode === "view" &&
+        typeof initialData?.orderItems === "object" && (
+          <ItemDetailsCardGrid items={initialData?.orderItems} />
+        )}
+
       <Form {...form}>
         <form
           onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
@@ -189,15 +188,16 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
           <div className="gap-8 md:grid md:grid-cols-3">
             <FormField
               control={form.control}
-              name="name"
+              name="isPaid"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Paid</FormLabel>
                   <FormControl>
-                    <Input
+                    <Checkbox
                       disabled={loading}
-                      placeholder="Color name"
-                      {...field}
+                      placeholder="Is Order Paid"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -206,39 +206,33 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
             />
             <FormField
               control={form.control}
-              name="value"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Value</FormLabel>
+                  <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <div className="flex items-center gap-x-4">
-                      <Input
-                        disabled={loading}
-                        placeholder="Color value"
-                        {...field}
-                      />
-                      <button
-                        className="aspect-square rounded-full border  p-4 px-4 py-2  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                        style={{ backgroundColor: field.value }}
-                        onClick={handleClick}
-                        aria-label="Pick Color"
-                      ></button>
-                      {displayColorPicker && (
-                        <div className="absolute z-10 mt-2">
-                          <div
-                            className="fixed inset-0"
-                            onClick={handleClose as MouseEventHandler}
-                          />
-                          <TwitterPicker
-                            color={selectedColor}
-                            onChangeComplete={(color) => {
-                              setSelectedColor(color.hex);
-                              form.setValue("value", color.hex);
-                            }}
-                          />
-                        </div>
-                      )}
-                    </div>
+                    <Input
+                      disabled={loading}
+                      placeholder="Phone Number"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Address"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -43,6 +43,28 @@ export const productsRouter = createTRPCRouter({
         },
       });
     }),
+  getDetailedProduct: publicProcedure
+    .input(z.object({ productId: z.string() }))
+    .query(({ ctx, input }) => {
+      if (!input.productId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Product id is required",
+        });
+      }
+
+      return ctx.prisma.product.findUnique({
+        where: {
+          id: input.productId,
+        },
+        include: {
+          images: true,
+          category: true,
+          size: true,
+          color: true,
+        },
+      });
+    }),
   createProduct: protectedProcedure
     .input(
       z.object({

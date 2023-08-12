@@ -34,6 +34,7 @@ const ColorsPage: FC<IProps> = ({ storeId }) => {
   useEffect(() => {
     if (colors) setFormattedColors(formatColors(colors) as ColorColumn[]);
   }, [colors, formatColors]);
+
   return (
     <AdminLayout>
       <div className="flex h-full flex-col">
