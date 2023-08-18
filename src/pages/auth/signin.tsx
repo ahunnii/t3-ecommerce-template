@@ -10,14 +10,20 @@ export default function SignIn({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <div className="flex h-screen w-screen items-center justify-center bg-slate-100">
-      {Object.values(providers).map((provider) => (
-        <div key={provider.name} className="flex">
-          <button onClick={() => void signIn(provider.id)}>
-            Sign in with {provider.name}
-          </button>
-        </div>
-      ))}
+    <div className="flex h-screen w-screen flex-col items-center justify-center  bg-slate-100">
+      <section className="flex h-96 w-96 flex-col items-center justify-center space-y-4 rounded bg-slate-400">
+        <h1 className="text-2xl ">Sign in </h1>
+        {Object.values(providers).map((provider) => (
+          <div key={provider.name} className="flex">
+            <button
+              onClick={() => void signIn(provider.id)}
+              className="rounded-md bg-slate-800 px-4 py-2 font-semibold text-white "
+            >
+              Sign in with {provider.name}
+            </button>
+          </div>
+        ))}
+      </section>
     </div>
   );
 }
@@ -33,7 +39,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   const providers = await getProviders();
-
+  console.log(providers);
   return {
     props: { providers: providers ?? [] },
   };
