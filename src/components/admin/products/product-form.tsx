@@ -1,15 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Category, Color, Image, Product, Size } from "@prisma/client";
-import axios from "axios";
+import type {
+  Attribute,
+  Category,
+  Color,
+  Image,
+  Product,
+  Size,
+  Variation,
+} from "@prisma/client";
+
 import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -24,7 +42,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
-import ImageLoader from "~/components/ui/image-loader";
+// import ImageLoader from "~/components/ui/image-loader";
 import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import {
@@ -35,6 +53,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
+import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
@@ -42,10 +61,21 @@ const formSchema = z.object({
   images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
-  colorId: z.string().min(1),
-  sizeId: z.string().min(1),
+  colorId: z.string().optional(),
+  sizeId: z.string().optional(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
+  description: z.string().optional(),
+  quantity: z.coerce.number().min(1).default(1),
+
+  variants: z.array(
+    z.object({
+      names: z.string().min(1),
+      values: z.string().min(1),
+      price: z.coerce.number().min(1),
+      quantity: z.coerce.number().min(1),
+    })
+  ),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -54,11 +84,13 @@ interface ProductFormProps {
   initialData:
     | (Product & {
         images: Image[];
+        variants: Variation[];
       })
     | null;
   categories: Category[];
   colors: Color[];
   sizes: Size[];
+  attributes: Attribute[];
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -66,6 +98,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   categories,
   sizes,
   colors,
+  attributes,
 }) => {
   const params = useRouter();
   const router = useNavigationRouter();
@@ -82,16 +115,38 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     ? {
         ...initialData,
         price: parseFloat(String(initialData?.price)),
+
+        colorId:
+          initialData.colorId && initialData.colorId != ""
+            ? initialData.colorId
+            : undefined,
+        sizeId:
+          initialData.sizeId && initialData.sizeId != ""
+            ? initialData.sizeId
+            : undefined,
+        description: initialData?.description ?? "",
+        variants: initialData?.variants
+          ? initialData?.variants?.map((variant) => ({
+              values: variant.values,
+              price: Number(variant.price),
+              names: variant.names,
+              quantity: variant.quantity,
+            }))
+          : [],
       }
     : {
         name: "",
         images: [],
         price: 0,
         categoryId: "",
-        colorId: "",
-        sizeId: "",
+        colorId: undefined,
+        sizeId: undefined,
+        description: "",
+        quantity: 1,
         isFeatured: false,
         isArchived: false,
+        attributes: [],
+        variants: [],
       };
 
   const form = useForm<ProductFormValues>({
@@ -159,7 +214,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         productId: params.query.productId as string,
       });
     } else {
-      createProduct({ ...data, storeId: params.query.storeId as string });
+      createProduct({
+        ...data,
+        storeId: params.query.storeId as string,
+      });
     }
   };
 
@@ -170,6 +228,48 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     });
   };
 
+  const handleGenerateVariations = () => {
+    function splitValues(attribute: Attribute): string[] {
+      return attribute.values.split(";");
+    }
+
+    function cartesianProduct(
+      sets: string[][],
+      prefix: string[] = []
+    ): string[][] {
+      if (!sets.length) {
+        return [prefix];
+      }
+
+      const resultSet: string[][] = [];
+      const [currentSet, ...remainingSets] = sets;
+
+      for (const item of currentSet!) {
+        const newPrefix = [...prefix, item];
+        const productOfRemaining = cartesianProduct(remainingSets, newPrefix);
+        resultSet.push(...productOfRemaining);
+      }
+
+      return resultSet;
+    }
+
+    const attributeValues = attributes.map(splitValues);
+    const test = cartesianProduct(attributeValues);
+
+    const generatedVariations = test.map((variation) => ({
+      names: attributes.map((attribute) => attribute.name).join(", "),
+      values: variation.join(", "),
+      price: form.getValues("price"),
+      quantity: 1,
+    }));
+
+    return generatedVariations;
+  };
+
+  const { fields, append, remove, update, replace } = useFieldArray({
+    control: form.control,
+    name: "variants",
+  });
   return (
     <>
       <AlertModal
@@ -195,7 +295,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       <Separator />
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
           className="w-full space-y-8"
         >
           <FormField
@@ -359,6 +459,41 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={loading}
+                      placeholder="1"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="e.g. This product is a ...."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="isFeatured"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
@@ -395,6 +530,115 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     </FormDescription>
                   </div>
                 </FormItem>
+              )}
+            />
+          </div>{" "}
+          <div className="w-full">
+            <FormField
+              control={form.control}
+              name="variants"
+              render={({ field }) => (
+                <>
+                  <FormLabel>Variations</FormLabel>{" "}
+                  <FormDescription>
+                    Create variations for customers to choose from. Note that
+                    these will override your default values above.
+                  </FormDescription>
+                  <div className="my-5 flex gap-5">
+                    <Button
+                      variant={"secondary"}
+                      className="my-2"
+                      type="button"
+                      onClick={() => replace(handleGenerateVariations())}
+                    >
+                      Generate Variations
+                    </Button>
+                    <Button
+                      variant={"destructive"}
+                      className="my-2"
+                      type="button"
+                      onClick={() => replace([])}
+                    >
+                      Delete all Variations
+                    </Button>
+                  </div>
+                  {field.value.length > 0 && (
+                    <div className="my-5 max-h-96 overflow-y-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            {/* <TableHead className="w-[100px]">ID</TableHead> */}
+                            {attributes
+                              .map((attribute) => attribute.name)
+                              .map((name) => (
+                                <TableHead key={name}>{name}</TableHead>
+                              ))}
+                            <TableHead className="">Quantity</TableHead>
+                            <TableHead>$ Price</TableHead>
+                            <TableHead className="text-right">
+                              Delete Variant
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {fields.map((item, index) => (
+                            <TableRow key={item.id}>
+                              {/* <TableCell className="font-medium">
+                                VAR00{index}
+                              </TableCell> */}
+                              {item?.values?.split(", ").map((name) => (
+                                <TableCell key={name}>{name}</TableCell>
+                              ))}
+                              <TableCell>
+                                <Controller
+                                  render={({ field }) => (
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      placeholder="Attribute (e.g., Size, Color)"
+                                      onChange={(e) =>
+                                        field.onChange(Number(e.target.value))
+                                      }
+                                    />
+                                  )}
+                                  name={`variants.${index}.quantity`}
+                                  control={form.control}
+                                  defaultValue={Number(item.quantity)}
+                                />
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {" "}
+                                <Controller
+                                  render={({ field }) => (
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      placeholder="Value (e.g., M, Red)"
+                                      onChange={(e) =>
+                                        field.onChange(Number(e.target.value))
+                                      }
+                                    />
+                                  )}
+                                  name={`variants.${index}.price`}
+                                  control={form.control}
+                                  defaultValue={Number(item.price)}
+                                />{" "}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  onClick={() => remove(index)}
+                                  variant="destructive"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </>
               )}
             />
           </div>

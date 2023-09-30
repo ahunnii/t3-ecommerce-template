@@ -1,8 +1,5 @@
-import { TRPCError } from "@trpc/server";
-import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
+
 import { prisma } from "~/server/db";
 
 import type { Stripe } from "stripe";
@@ -13,6 +10,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const { productIds } = req.body;
       const { storeId } = req.query;
+
       if (!productIds || productIds.length === 0) {
         return res.status(400).json({ error: "Product ids are required" });
       }
@@ -70,24 +68,6 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       });
 
-      //   const session = await stripe.checkout.sessions.create({
-      //     payment_method_types: ["card"],
-      //     line_items: [
-      //       {
-      //         price_data: {
-      //           currency: "usd",
-      //           product_data: {
-      //             name: "Sample Product",
-      //           },
-      //           unit_amount: 1000,
-      //         },
-      //         quantity: 1,
-      //       },
-      //     ],
-      //     mode: "payment",
-      //     success_url: `${req.headers.origin}/success`,
-      //     cancel_url: `${req.headers.origin}/`,
-      //   });
       res.status(200).json({ sessionId: session.id });
     } catch (err) {
       res.status(500).json({ error: "Error creating checkout session" });

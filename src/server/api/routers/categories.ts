@@ -39,6 +39,7 @@ export const categoriesRouter = createTRPCRouter({
         },
         include: {
           billboard: true,
+          attributes: true,
         },
       });
     }),
@@ -49,6 +50,12 @@ export const categoriesRouter = createTRPCRouter({
         name: z.string(),
         billboardId: z.string(),
         storeId: z.string(),
+        attributes: z.array(
+          z.object({
+            name: z.string(),
+            values: z.string(),
+          })
+        ),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -87,6 +94,15 @@ export const categoriesRouter = createTRPCRouter({
               name: input.name,
               billboardId: input.billboardId,
               storeId: input.storeId,
+              attributes: {
+                createMany: {
+                  data: [
+                    ...input.attributes.map(
+                      (attribute: { name: string; values: string }) => attribute
+                    ),
+                  ],
+                },
+              },
             },
           });
         })
@@ -106,6 +122,12 @@ export const categoriesRouter = createTRPCRouter({
         storeId: z.string(),
         name: z.string(),
         billboardId: z.string(),
+        attributes: z.array(
+          z.object({
+            name: z.string(),
+            values: z.string(),
+          })
+        ),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -142,15 +164,38 @@ export const categoriesRouter = createTRPCRouter({
             });
         })
         .then(() => {
-          return ctx.prisma.category.update({
-            where: {
-              id: input.categoryId,
-            },
-            data: {
-              name: input.name,
-              billboardId: input.billboardId,
-            },
-          });
+          return ctx.prisma.category
+            .update({
+              where: {
+                id: input.categoryId,
+              },
+              data: {
+                name: input.name,
+                billboardId: input.billboardId,
+                attributes: {
+                  deleteMany: {},
+                },
+              },
+            })
+            .then(() => {
+              return ctx.prisma.category.update({
+                where: {
+                  id: input.categoryId,
+                },
+                data: {
+                  attributes: {
+                    createMany: {
+                      data: [
+                        ...input.attributes.map(
+                          (attribute: { name: string; values: string }) =>
+                            attribute
+                        ),
+                      ],
+                    },
+                  },
+                },
+              });
+            });
         })
         .catch((err) => {
           throw new TRPCError({

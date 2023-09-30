@@ -41,6 +41,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     props: {
       store: {
         ...store,
+
         createdAt: store.createdAt.toISOString(),
         updatedAt: store.updatedAt.toISOString(),
       },

@@ -19,8 +19,8 @@ interface IProps {
 
 interface ExtendedProduct extends Product {
   category: Category;
-  size: Size;
-  color: Color;
+  // size?: Size;
+  // color?: Color;
 }
 
 const ProductsPage: FC<IProps> = ({ storeId }) => {
@@ -39,8 +39,8 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
       isArchived: item.isArchived,
       price: formatter.format(parseFloat(item.price.toString())),
       category: item.category.name,
-      size: item.size.name,
-      color: item.color.value,
+      // size: item?.size?.name ?? "N/A",
+      // color: item?.color?.value ?? "N/A",
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));
   }, []);

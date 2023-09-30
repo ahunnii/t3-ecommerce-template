@@ -38,6 +38,8 @@ export const storeRouter = createTRPCRouter({
       z.object({
         storeId: z.string(),
         name: z.string(),
+        stripeSk: z.string().optional(),
+        stripeWebhook: z.string().optional(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -75,6 +77,8 @@ export const storeRouter = createTRPCRouter({
             },
             data: {
               name: input.name,
+              stripeSk: input.stripeSk ?? "",
+              stripeWebhook: input.stripeWebhook ?? "",
             },
           });
         })

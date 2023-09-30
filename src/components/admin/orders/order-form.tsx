@@ -18,6 +18,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,7 +33,7 @@ const formSchema = z.object({
   isPaid: z.boolean(),
   phone: z.string().min(9).max(12),
   address: z.string().min(2),
-  orderItem: z.array(
+  orderItems: z.array(
     z.object({
       productId: z.string(),
     })
@@ -67,6 +68,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
       isPaid: false,
       phone: "",
       address: "",
+      orderItems: [],
     },
   });
 
@@ -234,6 +236,54 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />{" "}
+            <FormField
+              control={form.control}
+              name="orderItems"
+              render={() => (
+                <FormItem>
+                  <div className="mb-4">
+                    <FormLabel className="text-base">Sidebar</FormLabel>
+                    <FormDescription>
+                      Select the items you want to display in the sidebar.
+                    </FormDescription>
+                  </div>
+                  {form.getValues("orderItems").map((item) => (
+                    <FormField
+                      key={item.productId}
+                      control={form.control}
+                      name={`orderItems.${item.productId}`}
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={item.id}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...field.value, item.id])
+                                    : field.onChange(
+                                        field.value?.filter(
+                                          (value) => value !== item.id
+                                        )
+                                      );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-normal">
+                              {item.label}
+                            </FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
                   <FormMessage />
                 </FormItem>
               )}

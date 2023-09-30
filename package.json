@@ -36,6 +36,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
+    "crypto": "^1.0.1",
+    "cryptr": "^6.3.0",
     "date-fns": "^2.30.0",
     "framer-motion": "^10.15.1",
     "lucide-react": "^0.264.0",

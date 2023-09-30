@@ -40,6 +40,7 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
               colors={colors ?? []}
               sizes={sizes ?? []}
               initialData={product ?? null}
+              attributes={product?.category.attributes ?? []}
             />
           )}
         </div>

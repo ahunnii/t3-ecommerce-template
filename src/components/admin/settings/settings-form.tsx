@@ -3,21 +3,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Store } from "@prisma/client";
 import axios from "axios";
-import { Trash } from "lucide-react";
+import { LoaderIcon, Trash } from "lucide-react";
 
+import { useRouter as useNavigationRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
-
-import { useRouter as useNavigationRouter } from "next/navigation";
-import { useRouter } from "next/router";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { ApiAlert } from "~/components/ui/api-alert";
 import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,8 +28,12 @@ import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { useOrigin } from "~/hooks/use-origin";
 import { api } from "~/utils/api";
+import { decrypt, encrypt } from "~/utils/encryption";
+
 const formSchema = z.object({
   name: z.string().min(2),
+  stripeSk: z.string().min(2),
+  stripeWebhook: z.string().min(2),
 });
 type SettingsFormValues = z.infer<typeof formSchema>;
 
@@ -47,7 +51,15 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      name: initialData.name,
+      stripeSk: initialData?.stripeSk
+        ? decrypt(initialData?.stripeSk as string)
+        : "",
+      stripeWebhook: initialData?.stripeWebhook
+        ? decrypt(initialData?.stripeWebhook as string)
+        : "",
+    },
   });
 
   const { mutate: updateStore } = api.store.updateStore.useMutation({
@@ -89,6 +101,8 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     updateStore({
       storeId: params.query.storeId as string,
       name: data.name,
+      stripeSk: encrypt(data.stripeSk),
+      stripeWebhook: encrypt(data.stripeWebhook),
     });
   };
 
@@ -132,7 +146,11 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Name</FormLabel>{" "}
+                  <FormDescription>
+                    Give your store a unique name that will be displayed to your
+                    customers.
+                  </FormDescription>
                   <FormControl>
                     <Input
                       disabled={loading}
@@ -144,8 +162,50 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
+
+            {/* <FormField
+              control={form.control}
+              name="stripeSk"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stripe Secret Key</FormLabel>{" "}
+                  <FormDescription>
+                    You will not be able to sell until you get this key.
+                  </FormDescription>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="secret key"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="stripeWebhook"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stripe Webhook</FormLabel>{" "}
+                  <FormDescription>
+                    You will not be able to sell until you get this webhook.
+                  </FormDescription>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="secret key"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            /> */}
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
+            {loading && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}
             Save changes
           </Button>
         </form>

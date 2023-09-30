@@ -7,7 +7,7 @@ import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
@@ -35,6 +35,12 @@ import { api } from "~/utils/api";
 const formSchema = z.object({
   name: z.string().min(2),
   billboardId: z.string().min(1),
+  attributes: z.array(
+    z.object({
+      name: z.string().min(2),
+      values: z.string().min(2),
+    })
+  ),
 });
 
 type CategoryFormValues = z.infer<typeof formSchema>;
@@ -64,7 +70,13 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     defaultValues: initialData ?? {
       name: "",
       billboardId: "",
+      attributes: [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "attributes",
   });
 
   const { mutate: updateCategory } = api.categories.updateCategory.useMutation({
@@ -126,12 +138,14 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
         billboardId: data.billboardId,
         name: data.name,
         categoryId: params?.query?.categoryId as string,
+        attributes: data.attributes,
       });
     } else {
       createCategory({
         storeId: params?.query?.storeId as string,
         name: data.name,
         billboardId: data.billboardId,
+        attributes: data.attributes,
       });
     }
   };
@@ -167,7 +181,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       <Separator />
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
           className="w-full space-y-8"
         >
           <div className="gap-8 md:grid md:grid-cols-3">
@@ -220,6 +234,43 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                 </FormItem>
               )}
             />
+
+            <div>
+              <FormLabel>Attributes</FormLabel>
+
+              {fields.map((item, index) => (
+                <div key={item.id} className="flex items-center space-x-4">
+                  <Controller
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="Attribute (e.g., Size, Color)"
+                      />
+                    )}
+                    name={`attributes.${index}.name`}
+                    control={form.control}
+                    defaultValue={item.name}
+                  />
+
+                  <Controller
+                    render={({ field }) => (
+                      <Input {...field} placeholder="Value (e.g., M, Red)" />
+                    )}
+                    name={`attributes.${index}.values`}
+                    control={form.control}
+                    defaultValue={item.values}
+                  />
+
+                  <Button onClick={() => remove(index)} variant="destructive">
+                    Remove
+                  </Button>
+                </div>
+              ))}
+
+              <Button onClick={() => append({ name: "", values: "" })}>
+                Add Attribute
+              </Button>
+            </div>
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

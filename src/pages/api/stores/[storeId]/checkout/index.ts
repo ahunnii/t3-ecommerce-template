@@ -12,6 +12,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { productIds } = req.body;
   const { storeId } = req.query;
+
   try {
     switch (req.method) {
       case "OPTIONS":

@@ -61,7 +61,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={onConfirm}
+        onConfirm={() => void onConfirm()}
         loading={loading}
       />
       <DropdownMenu>
