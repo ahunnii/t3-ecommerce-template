@@ -7,6 +7,7 @@ export interface Product {
   size: Size;
   color: Color;
   images: Image[];
+  variants: Variation[];
 }
 
 export interface Image {
@@ -24,6 +25,7 @@ export interface Category {
   id: string;
   name: string;
   billboard: Billboard;
+  attributes: Attribute[];
 }
 
 export interface Size {
@@ -36,4 +38,24 @@ export interface Color {
   id: string;
   name: string;
   value: string;
+}
+
+export interface Variation {
+  id: string;
+  names: string;
+  values: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Attribute {
+  id: string;
+  name: string;
+  values: string;
+}
+
+export interface CartItem {
+  product: Product;
+  variant: Variation;
+  quantity: number;
 }

@@ -13,6 +13,7 @@ import useCart from "~/hooks/app/use-cart";
 const Summary = () => {
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
+  const cartItems = useCart((state) => state.cartItems);
   const removeAll = useCart((state) => state.removeAll);
 
   useEffect(() => {
@@ -26,20 +27,27 @@ const Summary = () => {
     }
   }, [searchParams, removeAll]);
 
-  const totalPrice = items.reduce((total, item) => {
-    return total + Number(item.price);
+  const totalPrice = cartItems.reduce((total, item) => {
+    return total + Number(item.product.price * item.quantity);
   }, 0);
 
   const onCheckout = async () => {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/checkout`,
       {
-        productIds: items.map((item) => item.id),
+        productIds: cartItems?.map((item) => item.product.id),
+        variantIds: cartItems?.map((item) => item?.variant?.id || "0"),
+        quantity: cartItems?.map((item) => item.quantity),
       }
     );
 
     window.location = response.data.url;
   };
+  console.log({
+    productIds: cartItems?.map((item) => item.product.id),
+    variantIds: cartItems?.map((item) => item?.variant?.id || null),
+    quantity: cartItems?.map((item) => item.quantity),
+  });
 
   return (
     <div className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
@@ -52,7 +60,7 @@ const Summary = () => {
       </div>
       <Button
         onClick={onCheckout}
-        disabled={items.length === 0}
+        disabled={cartItems.length === 0}
         className="mt-6 w-full"
       >
         Checkout

@@ -16,6 +16,7 @@ export const categoriesRouter = createTRPCRouter({
         },
         include: {
           billboard: true,
+          attributes: true,
         },
         orderBy: {
           createdAt: "desc",

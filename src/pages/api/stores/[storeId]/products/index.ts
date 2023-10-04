@@ -41,9 +41,14 @@ const productsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
           include: {
             images: true,
-            category: true,
+            category: {
+              include: {
+                attributes: true,
+              },
+            },
             color: true,
             size: true,
+            variants: true,
           },
           orderBy: {
             createdAt: "desc",

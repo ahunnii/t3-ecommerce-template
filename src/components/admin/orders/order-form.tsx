@@ -1,14 +1,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash } from "lucide-react";
+import {
+  Prisma,
+  type Order,
+  type OrderItem,
+  type Product,
+  type Variation,
+} from "@prisma/client";
+import { CheckIcon, SortAscIcon, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import { useState } from "react";
-
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
-
-import type { Order, OrderItem } from "@prisma/client";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 import { api } from "~/utils/api";
 
@@ -29,21 +42,66 @@ import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { ItemDetailsCardGrid } from "./item-details-card";
 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "~/components/ui/command";
+import { Label } from "~/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { cn } from "~/utils/styles";
+
 const formSchema = z.object({
   isPaid: z.boolean(),
   phone: z.string().min(9).max(12),
   address: z.string().min(2),
+  name: z.string().min(2),
   orderItems: z.array(
     z.object({
       productId: z.string(),
+      variantId: z.union([z.string(), z.null()]),
+      quantity: z.number().min(0),
+      product: z.object({
+        name: z.string(),
+        variants: z.array(
+          z.object({
+            id: z.string(),
+            names: z.string().min(1),
+            values: z.string().min(1),
+            price: z.instanceof(Prisma.Decimal),
+            quantity: z.number().min(1),
+          })
+        ),
+      }),
     })
   ),
 });
 
 type ColorFormValues = z.infer<typeof formSchema>;
 
+interface ExtendedProduct extends Product {
+  variants: Variation[];
+}
+
+interface ExtendedOrderItem extends OrderItem {
+  product: ExtendedProduct;
+}
+
 interface FetchedOrder extends Order {
-  orderItems: OrderItem[];
+  orderItems: ExtendedOrderItem[];
 }
 interface OrderFormProps {
   initialData: FetchedOrder | null;
@@ -53,21 +111,40 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const utils = api.useContext();
+  const { data: products } = api.products.getAllProducts.useQuery({
+    storeId: params?.query?.storeId as string,
+  });
+
+  const [openProducts, setOpenProducts] = useState(false);
+  const [productValue, setProductValue] = useState("");
 
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const title = initialData ? "Edit order" : "Create order";
-  const description = initialData ? "Edit a order." : "Add a new order";
+  const title = initialData
+    ? params.query.mode === "view"
+      ? "View order"
+      : "Edit order"
+    : "Create order";
+  const description = initialData
+    ? params.query.mode === "view"
+      ? "View a order."
+      : "Edit a order."
+    : "Add a new order";
   const toastMessage = initialData ? "Order updated." : "Order created.";
-  const action = initialData ? "Save changes" : "Create";
 
+  const action = initialData
+    ? params.query.mode === "view"
+      ? "Close"
+      : "Save changes"
+    : "Create";
   const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ?? {
       isPaid: false,
       phone: "",
       address: "",
+      name: "",
       orderItems: [],
     },
   });
@@ -130,6 +207,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: ColorFormValues) => {
+    if (params.query.mode === "view") {
+      router.push(`/admin/${params.query.storeId as string}/orders`);
+      return;
+    }
     if (initialData) {
       updateOrder({
         storeId: params?.query?.storeId as string,
@@ -155,6 +236,11 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
     });
   };
 
+  const { fields, append, remove, update, replace } = useFieldArray({
+    control: form.control,
+    name: "orderItems",
+  });
+
   return (
     <>
       <AlertModal
@@ -177,115 +263,193 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         )}
       </div>
       <Separator />
-      {params.query.mode === "view" &&
+      {/* {params.query.mode === "view" &&
         typeof initialData?.orderItems === "object" && (
           <ItemDetailsCardGrid items={initialData?.orderItems} />
-        )}
+        )} */}
 
       <Form {...form}>
         <form
           onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
           className="w-full space-y-8"
         >
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <FormField
-              control={form.control}
-              name="isPaid"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Paid</FormLabel>
-                  <FormControl>
-                    <Checkbox
-                      disabled={loading}
-                      placeholder="Is Order Paid"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Phone Number"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Address"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
+          <div className="w-full">
+            <FormLabel>Customer Info</FormLabel>{" "}
+            <FormDescription>
+              Edit the customer&apos;s shipping information.
+            </FormDescription>
+            <div className="my-5 gap-8 md:grid md:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Customer Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={loading}
+                        placeholder="Customer Name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={loading}
+                        placeholder="Phone Number"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={loading}
+                        placeholder="Address"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
+              <FormField
+                control={form.control}
+                name="isPaid"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        disabled={loading}
+                        placeholder="Is Order Paid"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Order Paid?</FormLabel>
+                      <FormDescription>
+                        This marks that the customer successfully paid for the
+                        order and awaiting shipment.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />{" "}
+            </div>
+          </div>
+
+          <div className="w-full">
             <FormField
               control={form.control}
               name="orderItems"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">Sidebar</FormLabel>
-                    <FormDescription>
-                      Select the items you want to display in the sidebar.
-                    </FormDescription>
-                  </div>
-                  {form.getValues("orderItems").map((item) => (
-                    <FormField
-                      key={item.productId}
-                      control={form.control}
-                      name={`orderItems.${item.productId}`}
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== item.id
-                                        )
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
+              render={({ field }) => (
+                <>
+                  <FormLabel>Order Items</FormLabel>{" "}
+                  <FormDescription>
+                    Edit the order items of this order. Please note that you may
+                    need to collect additional funds from the customer or refund
+                    them.
+                  </FormDescription>
+                  {field.value.length > 0 && (
+                    <div className="my-5 max-h-96 overflow-y-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="">Name</TableHead>
+                            <TableHead className="">Variant</TableHead>
+                            <TableHead className="">Quantity</TableHead>
+
+                            <TableHead className="text-right">
+                              Delete Item
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {fields.map((item, index) => (
+                            <TableRow key={item.id}>
+                              <TableCell>
+                                <Label>{item.product.name} </Label>
+                              </TableCell>
+                              <TableCell>
+                                <Controller
+                                  render={({ field }) => (
+                                    <Select
+                                      onValueChange={(e) => field.onChange(e)}
+                                      defaultValue={
+                                        item?.variantId ?? undefined
+                                      }
+                                    >
+                                      <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="No variant selected" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {item.product.variants.map(
+                                          (variant, idx) => (
+                                            <SelectItem
+                                              key={idx}
+                                              value={variant.id}
+                                              className="flex"
+                                            >
+                                              {variant.values}
+                                            </SelectItem>
+                                          )
+                                        )}
+                                      </SelectContent>
+                                    </Select>
+                                  )}
+                                  name={`orderItems.${index}.variantId`}
+                                  control={form.control}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Controller
+                                  render={({ field }) => (
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      defaultValue={Number(item.quantity) ?? 1}
+                                      onChange={(e) =>
+                                        field.onChange(Number(e.target.value))
+                                      }
+                                    />
+                                  )}
+                                  name={`orderItems.${index}.quantity`}
+                                  control={form.control}
+                                />
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  onClick={() => remove(index)}
+                                  variant="destructive"
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </>
               )}
             />
           </div>

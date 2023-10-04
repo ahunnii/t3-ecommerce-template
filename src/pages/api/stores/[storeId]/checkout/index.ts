@@ -10,7 +10,7 @@ import { stripe } from "~/server/stripe/client";
 const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const ctx = await createTRPCContext({ req, res });
 
-  const { productIds } = req.body;
+  const { productIds, variantIds, quantity } = req.body;
   const { storeId } = req.query;
 
   try {
@@ -29,16 +29,45 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                 in: productIds,
               },
             },
+            include: {
+              variants: true,
+              images: true,
+            },
           });
+
+          const variants = await ctx.prisma.variation.findMany({
+            where: {
+              id: {
+                in: variantIds,
+              },
+            },
+          });
+
           const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
-          products.forEach((product) => {
+          // Map the values key from the fetched variants to the variant IDs
+          const mapValuesToIds = () => {
+            const variantIdToValueMap: Record<string, string> = {};
+            for (const variant of variants) {
+              variantIdToValueMap[variant.id] = variant.values;
+            }
+
+            return variantIds.map((id: string) =>
+              id === "0" ? "Default" : variantIdToValueMap[id]
+            );
+          };
+
+          const variantValues = mapValuesToIds();
+
+          products.forEach((product, idx) => {
             line_items.push({
-              quantity: 1,
+              quantity: quantity[idx] ?? 1,
               price_data: {
                 currency: "USD",
                 product_data: {
-                  name: product.name,
+                  name: product.name + variants[0]?.values,
+                  description: variantValues[idx] as string,
+                  images: product.images.map((image) => image.url),
                 },
                 unit_amount: Math.floor(product.price.toNumber() * 100),
               },
@@ -50,13 +79,31 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
               storeId: storeId as string,
               isPaid: false,
               orderItems: {
-                create: productIds.map((productId: string) => ({
-                  product: {
-                    connect: {
-                      id: productId,
+                create: productIds.map((productId: string, idx: number) => {
+                  if (variantValues[idx] === "Default")
+                    return {
+                      product: {
+                        connect: {
+                          id: productId,
+                        },
+                      },
+                      quantity: quantity[idx] ?? 1,
+                    };
+
+                  return {
+                    product: {
+                      connect: {
+                        id: productId,
+                      },
                     },
-                  },
-                })),
+                    variant: {
+                      connect: {
+                        id: variantIds[idx],
+                      },
+                    },
+                    quantity: quantity[idx] ?? 1,
+                  };
+                }),
               },
             },
           });

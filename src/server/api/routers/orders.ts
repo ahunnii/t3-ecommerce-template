@@ -39,7 +39,11 @@ export const ordersRouter = createTRPCRouter({
         include: {
           orderItems: {
             include: {
-              product: true,
+              product: {
+                include: {
+                  variants: true,
+                },
+              },
             },
           },
         },

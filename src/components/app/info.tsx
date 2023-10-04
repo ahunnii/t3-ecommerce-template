@@ -2,20 +2,25 @@
 
 import { ShoppingCart } from "lucide-react";
 
+import { useState } from "react";
 import Button from "~/components/app/ui/button";
 import Currency from "~/components/app/ui/currency";
 import useCart from "~/hooks/app/use-cart";
-import type { Product } from "~/types";
+import type { Product, Variation } from "~/types";
+import VariantSelector from "./product/variant-selector";
 
 interface InfoProps {
   data: Product;
 }
 
 const Info: React.FC<InfoProps> = ({ data }) => {
+  const [variant, setVariant] = useState<Variation | null>(null);
+
+  const [quantity, setQuantity] = useState<number>(0);
   const cart = useCart();
 
   const onAddToCart = () => {
-    cart.addItem(data);
+    cart.addCartItem({ product: data, variant: variant!, quantity });
   };
 
   return (
@@ -28,20 +33,20 @@ const Info: React.FC<InfoProps> = ({ data }) => {
       </div>
       <hr className="my-4" />
       <div className="flex flex-col gap-y-6">
-        <div className="flex items-center gap-x-4">
-          <h3 className="font-semibold text-black">Size:</h3>
-          <div>{data?.size?.value}</div>
-        </div>
-        <div className="flex items-center gap-x-4">
-          <h3 className="font-semibold text-black">Color:</h3>
-          <div
-            className="h-6 w-6 rounded-full border border-gray-600"
-            style={{ backgroundColor: data?.color?.value }}
-          />
-        </div>
+        <VariantSelector
+          attributes={data?.category?.attributes}
+          variants={data?.variants}
+          variant={variant}
+          setVariant={setVariant}
+          setQuantity={setQuantity}
+        />
       </div>
       <div className="mt-10 flex items-center gap-x-3">
-        <Button onClick={onAddToCart} className="flex items-center gap-x-2">
+        <Button
+          onClick={onAddToCart}
+          className="flex items-center gap-x-2"
+          disabled={data?.variants?.length > 0 ? variant === null : false}
+        >
           Add To Cart
           <ShoppingCart size={20} />
         </Button>

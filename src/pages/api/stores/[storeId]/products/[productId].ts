@@ -45,9 +45,14 @@ const productByIdHandler = async (
           },
           include: {
             images: true,
-            category: true,
+            category: {
+              include: {
+                attributes: true,
+              },
+            },
             color: true,
             size: true,
+            variants: true,
           },
         });
         return res.status(200).json(getProduct);

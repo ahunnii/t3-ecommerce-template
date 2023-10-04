@@ -8,8 +8,12 @@ import { stripe } from "~/server/stripe/client";
 const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
-      const { productIds } = req.body;
+      const { productIds, variantIds, quantity } = req.body;
       const { storeId } = req.query;
+
+      console.log("productIds", productIds);
+      console.log("variantIds", variantIds);
+      console.log("quantity", quantity);
 
       if (!productIds || productIds.length === 0) {
         return res.status(400).json({ error: "Product ids are required" });
@@ -21,16 +25,33 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             in: productIds,
           },
         },
+        include: {
+          variants: true,
+        },
       });
+
+      const variants = await prisma.variation.findMany({
+        where: {
+          id: {
+            in: variantIds,
+          },
+        },
+      });
+
       const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
-      products.forEach((product) => {
+      products.forEach((product, idx) => {
         line_items.push({
-          quantity: 1,
+          quantity: quantity[idx] ?? 1,
           price_data: {
             currency: "USD",
             product_data: {
-              name: product.name,
+              name: product.name + " " + quantity[idx] ?? 1,
+              description: variantIds[idx]
+                ? variants.filter(
+                    (variant) => variant.id === variantIds[idx]
+                  )[0]!.values
+                : "",
             },
             unit_amount: product.price.toNumber() * 100,
           },

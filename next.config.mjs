@@ -19,7 +19,13 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["res.cloudinary.com"],
+    domains: [
+      "res.cloudinary.com",
+      "avatars.githubusercontent.com",
+      "cdn.discordapp.com",
+      "lh3.googleusercontent.com",
+      "media.githubusercontent.com",
+    ],
   },
 };
 
