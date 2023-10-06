@@ -28,7 +28,7 @@ const Summary = () => {
   }, [searchParams, removeAll]);
 
   const totalPrice = cartItems.reduce((total, item) => {
-    return total + Number(item.product.price * item.quantity);
+    return total + Number(item.product.price) * Number(item.quantity);
   }, 0);
 
   const onCheckout = async () => {
@@ -36,18 +36,13 @@ const Summary = () => {
       `${process.env.NEXT_PUBLIC_API_URL}/checkout`,
       {
         productIds: cartItems?.map((item) => item.product.id),
-        variantIds: cartItems?.map((item) => item?.variant?.id || "0"),
+        variantIds: cadrtItems?.map((item) => item?.variant?.id || "0"),
         quantity: cartItems?.map((item) => item.quantity),
       }
     );
 
     window.location = response.data.url;
   };
-  console.log({
-    productIds: cartItems?.map((item) => item.product.id),
-    variantIds: cartItems?.map((item) => item?.variant?.id || null),
-    quantity: cartItems?.map((item) => item.quantity),
-  });
 
   return (
     <div className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
@@ -59,12 +54,15 @@ const Summary = () => {
         </div>
       </div>
       <Button
-        onClick={onCheckout}
+        onClick={() => void onCheckout()}
         disabled={cartItems.length === 0}
         className="mt-6 w-full"
       >
         Checkout
       </Button>
+      <p className="mt-3 w-full text-center text-muted-foreground">
+        Shipping and taxes calculated at checkout
+      </p>
     </div>
   );
 };

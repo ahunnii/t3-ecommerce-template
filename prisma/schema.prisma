@@ -57,6 +57,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role      @default(USER)
+
+  cart Cart[] @relation("UserToCart")
 }
 
 model VerificationToken {
@@ -79,6 +81,8 @@ model Store {
   orders     Order[]     @relation("StoreToOrder")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+
+  cart Cart[] @relation("StoreToCart")
 }
 
 model Billboard {
@@ -111,27 +115,29 @@ model Category {
 }
 
 model Product {
-  id         String      @id @default(uuid())
-  storeId    String // Foreign Key to Store
-  store      Store       @relation("StoreToProduct", fields: [storeId], references: [id])
-  categoryId String // Foreign Key to Category
-  category   Category    @relation("CategoryToProduct", fields: [categoryId], references: [id])
-  name       String
-  price      Decimal
-  description String?    @db.VarChar(1000)
-  quantity   Int         @default(1)
+  id          String   @id @default(uuid())
+  storeId     String // Foreign Key to Store
+  store       Store    @relation("StoreToProduct", fields: [storeId], references: [id])
+  categoryId  String // Foreign Key to Category
+  category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  name        String
+  price       Decimal
+  description String?  @db.VarChar(1000)
+  quantity    Int      @default(1)
 
   isFeatured Boolean     @default(false)
   isArchived Boolean     @default(false)
   sizeId     String? // Foreign Key to Size
-  size       Size?        @relation(fields: [sizeId], references: [id])
+  size       Size?       @relation(fields: [sizeId], references: [id])
   colorId    String? // Foreign Key to Color
-  color      Color?       @relation(fields: [colorId], references: [id])
+  color      Color?      @relation(fields: [colorId], references: [id])
   images     Image[] // Relation to Image model
   orderItems OrderItem[] // Relation to Order model
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  variants  Variation[]
+  variants   Variation[]
+
+  cartItems CartItem[] // Relation to Order model
 
   @@index([storeId])
   @@index([categoryId])
@@ -156,14 +162,14 @@ model Order {
 
 // Intermediary for a many-to-many relationship
 model OrderItem {
-  id        String  @id @default(uuid())
+  id        String     @id @default(uuid())
   orderId   String // Foreign Key to Order
-  order     Order   @relation(fields: [orderId], references: [id])
+  order     Order      @relation(fields: [orderId], references: [id])
   productId String // Foreign Key to Product
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product    @relation(fields: [productId], references: [id])
   variantId String? // Foreign Key to Variant
-  variant   Variation?  @relation(fields: [variantId], references: [id])
-  quantity  Int    @default(1)
+  variant   Variation? @relation(fields: [variantId], references: [id])
+  quantity  Int        @default(1)
 
   @@index([orderId])
   @@index([productId])
@@ -220,18 +226,49 @@ model Attribute {
 }
 
 model Variation {
-  id              String   @id @default(uuid())
-  productId       String // Foreign Key to Product
-  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  names  String
-  values String
-  orderItems      OrderItem[] // Relation to Order model
-  quantity        Int 
-  price           Decimal
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt 
+  id         String      @id @default(uuid())
+  productId  String // Foreign Key to Product
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  names      String
+  values     String
+  orderItems OrderItem[] // Relation to Order model
+  quantity   Int
+  price      Decimal
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  cartItems CartItem[] // Relation to Order model
 
   @@index([productId])
+}
+
+model CartItem {
+  id        String     @id @default(uuid())
+  cartId    String // Foreign Key to Order
+  cart      Cart       @relation(fields: [cartId], references: [id])
+  productId String // Foreign Key to Product
+  product   Product    @relation(fields: [productId], references: [id])
+  variantId String? // Foreign Key to Variant
+  variant   Variation? @relation(fields: [variantId], references: [id])
+  quantity  Int        @default(1)
+
+  @@index([cartId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  storeId   String // Foreign Key to Store
+  store     Store      @relation("StoreToCart", fields: [storeId], references: [id])
+  userId    String
+  user      User       @relation("UserToCart", fields: [userId], references: [id])
+  cartItems CartItem[] // Relation to OrderItem model
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([storeId])
+  @@index([userId])
 }
 
 enum Role {

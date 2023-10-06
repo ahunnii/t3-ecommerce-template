@@ -4,16 +4,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
 
 import Button from "~/components/app/ui/button";
-import type { Color, Size } from "~/types";
+import type { Attribute, Color, Size } from "~/types";
 import { cn } from "~/utils/styles";
 
 interface FilterProps {
-  data: (Size | Color | any)[];
+  data: Attribute;
   name: string;
   valueKey: string;
 }
 
-const Filter: React.FC<FilterProps> = ({ data, name, valueKey }) => {
+const AttributeFilter: React.FC<FilterProps> = ({ data, name, valueKey }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -47,16 +47,16 @@ const Filter: React.FC<FilterProps> = ({ data, name, valueKey }) => {
       <h3 className="text-lg font-semibold">{name}</h3>
       <hr className="my-4" />
       <div className="flex flex-wrap gap-2">
-        {data.map((filter) => (
-          <div key={filter.id} className="flex items-center">
+        {data.values.split(";").map((filter) => (
+          <div key={filter} className="flex items-center">
             <Button
               className={cn(
                 "rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-800",
-                selectedValue === filter.id && "bg-black text-white"
+                selectedValue === filter && "bg-black text-white"
               )}
-              onClick={() => onClick(filter.id)}
+              onClick={() => onClick(filter)}
             >
-              {filter.name}
+              {filter}
             </Button>
           </div>
         ))}
@@ -65,4 +65,4 @@ const Filter: React.FC<FilterProps> = ({ data, name, valueKey }) => {
   );
 };
 
-export default Filter;
+export default AttributeFilter;

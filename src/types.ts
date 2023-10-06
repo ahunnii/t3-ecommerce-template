@@ -46,6 +46,7 @@ export interface Variation {
   values: string;
   quantity: number;
   price: number;
+  productId: string;
 }
 
 export interface Attribute {

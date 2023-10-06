@@ -6,16 +6,22 @@ import { useState } from "react";
 
 import Button from "~/components/app/ui/button";
 import IconButton from "~/components/app/ui/icon-button";
-import type { Color, Size } from "~/types";
+import type { Attribute, Color, Size } from "~/types";
 
+import AttributeFilter from "~/components/app/category/attribute-filter";
 import Filter from "./filter";
 
 interface MobileFiltersProps {
   sizes: Size[];
   colors: Color[];
+  data: Attribute[];
 }
 
-const MobileFilters: React.FC<MobileFiltersProps> = ({ sizes, colors }) => {
+const MobileFilters: React.FC<MobileFiltersProps> = ({
+  sizes,
+  colors,
+  data,
+}) => {
   const [open, setOpen] = useState(false);
 
   const onOpen = () => setOpen(true);
@@ -45,9 +51,19 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ sizes, colors }) => {
               <IconButton icon={<X size={15} />} onClick={onClose} />
             </div>
 
-            <div className="p-4">
+            {/* <div className="p-4">
               <Filter valueKey="sizeId" name="Sizes" data={sizes} />
               <Filter valueKey="colorId" name="Colors" data={colors} />
+            </div> */}
+            <div className="p-4">
+              {data?.map((attribute, idx) => (
+                <AttributeFilter
+                  key={idx}
+                  valueKey={`${attribute.name.toLowerCase()}Variant`}
+                  name={attribute.name}
+                  data={attribute}
+                />
+              ))}{" "}
             </div>
           </Dialog.Panel>
         </div>

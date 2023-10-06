@@ -40,8 +40,10 @@ import {
 import { Heading } from "~/components/ui/heading";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
+import { prisma } from "~/server/db";
 import { ItemDetailsCardGrid } from "./item-details-card";
 
+import { ErrorMessage } from "@hookform/error-message";
 import {
   Command,
   CommandEmpty,
@@ -63,7 +65,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { cn } from "~/utils/styles";
-
+import ViewOrder from "./view-order";
 const formSchema = z.object({
   isPaid: z.boolean(),
   phone: z.string().min(9).max(12),
@@ -71,21 +73,22 @@ const formSchema = z.object({
   name: z.string().min(2),
   orderItems: z.array(
     z.object({
-      productId: z.string(),
+      // productId: z.string(),
       variantId: z.union([z.string(), z.null()]),
+      // variant: z.any(),
       quantity: z.number().min(0),
-      product: z.object({
-        name: z.string(),
-        variants: z.array(
-          z.object({
-            id: z.string(),
-            names: z.string().min(1),
-            values: z.string().min(1),
-            price: z.instanceof(Prisma.Decimal),
-            quantity: z.number().min(1),
-          })
-        ),
-      }),
+      // product: z.object({
+      //   name: z.string(),
+      //   variants: z.array(
+      //     z.object({
+      //       id: z.string(),
+      //       names: z.string().min(1),
+      //       values: z.string().min(1),
+      //       price: z.instanceof(Prisma.Decimal),
+      //       quantity: z.number().min(1),
+      //     })
+      //   ),
+      // }),
     })
   ),
 });
@@ -98,6 +101,7 @@ interface ExtendedProduct extends Product {
 
 interface ExtendedOrderItem extends OrderItem {
   product: ExtendedProduct;
+  variant: Variation | null;
 }
 
 interface FetchedOrder extends Order {
@@ -207,6 +211,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: ColorFormValues) => {
+    console.log(data);
     if (params.query.mode === "view") {
       router.push(`/admin/${params.query.storeId as string}/orders`);
       return;
@@ -218,6 +223,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         isPaid: data.isPaid,
         phone: data.phone,
         address: data.address,
+        name: data.name,
       });
     } else {
       createOrder({
@@ -225,6 +231,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         isPaid: data.isPaid,
         phone: data.phone,
         address: data.address,
+        name: data.name,
       });
     }
   };
@@ -263,201 +270,211 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         )}
       </div>
       <Separator />
-      {/* {params.query.mode === "view" &&
-        typeof initialData?.orderItems === "object" && (
-          <ItemDetailsCardGrid items={initialData?.orderItems} />
-        )} */}
 
-      <Form {...form}>
-        <form
-          onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
-          className="w-full space-y-8"
-        >
-          <div className="w-full">
-            <FormLabel>Customer Info</FormLabel>{" "}
-            <FormDescription>
-              Edit the customer&apos;s shipping information.
-            </FormDescription>
-            <div className="my-5 gap-8 md:grid md:grid-cols-3">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Customer Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={loading}
-                        placeholder="Customer Name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={loading}
-                        placeholder="Phone Number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={loading}
-                        placeholder="Address"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="isPaid"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        disabled={loading}
-                        placeholder="Is Order Paid"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Order Paid?</FormLabel>
-                      <FormDescription>
-                        This marks that the customer successfully paid for the
-                        order and awaiting shipment.
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />{" "}
-            </div>
-          </div>
+      {params?.query?.mode === "view" ? (
+        <>
+          <h2>Customer Info</h2>
 
-          <div className="w-full">
-            <FormField
-              control={form.control}
-              name="orderItems"
-              render={({ field }) => (
-                <>
-                  <FormLabel>Order Items</FormLabel>{" "}
-                  <FormDescription>
-                    Edit the order items of this order. Please note that you may
-                    need to collect additional funds from the customer or refund
-                    them.
-                  </FormDescription>
-                  {field.value.length > 0 && (
-                    <div className="my-5 max-h-96 overflow-y-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="">Name</TableHead>
-                            <TableHead className="">Variant</TableHead>
-                            <TableHead className="">Quantity</TableHead>
-
-                            <TableHead className="text-right">
-                              Delete Item
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {fields.map((item, index) => (
-                            <TableRow key={item.id}>
-                              <TableCell>
-                                <Label>{item.product.name} </Label>
-                              </TableCell>
-                              <TableCell>
-                                <Controller
-                                  render={({ field }) => (
-                                    <Select
-                                      onValueChange={(e) => field.onChange(e)}
-                                      defaultValue={
-                                        item?.variantId ?? undefined
-                                      }
-                                    >
-                                      <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="No variant selected" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {item.product.variants.map(
-                                          (variant, idx) => (
-                                            <SelectItem
-                                              key={idx}
-                                              value={variant.id}
-                                              className="flex"
-                                            >
-                                              {variant.values}
-                                            </SelectItem>
-                                          )
-                                        )}
-                                      </SelectContent>
-                                    </Select>
-                                  )}
-                                  name={`orderItems.${index}.variantId`}
-                                  control={form.control}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Controller
-                                  render={({ field }) => (
-                                    <Input
-                                      {...field}
-                                      type="number"
-                                      defaultValue={Number(item.quantity) ?? 1}
-                                      onChange={(e) =>
-                                        field.onChange(Number(e.target.value))
-                                      }
-                                    />
-                                  )}
-                                  name={`orderItems.${index}.quantity`}
-                                  control={form.control}
-                                />
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <Button
-                                  onClick={() => remove(index)}
-                                  variant="destructive"
-                                >
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+          {/* {initialData?.} */}
+        </>
+      ) : (
+        <Form {...form}>
+          <form
+            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+            className="w-full space-y-8"
+          >
+            <div className="w-full">
+              <FormLabel>Customer Info</FormLabel>{" "}
+              <FormDescription>
+                Edit the customer&apos;s shipping information.
+              </FormDescription>
+              <div className="my-5 gap-8 md:grid md:grid-cols-3">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Customer Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Customer Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </>
-              )}
-            />
-          </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
-        </form>
-      </Form>
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Phone Number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Address"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="isPaid"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          disabled={loading}
+                          placeholder="Is Order Paid"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Order Paid?</FormLabel>
+                        <FormDescription>
+                          This marks that the customer successfully paid for the
+                          order and awaiting shipment.
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />{" "}
+              </div>
+            </div>
+            <div className="w-full">
+              <FormField
+                control={form.control}
+                name="orderItems"
+                render={({ field }) => (
+                  <>
+                    <FormLabel>Order Items</FormLabel>{" "}
+                    <FormDescription>
+                      Edit the order items of this order. Please note that you
+                      may need to collect additional funds from the customer or
+                      refund them.
+                    </FormDescription>
+                    {field.value.length > 0 && (
+                      <div className="my-5 max-h-96 overflow-y-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="">Name</TableHead>
+                              <TableHead className="">Variant</TableHead>
+                              <TableHead className="">Quantity</TableHead>
+
+                              <TableHead className="text-right">
+                                Delete Item
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {fields.map((item, index) => (
+                              <TableRow key={item.id}>
+                                <TableCell>
+                                  <Label>
+                                    {(item as ExtendedOrderItem).product.name}{" "}
+                                  </Label>
+                                </TableCell>
+                                <TableCell>
+                                  <Controller
+                                    render={({ field }) => (
+                                      <Select
+                                        onValueChange={(e) => field.onChange(e)}
+                                        defaultValue={
+                                          (item as ExtendedOrderItem)
+                                            ?.variantId ?? undefined
+                                        }
+                                      >
+                                        <SelectTrigger className="w-[180px]">
+                                          <SelectValue placeholder="No variant selected" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {(
+                                            item as ExtendedOrderItem
+                                          ).product.variants.map(
+                                            (variant, idx) => (
+                                              <SelectItem
+                                                key={idx}
+                                                value={variant.id}
+                                                className="flex"
+                                              >
+                                                {variant.values}
+                                              </SelectItem>
+                                            )
+                                          )}
+                                        </SelectContent>
+                                      </Select>
+                                    )}
+                                    name={`orderItems.${index}.variantId`}
+                                    control={form.control}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Controller
+                                    render={({ field }) => (
+                                      <Input
+                                        {...field}
+                                        type="number"
+                                        defaultValue={
+                                          Number(item.quantity) ?? 1
+                                        }
+                                        onChange={(e) =>
+                                          field.onChange(Number(e.target.value))
+                                        }
+                                      />
+                                    )}
+                                    name={`orderItems.${index}.quantity`}
+                                    control={form.control}
+                                  />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Button
+                                    onClick={() => remove(index)}
+                                    variant="destructive"
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
+            </Button>{" "}
+          </form>
+        </Form>
+      )}
     </>
   );
 };

@@ -7,13 +7,21 @@ import type { CartItem, Product, Variation } from "~/types";
 interface CartStore {
   items: Product[];
   cartItems: CartItem[];
-
+  paymentType: string;
+  shippingType: string;
+  shippingAddress: string;
+  shippingAdditional?: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingZip: string;
+  customerName: string;
   addItem: (data: Product) => void;
   addCartItem: (data: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   removeAll: () => void;
   getQuantity: () => number;
+  setValue: (key: string, value: string) => void;
 }
 
 const useCart = create(
@@ -21,6 +29,18 @@ const useCart = create(
     (set, get) => ({
       items: [],
       cartItems: [],
+      paymentType: "",
+      customerName: "",
+      shippingType: "",
+      shippingAddress: "",
+      shippingAdditional: "",
+      shippingCity: "",
+      shippingState: "",
+      shippingZip: "",
+
+      setValue: (key: string, value: string) => {
+        set({ [key]: value });
+      },
       addItem: (data: Product) => {
         const currentItems = get().items;
         const existingItem = currentItems.find((item) => item.id === data.id);

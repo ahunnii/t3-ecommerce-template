@@ -7,11 +7,11 @@ import { useRouter } from "next/router";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
+import { Toaster } from "~/components/ui/toaster";
 import { ModalProvider } from "~/providers/admin/modal-provider";
 import StorefrontModalProvider from "~/providers/app/modal-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/providers/toast-provider";
-
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
@@ -47,7 +47,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             }}
             className="base-page-size"
           >
-            <Component {...pageProps} />{" "}
+            <Component {...pageProps} /> <Toaster />
           </motion.div>{" "}
         </AnimatePresence>
       </ThemeProvider>

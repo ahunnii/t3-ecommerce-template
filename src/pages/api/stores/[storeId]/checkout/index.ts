@@ -61,7 +61,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           products.forEach((product, idx) => {
             line_items.push({
-              quantity: quantity[idx] ?? 1,
+              quantity: Number(quantity[idx]) ?? 1,
               price_data: {
                 currency: "USD",
                 product_data: {
@@ -87,7 +87,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                           id: productId,
                         },
                       },
-                      quantity: quantity[idx] ?? 1,
+                      quantity: Number(quantity[idx]) ?? 1,
                     };
 
                   return {
@@ -101,7 +101,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                         id: variantIds[idx],
                       },
                     },
-                    quantity: quantity[idx] ?? 1,
+                    quantity: Number(quantity[idx]) ?? 1,
                   };
                 }),
               },
@@ -113,6 +113,9 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             mode: "payment",
             payment_method_types: ["card"],
             billing_address_collection: "required",
+            shipping_address_collection: {
+              allowed_countries: ["US", "CA"],
+            },
             phone_number_collection: {
               enabled: true,
             },

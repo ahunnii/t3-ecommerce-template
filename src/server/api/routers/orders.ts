@@ -39,6 +39,7 @@ export const ordersRouter = createTRPCRouter({
         include: {
           orderItems: {
             include: {
+              variant: true,
               product: {
                 include: {
                   variants: true,
@@ -56,6 +57,7 @@ export const ordersRouter = createTRPCRouter({
         isPaid: z.boolean().optional(),
         phone: z.string(),
         address: z.string(),
+        name: z.string(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -95,6 +97,7 @@ export const ordersRouter = createTRPCRouter({
               isPaid: input.isPaid,
               address: input.address,
               phone: input.phone,
+              name: input.name,
             },
           });
         })
@@ -115,6 +118,7 @@ export const ordersRouter = createTRPCRouter({
         isPaid: z.boolean().optional(),
         phone: z.string(),
         address: z.string(),
+        name: z.string(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -159,6 +163,7 @@ export const ordersRouter = createTRPCRouter({
               isPaid: input.isPaid,
               address: input.address,
               phone: input.phone,
+              name: input.name,
             },
           });
         })

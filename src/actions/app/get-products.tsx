@@ -1,4 +1,5 @@
 import qs from "query-string";
+import { string } from "zod";
 import type { Product } from "~/types";
 
 const URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
