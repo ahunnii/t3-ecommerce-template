@@ -29,11 +29,17 @@ const productsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         const colorId = req.query.colorId;
         const sizeId = req.query.sizeId;
         const isFeatured = req.query.isFeatured;
+        const collectionId = req.query.collectionId;
 
         const allProducts = await ctx.prisma.product.findMany({
           where: {
             storeId: storeId as string,
             categoryId: categoryId ? (categoryId as string) : undefined,
+            collections: {
+              some: {
+                id: collectionId ? (collectionId as string) : undefined,
+              },
+            },
             colorId: colorId ? (colorId as string) : undefined,
             sizeId: sizeId ? (sizeId as string) : undefined,
             isFeatured: isFeatured ? isFeatured === "true" : undefined,

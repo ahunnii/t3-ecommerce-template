@@ -1,11 +1,13 @@
+import { Prisma } from "@prisma/client";
+
 export interface Product {
   id: string;
   category: Category;
   name: string;
-  price: string;
+  price: Prisma.Decimal | number | string;
   isFeatured: boolean;
-  size: Size;
-  color: Color;
+  size?: Size;
+  color?: Color;
   images: Image[];
   variants: Variation[];
 }
@@ -57,6 +59,13 @@ export interface Attribute {
 
 export interface CartItem {
   product: Product;
-  variant: Variation;
+  variant: Variation | null;
   quantity: number;
+}
+
+export interface Collection {
+  id: string;
+  name: string;
+  products: Product[] | Partial<Product>[];
+  billboard: Billboard;
 }

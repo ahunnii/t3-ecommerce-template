@@ -5,13 +5,8 @@ import getCategories from "~/actions/app/get-categories";
 import MainNav from "~/components/app/main-nav";
 import NavbarActions from "~/components/app/navbar-actions";
 import Container from "~/components/app/ui/container";
-import { api } from "~/utils/api";
 
 const CartNavbar = () => {
-  const { data: categories } = api.categories.getAllCategories.useQuery({
-    storeId: process.env.NEXT_PUBLIC_STORE_ID!,
-  });
-
   return (
     <div className="border-b">
       <Container>

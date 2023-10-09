@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Billboard } from "@prisma/client";
 
@@ -26,6 +24,7 @@ import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { api } from "~/utils/api";
+
 const formSchema = z.object({
   label: z.string().min(1),
   imageUrl: z.string().min(1),
@@ -165,7 +164,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
       <Separator />
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
           className="w-full space-y-8"
         >
           <FormField

@@ -33,7 +33,11 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
   const onAddToCart: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.stopPropagation();
 
-    cart.addItem(data);
+    cart.addCartItem({
+      product: data,
+      quantity: 1,
+      variant: null,
+    });
   };
 
   return (
@@ -55,10 +59,12 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
               onClick={onPreview}
               icon={<Expand size={20} className="text-gray-600" />}
             />
-            <IconButton
-              onClick={onAddToCart}
-              icon={<ShoppingCart size={20} className="text-gray-600" />}
-            />
+            {data.variants?.length === 0 && (
+              <IconButton
+                onClick={onAddToCart}
+                icon={<ShoppingCart size={20} className="text-gray-600" />}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -1,16 +1,19 @@
-"use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-import type { Category } from "~/types";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "~/components/ui/hover-card";
+import type { Category, Collection } from "~/types";
 import { cn } from "~/utils/styles";
 
 interface MainNavProps {
   data: Category[];
+  collections: Partial<Collection>[];
 }
 
-const MainNav: React.FC<MainNavProps> = ({ data }) => {
+const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
   const pathname = usePathname();
 
   const routes = data.map((route) => ({
@@ -33,6 +36,44 @@ const MainNav: React.FC<MainNavProps> = ({ data }) => {
           {route.label}
         </Link>
       ))}
+      <HoverCard>
+        <HoverCardTrigger>
+          <Link
+            href={"/collections/all-products"}
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-black",
+              pathname === "/collections/all-products"
+                ? "text-black"
+                : "text-neutral-500"
+            )}
+          >
+            Shop by Collection
+          </Link>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-96">
+          <div className="space-y-1">
+            <h4 className="text-lg font-semibold">Collections</h4>
+
+            <div className="flex  flex-wrap items-center gap-5 pt-2">
+              {collections?.length &&
+                collections.map((collection) => (
+                  <Link
+                    href={`/collections/${collection.id}`}
+                    key={collection.id}
+                    className={cn(
+                      "text-sm font-medium transition-colors hover:text-black",
+                      pathname === `/collections/${collection.id}`
+                        ? "text-black"
+                        : "text-neutral-500"
+                    )}
+                  >
+                    {collection.name}
+                  </Link>
+                ))}
+            </div>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
     </nav>
   );
 };

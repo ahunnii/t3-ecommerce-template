@@ -1,5 +1,6 @@
 "use client";
 
+import { Prisma } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 const formatter = new Intl.NumberFormat("en-US", {
@@ -8,7 +9,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 interface CurrencyProps {
-  value?: string | number;
+  value?: string | number | Prisma.Decimal;
 }
 
 const Currency: React.FC<CurrencyProps> = ({ value = 0 }) => {

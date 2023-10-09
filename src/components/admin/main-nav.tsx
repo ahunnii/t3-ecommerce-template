@@ -36,6 +36,12 @@ export function MainNav({
         pathname === `/admin/${router?.query?.storeId.toString()}/categories`,
     },
     {
+      href: `/admin/${router?.query?.storeId.toString()}/collections`,
+      label: "Collections",
+      active:
+        pathname === `/admin/${router?.query?.storeId.toString()}/categories`,
+    },
+    {
       href: `/admin/${router?.query?.storeId.toString()}/sizes`,
       label: "Sizes",
       active: pathname === `/admin/${router?.query?.storeId.toString()}/sizes`,

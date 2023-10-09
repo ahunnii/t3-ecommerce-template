@@ -1,9 +1,7 @@
-"use client";
-
-import { ShieldCheck, ShoppingBag, Store, User } from "lucide-react";
+import { ShoppingBag, User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Currency from "~/components/app/ui/currency";
@@ -12,11 +10,9 @@ import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import {
@@ -69,7 +65,7 @@ const NavbarActions = () => {
               <div className="flex flex-col space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium leading-none">
-                    {sessionData?.user?.name}{" "}
+                    {sessionData?.user?.name}
                   </p>
                 </div>
                 <p className="text-xs leading-none text-muted-foreground">
@@ -78,23 +74,7 @@ const NavbarActions = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Link href="/profile" className="w-full">
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/profile/shop" className="w-full">
-                  Shop
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/profile/survey" className="w-full">
-                  Survey
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => void signOut()}>
               Log out
@@ -142,9 +122,9 @@ const NavbarActions = () => {
                       {item.product.name}
                     </h1>
                     <div className="mt-3 flex items-end justify-between">
-                      <p className="text-sm text-gray-900">
-                        <Currency value={item.product?.price} />
-                      </p>
+                      {/* <p className="text-sm text-gray-900"> */}
+                      <Currency value={item.product?.price} />
+                      {/* </p> */}
                     </div>
                   </div>
                 </div>

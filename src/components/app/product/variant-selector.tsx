@@ -79,7 +79,7 @@ const VariantSelector: FC<IProps> = ({
       setQuantity(0);
     }
   }, [watchedValues, variants]);
-  console.log(attributes);
+
   return (
     <>
       <Form {...form}>
@@ -102,7 +102,7 @@ const VariantSelector: FC<IProps> = ({
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel className="capitalize">
-                            {formField.name}
+                            {field.name}
                           </SelectLabel>
                           {attributes[idx]!.values.split(";").map(
                             (value, idx) => (
@@ -133,6 +133,7 @@ const VariantSelector: FC<IProps> = ({
                     {...field}
                     className="w-[180px]"
                     type="number"
+                    min={1}
                     max={variant ? variant.quantity : 10}
                   />
                 </FormControl>
