@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
+import { useShippingModal } from "~/hooks/use-shipping-modal";
 import { api } from "~/utils/api";
 import type { OrderColumn } from "./columns";
 
@@ -24,6 +25,7 @@ interface CellActionProps {
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useNavigationRouter();
+  const shippingModal = useShippingModal();
   const params = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -94,6 +96,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             }
           >
             <Edit className="mr-2 h-4 w-4" /> Update
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => shippingModal.onOpen(data)}>
+            <Edit className="mr-2 h-4 w-4" /> Create label
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 w-4" /> Delete

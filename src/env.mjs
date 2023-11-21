@@ -32,6 +32,8 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: z.string(),
     NEXT_PUBLIC_ENCRYPTION_KEY: z.string().min(32),
     NEXT_PUBLIC_STORE_ID: z.string(),
+    EASYPOST_API_KEY: z.string(),
+    SHIPPO_API_KEY: z.string(),
   },
 
   /**
@@ -65,6 +67,8 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NEXT_PUBLIC_ENCRYPTION_KEY: process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
     NEXT_PUBLIC_STORE_ID: process.env.NEXT_PUBLIC_STORE_ID,
+    EASYPOST_API_KEY: process.env.EASYPOST_API_KEY,
+    SHIPPO_API_KEY: process.env.SHIPPO_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

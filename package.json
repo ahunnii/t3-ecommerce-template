@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@easypost/api": "^6.7.3",
     "@headlessui/react": "^1.7.16",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^3.2.0",
@@ -26,6 +27,7 @@
     "@radix-ui/react-select": "^1.2.2",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.4",
     "@t3-oss/env-nextjs": "^0.3.1",
     "@tanstack/react-query": "^4.29.7",
@@ -59,6 +61,7 @@
     "react-hot-toast": "^2.4.1",
     "react-spinners": "^0.13.8",
     "recharts": "^2.7.2",
+    "shippo": "^1.7.1",
     "stripe": "^12.17.0",
     "superjson": "1.12.2",
     "tailwind-merge": "^1.14.0",
@@ -74,6 +77,7 @@
     "@types/prettier": "^2.7.2",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
+    "@types/shippo": "^1.7.3",
     "@typescript-eslint/eslint-plugin": "6.0.0",
     "@typescript-eslint/parser": "6.0.0",
     "autoprefixer": "^10.4.14",

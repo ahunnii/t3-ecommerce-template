@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { ShippingModal } from "~/components/admin/modals/shipping-modal";
 import { StoreModal } from "~/components/admin/modals/store-modal";
 
 export const ModalProvider = () => {
@@ -18,6 +19,7 @@ export const ModalProvider = () => {
   return (
     <>
       <StoreModal />
+      <ShippingModal />
     </>
   );
 };
