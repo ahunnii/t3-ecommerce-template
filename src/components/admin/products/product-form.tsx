@@ -8,6 +8,7 @@ import type {
   Color,
   Image,
   Product,
+  ShippingType,
   Size,
   Variation,
 } from "@prisma/client";
@@ -61,8 +62,8 @@ const formSchema = z.object({
   images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
-  colorId: z.string().optional(),
-  sizeId: z.string().optional(),
+  // colorId: z.string().optional(),
+  // sizeId: z.string().optional(),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   description: z.string().optional(),
@@ -76,10 +77,21 @@ const formSchema = z.object({
       quantity: z.coerce.number().min(1),
     })
   ),
+
+  shippingCost: z.coerce.number().min(0).optional(),
+  shippingType: z.enum([
+    "FLAT_RATE" as ShippingType,
+    "FREE" as ShippingType,
+    "VARIABLE" as ShippingType,
+  ]),
+  weight: z.coerce.number().min(0).optional(),
+  length: z.coerce.number().min(0).optional(),
+  width: z.coerce.number().min(0).optional(),
+  height: z.coerce.number().min(0).optional(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
-
+type ExtendedCategory = Category & { attributes: Attribute[] };
 interface ProductFormProps {
   initialData:
     | (Product & {
@@ -87,7 +99,7 @@ interface ProductFormProps {
         variants: Variation[];
       })
     | null;
-  categories: Category[];
+  categories: ExtendedCategory[];
   colors: Color[];
   sizes: Size[];
   attributes: Attribute[];
@@ -96,9 +108,6 @@ interface ProductFormProps {
 export const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
   categories,
-  sizes,
-  colors,
-  attributes,
 }) => {
   const params = useRouter();
   const router = useNavigationRouter();
@@ -116,14 +125,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         ...initialData,
         price: parseFloat(String(initialData?.price)),
 
-        colorId:
-          initialData.colorId && initialData.colorId != ""
-            ? initialData.colorId
-            : undefined,
-        sizeId:
-          initialData.sizeId && initialData.sizeId != ""
-            ? initialData.sizeId
-            : undefined,
         description: initialData?.description ?? "",
         variants: initialData?.variants
           ? initialData?.variants?.map((variant) => ({
@@ -133,12 +134,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               quantity: variant.quantity,
             }))
           : [],
+        shippingCost: initialData?.shippingCost ?? 0.0,
+        shippingType:
+          initialData?.shippingType ?? ("FLAT_RATE" as ShippingType),
+        weight: initialData?.weight ?? 0.0,
+        length: initialData?.length ?? 0.0,
+        width: initialData?.width ?? 0.0,
+        height: initialData?.height ?? 0.0,
       }
     : {
         name: "",
         images: [],
-        price: 0,
-        categoryId: "",
+        price: 0.0,
+        categoryId: undefined,
         colorId: undefined,
         sizeId: undefined,
         description: "",
@@ -147,12 +155,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         isArchived: false,
         attributes: [],
         variants: [],
+        shippingCost: 0.0,
+        shippingType: "FLAT_RATE" as ShippingType,
+        weight: 0.0,
+        length: 0.0,
+        width: 0.0,
+        height: 0.0,
       };
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
+  const { categoryId: category, shippingType } = form.watch();
+
+  const apiContext = api.useContext();
+
+  const currentAttributes: Attribute[] =
+    categories && category
+      ? categories.filter((cat) => cat.id === category)[0]!.attributes
+      : [];
 
   const { mutate: updateProduct } = api.products.updateProduct.useMutation({
     onSuccess: () => {
@@ -163,11 +185,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       toast.error("Something went wrong");
       console.error(error);
     },
-    onMutate: () => {
-      setLoading(true);
-    },
-    onSettled: () => {
+    onMutate: () => setLoading(true),
+    onSettled: async () => {
       setLoading(false);
+      await apiContext.products.getProduct.invalidate();
     },
   });
 
@@ -253,11 +274,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return resultSet;
     }
 
-    const attributeValues = attributes.map(splitValues);
+    const attributeValues = currentAttributes.map(splitValues);
+
     const test = cartesianProduct(attributeValues);
 
     const generatedVariations = test.map((variation) => ({
-      names: attributes.map((attribute) => attribute.name).join(", "),
+      names: currentAttributes.map((attribute) => attribute.name).join(", "),
       values: variation.join(", "),
       price: form.getValues("price"),
       quantity: 1,
@@ -266,10 +288,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     return generatedVariations;
   };
 
-  const { fields, append, remove, update, replace } = useFieldArray({
+  const { fields, remove, replace } = useFieldArray({
     control: form.control,
     name: "variants",
   });
+
   return (
     <>
       <AlertModal
@@ -343,24 +366,29 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      disabled={loading}
-                      placeholder="9.99"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            {fields.length === 0 && (
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="9.99"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>Base price before taxes</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="categoryId"
@@ -396,70 +424,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
             {fields.length === 0 && (
               <>
-                <FormField
-                  control={form.control}
-                  name="sizeId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Size</FormLabel>
-                      <Select
-                        disabled={loading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a size"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {sizes.map((size) => (
-                            <SelectItem key={size.id} value={size.id}>
-                              {size.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="colorId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Color</FormLabel>
-                      <Select
-                        disabled={loading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a color"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {colors.map((color) => (
-                            <SelectItem key={color.id} value={color.id}>
-                              {color.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="quantity"
@@ -540,7 +504,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>{" "}
-          <div className="w-full">
+          <div className="w-full rounded-md border border-border bg-background/50 p-4 ">
             <FormField
               control={form.control}
               name="variants"
@@ -551,35 +515,42 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     Create variations for customers to choose from. Note that
                     these will override your default values above.
                   </FormDescription>
-                  <div className="my-5 flex gap-5">
-                    <Button
-                      variant={"secondary"}
-                      className="my-2"
-                      type="button"
-                      onClick={() => replace(handleGenerateVariations())}
-                    >
-                      Generate Variations
-                    </Button>
-                    <Button
-                      variant={"destructive"}
-                      className="my-2"
-                      type="button"
-                      onClick={() => replace([])}
-                    >
-                      Delete all Variations
-                    </Button>
-                  </div>
+                  {category === undefined ? (
+                    <p className="leading-7 text-primary [&:not(:first-child)]:mt-6">
+                      Choose a category first
+                    </p>
+                  ) : (
+                    <div className="my-5 flex gap-5">
+                      <Button
+                        variant={"secondary"}
+                        className="my-2"
+                        type="button"
+                        onClick={() => replace(handleGenerateVariations())}
+                      >
+                        Generate Variations
+                      </Button>
+                      <Button
+                        variant={"destructive"}
+                        className="my-2"
+                        type="button"
+                        onClick={() => replace([])}
+                      >
+                        Delete all Variations
+                      </Button>
+                    </div>
+                  )}
                   {field.value.length > 0 && (
                     <div className="my-5 max-h-96 overflow-y-auto">
                       <Table>
                         <TableHeader>
                           <TableRow>
                             {/* <TableHead className="w-[100px]">ID</TableHead> */}
-                            {attributes
-                              .map((attribute) => attribute.name)
-                              .map((name) => (
-                                <TableHead key={name}>{name}</TableHead>
-                              ))}
+                            {currentAttributes.length > 0 &&
+                              currentAttributes
+                                .map((attribute) => attribute.name)
+                                .map((name) => (
+                                  <TableHead key={name}>{name}</TableHead>
+                                ))}
                             <TableHead className="">Quantity</TableHead>
                             <TableHead>$ Price</TableHead>
                             <TableHead className="text-right">
@@ -648,6 +619,154 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </>
               )}
             />
+          </div>
+          <div className="w-full  rounded-md border border-border bg-background/50 p-4 ">
+            {" "}
+            <FormLabel>Shipping</FormLabel>{" "}
+            <FormDescription className="pb-5">
+              Measurements and weight are used to calculate shipping rates.
+              Measurements are in inches.
+            </FormDescription>
+            <FormField
+              control={form.control}
+              name="shippingType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Shipping Type</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="Select a category"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={"FLAT_RATE"}>Flat Rate</SelectItem>
+                      <SelectItem value={"FREE"}>Free Shipping</SelectItem>
+                      <SelectItem value={"VARIABLE"}>
+                        Calculate at Shipping
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {shippingType === "FLAT_RATE" && (
+              <FormField
+                control={form.control}
+                name="shippingCost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Shipping Cost</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="1"
+                        min={0}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Optional: Fill out if flat rate. Defaults to $0
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Weight (g):</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={loading}
+                      placeholder="1"
+                      min={0}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Weight of item in grams (excluding packaging)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="gap-8 md:grid md:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="length"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Length (in):</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="1"
+                        min={0}
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="width"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Width (in):</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="1"
+                        min={0}
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
+              <FormField
+                control={form.control}
+                name="height"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Height (in):</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="1"
+                        min={0}
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

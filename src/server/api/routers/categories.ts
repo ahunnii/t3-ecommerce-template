@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -23,6 +24,23 @@ export const categoriesRouter = createTRPCRouter({
         },
       });
     }),
+
+  getAllStoreCategoryAttributes: publicProcedure.query(async ({ ctx }) => {
+    const categories = await ctx.prisma.category.findMany({
+      where: {
+        storeId: env.NEXT_PUBLIC_STORE_ID,
+      },
+      include: {
+        attributes: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const attributes = categories.map((category) => category.attributes).flat();
+    return attributes;
+  }),
 
   getCategory: publicProcedure
     .input(z.object({ categoryId: z.string() }))
@@ -49,17 +67,18 @@ export const categoriesRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        billboardId: z.string(),
+        billboardId: z.string().optional(),
         storeId: z.string(),
         attributes: z.array(
           z.object({
             name: z.string(),
             values: z.string(),
+            storeId: z.string(),
           })
         ),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (!input.name) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -67,12 +86,12 @@ export const categoriesRouter = createTRPCRouter({
         });
       }
 
-      if (!input.billboardId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Billboard Id is required",
-        });
-      }
+      // if (!input.billboardId) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "Billboard Id is required",
+      //   });
+      // }
 
       return ctx.prisma.store
         .findFirst({
@@ -99,7 +118,11 @@ export const categoriesRouter = createTRPCRouter({
                 createMany: {
                   data: [
                     ...input.attributes.map(
-                      (attribute: { name: string; values: string }) => attribute
+                      (attribute: {
+                        name: string;
+                        values: string;
+                        storeId: string;
+                      }) => attribute
                     ),
                   ],
                 },

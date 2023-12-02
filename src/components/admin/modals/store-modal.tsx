@@ -1,15 +1,14 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
+
 import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,6 +16,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Modal } from "~/components/ui/modal";
+
 import { useStoreModal } from "~/hooks/use-store-modal";
 import { api } from "~/utils/api";
 
@@ -28,18 +28,13 @@ export const StoreModal = () => {
   const storeModal = useStoreModal();
 
   const { mutate } = api.store.createStore.useMutation({
-    onSuccess: ({ id }) => {
-      window.location.assign(`/${id}`);
-      setLoading(false);
-    },
+    onSuccess: ({ id }) => window.location.assign(`/admin/${id}`),
     onError: (error) => {
       toast.error("Something went wrong");
       console.error(error);
-      setLoading(false);
     },
-    onMutate: () => {
-      setLoading(true);
-    },
+    onMutate: () => setLoading(true),
+    onSettled: () => setLoading(false),
   });
   const [loading, setLoading] = useState(false);
 
@@ -65,7 +60,7 @@ export const StoreModal = () => {
         <div className="space-y-4 py-2 pb-4">
           <div className="space-y-2">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
+              <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
                 <FormField
                   control={form.control}
                   name="name"

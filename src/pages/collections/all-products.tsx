@@ -1,9 +1,77 @@
+import type { GetServerSidePropsContext } from "next";
+import type { ParsedUrlQuery } from "querystring";
+import type { FC } from "react";
+import type {
+  Category,
+  Color,
+  DetailedProductFull,
+  Size,
+  Variation,
+} from "~/types";
+
+import getCategory from "~/actions/core/get-category";
+import getColors from "~/actions/core/get-colors";
+import getProducts from "~/actions/core/get-products";
+import getSizes from "~/actions/core/get-sizes";
+
+import AttributeFilter from "~/components/core/category/attribute-filter";
+
+import type { Attribute, Product } from "@prisma/client";
+import MobileFilters from "~/components/core/category/mobile-filters";
+import Billboard from "~/components/core/ui/billboard";
+import NoResults from "~/components/core/ui/no-results";
+import ProductCard from "~/components/core/ui/product-card";
+
+import { useParams, useSearchParams } from "next/navigation";
 import StorefrontLayout from "~/layouts/StorefrontLayout";
+import { api } from "~/utils/api";
 
 const AllProductsPage = () => {
+  const searchParams = useSearchParams();
+
+  console.log(searchParams.toString());
+  const { data: products } = api.products.getAllStoreProducts.useQuery({
+    queryString: searchParams.toString(),
+  });
+
+  const { data: attributes } =
+    api.categories.getAllStoreCategoryAttributes.useQuery();
+
   return (
     <StorefrontLayout>
-      <h1>All Products</h1>
+      {" "}
+      <div className="px-4 pb-24 sm:px-6 lg:px-8">
+        <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
+          {attributes && (
+            <MobileFilters sizes={[]} colors={[]} data={attributes} />
+          )}
+          <div className="hidden lg:block">
+            {" "}
+            <div className="text-md max-w-xs py-8 font-bold sm:max-w-xl sm:text-xl lg:text-2xl">
+              Filters
+            </div>
+            {attributes?.map((attribute, idx) => (
+              <AttributeFilter
+                key={idx}
+                valueKey={`${attribute.name.toLowerCase()}Variant`}
+                data={attribute}
+              />
+            ))}
+          </div>
+          <div className="mt-6 lg:col-span-4 lg:mt-0">
+            <div className="max-w-xs py-8  text-3xl font-bold sm:max-w-xl sm:text-5xl lg:text-6xl">
+              All Products
+            </div>
+
+            {products?.length === 0 && <NoResults />}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {products?.map((item: DetailedProductFull) => (
+                <ProductCard key={item.id} data={item} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </StorefrontLayout>
   );
 };

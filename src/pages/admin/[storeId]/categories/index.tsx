@@ -11,12 +11,13 @@ import { authenticateSession } from "~/utils/auth";
 import { CategoriesClient } from "~/components/admin/categories/client";
 import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
+import { prisma } from "~/server/db";
 
 interface IProps {
   storeId: string;
 }
 interface ExtendedCategory extends Category {
-  billboard: Billboard;
+  billboard?: Billboard;
 }
 
 const CategoriesPage: FC<IProps> = ({ storeId }) => {
@@ -32,7 +33,7 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
     return categories.map((item: ExtendedCategory) => ({
       id: item.id,
       name: item.name,
-      billboardLabel: item.billboard.label,
+      billboardLabel: item?.billboard?.label,
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));
   }, []);

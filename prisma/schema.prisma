@@ -85,6 +85,7 @@ model Store {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
+
   cart Cart[] @relation("StoreToCart")
 }
 
@@ -118,7 +119,12 @@ model Category {
   @@index([storeId])
   @@index([billboardId])
 }
-
+enum ShippingType  {
+FLAT_RATE
+FREE
+LOCAL_PICKUP
+VARIABLE 
+}
 model Product {
   id          String   @id @default(uuid())
   storeId     String // Foreign Key to Store
@@ -126,7 +132,7 @@ model Product {
   categoryId  String // Foreign Key to Category
   category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
   name        String
-  price       Decimal
+  price       Float    @default(0.00)
   description String?  @db.VarChar(1000)
   quantity    Int      @default(1)
 
@@ -142,8 +148,16 @@ model Product {
   updatedAt   DateTime     @updatedAt
   variants    Variation[]
   collections Collection[]
+  featuredImage String?
 
   cartItems CartItem[] // Relation to Order model
+  weight    Float? @default(0) // in grams
+  length    Float? @default(0) // in in
+  width Float? @default(0) // in in
+  height Float? @default(0) // in in
+
+  shippingType ShippingType @default(FLAT_RATE)
+  shippingCost Float? @default(0)
 
   @@index([storeId])
   @@index([categoryId])
@@ -228,6 +242,7 @@ model Attribute {
   values     String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  storeId    String  
 
   @@index([categoryId])
 }

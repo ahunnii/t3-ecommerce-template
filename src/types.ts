@@ -1,16 +1,16 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
-export interface Product {
-  id: string;
-  category: Category;
-  name: string;
-  price: Prisma.Decimal | number | string;
-  isFeatured: boolean;
-  size?: Size;
-  color?: Color;
-  images: Image[];
-  variants: Variation[];
-}
+// export interface Product {
+//   id: string;
+//   category: Category;
+//   name: string;
+//   price: Prisma.Decimal | number | string;
+//   isFeatured: boolean;
+//   size?: Size;
+//   color?: Color;
+//   images: Image[];
+//   variants: Variation[];
+// }
 
 export interface Image {
   id: string;
@@ -69,3 +69,26 @@ export interface Collection {
   products: Product[] | Partial<Product>[];
   billboard: Billboard;
 }
+
+export type DetailedProduct = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    category: {
+      include: {
+        billboard: true;
+      };
+    };
+  };
+}>;
+
+export type DetailedProductFull = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    variants: true;
+    category: {
+      include: {
+        attributes: true;
+      };
+    };
+  };
+}>;

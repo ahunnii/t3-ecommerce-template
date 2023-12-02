@@ -1,8 +1,8 @@
 "use client";
 
-import Footer from "~/components/app/footer";
-import Navbar from "~/components/app/navbar";
-import Container from "~/components/app/ui/container";
+import Footer from "~/components/core/footer";
+import Navbar from "~/components/core/navbar";
+import Container from "~/components/core/ui/container";
 
 export default function StorefrontLayout({
   children,

@@ -1,20 +1,19 @@
-import type { GetServerSidePropsContext, GetStaticPropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import type { ParsedUrlQuery } from "querystring";
 import type { FC } from "react";
 import type { Category, Color, Product, Size, Variation } from "~/types";
 
-import getCategories from "~/actions/app/get-categories";
-import getCategory from "~/actions/app/get-category";
-import getColors from "~/actions/app/get-colors";
-import getProducts from "~/actions/app/get-products";
-import getSizes from "~/actions/app/get-sizes";
+import getCategory from "~/actions/core/get-category";
+import getColors from "~/actions/core/get-colors";
+import getProducts from "~/actions/core/get-products";
+import getSizes from "~/actions/core/get-sizes";
 
-import AttributeFilter from "~/components/app/category/attribute-filter";
-import Filter from "~/components/app/category/filter";
-import MobileFilters from "~/components/app/category/mobile-filters";
-import Billboard from "~/components/app/ui/billboard";
-import NoResults from "~/components/app/ui/no-results";
-import ProductCard from "~/components/app/ui/product-card";
+import AttributeFilter from "~/components/core/category/attribute-filter";
+
+import MobileFilters from "~/components/core/category/mobile-filters";
+import Billboard from "~/components/core/ui/billboard";
+import NoResults from "~/components/core/ui/no-results";
+import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/layouts/StorefrontLayout";
 
 interface IProps {
@@ -43,13 +42,10 @@ const CategoryPage: FC<IProps> = ({ products, sizes, colors, category }) => {
             data={category?.attributes}
           />
           <div className="hidden lg:block">
-            {/* <Filter valueKey="sizeId" name="Sizes" data={sizes} />
-            <Filter valueKey="colorId" name="Colors" data={colors} /> */}
             {category?.attributes?.map((attribute, idx) => (
               <AttributeFilter
                 key={idx}
                 valueKey={`${attribute.name.toLowerCase()}Variant`}
-                name={attribute.name}
                 data={attribute}
               />
             ))}

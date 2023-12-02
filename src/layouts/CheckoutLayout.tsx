@@ -1,6 +1,6 @@
-import CartNavbar from "~/components/app/cart-navbar";
-import Footer from "~/components/app/footer";
-import Container from "~/components/app/ui/container";
+import CartNavbar from "~/components/core/cart-navbar";
+import Footer from "~/components/core/footer";
+import Container from "~/components/core/ui/container";
 
 export default function CheckoutLayout({
   children,

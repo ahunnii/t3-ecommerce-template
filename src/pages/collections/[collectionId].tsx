@@ -1,10 +1,10 @@
 import { GetServerSidePropsContext } from "next";
-import getCollection from "~/actions/app/get-collection";
-import getProducts from "~/actions/app/get-products";
-import Billboard from "~/components/app/ui/billboard";
-import Header from "~/components/app/ui/header";
-import NoResults from "~/components/app/ui/no-results";
-import ProductCard from "~/components/app/ui/product-card";
+import getCollection from "~/actions/core/get-collection";
+import getProducts from "~/actions/core/get-products";
+import Billboard from "~/components/core/ui/billboard";
+import Header from "~/components/core/ui/header";
+import NoResults from "~/components/core/ui/no-results";
+import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/layouts/StorefrontLayout";
 import { Product } from "~/types";
 
