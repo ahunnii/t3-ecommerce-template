@@ -13,16 +13,10 @@ import AttributeFilter from "~/components/core/category/attribute-filter";
 import Filter from "./filter";
 
 interface MobileFiltersProps {
-  sizes: Size[];
-  colors: Color[];
   data: Attribute[];
 }
 
-const MobileFilters: React.FC<MobileFiltersProps> = ({
-  sizes,
-  colors,
-  data,
-}) => {
+const MobileFilters: React.FC<MobileFiltersProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
 
   const onOpen = () => setOpen(true);
@@ -52,10 +46,6 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({
               <IconButton icon={<X size={15} />} onClick={onClose} />
             </div>
 
-            {/* <div className="p-4">
-              <Filter valueKey="sizeId" name="Sizes" data={sizes} />
-              <Filter valueKey="colorId" name="Colors" data={colors} />
-            </div> */}
             <div className="p-4">
               {data?.map((attribute, idx) => (
                 <AttributeFilter

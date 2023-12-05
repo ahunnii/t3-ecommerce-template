@@ -1,14 +1,14 @@
-import type { Product } from "@prisma/client";
+import type { FC } from "react";
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
-import { DetailedProduct, DetailedProductFull } from "~/types";
+import type { DetailedProductFull } from "~/types";
 
 interface ProductListProps {
   title: string;
   items: DetailedProductFull[];
 }
 
-const ProductList: React.FC<ProductListProps> = ({ title, items }) => {
+const ProductList: FC<ProductListProps> = ({ title, items }) => {
   return (
     <div className="space-y-4">
       <h3 className="text-3xl font-bold">{title}</h3>

@@ -1,16 +1,10 @@
 import type { GetServerSidePropsContext } from "next";
 import type { ParsedUrlQuery } from "querystring";
 import type { FC } from "react";
-import type {
-  Category,
-  Color,
-  DetailedProductFull,
-  Size,
-  Variation,
-} from "~/types";
+import type { Category, DetailedProductFull, Size, Variation } from "~/types";
 
 import getCategory from "~/actions/core/get-category";
-import getColors from "~/actions/core/get-colors";
+
 import getProducts from "~/actions/core/get-products";
 import getSizes from "~/actions/core/get-sizes";
 
@@ -29,7 +23,6 @@ import { api } from "~/utils/api";
 const AllProductsPage = () => {
   const searchParams = useSearchParams();
 
-  console.log(searchParams.toString());
   const { data: products } = api.products.getAllStoreProducts.useQuery({
     queryString: searchParams.toString(),
   });
@@ -42,9 +35,7 @@ const AllProductsPage = () => {
       {" "}
       <div className="px-4 pb-24 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
-          {attributes && (
-            <MobileFilters sizes={[]} colors={[]} data={attributes} />
-          )}
+          {attributes && <MobileFilters data={attributes} />}
           <div className="hidden lg:block">
             {" "}
             <div className="text-md max-w-xs py-8 font-bold sm:max-w-xl sm:text-xl lg:text-2xl">

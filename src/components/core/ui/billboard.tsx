@@ -1,10 +1,9 @@
-import { Billboard } from "~/types";
+import type { Billboard as BillboardType } from "@prisma/client";
+import type { FC } from "react";
 
-interface BillboardProps {
-  data: Billboard;
-}
+type TBillboardProps = { data: BillboardType };
 
-const Billboard: React.FC<BillboardProps> = ({ data }) => {
+const Billboard: FC<TBillboardProps> = ({ data }) => {
   return (
     <div className="overflow-hidden rounded-xl p-4 sm:p-6 lg:p-8">
       <div

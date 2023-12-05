@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   Attribute,
   Category,
-  Color,
   Image,
   Product,
   ShippingType,
@@ -62,8 +60,7 @@ const formSchema = z.object({
   images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
-  // colorId: z.string().optional(),
-  // sizeId: z.string().optional(),
+
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
   description: z.string().optional(),
@@ -100,7 +97,7 @@ interface ProductFormProps {
       })
     | null;
   categories: ExtendedCategory[];
-  colors: Color[];
+
   sizes: Size[];
   attributes: Attribute[];
 }
@@ -147,8 +144,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         images: [],
         price: 0.0,
         categoryId: undefined,
-        colorId: undefined,
-        sizeId: undefined,
+
         description: "",
         quantity: 1,
         isFeatured: false,
@@ -573,7 +569,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                                     <Input
                                       {...field}
                                       type="number"
-                                      placeholder="Attribute (e.g., Size, Color)"
+                                      placeholder="Attribute (e.g., Size)"
                                       onChange={(e) =>
                                         field.onChange(Number(e.target.value))
                                       }

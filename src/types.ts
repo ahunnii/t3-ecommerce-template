@@ -36,11 +36,11 @@ export interface Size {
   value: string;
 }
 
-export interface Color {
-  id: string;
-  name: string;
-  value: string;
-}
+// export interface Color {
+//   id: string;
+//   name: string;
+//   value: string;
+// }
 
 export interface Variation {
   id: string;

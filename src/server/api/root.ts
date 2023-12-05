@@ -1,7 +1,7 @@
 import { billboardsRouter } from "~/server/api/routers/billboards";
 import { categoriesRouter } from "~/server/api/routers/categories";
 import { collectionsRouter } from "~/server/api/routers/collections";
-import { colorsRouter } from "~/server/api/routers/colors";
+
 import { exampleRouter } from "~/server/api/routers/example";
 import { ordersRouter } from "~/server/api/routers/orders";
 import { sizesRouter } from "~/server/api/routers/sizes";
@@ -21,7 +21,7 @@ export const appRouter = createTRPCRouter({
   example: exampleRouter,
   store: storeRouter,
   sizes: sizesRouter,
-  colors: colorsRouter,
+
   categories: categoriesRouter,
   collections: collectionsRouter,
   billboards: billboardsRouter,

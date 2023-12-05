@@ -1,4 +1,14 @@
-import { FC, useEffect, useState } from "react";
+import { useEffect, type FC } from "react";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,24 +19,11 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-import type { Attribute, Variation } from "~/types";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+import type { Attribute, Variation } from "~/types";
 
 interface IProps {
   attributes: Attribute[];

@@ -8,55 +8,29 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-function extractQueryString(query: string) {
-  // Split the query string into individual key-value pairs
-  const pairs = query.split("&");
-
-  // Extract the names and values into separate arrays
-  const names: string[] | undefined = [];
-  const values: string[] | undefined = [];
-
-  pairs.forEach((pair) => {
-    const [key, value] = pair.split("=");
-    // Extract the name from the key (assuming it always ends with 'Variant')
-    const name = key?.replace("Variant", "");
-    names?.push(name?.charAt(0).toUpperCase() + name?.slice(1)); // Capitalize the first letter
-    values.push(value);
-  });
-
-  // Join the names and values with ' | ' and return
-  return {
-    names: names.join(" & "),
-    values: values.join(" & "),
-  };
-}
+import {
+  extractQueryString,
+  filterProductsByVariants,
+} from "~/utils/filtering";
 
 export const productsRouter = createTRPCRouter({
+  // Queries for the frontend
   getAllStoreProducts: publicProcedure
     .input(
       z.object({
         isFeatured: z.boolean().optional(),
         queryString: z.string().optional(),
+        categoryId: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
       const results = extractQueryString(input.queryString ?? "");
 
-      console.log(results);
       const products = await ctx.prisma.product.findMany({
         where: {
           storeId: env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured,
-          variants: {
-            some: {
-              names: {
-                contains: input.queryString ? results.names : undefined,
-              },
-              values: {
-                contains: input.queryString ? results.values : undefined,
-              },
-            },
-          },
+          categoryId: input.categoryId,
         },
         include: {
           category: {
@@ -72,7 +46,13 @@ export const productsRouter = createTRPCRouter({
         },
       });
 
-      return products;
+      const filteredProducts = filterProductsByVariants(
+        products,
+        results.names,
+        results.values
+      );
+
+      return input.queryString ? filteredProducts : products;
     }),
 
   getAllSuggestedProducts: publicProcedure
@@ -93,6 +73,7 @@ export const productsRouter = createTRPCRouter({
       });
     }),
 
+  // Queries for the admin
   getAllProducts: publicProcedure
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
@@ -103,7 +84,7 @@ export const productsRouter = createTRPCRouter({
         include: {
           category: true,
           size: true,
-          color: true,
+
           images: true,
         },
         orderBy: {
@@ -111,6 +92,7 @@ export const productsRouter = createTRPCRouter({
         },
       });
     }),
+
   getProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
@@ -136,6 +118,7 @@ export const productsRouter = createTRPCRouter({
         },
       });
     }),
+
   getDetailedProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
@@ -155,17 +138,17 @@ export const productsRouter = createTRPCRouter({
           variants: true,
           category: true,
           size: true,
-          color: true,
         },
       });
     }),
+
   createProduct: protectedProcedure
     .input(
       z.object({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
-        colorId: z.string().optional(),
+
         sizeId: z.string().optional(),
         description: z.string().optional(),
         quantity: z.number(),
@@ -256,7 +239,7 @@ export const productsRouter = createTRPCRouter({
               isFeatured: input.isFeatured,
               isArchived: input.isArchived,
               categoryId: input.categoryId,
-              colorId: input.colorId,
+
               sizeId: input.sizeId,
               storeId: input.storeId,
               images: {
@@ -305,7 +288,7 @@ export const productsRouter = createTRPCRouter({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
-        colorId: z.string().optional(),
+
         sizeId: z.string().optional(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),
@@ -359,20 +342,6 @@ export const productsRouter = createTRPCRouter({
         });
       }
 
-      // if (!input.colorId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Color id is required",
-      //   });
-      // }
-
-      // if (!input.sizeId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Size id is required",
-      //   });
-      // }
-
       if (!input.storeId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -421,7 +390,7 @@ export const productsRouter = createTRPCRouter({
                 isFeatured: input.isFeatured,
                 isArchived: input.isArchived,
                 categoryId: input.categoryId,
-                colorId: input.colorId,
+
                 sizeId: input.sizeId,
                 description: input.description,
                 quantity: input.quantity,
