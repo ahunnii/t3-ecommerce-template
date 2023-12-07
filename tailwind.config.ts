@@ -51,6 +51,18 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "sledge-primary": {
+          DEFAULT: "hsl(var(--sledge-primary))",
+          foreground: "hsl(var(--sledge-primary-foreground))",
+        },
+        "sledge-secondary": {
+          DEFAULT: "hsl(var(--sledge-secondary))",
+          foreground: "hsl(var(--sledge-secondary-foreground))",
+        },
+        "sledge-accent": {
+          DEFAULT: "hsl(var(--sledge-accent))",
+          foreground: "hsl(var(--sledge-accent-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

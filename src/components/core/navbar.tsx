@@ -9,8 +9,8 @@ import { env } from "~/env.mjs";
 import { api } from "~/utils/api";
 
 const Navbar = () => {
-  const { data: categories } = api.categories.getAllCategories.useQuery({
-    storeId: env.NEXT_PUBLIC_STORE_ID,
+  const { data: categories } = api.collections.getAllCollections.useQuery({
+    isFeatured: true,
   });
 
   const { data: collections } = api.collections.getAllCollections.useQuery({

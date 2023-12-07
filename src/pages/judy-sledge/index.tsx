@@ -12,7 +12,12 @@ import StorefrontLayout from "~/layouts/StorefrontLayout";
 import { api } from "~/utils/api";
 
 const HomePage = () => {
-  const { data: products } = api.products.getAllStoreProducts.useQuery({});
+  const { data: products } = api.products.getAllProducts.useQuery({
+    isFeatured: true,
+  });
+  const { data: collections } = api.collections.getAllCollections.useQuery({
+    isFeatured: true,
+  });
   return (
     <StorefrontLayout>
       <Hero />
@@ -34,7 +39,7 @@ const HomePage = () => {
           </button>
         </div>
       </div>
-      <Featured items={products ?? []} />
+      <Featured items={products ?? []} collections={collections ?? []} />
       <div className="mx-auto flex w-full max-w-6xl flex-col justify-between gap-x-11 py-28">
         <div className="mb-10 flex flex-row items-center">
           <div className="flex w-2/5 flex-col">

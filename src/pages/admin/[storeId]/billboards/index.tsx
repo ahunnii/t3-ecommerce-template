@@ -1,16 +1,17 @@
-import { format } from "date-fns";
+import type { GetServerSidePropsContext } from "next";
 import { useCallback, useEffect, useState, type FC } from "react";
 
 import type { Billboard } from "@prisma/client";
-import type { GetServerSidePropsContext } from "next";
+import { format } from "date-fns";
+
+import { BillboardClient } from "~/components/admin/billboards/client";
 import type { BillboardColumn } from "~/components/admin/billboards/columns";
+import PageLoader from "~/components/ui/page-loader";
+
+import AdminLayout from "~/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
-
-import { BillboardClient } from "~/components/admin/billboards/client";
-import PageLoader from "~/components/ui/page-loader";
-import AdminLayout from "~/layouts/AdminLayout";
 
 interface IProps {
   storeId: string;
@@ -20,9 +21,10 @@ const BillboardsPage: FC<IProps> = ({ storeId }) => {
   const [formattedBillboards, setFormattedBillboards] = useState<
     BillboardColumn[]
   >([]);
-  const { data: billboards } = api.billboards.getAllBillboards.useQuery({
-    storeId,
-  });
+  const { data: billboards, isLoading } =
+    api.billboards.getAllBillboards.useQuery({
+      storeId,
+    });
 
   const formatBillboards = useCallback((billboards: Billboard[]) => {
     return billboards.map((item: Billboard) => ({
@@ -33,19 +35,20 @@ const BillboardsPage: FC<IProps> = ({ storeId }) => {
   }, []);
 
   useEffect(() => {
-    if (billboards) {
-      setFormattedBillboards(formatBillboards(billboards) as BillboardColumn[]);
-    }
+    if (billboards) setFormattedBillboards(formatBillboards(billboards));
   }, [billboards, formatBillboards]);
 
   return (
     <AdminLayout>
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {!billboards && <PageLoader />}
-          {billboards && <BillboardClient data={formattedBillboards} />}
+          {isLoading ? (
+            <PageLoader />
+          ) : (
+            <BillboardClient data={formattedBillboards} />
+          )}
         </div>
-      </div>{" "}
+      </div>
     </AdminLayout>
   );
 };

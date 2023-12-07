@@ -7,7 +7,6 @@ import type {
   Image,
   Product,
   ShippingType,
-  Size,
   Variation,
 } from "@prisma/client";
 
@@ -98,7 +97,6 @@ interface ProductFormProps {
     | null;
   categories: ExtendedCategory[];
 
-  sizes: Size[];
   attributes: Attribute[];
 }
 
@@ -117,47 +115,72 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const toastMessage = initialData ? "Product updated." : "Product created.";
   const action = initialData ? "Save changes" : "Create";
 
-  const defaultValues = initialData
-    ? {
-        ...initialData,
-        price: parseFloat(String(initialData?.price)),
+  // const defaultValues = initialData
+  //   ? {
+  //       ...initialData,
+  //       price: parseFloat(String(initialData?.price)),
 
-        description: initialData?.description ?? "",
-        variants: initialData?.variants
-          ? initialData?.variants?.map((variant) => ({
-              values: variant.values,
-              price: Number(variant.price),
-              names: variant.names,
-              quantity: variant.quantity,
-            }))
-          : [],
-        shippingCost: initialData?.shippingCost ?? 0.0,
-        shippingType:
-          initialData?.shippingType ?? ("FLAT_RATE" as ShippingType),
-        weight: initialData?.weight ?? 0.0,
-        length: initialData?.length ?? 0.0,
-        width: initialData?.width ?? 0.0,
-        height: initialData?.height ?? 0.0,
-      }
-    : {
-        name: "",
-        images: [],
-        price: 0.0,
-        categoryId: undefined,
+  //       description: initialData?.description ?? "",
+  //       variants: initialData?.variants
+  //         ? initialData?.variants?.map((variant) => ({
+  //             values: variant.values,
+  //             price: Number(variant.price),
+  //             names: variant.names,
+  //             quantity: variant.quantity,
+  //           }))
+  //         : [],
+  //       shippingCost: initialData?.shippingCost ?? 0.0,
+  //       shippingType:
+  //         initialData?.shippingType ?? ("FLAT_RATE" as ShippingType),
+  //       weight: initialData?.weight ?? 0.0,
+  //       length: initialData?.length ?? 0.0,
+  //       width: initialData?.width ?? 0.0,
+  //       height: initialData?.height ?? 0.0,
+  //     }
+  //   : {
+  //       name: "",
+  //       images: [],
+  //       price: 0.0,
+  //       categoryId: undefined,
 
-        description: "",
-        quantity: 1,
-        isFeatured: false,
-        isArchived: false,
-        attributes: [],
-        variants: [],
-        shippingCost: 0.0,
-        shippingType: "FLAT_RATE" as ShippingType,
-        weight: 0.0,
-        length: 0.0,
-        width: 0.0,
-        height: 0.0,
-      };
+  //       description: "",
+  //       quantity: 1,
+  //       isFeatured: false,
+  //       isArchived: false,
+  //       attributes: [],
+  //       variants: [],
+  //       shippingCost: 0.0,
+  //       shippingType: "FLAT_RATE" as ShippingType,
+  //       weight: 0.0,
+  //       length: 0.0,
+  //       width: 0.0,
+  //       height: 0.0,
+  //     };
+
+  const defaultValues = {
+    name: initialData?.name ?? "",
+    images: initialData?.images ?? [],
+    price: initialData?.price ?? 0.0,
+    categoryId: initialData?.categoryId ?? undefined,
+    description: initialData?.description ?? undefined,
+    quantity: initialData?.quantity ?? 1,
+    isFeatured: initialData?.isFeatured ?? false,
+    isArchived: initialData?.isArchived ?? false,
+    variants: initialData?.variants
+      ? initialData?.variants?.map((variant) => ({
+          values: variant.values,
+          price: Number(variant.price),
+          names: variant.names,
+          quantity: variant.quantity,
+        }))
+      : [],
+    shippingCost: initialData?.shippingCost ?? 0.0,
+    shippingType: initialData?.shippingType ?? ("FLAT_RATE" as ShippingType),
+    weight: initialData?.weight ?? 0.0,
+    length: initialData?.length ?? 0.0,
+    width: initialData?.width ?? 0.0,
+    height: initialData?.height ?? 0.0,
+  };
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),

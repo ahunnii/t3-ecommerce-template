@@ -1,15 +1,14 @@
-"use client";
-
-import { Plus } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 
+import { Plus } from "lucide-react";
+
+import { ApiList } from "~/components/ui/api-list";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
-import { ApiList } from "~/components/ui/api-list";
 import { columns, type CollectionColumn } from "./columns";
 
 interface CollectionsClientProps {
@@ -27,7 +26,7 @@ export const CollectionsClient: React.FC<CollectionsClientProps> = ({
       <div className="flex items-center justify-between">
         <Heading
           title={`Collections (${data.length})`}
-          description="Manage collections for your store"
+          description="Manage collections for your store. Collections are used to group products together. From basics like Apparel and Jewelry to more specific collections like Holiday and Sale."
         />
         <Button
           onClick={() =>

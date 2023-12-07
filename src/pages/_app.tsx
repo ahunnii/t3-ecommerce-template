@@ -35,7 +35,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <ToastProvider />
         <ModalProvider />
         <StorefrontModalProvider />
-        <AnimatePresence mode="wait">
+        {/* <AnimatePresence mode="wait">
           <motion.div
             key={router.route}
             initial="initialState"
@@ -58,10 +58,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
               },
             }}
             className="base-page-size"
-          >
-            <Component {...pageProps} /> <Toaster />
-          </motion.div>{" "}
-        </AnimatePresence>
+          > */}
+        <Component {...pageProps} /> <Toaster />
+        {/* </motion.div>{" "}
+        </AnimatePresence> */}
       </ThemeProvider>
     </SessionProvider>
   );

@@ -75,17 +75,34 @@ export const productsRouter = createTRPCRouter({
 
   // Queries for the admin
   getAllProducts: publicProcedure
-    .input(z.object({ storeId: z.string() }))
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        isFeatured: z.boolean().optional(),
+        collectionId: z.string().optional(),
+      })
+    )
     .query(({ ctx, input }) => {
       return ctx.prisma.product.findMany({
         where: {
-          storeId: input.storeId,
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          isFeatured: input.isFeatured ?? undefined,
+          collections: input.collectionId
+            ? {
+                some: {
+                  id: input.collectionId ?? undefined,
+                },
+              }
+            : {},
         },
         include: {
-          category: true,
-          size: true,
-
           images: true,
+          variants: true,
+          category: {
+            include: {
+              attributes: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -137,7 +154,6 @@ export const productsRouter = createTRPCRouter({
           images: true,
           variants: true,
           category: true,
-          size: true,
         },
       });
     }),
@@ -149,7 +165,6 @@ export const productsRouter = createTRPCRouter({
         price: z.number(),
         categoryId: z.string(),
 
-        sizeId: z.string().optional(),
         description: z.string().optional(),
         quantity: z.number(),
         storeId: z.string(),
@@ -240,7 +255,6 @@ export const productsRouter = createTRPCRouter({
               isArchived: input.isArchived,
               categoryId: input.categoryId,
 
-              sizeId: input.sizeId,
               storeId: input.storeId,
               images: {
                 createMany: {
@@ -289,7 +303,6 @@ export const productsRouter = createTRPCRouter({
         price: z.number(),
         categoryId: z.string(),
 
-        sizeId: z.string().optional(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),
         isArchived: z.boolean().optional(),
@@ -391,7 +404,6 @@ export const productsRouter = createTRPCRouter({
                 isArchived: input.isArchived,
                 categoryId: input.categoryId,
 
-                sizeId: input.sizeId,
                 description: input.description,
                 quantity: input.quantity,
                 images: {

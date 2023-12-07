@@ -22,9 +22,6 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
   const { data: categories } = api.categories.getAllCategories.useQuery({
     storeId,
   });
-  const { data: sizes } = api.sizes.getAllSizes.useQuery({
-    storeId,
-  });
 
   return (
     <>
@@ -40,7 +37,6 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
             {typeof product === "object" && (
               <ProductForm
                 categories={categories ?? []}
-                sizes={sizes ?? []}
                 initialData={product ?? null}
                 attributes={product?.category.attributes ?? []}
               />

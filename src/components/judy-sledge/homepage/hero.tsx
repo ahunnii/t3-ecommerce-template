@@ -6,7 +6,7 @@ const Hero = () => {
     <div className="mx-auto flex  w-full max-w-6xl justify-between gap-x-11 py-28">
       <div className=" w-3/5 ">
         <h1 className="text-default text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Judy <span className="text-accent">Sledge</span> Designs
+          Judy <span className="text-sledge-primary">Sledge</span> Designs
         </h1>
 
         <p className="text-default my-5 py-5  text-lg">

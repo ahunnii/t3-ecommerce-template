@@ -5,11 +5,11 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "~/components/ui/hover-card";
-import type { Category, Collection } from "~/types";
+import type { Category, Collection, DetailedCollection } from "~/types";
 import { cn } from "~/utils/styles";
 
 interface MainNavProps {
-  data: Category[];
+  data: DetailedCollection[];
   collections: Partial<Collection>[];
 }
 
@@ -17,9 +17,9 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
   const pathname = usePathname();
 
   const routes = data.map((route) => ({
-    href: `/category/${route.id}`,
+    href: `/collections/${route.id}`,
     label: route.name,
-    active: pathname === `/category/${route.id}`,
+    active: pathname === `/collections/${route.id}`,
   }));
 
   return (
@@ -33,7 +33,7 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
             : "text-neutral-500"
         )}
       >
-        All Products
+        All
       </Link>
 
       {routes.map((route) => (

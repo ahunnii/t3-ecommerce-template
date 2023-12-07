@@ -61,6 +61,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 }) => {
   const params = useRouter();
   const router = useNavigationRouter();
+  const apiContext = api.useContext();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -94,7 +95,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       console.error(error);
     },
     onMutate: () => setLoading(true),
-    onSettled: () => setLoading(false),
+    onSettled: () => {
+      setLoading(false);
+      void apiContext.categories.getCategory.invalidate();
+    },
   });
 
   const { mutate: createCategory } = api.categories.createCategory.useMutation({

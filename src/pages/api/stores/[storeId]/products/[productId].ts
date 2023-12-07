@@ -41,7 +41,7 @@ const productByIdHandler = async (
               },
             },
 
-            size: true,
+     
             variants: true,
           },
         });

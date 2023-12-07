@@ -1,16 +1,18 @@
-import { format } from "date-fns";
+import type { GetServerSidePropsContext } from "next";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { Billboard, Category, Collection } from "@prisma/client";
-import type { GetServerSidePropsContext } from "next";
+import { format } from "date-fns";
+
+import { CollectionsClient } from "~/components/admin/collections/client";
 import type { CollectionColumn } from "~/components/admin/collections/columns";
+import PageLoader from "~/components/ui/page-loader";
+
+import AdminLayout from "~/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import { CollectionsClient } from "~/components/admin/collections/client";
-import PageLoader from "~/components/ui/page-loader";
-import AdminLayout from "~/layouts/AdminLayout";
+import type { DetailedCollection } from "~/types";
 
 interface IProps {
   storeId: string;
@@ -25,18 +27,19 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
     storeId,
   });
 
-  const formatCategories = useCallback((collections: Collection[]) => {
-    return collections.map((item: Collection) => ({
+  const formatCategories = useCallback((collections: DetailedCollection[]) => {
+    return collections.map((item: DetailedCollection) => ({
       id: item.id,
       name: item.name,
-      createdAt: format(item.createdAt as Date, "MMMM do, yyyy"),
+      products: item.products.length,
+      createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));
   }, []);
 
   useEffect(() => {
     if (collections)
       setFormattedCollections(
-        formatCategories(collections as Collection[]) as CollectionColumn[]
+        formatCategories(collections) as CollectionColumn[]
       );
   }, [collections, formatCategories]);
 

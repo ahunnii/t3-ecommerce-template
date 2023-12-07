@@ -5,8 +5,9 @@ import StorefrontLayout from "~/layouts/StorefrontLayout";
 import { api } from "~/utils/api";
 
 const HomePage = () => {
-  const { data: products, isLoading } =
-    api.products.getAllStoreProducts.useQuery({ isFeatured: true });
+  const { data: products, isLoading } = api.products.getAllProducts.useQuery({
+    isFeatured: true,
+  });
 
   return (
     <StorefrontLayout>

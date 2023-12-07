@@ -11,29 +11,22 @@ export const billboardsRouter = createTRPCRouter({
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.billboard.findMany({
-        where: {
-          storeId: input.storeId,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        where: { storeId: input.storeId },
+        orderBy: { createdAt: "desc" },
       });
     }),
 
   getBillboard: publicProcedure
     .input(z.object({ billboardId: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.billboardId) {
+      if (!input.billboardId)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Billboard id is required",
         });
-      }
 
       return ctx.prisma.billboard.findUnique({
-        where: {
-          id: input.billboardId,
-        },
+        where: { id: input.billboardId },
       });
     }),
 
@@ -43,54 +36,43 @@ export const billboardsRouter = createTRPCRouter({
         label: z.string(),
         imageUrl: z.string(),
         storeId: z.string(),
+        description: z.string().optional(),
       })
     )
-    .mutation(({ ctx, input }) => {
-      if (!input.label) {
+    .mutation(async ({ ctx, input }) => {
+      if (!input.label)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Label is required",
         });
-      }
 
-      if (!input.imageUrl) {
+      if (!input.imageUrl)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Image Url is required",
         });
+
+      const store = await ctx.prisma.store.findFirst({
+        where: {
+          id: input.storeId,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (!store) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Billboard id does not belong to current user",
+        });
       }
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Billboard id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.billboard.create({
-            data: {
-              label: input.label,
-              imageUrl: input.imageUrl,
-              storeId: input.storeId,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.billboard.create({
+        data: {
+          label: input.label,
+          imageUrl: input.imageUrl,
+          storeId: input.storeId,
+        },
+      });
     }),
 
   updateBillboard: protectedProcedure
@@ -100,9 +82,10 @@ export const billboardsRouter = createTRPCRouter({
         storeId: z.string(),
         label: z.string(),
         imageUrl: z.string(),
+        description: z.string().optional(),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (!input.label)
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -121,38 +104,29 @@ export const billboardsRouter = createTRPCRouter({
           message: "Billboard id is required",
         });
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Billboard id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.billboard.update({
-            where: {
-              id: input.billboardId,
-            },
-            data: {
-              label: input.label,
-              imageUrl: input.imageUrl,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
+      const store = await ctx.prisma.store.findFirst({
+        where: {
+          id: input.storeId,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (!store) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Billboard id does not belong to current user",
         });
+      }
+
+      return ctx.prisma.billboard.update({
+        where: {
+          id: input.billboardId,
+        },
+        data: {
+          label: input.label,
+          imageUrl: input.imageUrl,
+        },
+      });
     }),
 
   deleteBillboard: protectedProcedure
@@ -162,40 +136,31 @@ export const billboardsRouter = createTRPCRouter({
         storeId: z.string(),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (!input.billboardId)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Billboard id is required",
         });
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Billboard id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.billboard.delete({
-            where: {
-              id: input.billboardId,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
+      const store = await ctx.prisma.store.findFirst({
+        where: {
+          id: input.storeId,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (!store) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Billboard id does not belong to current user",
         });
+      }
+
+      return ctx.prisma.billboard.delete({
+        where: {
+          id: input.billboardId,
+        },
+      });
     }),
 });

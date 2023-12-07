@@ -1,14 +1,14 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { Billboard } from "@prisma/client";
-
-import { Trash } from "lucide-react";
-
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Billboard } from "@prisma/client";
+import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
+
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
@@ -23,11 +23,13 @@ import { Heading } from "~/components/ui/heading";
 import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
+
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
   label: z.string().min(1),
   imageUrl: z.string().min(1),
+  description: z.string().optional(),
 });
 
 type BillboardFormValues = z.infer<typeof formSchema>;
@@ -41,6 +43,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
 }) => {
   const params = useRouter();
   const router = useNavigationRouter();
+  const apiContext = api.useContext();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,9 +57,10 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
 
   const form = useForm<BillboardFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData ?? {
-      label: "",
-      imageUrl: "",
+    defaultValues: {
+      label: initialData?.label ?? "",
+      imageUrl: initialData?.imageUrl ?? "",
+      description: initialData?.description ?? undefined,
     },
   });
 
@@ -70,30 +74,25 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         toast.error("Something went wrong");
         console.error(error);
       },
-      onMutate: () => {
-        setLoading(true);
-      },
+      onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
+        void apiContext.billboards.getBillboard.invalidate();
       },
     });
 
   const { mutate: createBillboard } =
     api.billboards.createBillboard.useMutation({
       onSuccess: () => {
-        router.push(`/admin/${params.query.storeId as string}/billboards/`);
+        router.push(`/admin/${params.query.storeId as string}/billboards`);
         toast.success(toastMessage);
       },
       onError: (error) => {
         toast.error("Something went wrong");
         console.error(error);
       },
-      onMutate: () => {
-        setLoading(true);
-      },
-      onSettled: () => {
-        setLoading(false);
-      },
+      onMutate: () => setLoading(true),
+      onSettled: () => setLoading(false),
     });
 
   const { mutate: deleteBillboard } =
@@ -108,9 +107,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         );
         console.error(error);
       },
-      onMutate: () => {
-        setLoading(true);
-      },
+      onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
         setOpen(false);
@@ -124,12 +121,14 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         billboardId: params?.query?.billboardId as string,
         label: data.label,
         imageUrl: data.imageUrl,
+        description: data?.description ?? undefined,
       });
     } else {
       createBillboard({
         storeId: params?.query?.storeId as string,
         label: data.label,
         imageUrl: data.imageUrl,
+        description: data?.description,
       });
     }
   };
@@ -196,6 +195,25 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
                     <Input
                       disabled={loading}
                       placeholder="Billboard label"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="gap-8 md:grid md:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Billboard description"
                       {...field}
                     />
                   </FormControl>

@@ -3,7 +3,9 @@ import Link from "next/link";
 import { FC } from "react";
 import getCollection from "~/actions/core/get-collection";
 import getProducts from "~/actions/core/get-products";
+import { MainNav } from "~/components/admin/main-nav";
 import AttributeFilter from "~/components/core/category/attribute-filter";
+import { CollectionCard } from "~/components/core/category/collection-card";
 import MobileFilters from "~/components/core/category/mobile-filters";
 import Billboard from "~/components/core/ui/billboard";
 import Header from "~/components/core/ui/header";
@@ -17,15 +19,15 @@ import { api } from "~/utils/api";
 type ICollectionPageProps = {
   collectionId: string;
 };
-const CollectionPage: FC<ICollectionPageProps> = ({ collectionId }) => {
-  const { data: collection, isLoading: isCollectionLoading } =
-    api.collections.getCollection.useQuery({ collectionId });
+const CollectionPage = () => {
+  const { data: collections, isLoading } =
+    api.collections.getAllCollections.useQuery({});
 
   return (
     <StorefrontLayout>
       {/* <Billboard data={collection?.billboard} /> */}
 
-      <nav className="mb-4 flex   px-5 pb-5 pt-10 " aria-label="Breadcrumb">
+      <nav className="mx-6 mb-4   flex  px-1 pb-2 pt-8" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
             <Link
@@ -65,37 +67,24 @@ const CollectionPage: FC<ICollectionPageProps> = ({ collectionId }) => {
               </Link>
             </div>
           </li>
-          <li aria-current="page">
-            <div className="flex items-center">
-              <svg
-                className="h-6 w-6 text-neutral-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              <span className="ml-1 text-sm font-medium  text-black md:ml-2">
-                {collection?.name}
-              </span>
-            </div>
-          </li>
         </ol>
       </nav>
 
       <div className="px-4 pb-24 sm:px-6 lg:px-8">
-        {isCollectionLoading ? (
+        {isLoading ? (
           <PageLoader />
         ) : (
           <div className="mt-6 lg:col-span-4 lg:mt-0">
-            {collection?.products.length === 0 && <NoResults />}
+            {collections?.length === 0 && <NoResults />}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {collection?.products.map((item) => (
-                <ProductCard key={item.id} data={item} />
+              {collections?.map((item: DetailedCollection) => (
+                <CollectionCard
+                  key={item.id}
+                  collection={item}
+                  aspectRatio="square"
+                  width={150}
+                  height={150}
+                />
               ))}
             </div>
           </div>
@@ -106,13 +95,3 @@ const CollectionPage: FC<ICollectionPageProps> = ({ collectionId }) => {
 };
 
 export default CollectionPage;
-
-export const getServerSideProps = (ctx: GetServerSidePropsContext) => {
-  const { collectionId } = ctx.query;
-
-  return {
-    props: {
-      collectionId,
-    },
-  };
-};

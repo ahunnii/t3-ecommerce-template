@@ -1,0 +1,263 @@
+{
+  "id": 7800166285462,
+  "title": "Tamera Pink Sequin Dress",
+  "handle": "hot-pink-floral-mini-dress",
+  "description": "\u003cmeta charset=\"UTF-8\"\u003e\n\u003cp\u003eIn the Tamera Pink Sequin Dress, a woman will feel absolutely fabulous and ready to party. This floral overlay sleeveless halter neck dress is a fun and flirty choice for any special occasion. The pink sequins add a playful and dazzling touch, making her the center of attention. She'll feel vivacious and confident, as this mini dress embodies the perfect blend of glamour and charm, allowing her to embrace a night of celebration and style.\u003c/p\u003e\n\u003cp\u003e\u00a0\u003c/p\u003e\n\u003cp\u003e\u00a0\u003c/p\u003e\n\u003cp\u003eMulti Color\u003c/p\u003e\n\u003cp\u003eFeather Trim\u003c/p\u003e\n\u003cp\u003eHalter Neck Dress\u003c/p\u003e\n\u003cp\u003eDry Clean Only\u003c/p\u003e\n\u003cp\u003e100% Faux Feathers\u003c/p\u003e\n\u003cp\u003e100% Polyester Shell\u003cbr\u003e\u00a0\u003cbr\u003e94%Polyester Lining\u003c/p\u003e\n\u003cp\u003e6% Spandex\u003c/p\u003e\n\u003cp\u003eModel is 5\u201910\u201d \u0026amp; Wears A Size Small\u003c/p\u003e",
+  "published_at": "2023-11-01T23:03:47-04:00",
+  "created_at": "2023-08-09T14:35:02-04:00",
+  "vendor": "OLIVE MODE",
+  "type": "",
+  "tags": [
+    "BIRTHDAY DRESS",
+    "CHRISTMAS PARTY DRESS",
+    "COCKTAIL DRESS",
+    "DRESS",
+    "FUCHSIA DRESS",
+    "HOLIDAY DRESS",
+    "HOMECOMING DRESS",
+    "HOT PINK DRESS",
+    "MINI DRESS",
+    "NEW YEARS DRESS",
+    "NIGHT OUT DRESS",
+    "PARTY DRESS",
+    "PROM DRESS",
+    "WEDDING GUEST DRESS"
+  ],
+  "price": 15800,
+  "price_min": 15800,
+  "price_max": 15800,
+  "available": true,
+  "price_varies": false,
+  "compare_at_price": null,
+  "compare_at_price_min": 0,
+  "compare_at_price_max": 0,
+  "compare_at_price_varies": false,
+  "variants": [
+    {
+      "id": 42706431279254,
+      "title": "S",
+      "option1": "S",
+      "option2": null,
+      "option3": null,
+      "sku": null,
+      "requires_shipping": true,
+      "taxable": true,
+      "featured_image": {
+        "id": 35310165098646,
+        "product_id": 7800166285462,
+        "position": 1,
+        "created_at": "2023-10-27T18:03:32-04:00",
+        "updated_at": "2023-10-27T18:06:03-04:00",
+        "alt": null,
+        "width": 3512,
+        "height": 6240,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363",
+        "variant_ids": [42706431279254, 42706431312022, 42706431344790]
+      },
+      "available": true,
+      "name": "Tamera Pink Sequin Dress - S",
+      "public_title": "S",
+      "options": ["S"],
+      "price": 15800,
+      "weight": 0,
+      "compare_at_price": null,
+      "inventory_management": "shopify",
+      "barcode": "31279254",
+      "featured_media": {
+        "alt": null,
+        "id": 27755067637910,
+        "position": 1,
+        "preview_image": {
+          "aspect_ratio": 0.563,
+          "height": 6240,
+          "width": 3512,
+          "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363"
+        }
+      },
+      "requires_selling_plan": false,
+      "selling_plan_allocations": []
+    },
+    {
+      "id": 42706431312022,
+      "title": "M",
+      "option1": "M",
+      "option2": null,
+      "option3": null,
+      "sku": null,
+      "requires_shipping": true,
+      "taxable": true,
+      "featured_image": {
+        "id": 35310165098646,
+        "product_id": 7800166285462,
+        "position": 1,
+        "created_at": "2023-10-27T18:03:32-04:00",
+        "updated_at": "2023-10-27T18:06:03-04:00",
+        "alt": null,
+        "width": 3512,
+        "height": 6240,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363",
+        "variant_ids": [42706431279254, 42706431312022, 42706431344790]
+      },
+      "available": true,
+      "name": "Tamera Pink Sequin Dress - M",
+      "public_title": "M",
+      "options": ["M"],
+      "price": 15800,
+      "weight": 0,
+      "compare_at_price": null,
+      "inventory_management": "shopify",
+      "barcode": "31312022",
+      "featured_media": {
+        "alt": null,
+        "id": 27755067637910,
+        "position": 1,
+        "preview_image": {
+          "aspect_ratio": 0.563,
+          "height": 6240,
+          "width": 3512,
+          "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363"
+        }
+      },
+      "requires_selling_plan": false,
+      "selling_plan_allocations": []
+    },
+    {
+      "id": 42706431344790,
+      "title": "L",
+      "option1": "L",
+      "option2": null,
+      "option3": null,
+      "sku": null,
+      "requires_shipping": true,
+      "taxable": true,
+      "featured_image": {
+        "id": 35310165098646,
+        "product_id": 7800166285462,
+        "position": 1,
+        "created_at": "2023-10-27T18:03:32-04:00",
+        "updated_at": "2023-10-27T18:06:03-04:00",
+        "alt": null,
+        "width": 3512,
+        "height": 6240,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363",
+        "variant_ids": [42706431279254, 42706431312022, 42706431344790]
+      },
+      "available": true,
+      "name": "Tamera Pink Sequin Dress - L",
+      "public_title": "L",
+      "options": ["L"],
+      "price": 15800,
+      "weight": 0,
+      "compare_at_price": null,
+      "inventory_management": "shopify",
+      "barcode": "31344790",
+      "featured_media": {
+        "alt": null,
+        "id": 27755067637910,
+        "position": 1,
+        "preview_image": {
+          "aspect_ratio": 0.563,
+          "height": 6240,
+          "width": 3512,
+          "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363"
+        }
+      },
+      "requires_selling_plan": false,
+      "selling_plan_allocations": []
+    }
+  ],
+  "images": [
+    "//cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363",
+    "//cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress.jpg?v=1698444363",
+    "//cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_3.jpg?v=1698444363",
+    "//cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_4.jpg?v=1698444363",
+    "//cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_d93e48bd-76c3-4e24-ae93-53a1422a04d6.jpg?v=1698444215"
+  ],
+  "featured_image": "//cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363",
+  "options": [{ "name": "Size", "position": 1, "values": ["S", "M", "L"] }],
+  "url": "/products/hot-pink-floral-mini-dress",
+  "media": [
+    {
+      "alt": null,
+      "id": 27755067637910,
+      "position": 1,
+      "preview_image": {
+        "aspect_ratio": 0.563,
+        "height": 6240,
+        "width": 3512,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363"
+      },
+      "aspect_ratio": 0.563,
+      "height": 6240,
+      "media_type": "image",
+      "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_2.jpg?v=1698444363",
+      "width": 3512
+    },
+    {
+      "alt": null,
+      "id": 27755067539606,
+      "position": 2,
+      "preview_image": {
+        "aspect_ratio": 0.563,
+        "height": 6240,
+        "width": 3512,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress.jpg?v=1698444363"
+      },
+      "aspect_ratio": 0.563,
+      "height": 6240,
+      "media_type": "image",
+      "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress.jpg?v=1698444363",
+      "width": 3512
+    },
+    {
+      "alt": null,
+      "id": 27755067572374,
+      "position": 3,
+      "preview_image": {
+        "aspect_ratio": 0.563,
+        "height": 6240,
+        "width": 3512,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_3.jpg?v=1698444363"
+      },
+      "aspect_ratio": 0.563,
+      "height": 6240,
+      "media_type": "image",
+      "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_3.jpg?v=1698444363",
+      "width": 3512
+    },
+    {
+      "alt": null,
+      "id": 27755067605142,
+      "position": 4,
+      "preview_image": {
+        "aspect_ratio": 0.563,
+        "height": 6240,
+        "width": 3512,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_4.jpg?v=1698444363"
+      },
+      "aspect_ratio": 0.563,
+      "height": 6240,
+      "media_type": "image",
+      "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_4.jpg?v=1698444363",
+      "width": 3512
+    },
+    {
+      "alt": null,
+      "id": 27755067670678,
+      "position": 5,
+      "preview_image": {
+        "aspect_ratio": 0.563,
+        "height": 6240,
+        "width": 3512,
+        "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_d93e48bd-76c3-4e24-ae93-53a1422a04d6.jpg?v=1698444215"
+      },
+      "aspect_ratio": 0.563,
+      "height": 6240,
+      "media_type": "image",
+      "src": "https://cdn.shopify.com/s/files/1/0524/0782/8630/files/Tamera-Dress_d93e48bd-76c3-4e24-ae93-53a1422a04d6.jpg?v=1698444215",
+      "width": 3512
+    }
+  ],
+  "requires_selling_plan": false,
+  "selling_plan_groups": []
+}

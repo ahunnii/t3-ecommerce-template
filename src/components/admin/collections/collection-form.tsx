@@ -1,5 +1,3 @@
-"use client";
-
 import { Combobox, Listbox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Billboard, Collection, Product } from "@prisma/client";
@@ -14,10 +12,12 @@ import * as z from "zod";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { Command, CommandGroup, CommandItem } from "~/components/ui/command";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -33,11 +33,13 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
+import { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
   name: z.string().min(2),
   billboardId: z.string().min(1),
+  isFeatured: z.boolean().default(false),
   products: z.array(
     z.object({
       id: z.string(),
@@ -48,7 +50,7 @@ const formSchema = z.object({
 type CollectionFormValues = z.infer<typeof formSchema>;
 
 interface CollectionFormProps {
-  initialData: Collection;
+  initialData: DetailedCollection | null;
   products: Product[];
   billboards: Billboard[];
 }
@@ -72,24 +74,27 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
     ? "Collection updated."
     : "Collection created.";
   const action = initialData ? "Save changes" : "Create";
-  console.log(initialData);
+
   const form = useForm<CollectionFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData ?? {
-      name: "",
-      billboardId: "",
-      products: [],
+    defaultValues: {
+      name: initialData?.name ?? "",
+      billboardId: initialData?.billboardId ?? undefined,
+      products: initialData?.products ?? [],
     },
   });
+
+  const apiContext = api.useContext();
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [productsOpen, setProductsOpen] = useState(false);
 
   const [inputValue, setInputValue] = useState("");
 
-  const handleUnselect = useCallback((framework: Product) => {
+  const handleUnselect = useCallback((product: Product) => {
     const current = form
       .getValues("products")
-      .filter((s) => s.id !== framework.id);
+      .filter((s) => s.id !== product.id);
     form.setValue("products", current);
   }, []);
 
@@ -115,7 +120,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   );
 
   const selectables = products.filter(
-    (framework) => !form.getValues("products").includes(framework)
+    (product) => !form.getValues("products").includes(product)
   );
 
   const { mutate: updateCollection } =
@@ -133,6 +138,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
       },
       onSettled: () => {
         setLoading(false);
+        void apiContext.collections.getCollection.invalidate();
       },
     });
 
@@ -180,6 +186,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
       updateCollection({
         storeId: params?.query?.storeId as string,
         billboardId: data.billboardId,
+        isFeatured: data.isFeatured,
         name: data.name,
         collectionId: params?.query?.collectionId as string,
         products: data.products,
@@ -187,6 +194,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
     } else {
       createCollection({
         storeId: params?.query?.storeId as string,
+        isFeatured: data.isFeatured,
         name: data.name,
         billboardId: data.billboardId,
         products: data.products,
@@ -226,7 +234,6 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
       <Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          // onChange={(e) => console.log(form.getValues())}
           className="w-full space-y-8"
         >
           <div className="gap-8 md:grid md:grid-cols-3">
@@ -281,10 +288,31 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
             />
             <FormField
               control={form.control}
+              name="isFeatured"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Featured</FormLabel>
+                    <FormDescription>
+                      This collection will be featured on the homepage (first
+                      three) as well as in the navbar.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="products"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Products</FormLabel>
                   <FormControl>
                     <Command
                       onKeyDown={handleKeyDown}
@@ -292,19 +320,19 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
                     >
                       <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                         <div className="flex flex-wrap gap-1">
-                          {field.value.map((framework) => {
+                          {field.value.map((product) => {
                             return (
                               <Badge
-                                key={(framework as Product).name}
+                                key={(product as Product).name}
                                 variant="secondary"
                               >
-                                {(framework as Product).name}
+                                {(product as Product).name}
                                 <button
                                   className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                  aria-label={(framework as Product).name}
+                                  aria-label={(product as Product).name}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
-                                      handleUnselect(framework as Product);
+                                      handleUnselect(product as Product);
                                     }
                                   }}
                                   onMouseDown={(e) => {
@@ -312,7 +340,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
                                     e.stopPropagation();
                                   }}
                                   onClick={() =>
-                                    handleUnselect(framework as Product)
+                                    handleUnselect(product as Product)
                                   }
                                 >
                                   <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
@@ -327,7 +355,12 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
                             onValueChange={setInputValue}
                             onBlur={() => setProductsOpen(false)}
                             onFocus={() => setProductsOpen(true)}
-                            placeholder="Select frameworks..."
+                            placeholder={
+                              products.length === 0
+                                ? "Add some products first."
+                                : "Select products..."
+                            }
+                            disabled={products.length === 0}
                             className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
                           />
                         </div>
@@ -336,10 +369,10 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
                         {productsOpen && selectables.length > 0 ? (
                           <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
                             <CommandGroup className="h-full overflow-auto">
-                              {selectables.map((framework) => {
+                              {selectables.map((product) => {
                                 return (
                                   <CommandItem
-                                    key={framework.name}
+                                    key={product.name}
                                     onMouseDown={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
@@ -348,12 +381,12 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
                                       setInputValue("");
                                       form.setValue("products", [
                                         ...field.value,
-                                        framework,
+                                        product,
                                       ]);
                                     }}
                                     className={"cursor-pointer"}
                                   >
-                                    {framework.name}
+                                    {product.name}
                                   </CommandItem>
                                 );
                               })}
@@ -362,81 +395,11 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
                         ) : null}
                       </div>
                     </Command>
-                    {/* <Listbox
-                      value={field.value}
-                      onChange={field.onChange}
-                      multiple
-                    >
-                      <Listbox.Button>
-                        {field.value
-                          .map((product: Product) => product.name)
-                          .join(", ")}
-                      </Listbox.Button>
-                      <Listbox.Options>
-                        {products.map((product) => (
-                          <Listbox.Option key={product.id} value={product.id}>
-                            {product.name}
-                          </Listbox.Option>
-                        ))}
-                      </Listbox.Options>
-                    </Listbox> */}
-
-                    {/* <Input
-                      disabled={loading}
-                      placeholder="Collection name"
-                      {...field}
-                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* <div>
-              <FormLabel>Products</FormLabel>
-
-              {fields.map((item, index) => (
-                <div key={item.id} className="flex items-center space-x-4">
-                  <Controller
-                    render={({ field }) => (
-                      <Select
-                        onValueChange={(e) => field.onChange(e)}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="No variant selected" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products.map((product, idx) => (
-                            <SelectItem
-                              key={idx}
-                              value={product.id}
-                              className="flex"
-                            >
-                              {product.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    name={`products.${index}.id`}
-                    control={form.control}
-                  />
-
-
-                  <Button
-                    onClick={() => remove(index)}
-                    variant="destructive"
-                    type="button"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-
-              <Button onClick={() => append({ id: "" })} type="button">
-                Add Product
-              </Button>
-            </div> */}
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

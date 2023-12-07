@@ -92,3 +92,17 @@ export type DetailedProductFull = Prisma.ProductGetPayload<{
     };
   };
 }>;
+
+export type DetailedCategory = Prisma.CategoryGetPayload<{
+  include: {
+    billboard: true;
+    attributes: true;
+  };
+}>;
+
+export type DetailedCollection = Prisma.CollectionGetPayload<{
+  include: {
+    products: true;
+    billboard: true;
+  };
+}>;
