@@ -34,6 +34,7 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_ID: z.string(),
     EASYPOST_API_KEY: z.string(),
     SHIPPO_API_KEY: z.string(),
+    NEXT_PUBLIC_SITE_DIRECTORY: z.string(),
   },
 
   /**
@@ -45,6 +46,7 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
     NEXT_PUBLIC_ENCRYPTION_KEY: z.string().min(32),
     NEXT_PUBLIC_STORE_ID: z.string(),
+    NEXT_PUBLIC_SITE_DIRECTORY: z.string(),
   },
 
   /**
@@ -69,6 +71,7 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_ID: process.env.NEXT_PUBLIC_STORE_ID,
     EASYPOST_API_KEY: process.env.EASYPOST_API_KEY,
     SHIPPO_API_KEY: process.env.SHIPPO_API_KEY,
+    NEXT_PUBLIC_SITE_DIRECTORY: process.env.NEXT_PUBLIC_SITE_DIRECTORY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

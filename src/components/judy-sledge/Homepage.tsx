@@ -8,7 +8,7 @@ import ProductList from "~/components/core/product/product-list";
 import Billboard from "~/components/core/ui/billboard";
 import Featured from "~/components/judy-sledge/homepage/featured";
 import Hero from "~/components/judy-sledge/homepage/hero";
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/judy-sledge/StorefrontLayout";
 import { api } from "~/utils/api";
 
 const HomePage = () => {

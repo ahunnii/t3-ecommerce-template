@@ -1,8 +1,5 @@
-import { Menu, Transition } from "@headlessui/react";
-import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Fragment } from "react";
 import {
   HoverCard,
   HoverCardContent,
@@ -10,6 +7,7 @@ import {
 } from "~/components/ui/hover-card";
 import type { Category, Collection, DetailedCollection } from "~/types";
 import { cn } from "~/utils/styles";
+
 interface MainNavProps {
   data: DetailedCollection[];
   collections: Partial<Collection>[];
@@ -35,10 +33,10 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
             : "text-neutral-500"
         )}
       >
-        Shop
+        All
       </Link>
 
-      {/* {routes.map((route) => (
+      {routes.map((route) => (
         <Link
           key={route.href}
           href={route.href}
@@ -49,61 +47,8 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
         >
           {route.label}
         </Link>
-      ))} */}
+      ))}
 
-      <HoverCard>
-        <HoverCardTrigger>
-          <Link
-            href={"/collections/all-products"}
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-black",
-              pathname === "/collections/all-products"
-                ? "text-black"
-                : "text-neutral-500"
-            )}
-          >
-            The Store
-          </Link>
-        </HoverCardTrigger>
-        <HoverCardContent className="w-auto">
-          <div className="space-y-1">
-            <div className="flex  flex-col  gap-5 ">
-              <Link
-                href={`/about-us`}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-black",
-                  pathname === `/about-us` ? "text-black" : "text-neutral-500"
-                )}
-              >
-                About Us
-              </Link>
-              <Link
-                href={`/collections/`}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-black",
-                  pathname === `/collections/`
-                    ? "text-black"
-                    : "text-neutral-500"
-                )}
-              >
-                Gallery
-              </Link>
-
-              <Link
-                href={`/collections/`}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-black",
-                  pathname === `/collections/`
-                    ? "text-black"
-                    : "text-neutral-500"
-                )}
-              >
-                Blog
-              </Link>
-            </div>
-          </div>
-        </HoverCardContent>
-      </HoverCard>
       {collections?.length > 0 && (
         <HoverCard>
           <HoverCardTrigger>
@@ -116,12 +61,14 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
                   : "text-neutral-500"
               )}
             >
-              Collections
+              Shop by Collection
             </Link>
           </HoverCardTrigger>
-          <HoverCardContent className="w-auto">
+          <HoverCardContent className="w-96">
             <div className="space-y-1">
-              <div className="flex  flex-col items-center gap-5 ">
+              <h4 className="text-lg font-semibold">Collections</h4>
+
+              <div className="flex  flex-wrap items-center gap-5 pt-2">
                 {collections?.length &&
                   collections.map((collection) => (
                     <Link
@@ -142,18 +89,6 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
           </HoverCardContent>
         </HoverCard>
       )}
-
-      <Link
-        href={"/collections/all-products"}
-        className={cn(
-          "text-sm font-medium transition-colors hover:text-black",
-          pathname === `/collections/all-products`
-            ? "text-black"
-            : "text-neutral-500"
-        )}
-      >
-        Contact Us
-      </Link>
     </nav>
   );
 };

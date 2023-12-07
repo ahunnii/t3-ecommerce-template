@@ -29,7 +29,6 @@ const productsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                 id: collectionId ? (collectionId as string) : undefined,
               },
             },
-
             isFeatured: isFeatured ? isFeatured === "true" : undefined,
             isArchived: false,
           },
@@ -40,8 +39,6 @@ const productsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                 attributes: true,
               },
             },
-
-            size: true,
             variants: true,
           },
           orderBy: {

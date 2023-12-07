@@ -23,10 +23,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import type { Attribute, Variation } from "~/types";
+import type { Attribute, DetailedProductFull, Variation } from "~/types";
 
 interface IProps {
   attributes: Attribute[];
+  product: DetailedProductFull;
   variant: Variation | null;
   variants: Variation[];
   setVariant: (variant: Variation | null) => void;
@@ -41,6 +42,7 @@ type ProductFormValues = z.infer<typeof formSchema>;
 
 const VariantSelector: FC<IProps> = ({
   attributes,
+  product,
   variants,
   variant,
   setVariant,

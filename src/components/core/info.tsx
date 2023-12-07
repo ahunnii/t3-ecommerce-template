@@ -36,6 +36,7 @@ const Info: React.FC<InfoProps> = ({ data }) => {
         <VariantSelector
           attributes={data?.category?.attributes}
           variants={data?.variants}
+          product={data}
           variant={variant}
           setVariant={setVariant}
           setQuantity={setQuantity}
@@ -47,8 +48,7 @@ const Info: React.FC<InfoProps> = ({ data }) => {
           className="flex items-center gap-x-2"
           disabled={data?.variants?.length > 0 ? variant === null : false}
         >
-          Add To Cart
-          <ShoppingCart size={20} />
+          Add To Cart <ShoppingCart size={20} />
         </Button>
       </div>
     </div>
