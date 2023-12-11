@@ -21,6 +21,7 @@ import {
   HoverCardTrigger,
 } from "~/components/ui/hover-card";
 import useCart from "~/hooks/core/use-cart";
+import { cn } from "~/utils/styles";
 import { Separator } from "../ui/separator";
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -33,6 +34,7 @@ const NavbarActions = () => {
   const cart = useCart();
 
   const cartItems = cart.getQuantity();
+  const cartTotal = cart.getTotal();
 
   if (!isMounted) {
     return null;
@@ -121,8 +123,21 @@ const NavbarActions = () => {
                   </div>
                   <div className="col-span-5 ">
                     <h1 className="text-base font-bold text-gray-900">
-                      {item.product.name}
+                      {item.product.name} ({item.quantity})
                     </h1>
+                    <div className="mt-1 flex w-full text-xs">
+                      {item.variant?.values.split(", ").map((item, idx) => (
+                        <p
+                          className={cn(
+                            "  border-gray-200  text-gray-500",
+                            idx > 0 ? "ml-2 border-l pl-2" : ""
+                          )}
+                          key={idx}
+                        >
+                          {item}
+                        </p>
+                      ))}
+                    </div>
                     <div className="mt-3 flex items-end justify-between">
                       {/* <p className="text-sm text-gray-900"> */}
                       <Currency value={item.product?.price} />
@@ -133,7 +148,7 @@ const NavbarActions = () => {
               ))}
 
             <div className="flex w-full justify-between py-1 text-sm">
-              <p>Subtotal:</p> <Currency value={0} />
+              <p>Subtotal:</p> <Currency value={cartTotal} />
             </div>
             <div className="flex items-center pt-2">
               <span className="text-xs text-muted-foreground">

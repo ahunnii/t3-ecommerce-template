@@ -55,6 +55,7 @@ export interface Attribute {
   id: string;
   name: string;
   values: string;
+  quantity: number;
 }
 
 export interface CartItem {

@@ -9,27 +9,36 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+
+import { Check, ChevronsUpDown } from "lucide-react";
+import * as React from "react";
+
+import { Button } from "~/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "~/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+
 import * as z from "zod";
 
-import type { Attribute, DetailedProductFull, Variation } from "~/types";
+import type { DetailedProductFull, Variation } from "~/types";
+import { cn } from "~/utils/styles";
 
 interface IProps {
-  attributes: Attribute[];
   product: DetailedProductFull;
   variant: Variation | null;
-  variants: Variation[];
+
   setVariant: (variant: Variation | null) => void;
   setQuantity: (quantity: number) => void;
 }
@@ -41,9 +50,8 @@ const formSchema = z.object({
 type ProductFormValues = z.infer<typeof formSchema>;
 
 const VariantSelector: FC<IProps> = ({
-  attributes,
   product,
-  variants,
+
   variant,
   setVariant,
   setQuantity,
@@ -57,66 +65,173 @@ const VariantSelector: FC<IProps> = ({
       quantity: 1,
     },
   });
+
   const watchedValues = form.watch();
 
   useEffect(() => {
-    const selected = Object.values(watchedValues.selection)
-      .filter((item) => item)
-      .join(", ");
+    const getVariant = () => {
+      return product.variants?.find(
+        (variant) =>
+          Object.values(watchedValues.selection).join(", ") === variant.values
+      );
+    };
 
-    const available = variants?.map((variant) => {
-      return variant.values;
-    });
+    const selectedVariant = getVariant();
 
-    const isAvailable = available?.indexOf(selected);
-
-    if (variants?.length > 0 && available?.includes(selected)) {
-      setVariant(variants[isAvailable]!);
-      setQuantity(watchedValues.quantity);
+    if (product.variants?.length > 0 && selectedVariant) {
+      setVariant(selectedVariant);
     } else {
       setVariant(null);
-      setQuantity(0);
     }
-  }, [watchedValues, variants]);
+    setQuantity(watchedValues.quantity);
+  }, [watchedValues, product.variants]);
+
+  useEffect(() => {
+    if (variant) form.setValue("quantity", 1);
+  }, [variant]);
+
+  const availableOptions = product?.variants?.map((variant) => {
+    return `${variant.values}, ${variant.quantity}`;
+  });
+
+  const isOptionAvailable = (option: string) => {
+    // Assuming availableOptions is an array of strings
+    // Update this logic based on how your availableOptions are structured
+    return availableOptions.some((availableOption) =>
+      availableOption.includes(option)
+    );
+  };
+
+  const possibleOptions = React.useMemo(() => {
+    return product.category.attributes?.map((attribute) => {
+      return {
+        name: attribute.name,
+        values: attribute.values.split(";"),
+      };
+    });
+  }, [product.category.attributes]);
+
+  //  First, generate an array of possible options and array of available options
+  //  Second, compare the two arrays and return the available options
+  function doesMatch(option: string, idx: number, name: string): boolean {
+    const searchArray = Object.values({
+      ...form.watch("selection"),
+      [name]: option,
+    });
+    for (const target of availableOptions) {
+      const splitTarget = target.split(", ").map((s) => s.trim());
+      let isMatch = true;
+
+      for (let i = 0; i < searchArray.length; i++) {
+        const searchElement = searchArray[i];
+        const targetElement = splitTarget[i];
+
+        // Check if the elements match, considering undefined as a wildcard
+        if (searchElement !== undefined && searchElement !== targetElement) {
+          isMatch = false;
+          break;
+        }
+      }
+
+      if (isMatch) {
+        return true; // Found a matching string in targetArray
+      }
+    }
+
+    return false; // No match found in targetArray
+  }
+
+  // console.log(availableOptions);
 
   return (
     <>
       <Form {...form}>
-        <form>
-          {variants?.length > 0 &&
-            attributes?.map((field, idx) => (
-              <FormItem key={idx}>
+        <form className="space-y-5">
+          {product.variants?.length > 0 &&
+            possibleOptions?.map((field, idx) => (
+              <FormItem key={idx} className="flex flex-col">
                 <FormLabel>{field.name}</FormLabel>{" "}
                 <Controller
                   name={`selection.${field.name}`}
                   control={form.control}
                   render={({ field: formField }) => (
-                    <Select
-                      {...formField}
-                      onValueChange={(e) => formField.onChange(e)}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={`Select a ${field.name}`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel className="capitalize">
-                            {field.name}
-                          </SelectLabel>
-                          {attributes[idx]!.values.split(";").map(
-                            (value, idx) => (
-                              <SelectItem
-                                key={idx}
-                                value={value}
-                                className="flex"
-                              >
-                                {value}
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                    <>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-[200px] justify-between",
+                                !formField.value && "text-muted-foreground"
+                              )}
+                            >
+                              {formField.value
+                                ? product.category.attributes[
+                                    idx
+                                  ]!.values.split(";").find(
+                                    (language) => language === formField.value
+                                  )
+                                : `Select a ${field.name}`}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder={`Search ${field.name}...`}
+                            />
+                            <CommandEmpty>No {field.name} found.</CommandEmpty>
+                            <CommandGroup>
+                              {field.values.map((language, index) => {
+                                const available = isOptionAvailable(language);
+                                const combo = doesMatch(
+                                  language,
+                                  idx,
+                                  field.name
+                                );
+
+                                return (
+                                  <CommandItem
+                                    value={language}
+                                    key={index}
+                                    className={cn(
+                                      available && combo
+                                        ? ""
+                                        : "text-gray-400 line-through"
+                                    )}
+                                    disabled={!available || !combo}
+                                    onSelect={() => {
+                                      form.setValue(
+                                        `selection.${field.name}`,
+                                        formField.value === language
+                                          ? ""
+                                          : language
+                                      );
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        language === formField.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {language}{" "}
+                                    {!available || !combo
+                                      ? " - Out of stock"
+                                      : ""}
+                                  </CommandItem>
+                                );
+                              })}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </>
                   )}
                 />
               </FormItem>

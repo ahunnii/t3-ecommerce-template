@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import getProducts from "~/actions/core/get-products";
 import ProductList from "~/components/core/product/product-list";
 import { env } from "~/env.mjs";
@@ -14,24 +15,32 @@ const HomePage = () => {
   });
 
   return (
-    <StorefrontLayout>
-      <div className="space-y-10 pb-10">
-        <div className="overflow-hidden rounded-xl p-4 sm:p-6 lg:p-8">
-          <div
-            style={{ backgroundImage: `url(${"/hero.png"})` }}
-            className="relative aspect-square overflow-hidden rounded-xl bg-cover md:aspect-[2.4/1]"
-          ></div>
-        </div>
+    <>
+      <Head>
+        <title>Homepage | DreamWalker Studios</title>
+        <meta name="description" content="Admin" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-        <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-          {isLoading ? (
-            <div>Loading...</div>
-          ) : (
-            <ProductList title="Featured Products" items={products! ?? []} />
-          )}
+      <StorefrontLayout>
+        <div className="space-y-10 pb-10">
+          <div className="overflow-hidden rounded-xl p-4 sm:p-6 lg:p-8">
+            <div
+              style={{ backgroundImage: `url(${"/hero.png"})` }}
+              className="relative aspect-square overflow-hidden rounded-xl bg-cover md:aspect-[2.4/1]"
+            ></div>
+          </div>
+
+          <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              <ProductList title="Featured Products" items={products! ?? []} />
+            )}
+          </div>
         </div>
-      </div>
-    </StorefrontLayout>
+      </StorefrontLayout>
+    </>
   );
 };
 

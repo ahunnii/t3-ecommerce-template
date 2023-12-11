@@ -1,16 +1,14 @@
-"use client";
-
 import { ShoppingCart } from "lucide-react";
 
 import { useState } from "react";
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
-import useCart from "~/hooks/core/use-cart";
-import type { Product, Variation } from "~/types";
+import useCart, { withStorageDOMEvents } from "~/hooks/core/use-cart";
+import type { DetailedProductFull, Variation } from "~/types";
 import VariantSelector from "./product/variant-selector";
 
 interface InfoProps {
-  data: Product;
+  data: DetailedProductFull;
 }
 
 const Info: React.FC<InfoProps> = ({ data }) => {
@@ -34,8 +32,6 @@ const Info: React.FC<InfoProps> = ({ data }) => {
       <hr className="my-4" />
       <div className="flex flex-col gap-y-6">
         <VariantSelector
-          attributes={data?.category?.attributes}
-          variants={data?.variants}
           product={data}
           variant={variant}
           setVariant={setVariant}

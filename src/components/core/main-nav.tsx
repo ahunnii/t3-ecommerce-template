@@ -53,17 +53,14 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
 
       <HoverCard>
         <HoverCardTrigger>
-          <Link
-            href={"/collections/all-products"}
+          <p
             className={cn(
               "text-sm font-medium transition-colors hover:text-black",
-              pathname === "/collections/all-products"
-                ? "text-black"
-                : "text-neutral-500"
+              "cursor-pointer text-neutral-500"
             )}
           >
             The Store
-          </Link>
+          </p>
         </HoverCardTrigger>
         <HoverCardContent className="w-auto">
           <div className="space-y-1">
@@ -78,27 +75,13 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
                 About Us
               </Link>
               <Link
-                href={`/collections/`}
+                href={`/gallery`}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-black",
-                  pathname === `/collections/`
-                    ? "text-black"
-                    : "text-neutral-500"
+                  pathname === `/gallery` ? "text-black" : "text-neutral-500"
                 )}
               >
                 Gallery
-              </Link>
-
-              <Link
-                href={`/collections/`}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-black",
-                  pathname === `/collections/`
-                    ? "text-black"
-                    : "text-neutral-500"
-                )}
-              >
-                Blog
               </Link>
             </div>
           </div>
@@ -108,7 +91,7 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
         <HoverCard>
           <HoverCardTrigger>
             <Link
-              href={"/collections/all-products"}
+              href={"/collections"}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-black",
                 pathname === "/collections/all-products"
@@ -144,12 +127,10 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
       )}
 
       <Link
-        href={"/collections/all-products"}
+        href={"/contact-us"}
         className={cn(
           "text-sm font-medium transition-colors hover:text-black",
-          pathname === `/collections/all-products`
-            ? "text-black"
-            : "text-neutral-500"
+          pathname === `/contact-us` ? "text-black" : "text-neutral-500"
         )}
       >
         Contact Us

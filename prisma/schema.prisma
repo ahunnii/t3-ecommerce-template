@@ -74,11 +74,12 @@ model Store {
   id                String       @id @default(uuid())
   name              String
   userId            String
-  businessAddress   String  @default("")
+  businessAddress   String       @default("")
   billboards        Billboard[]  @relation("StoreToBillboard")
   categories        Category[]   @relation("StoreToCategory")
   products          Product[]    @relation("StoreToProduct")
   orders            Order[]      @relation("StoreToOrder")
+  gallery           GalleryImage[] @relation("StoreToGalleryImage")
   
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -223,6 +224,16 @@ model Image {
   @@index([productId])
 }
 
+model GalleryImage {
+  id        String   @id @default(uuid())
+  storeId   String // Foreign Key to Product
+  store     Store  @relation( "StoreToGalleryImage", fields: [storeId], references: [id], onDelete: Cascade)
+  title     String
+  url       String // URL of the image
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Attribute {
   id         String   @id @default(uuid())
   categoryId String // Foreign Key to Product
@@ -244,7 +255,7 @@ model Variation {
   values     String
   orderItems OrderItem[] // Relation to Order model
   quantity   Int
-  price      Decimal
+  price      Float
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 

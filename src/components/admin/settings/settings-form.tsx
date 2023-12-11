@@ -28,6 +28,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
+import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import {
   Popover,
@@ -43,11 +44,11 @@ import { cn } from "~/utils/styles";
 const formSchema = z.object({
   name: z.string().min(2),
 
-  street: z.string(),
+  street: z.string().optional(),
   additional: z.string().optional(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.number(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zip: z.coerce.number().positive().int().optional(),
 });
 
 type SettingsFormValues = z.infer<typeof formSchema>;
@@ -70,6 +71,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData.name,
+
       street: address[0] ?? undefined,
       additional: address.length > 5 ? address[1] ?? undefined : undefined,
       city:

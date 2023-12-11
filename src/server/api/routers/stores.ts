@@ -19,6 +19,9 @@ export const storeRouter = createTRPCRouter({
           id: input.storeId,
           userId: ctx.session.user.id,
         },
+        include: {
+          gallery: true,
+        },
       });
     }),
 

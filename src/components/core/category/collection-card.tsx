@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DetailedCollection } from "~/types";
 
@@ -8,25 +9,14 @@ interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
   collection: DetailedCollection;
 }
 
-export function CollectionCard({
-  collection,
-
-  className,
-  ...props
-}: AlbumArtworkProps) {
-  const router = useRouter();
-  const handleClick = () => {
-    router.push(`/collections/${collection?.id}`);
-  };
-
+export function CollectionCard({ collection, className }: AlbumArtworkProps) {
   return (
-    <div
-      onClick={handleClick}
+    <Link
+      href={`/collections/${collection?.id}`}
       className={cn(
         "group cursor-pointer space-y-4 rounded-xl border bg-white p-3",
         className
       )}
-      {...props}
     >
       <div className="relative aspect-square overflow-hidden rounded-xl">
         <Image
@@ -46,6 +36,6 @@ export function CollectionCard({
           {collection.products.length} products
         </p>
       </div>
-    </div>
+    </Link>
   );
 }
