@@ -6,11 +6,9 @@ import { useState } from "react";
 
 import Button from "~/components/core/ui/button";
 import IconButton from "~/components/core/ui/icon-button";
-import type { Color, Size } from "~/types";
 
 import { Attribute } from "@prisma/client";
 import AttributeFilter from "~/components/core/category/attribute-filter";
-import Filter from "./filter";
 
 interface MobileFiltersProps {
   data: Attribute[];
@@ -51,7 +49,6 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ data }) => {
                 <AttributeFilter
                   key={idx}
                   valueKey={`${attribute.name.toLowerCase()}Variant`}
-                  name={attribute.name}
                   data={attribute}
                 />
               ))}{" "}

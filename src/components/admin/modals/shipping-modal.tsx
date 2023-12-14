@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { CheckIcon, ChevronsUpDown } from "lucide-react";
@@ -136,6 +137,7 @@ export const ShippingModal = () => {
   const order = useShippingModal((state) => state.data);
 
   const [loading, setLoading] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [rates, setRates] = useState<any[]>([]);
 
   const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
@@ -872,7 +874,7 @@ export const ShippingModal = () => {
                                                 {rate?.servicelevel?.name} $
                                                 {rate?.amount}
                                                 {rate?.attributes?.map(
-                                                  (attr, idx) => (
+                                                  (attr: any, idx: any) => (
                                                     <Badge
                                                       key={idx}
                                                       className="text-xs"

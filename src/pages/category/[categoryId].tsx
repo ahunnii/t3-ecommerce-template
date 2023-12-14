@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { ParsedUrlQuery } from "querystring";
 import type { FC } from "react";
-import type { Category, Product, Size, Variation } from "~/types";
+import type { Category, DetailedProductFull, Size, Variation } from "~/types";
 
 import getCategory from "~/actions/core/get-category";
 
@@ -10,6 +10,7 @@ import getSizes from "~/actions/core/get-sizes";
 
 import AttributeFilter from "~/components/core/category/attribute-filter";
 
+import { Billboard as BillboardType } from "@prisma/client";
 import { useParams, useSearchParams } from "next/navigation";
 import MobileFilters from "~/components/core/category/mobile-filters";
 import Billboard from "~/components/core/ui/billboard";
@@ -20,7 +21,7 @@ import { api } from "~/utils/api";
 
 interface IProps {
   category: Category;
-  products: Product[];
+  products: DetailedProductFull[];
   sizes: Size[];
 }
 
@@ -43,7 +44,7 @@ const CategoryPage: FC<IProps> = () => {
   });
   return (
     <StorefrontLayout>
-      <Billboard data={category?.billboard} />
+      {category?.billboard && <Billboard data={category.billboard} />}
       {category && (
         <div className="px-4 pb-24 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
@@ -60,7 +61,7 @@ const CategoryPage: FC<IProps> = () => {
             <div className="mt-6 lg:col-span-4 lg:mt-0">
               {products?.length === 0 && <NoResults />}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                {products?.map((item: Product) => (
+                {products?.map((item: DetailedProductFull) => (
                   <ProductCard key={item.id} data={item} />
                 ))}
               </div>
@@ -115,7 +116,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     .map((variant: Variation) => variant?.productId);
 
   const variantProducts = products.filter((product) =>
-    filteredProductIds.includes(product.id as string)
+    filteredProductIds.includes(product.id)
   );
 
   return {

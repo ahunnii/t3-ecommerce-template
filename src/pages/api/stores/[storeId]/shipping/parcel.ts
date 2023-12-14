@@ -114,7 +114,7 @@ const addressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const addressFrom = {
             name: "Shawn Ippotle",
-            street1: "11638 Marshall Rd.",
+            street1: "",
             city: "Birch Run",
             state: "MI",
             zip: "48415",
@@ -123,7 +123,7 @@ const addressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const addressTo = {
             name: "Mr Hippo",
-            street1: "673 Lakewood Dr.",
+            street1: "",
             city: "South Lyon",
             state: "MI",
             zip: "48178",
@@ -131,18 +131,18 @@ const addressHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           };
 
           const parcel = {
-            length: "5",
-            width: "5",
-            height: "5",
+            length: 5,
+            width: 5,
+            height: 5,
             distance_unit: "in",
-            weight: "2",
+            weight: 2,
             mass_unit: "lb",
           };
 
           const results = await shippoClient.shipment.create({
             address_from: addressFrom,
             address_to: addressTo,
-            parcels: [parcel],
+            parcels: [],
             async: false,
           });
           return res.status(200).json(results);

@@ -1,13 +1,11 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { Color } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
-import type { ColorColumn } from "~/components/admin/colors/columns";
+
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import { ColorClient } from "~/components/admin/colors/client";
 import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
 

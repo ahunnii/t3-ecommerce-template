@@ -160,7 +160,7 @@ export const productsRouter = createTRPCRouter({
         ...new Set(
           input.products
             .filter((item) => item.variantId !== null)
-            .map((item) => item.variantId)
+            .map((item) => item.variantId!)
         ),
       ];
 

@@ -28,29 +28,6 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
 const GalleryCard: React.FC<ProductCard> = ({ data }) => {
-  const previewModal = usePreviewModal();
-  const cart = useCart();
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push(`/product/${data?.id}`);
-  };
-
-  const onPreview: MouseEventHandler<HTMLButtonElement> = (event) => {
-    event.stopPropagation();
-    previewModal.onOpen(data);
-  };
-
-  const onAddToCart: MouseEventHandler<HTMLButtonElement> = (event) => {
-    event.stopPropagation();
-
-    cart.addCartItem({
-      product: data,
-      quantity: 1,
-      variant: null,
-    });
-  };
-
   return (
     <Dialog>
       <DialogTrigger asChild>

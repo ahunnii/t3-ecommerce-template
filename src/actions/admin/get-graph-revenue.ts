@@ -22,7 +22,7 @@ export const getGraphRevenue = async (
     },
   });
 
-  const monthlyRevenue: { [key: number]: number } = {};
+  const monthlyRevenue: Record<number, number> = {};
 
   // Grouping the orders by month and summing the revenue
   for (const order of paidOrders) {
@@ -54,9 +54,11 @@ export const getGraphRevenue = async (
   ];
 
   // Filling in the revenue data
-  for (const month in monthlyRevenue) {
-    graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)];
-  }
+
+  graphData.forEach((month, idx) => (month.total = monthlyRevenue[idx] ?? 0));
+  // for (const month in monthlyRevenue) {
+  //   graphData[parseInt(month)!].total = monthlyRevenue[parseInt(month)]!;
+  // }
 
   return graphData;
 };

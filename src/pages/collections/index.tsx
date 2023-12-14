@@ -44,9 +44,9 @@ const CollectionPage = () => {
                 <CollectionCard
                   key={item.id}
                   collection={item}
-                  aspectRatio="square"
-                  width={150}
-                  height={150}
+                  // aspectRatio="square"
+                  // width={150}
+                  // height={150}
                 />
               ))}
             </div>

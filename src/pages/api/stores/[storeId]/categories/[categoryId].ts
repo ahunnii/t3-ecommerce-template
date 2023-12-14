@@ -31,24 +31,24 @@ const colorByIdHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           categoryId: categoryId as string,
         });
         return res.status(200).json(getCategory);
-      case "PATCH":
-        if (!userId)
-          return res.status(403).json({ message: "Unauthenticated" });
-        if (!name) return res.status(400).json({ message: "Name is required" });
-        if (!billboardId)
-          return res.status(400).json({ message: "Billboard id is required" });
-        if (!categoryId)
-          return res.status(400).json({ message: "Category Id is required" });
-        if (!storeByUserId)
-          return res.status(405).json({ message: "Unauthorized" });
+      // case "PATCH":
+      //   if (!userId)
+      //     return res.status(403).json({ message: "Unauthenticated" });
+      //   if (!name) return res.status(400).json({ message: "Name is required" });
+      //   if (!billboardId)
+      //     return res.status(400).json({ message: "Billboard id is required" });
+      //   if (!categoryId)
+      //     return res.status(400).json({ message: "Category Id is required" });
+      //   if (!storeByUserId)
+      //     return res.status(405).json({ message: "Unauthorized" });
 
-        const updateCategory = await caller.categories.updateCategory({
-          categoryId: categoryId as string,
-          storeId: storeId as string,
-          billboardId: billboardId as string,
-          name: req.body.name,
-        });
-        return res.status(200).json(updateCategory);
+      //   const updateCategory = await caller.categories.updateCategory({
+      //     categoryId: categoryId as string,
+      //     storeId: storeId as string,
+      //     billboardId: billboardId as string,
+      //     name: req.body.name,
+      //   });
+      //   return res.status(200).json(updateCategory);
       case "DELETE":
         if (!userId)
           return res.status(403).json({ message: "Unauthenticated" });

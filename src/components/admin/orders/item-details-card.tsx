@@ -23,10 +23,7 @@ const ItemDetailsCard = ({ item }: { item: OrderItem }) => {
           />
         </div>
       </TableCell>
-      <TableCell>{product.name}</TableCell>{" "}
-      <TableCell>
-        {product?.color?.name}, {product?.size.name}
-      </TableCell>
+      <TableCell>{product.name}</TableCell> <TableCell></TableCell>
       <TableCell>1</TableCell>
       <TableCell>${product.price.toString()}</TableCell>{" "}
       <TableCell className="text-right">

@@ -4,7 +4,7 @@ import { collectionsRouter } from "~/server/api/routers/collections";
 
 import { exampleRouter } from "~/server/api/routers/example";
 import { ordersRouter } from "~/server/api/routers/orders";
-import { sizesRouter } from "~/server/api/routers/sizes";
+// import { sizesRouter } from "~/server/api/routers/sizes";
 import { storeRouter } from "~/server/api/routers/stores";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { attributesRouter } from "./routers/attributes";
@@ -21,7 +21,7 @@ import { userRouter } from "./routers/users";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   store: storeRouter,
-  sizes: sizesRouter,
+  // sizes: sizesRouter,
 
   categories: categoriesRouter,
   collections: collectionsRouter,

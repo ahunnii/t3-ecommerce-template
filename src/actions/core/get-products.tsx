@@ -1,6 +1,6 @@
 import qs from "query-string";
 import { string } from "zod";
-import type { Product } from "~/types";
+import { DetailedProductFull } from "~/types";
 
 const URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
 
@@ -11,7 +11,7 @@ interface Query {
   isFeatured?: boolean;
 }
 
-const getProducts = async (query: Query): Promise<Product[]> => {
+const getProducts = async (query: Query): Promise<DetailedProductFull[]> => {
   const url = qs.stringifyUrl({
     url: URL,
     query: {

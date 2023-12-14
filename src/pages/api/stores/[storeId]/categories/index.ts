@@ -31,21 +31,21 @@ const colorsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
         return res.status(200).json(getAllCategories);
 
-      case "POST":
-        if (!userId)
-          return res.status(403).json({ message: "Unauthenticated" });
-        if (!name) return res.status(400).json({ message: "Name is required" });
-        if (!billboardId)
-          return res.status(400).json({ message: "Billboard id is required" });
-        if (!storeByUserId)
-          return res.status(405).json({ message: "Unauthorized" });
+      // case "POST":
+      //   if (!userId)
+      //     return res.status(403).json({ message: "Unauthenticated" });
+      //   if (!name) return res.status(400).json({ message: "Name is required" });
+      //   if (!billboardId)
+      //     return res.status(400).json({ message: "Billboard id is required" });
+      //   if (!storeByUserId)
+      //     return res.status(405).json({ message: "Unauthorized" });
 
-        const createCategory = await caller.categories.createCategory({
-          storeId: storeId as string,
-          name,
-          billboardId,
-        });
-        return res.status(200).json(createCategory);
+      //   const createCategory = await caller.categories.createCategory({
+      //     storeId: storeId as string,
+      //     name,
+      //     billboardId,
+      //   });
+      //   return res.status(200).json(createCategory);
 
       default:
         res.setHeader("Allow", "GET, POST");

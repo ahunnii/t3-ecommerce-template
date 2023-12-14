@@ -32,7 +32,7 @@ const cartItemsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             ...new Set(
               (cartItems as CartItem[])
                 .filter((item) => item.variant !== null)
-                .map((item) => item.variant?.id)
+                .map((item) => item.variant!.id)
             ),
           ];
 

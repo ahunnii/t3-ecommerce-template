@@ -11,7 +11,7 @@ import { api } from "~/utils/api";
 const GalleryPage = () => {
   const { data: products } = api.products.getAllProducts.useQuery({});
 
-  const items = products?.map((product) => product.images[0].url) || [];
+  const items = products?.map((product) => product.images[0]?.url) ?? [];
 
   //   const items = [
   //     "http://localhost:3000/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdlpkok326%2Fimage%2Fupload%2Fv1701896698%2Fykyo0as2lfldblnvebdt.jpg&w=3840&q=75",
@@ -24,7 +24,7 @@ const GalleryPage = () => {
             <h3 className="text-3xl font-bold">Gallery</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {items.map((item, idx) => (
-                <GalleryCard key={idx} data={item} />
+                <GalleryCard key={idx} data={item!} />
               ))}
             </div>
           </div>

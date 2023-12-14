@@ -67,7 +67,7 @@ export const categoriesRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        billboardId: z.string().optional(),
+        billboardId: z.string(),
         storeId: z.string(),
         attributes: z.array(
           z.object({
@@ -211,8 +211,9 @@ export const categoriesRouter = createTRPCRouter({
                     createMany: {
                       data: [
                         ...input.attributes.map(
-                          (attribute: { name: string; values: string }) =>
-                            attribute
+                          (attribute: { name: string; values: string }) => {
+                            return { ...attribute, storeId: input.storeId };
+                          }
                         ),
                       ],
                     },
