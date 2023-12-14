@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { Category, Color, Product, Size } from "@prisma/client";
+import type { Category, Product } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
 import type { ProductColumn } from "~/components/admin/products/columns";
 
@@ -19,8 +19,6 @@ interface IProps {
 
 interface ExtendedProduct extends Product {
   category: Category;
-  // size?: Size;
-  // color?: Color;
 }
 
 const ProductsPage: FC<IProps> = ({ storeId }) => {
@@ -39,8 +37,7 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
       isArchived: item.isArchived,
       price: formatter.format(parseFloat(item.price.toString())),
       category: item.category.name,
-      // size: item?.size?.name ?? "N/A",
-      // color: item?.color?.value ?? "N/A",
+
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));
   }, []);
@@ -51,7 +48,7 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
   }, [products, formatProducts]);
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Products">
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
           {!products && <PageLoader />}

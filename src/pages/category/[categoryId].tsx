@@ -1,84 +1,88 @@
-import type { GetServerSidePropsContext, GetStaticPropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import type { ParsedUrlQuery } from "querystring";
 import type { FC } from "react";
-import type { Category, Color, Product, Size, Variation } from "~/types";
+import type { Category, Product, Size, Variation } from "~/types";
 
-import getCategories from "~/actions/app/get-categories";
-import getCategory from "~/actions/app/get-category";
-import getColors from "~/actions/app/get-colors";
-import getProducts from "~/actions/app/get-products";
-import getSizes from "~/actions/app/get-sizes";
+import getCategory from "~/actions/core/get-category";
 
-import AttributeFilter from "~/components/app/category/attribute-filter";
-import Filter from "~/components/app/category/filter";
-import MobileFilters from "~/components/app/category/mobile-filters";
-import Billboard from "~/components/app/ui/billboard";
-import NoResults from "~/components/app/ui/no-results";
-import ProductCard from "~/components/app/ui/product-card";
+import getProducts from "~/actions/core/get-products";
+import getSizes from "~/actions/core/get-sizes";
+
+import AttributeFilter from "~/components/core/category/attribute-filter";
+
+import { useParams, useSearchParams } from "next/navigation";
+import MobileFilters from "~/components/core/category/mobile-filters";
+import Billboard from "~/components/core/ui/billboard";
+import NoResults from "~/components/core/ui/no-results";
+import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/layouts/StorefrontLayout";
+import { api } from "~/utils/api";
 
 interface IProps {
   category: Category;
   products: Product[];
   sizes: Size[];
-  colors: Color[];
 }
 
 interface Params extends ParsedUrlQuery {
-  colorId: string;
   sizeId: string;
   categoryId: string;
   sizeVariant: string;
 }
 
-const CategoryPage: FC<IProps> = ({ products, sizes, colors, category }) => {
+const CategoryPage: FC<IProps> = () => {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const { data: category } = api.categories.getCategory.useQuery({
+    categoryId: params.categoryId as string,
+  });
+
+  const { data: products } = api.products.getAllStoreProducts.useQuery({
+    categoryId: params.categoryId as string,
+    queryString: searchParams.toString(),
+  });
   return (
     <StorefrontLayout>
-      <Billboard data={category.billboard} />
-      <div className="px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
-          <MobileFilters
-            sizes={sizes}
-            colors={colors}
-            data={category?.attributes}
-          />
-          <div className="hidden lg:block">
-            {/* <Filter valueKey="sizeId" name="Sizes" data={sizes} />
-            <Filter valueKey="colorId" name="Colors" data={colors} /> */}
-            {category?.attributes?.map((attribute, idx) => (
-              <AttributeFilter
-                key={idx}
-                valueKey={`${attribute.name.toLowerCase()}Variant`}
-                name={attribute.name}
-                data={attribute}
-              />
-            ))}
-          </div>
-          <div className="mt-6 lg:col-span-4 lg:mt-0">
-            {products.length === 0 && <NoResults />}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {products.map((item: Product) => (
-                <ProductCard key={item.id} data={item} />
+      <Billboard data={category?.billboard} />
+      {category && (
+        <div className="px-4 pb-24 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
+            <MobileFilters data={category?.attributes} />
+            <div className="hidden lg:block">
+              {category?.attributes?.map((attribute, idx) => (
+                <AttributeFilter
+                  key={idx}
+                  valueKey={`${attribute.name.toLowerCase()}Variant`}
+                  data={attribute}
+                />
               ))}
+            </div>
+            <div className="mt-6 lg:col-span-4 lg:mt-0">
+              {products?.length === 0 && <NoResults />}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                {products?.map((item: Product) => (
+                  <ProductCard key={item.id} data={item} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </StorefrontLayout>
   );
 };
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { colorId, sizeId, categoryId } = ctx.query as Params;
+  const { sizeId, categoryId } = ctx.query as Params;
 
   const products = await getProducts({
     categoryId,
-    colorId,
+
     sizeId,
   });
 
   const sizes = await getSizes();
-  const colors = await getColors();
+
   const category = await getCategory(categoryId);
 
   const attributes = category.attributes.map((attribute) =>
@@ -90,7 +94,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       props: {
         products,
         sizes,
-        colors,
+
         category,
       },
     };
@@ -111,14 +115,14 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     .map((variant: Variation) => variant?.productId);
 
   const variantProducts = products.filter((product) =>
-    filteredProductIds.includes(product.id)
+    filteredProductIds.includes(product.id as string)
   );
 
   return {
     props: {
       products: variantProducts,
       sizes,
-      colors,
+
       category,
     },
   };

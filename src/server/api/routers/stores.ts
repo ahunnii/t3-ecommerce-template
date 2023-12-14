@@ -19,6 +19,9 @@ export const storeRouter = createTRPCRouter({
           id: input.storeId,
           userId: ctx.session.user.id,
         },
+        include: {
+          gallery: true,
+        },
       });
     }),
 
@@ -38,8 +41,13 @@ export const storeRouter = createTRPCRouter({
       z.object({
         storeId: z.string(),
         name: z.string(),
-        stripeSk: z.string().optional(),
-        stripeWebhook: z.string().optional(),
+        businessAddress: z.string(),
+        hasFreeShipping: z.boolean(),
+        minFreeShipping: z.coerce.number().nonnegative().optional(),
+        hasPickup: z.boolean(),
+        maxPickupDistance: z.coerce.number().nonnegative().optional(),
+        hasFlatRate: z.boolean(),
+        flatRateAmount: z.coerce.number().nonnegative().optional(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -77,8 +85,13 @@ export const storeRouter = createTRPCRouter({
             },
             data: {
               name: input.name,
-              stripeSk: input.stripeSk ?? "",
-              stripeWebhook: input.stripeWebhook ?? "",
+              businessAddress: input.businessAddress,
+              hasFreeShipping: input.hasFreeShipping,
+              minFreeShipping: input.minFreeShipping,
+              hasPickup: input.hasPickup,
+              maxPickupDistance: input.maxPickupDistance,
+              hasFlatRate: input.hasFlatRate,
+              flatRateAmount: input.flatRateAmount,
             },
           });
         })

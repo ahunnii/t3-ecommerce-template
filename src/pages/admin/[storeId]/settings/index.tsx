@@ -9,7 +9,7 @@ import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
 
 interface IProps {
-  store: Store;
+  store: Store & { gallery: { url: string }[] };
 }
 const SettingsPage: FC<IProps> = ({ store }) => {
   return (

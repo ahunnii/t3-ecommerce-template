@@ -25,7 +25,7 @@ export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
       <div className="flex items-center justify-between">
         <Heading
           title={`Categories (${data.length})`}
-          description="Manage categories for your store"
+          description="Manage categories for your store. Products are assigned a category, which includes shared attributes that can used to generate product variants."
         />
         <Button
           onClick={() =>

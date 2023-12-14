@@ -11,7 +11,7 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Toaster } from "~/components/ui/toaster";
 import { ModalProvider } from "~/providers/admin/modal-provider";
-import StorefrontModalProvider from "~/providers/app/modal-provider";
+import StorefrontModalProvider from "~/providers/core/modal-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/providers/toast-provider";
 
@@ -35,7 +35,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <ToastProvider />
         <ModalProvider />
         <StorefrontModalProvider />
-        <AnimatePresence mode="wait">
+        {/* <AnimatePresence mode="wait">
           <motion.div
             key={router.route}
             initial="initialState"
@@ -58,10 +58,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
               },
             }}
             className="base-page-size"
-          >
-            <Component {...pageProps} /> <Toaster />
-          </motion.div>{" "}
-        </AnimatePresence>
+          > */}
+        <Component {...pageProps} /> <Toaster />
+        {/* </motion.div>{" "}
+        </AnimatePresence> */}
       </ThemeProvider>
     </SessionProvider>
   );

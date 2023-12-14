@@ -1,70 +1,117 @@
-import type { GetStaticPropsContext } from "next";
-import type { ParsedUrlQuery } from "querystring";
-import type { FC } from "react";
-import type { Product } from "~/types";
+import { useParams } from "next/navigation";
 
-import getProduct from "~/actions/app/get-product";
-import getProducts from "~/actions/app/get-products";
-
-import Gallery from "~/components/app/gallery";
-import Info from "~/components/app/info";
-import ProductList from "~/components/app/product-list";
+import Gallery from "~/components/core/gallery";
+import Info from "~/components/core/info";
+import ProductList from "~/components/core/product/product-list";
 import PageLoader from "~/components/ui/page-loader";
+
 import StorefrontLayout from "~/layouts/StorefrontLayout";
 
-interface IProps {
-  product: Product;
-  suggestedProducts: Product[];
-}
+import { api } from "~/utils/api";
 
-interface Params extends ParsedUrlQuery {
-  productId: string;
-}
+import { GetServerSidePropsContext } from "next";
+import Head from "next/head";
+import Breadcrumbs from "~/components/core/category/breadcrumbs";
+import { prisma } from "~/server/db";
+import type { DetailedProduct, DetailedProductFull } from "~/types";
 
-const ProductPage: FC<IProps> = ({ product, suggestedProducts }) => {
+const ProductPage = ({ prevUrl, name }: { name: string; prevUrl: string }) => {
+  const params = useParams();
+
+  const { data: product, isLoading } = api.products.getProduct.useQuery({
+    productId: params?.productId as string,
+  });
+
+  const { data: collection } = api.collections.getCollection.useQuery({
+    collectionId: prevUrl
+      ? prevUrl.includes("collections")
+        ? prevUrl.split("/")[4]!
+        : ""
+      : "",
+  });
+
+  const { data: suggested } = api.products.getAllSuggestedProducts.useQuery({
+    categoryId: product?.category?.id ?? "",
+  });
+
+  console.log(product);
+  const pathway =
+    prevUrl && prevUrl.includes("collections")
+      ? [
+          {
+            name: "Collections",
+            link: "/collections",
+          },
+
+          {
+            name: collection?.name ?? "All Products",
+            link: `/collections/${collection?.id ?? "all-products"}`,
+          },
+
+          {
+            name: product?.name ?? "",
+          },
+        ]
+      : [
+          {
+            name: "Products",
+            link: "/collections/all-products",
+          },
+
+          {
+            name: product?.name ?? "",
+          },
+        ];
+
   return (
-    <StorefrontLayout>
-      {!product && <PageLoader />}
-      {product && (
-        <div className="px-4 py-10 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
-            <Gallery images={product.images} />
-            <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-              <Info data={product} />
+    <>
+      <Head>
+        <title>{name} | DreamWalker Studios</title>
+        <meta name="description" content="Admin" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <StorefrontLayout>
+        {isLoading && <PageLoader />}
+        <Breadcrumbs pathway={pathway} />
+        {!isLoading && product && (
+          <div className="px-4 py-10 sm:px-6 lg:px-8">
+            <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
+              <Gallery images={product?.images} />
+              <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
+                <Info data={product} />
+              </div>
             </div>
+            <hr className="my-10" />
+            {suggested && (
+              <ProductList
+                title="Related Items"
+                items={(suggested as DetailedProductFull[]) ?? []}
+              />
+            )}
           </div>
-          <hr className="my-10" />
-          <ProductList title="Related Items" items={suggestedProducts} />
-        </div>
-      )}
-    </StorefrontLayout>
+        )}
+      </StorefrontLayout>
+    </>
   );
 };
 
-export const getStaticProps = async (ctx: GetStaticPropsContext) => {
-  const { productId } = ctx.params as Params;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { productId } = context.params!;
 
-  const product = await getProduct(productId);
-  const suggestedProducts = await getProducts({
-    categoryId: product?.category?.id,
+  const product = await prisma.product.findFirst({
+    where: {
+      id: productId as string,
+    },
   });
+
+  console.log(product);
 
   return {
     props: {
-      product,
-      suggestedProducts,
+      prevUrl: context.req.headers.referer ?? "",
+      name: product?.name ?? "",
     },
   };
-};
-
-export const getStaticPaths = async () => {
-  const slugs = await getProducts({});
-  const paths = slugs.map((slug) => ({ params: { productId: slug.id } }));
-
-  return {
-    paths,
-    fallback: "blocking",
-  };
-};
+}
 
 export default ProductPage;

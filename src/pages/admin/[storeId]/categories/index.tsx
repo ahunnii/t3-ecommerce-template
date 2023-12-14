@@ -1,38 +1,37 @@
-import { format } from "date-fns";
+import type { GetServerSidePropsContext } from "next";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { Billboard, Category } from "@prisma/client";
-import type { GetServerSidePropsContext } from "next";
+import { format } from "date-fns";
+
+import { CategoriesClient } from "~/components/admin/categories/client";
 import type { CategoryColumn } from "~/components/admin/categories/columns";
+import PageLoader from "~/components/ui/page-loader";
+
+import AdminLayout from "~/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import { CategoriesClient } from "~/components/admin/categories/client";
-import PageLoader from "~/components/ui/page-loader";
-import AdminLayout from "~/layouts/AdminLayout";
+import type { DetailedCategory } from "~/types";
 
 interface IProps {
   storeId: string;
 }
-interface ExtendedCategory extends Category {
-  billboard: Billboard;
-}
-
 const CategoriesPage: FC<IProps> = ({ storeId }) => {
   const [formattedCategories, setFormattedCategories] = useState<
     CategoryColumn[]
   >([]);
 
-  const { data: categories } = api.categories.getAllCategories.useQuery({
-    storeId,
-  });
+  const { data: categories, isLoading } =
+    api.categories.getAllCategories.useQuery({
+      storeId,
+    });
 
-  const formatCategories = useCallback((categories: ExtendedCategory[]) => {
-    return categories.map((item: ExtendedCategory) => ({
+  const formatCategories = useCallback((categories: DetailedCategory[]) => {
+    return categories.map((item: DetailedCategory) => ({
       id: item.id,
       name: item.name,
-      billboardLabel: item.billboard.label,
+      billboardLabel: item?.billboard?.label,
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));
   }, []);
@@ -46,8 +45,11 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
     <AdminLayout>
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {!categories && <PageLoader />}
-          {categories && <CategoriesClient data={formattedCategories} />}
+          {isLoading ? (
+            <PageLoader />
+          ) : (
+            <CategoriesClient data={formattedCategories} />
+          )}
         </div>
       </div>
     </AdminLayout>

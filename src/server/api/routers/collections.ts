@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -8,19 +9,23 @@ import {
 
 export const collectionsRouter = createTRPCRouter({
   getAllCollections: publicProcedure
-    .input(z.object({ storeId: z.string() }))
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        isFeatured: z.boolean().optional(),
+      })
+    )
     .query(({ ctx, input }) => {
       return ctx.prisma.collection.findMany({
         where: {
-          storeId: input.storeId,
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          isFeatured: input.isFeatured,
         },
         include: {
           products: true,
           billboard: true,
         },
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
       });
     }),
 
@@ -39,7 +44,17 @@ export const collectionsRouter = createTRPCRouter({
           id: input.collectionId,
         },
         include: {
-          products: true,
+          products: {
+            include: {
+              images: true,
+              variants: true,
+              category: {
+                include: {
+                  attributes: true,
+                },
+              },
+            },
+          },
           billboard: true,
         },
       });
@@ -51,6 +66,7 @@ export const collectionsRouter = createTRPCRouter({
         name: z.string(),
         storeId: z.string(),
         billboardId: z.string(),
+        isFeatured: z.boolean(),
         products: z.array(
           z.object({
             id: z.string(),
@@ -91,7 +107,7 @@ export const collectionsRouter = createTRPCRouter({
             data: {
               name: input.name,
               billboardId: input.billboardId,
-
+              isFeatured: input.isFeatured,
               storeId: input.storeId,
               products: {
                 connect: input.products,
@@ -115,6 +131,7 @@ export const collectionsRouter = createTRPCRouter({
         storeId: z.string(),
         name: z.string(),
         billboardId: z.string(),
+        isFeatured: z.boolean(),
 
         products: z.array(
           z.object({
@@ -164,6 +181,7 @@ export const collectionsRouter = createTRPCRouter({
               data: {
                 name: input.name,
                 billboardId: input.billboardId,
+                isFeatured: input.isFeatured,
                 products: {
                   set: [],
                 },

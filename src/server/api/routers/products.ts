@@ -1,30 +1,116 @@
-import { Variation } from "@prisma/client";
+import { type ShippingType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { CartItem } from "~/types";
+
+import {
+  extractQueryString,
+  filterProductsByVariants,
+} from "~/utils/filtering";
 
 export const productsRouter = createTRPCRouter({
-  getAllProducts: publicProcedure
-    .input(z.object({ storeId: z.string() }))
+  // Queries for the frontend
+  getAllStoreProducts: publicProcedure
+    .input(
+      z.object({
+        isFeatured: z.boolean().optional(),
+        queryString: z.string().optional(),
+        categoryId: z.string().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const results = extractQueryString(input.queryString ?? "");
+
+      const products = await ctx.prisma.product.findMany({
+        where: {
+          storeId: env.NEXT_PUBLIC_STORE_ID,
+          isFeatured: input.isFeatured,
+          categoryId: input.categoryId,
+        },
+        include: {
+          category: {
+            include: {
+              attributes: true,
+            },
+          },
+          variants: true,
+          images: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      const filteredProducts = filterProductsByVariants(
+        products,
+        results.names,
+        results.values
+      );
+
+      return input.queryString ? filteredProducts : products;
+    }),
+
+  getAllSuggestedProducts: publicProcedure
+    .input(z.object({ categoryId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.product.findMany({
         where: {
-          storeId: input.storeId,
+          storeId: env.NEXT_PUBLIC_STORE_ID,
+          categoryId: input.categoryId,
         },
         include: {
           category: true,
-          size: true,
-          color: true,
+          images: true,
         },
         orderBy: {
           createdAt: "desc",
         },
       });
     }),
+
+  // Queries for the admin
+  getAllProducts: publicProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        isFeatured: z.boolean().optional(),
+        collectionId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      return ctx.prisma.product.findMany({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          isFeatured: input.isFeatured ?? undefined,
+          collections: input.collectionId
+            ? {
+                some: {
+                  id: input.collectionId ?? undefined,
+                },
+              }
+            : {},
+        },
+        include: {
+          images: true,
+          variants: true,
+          category: {
+            include: {
+              attributes: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
   getProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
@@ -50,6 +136,64 @@ export const productsRouter = createTRPCRouter({
         },
       });
     }),
+
+  getCartProducts: publicProcedure
+    .input(
+      z.object({
+        products: z.array(
+          z.object({
+            productId: z.string(),
+            variantId: z.string().nullish(),
+            quantity: z.number(),
+          })
+        ),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // const productIds = input.products.map((product) => product.productId);
+
+      // Fetch all unique product IDs and variant IDs from the cart items
+      const productIds = [
+        ...new Set(input.products.map((item) => item.productId)),
+      ];
+      const variantIds = [
+        ...new Set(
+          input.products
+            .filter((item) => item.variantId !== null)
+            .map((item) => item.variantId)
+        ),
+      ];
+
+      // Fetch all products and variants in one go
+      const [products, variants] = await Promise.all([
+        ctx.prisma.product.findMany({
+          where: { id: { in: productIds } },
+          include: {
+            images: true,
+            variants: true,
+            category: {
+              include: {
+                attributes: true,
+              },
+            },
+          },
+        }),
+        ctx.prisma.variation.findMany({
+          where: { id: { in: variantIds } },
+        }),
+      ]);
+
+      const detailedCartItems = input.products.map((cartItem) => ({
+        product: products.find((p) => p.id === cartItem.productId),
+        variant: cartItem.variantId
+          ? variants.find((v) => v.id === cartItem.variantId)
+          : null,
+        quantity: cartItem.quantity,
+      })) as CartItem[];
+
+      return detailedCartItems;
+    }),
+
   getDetailedProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
@@ -68,24 +212,33 @@ export const productsRouter = createTRPCRouter({
           images: true,
           variants: true,
           category: true,
-          size: true,
-          color: true,
         },
       });
     }),
+
   createProduct: protectedProcedure
     .input(
       z.object({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
-        colorId: z.string().optional(),
-        sizeId: z.string().optional(),
+
         description: z.string().optional(),
         quantity: z.number(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),
         isArchived: z.boolean().optional(),
+        shippingCost: z.coerce.number().min(0).optional(),
+        shippingType: z.enum([
+          "FLAT_RATE" as ShippingType,
+          "FREE" as ShippingType,
+          "VARIABLE" as ShippingType,
+        ]),
+        weight: z.coerce.number().min(0).optional(),
+        length: z.coerce.number().min(0).optional(),
+        width: z.coerce.number().min(0).optional(),
+        height: z.coerce.number().min(0).optional(),
+        estimatedCompletion: z.coerce.number().min(0).optional(),
         images: z.array(
           z.object({
             url: z.string(),
@@ -122,20 +275,6 @@ export const productsRouter = createTRPCRouter({
           message: "Category id is required",
         });
       }
-
-      // if (!input.colorId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Color id is required",
-      //   });
-      // }
-
-      // if (!input.sizeId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Size id is required",
-      //   });
-      // }
 
       if (!input.storeId) {
         throw new TRPCError({
@@ -174,8 +313,8 @@ export const productsRouter = createTRPCRouter({
               isFeatured: input.isFeatured,
               isArchived: input.isArchived,
               categoryId: input.categoryId,
-              colorId: input.colorId,
-              sizeId: input.sizeId,
+
+              estimatedCompletion: input.estimatedCompletion ?? 0,
               storeId: input.storeId,
               images: {
                 createMany: {
@@ -198,6 +337,12 @@ export const productsRouter = createTRPCRouter({
                   ],
                 },
               },
+              shippingCost: input.shippingCost,
+              shippingType: input.shippingType,
+              weight: input.weight,
+              length: input.length,
+              width: input.width,
+              height: input.height,
             },
           });
         })
@@ -217,8 +362,7 @@ export const productsRouter = createTRPCRouter({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
-        colorId: z.string().optional(),
-        sizeId: z.string().optional(),
+        estimatedCompletion: z.coerce.number().min(0).optional(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),
         isArchived: z.boolean().optional(),
@@ -237,6 +381,16 @@ export const productsRouter = createTRPCRouter({
             quantity: z.number(),
           })
         ),
+        shippingCost: z.coerce.number().min(0).optional(),
+        shippingType: z.enum([
+          "FLAT_RATE" as ShippingType,
+          "FREE" as ShippingType,
+          "VARIABLE" as ShippingType,
+        ]),
+        weight: z.coerce.number().min(0).optional(),
+        length: z.coerce.number().min(0).optional(),
+        width: z.coerce.number().min(0).optional(),
+        height: z.coerce.number().min(0).optional(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -260,20 +414,6 @@ export const productsRouter = createTRPCRouter({
           message: "Category id is required",
         });
       }
-
-      // if (!input.colorId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Color id is required",
-      //   });
-      // }
-
-      // if (!input.sizeId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Size id is required",
-      //   });
-      // }
 
       if (!input.storeId) {
         throw new TRPCError({
@@ -323,8 +463,7 @@ export const productsRouter = createTRPCRouter({
                 isFeatured: input.isFeatured,
                 isArchived: input.isArchived,
                 categoryId: input.categoryId,
-                colorId: input.colorId,
-                sizeId: input.sizeId,
+                estimatedCompletion: input.estimatedCompletion ?? 0,
                 description: input.description,
                 quantity: input.quantity,
                 images: {
@@ -333,6 +472,12 @@ export const productsRouter = createTRPCRouter({
                 variants: {
                   deleteMany: {},
                 },
+                shippingCost: input.shippingCost,
+                shippingType: input.shippingType,
+                weight: input.weight,
+                length: input.length,
+                width: input.width,
+                height: input.height,
               },
             })
             .then(() => {

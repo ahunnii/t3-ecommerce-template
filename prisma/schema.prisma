@@ -71,20 +71,32 @@ model VerificationToken {
 }
 
 model Store {
-  id          String       @id @default(uuid())
-  name        String
-  userId      String
-  billboards  Billboard[]  @relation("StoreToBillboard")
-  categories  Category[]   @relation("StoreToCategory")
-  products    Product[]    @relation("StoreToProduct")
-  sizes       Size[]       @relation("StoreToSize")
-  colors      Color[]      @relation("StoreToColor")
-  orders      Order[]      @relation("StoreToOrder")
-  collections Collection[] @relation("StoreToCollection")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                String       @id @default(uuid())
+  name              String
+  userId            String
+  businessAddress   String       @default("")
+  billboards        Billboard[]  @relation("StoreToBillboard")
+  categories        Category[]   @relation("StoreToCategory")
+  products          Product[]    @relation("StoreToProduct")
+  orders            Order[]      @relation("StoreToOrder")
+  gallery           GalleryImage[] @relation("StoreToGalleryImage")
+
+
+  hasFreeShipping   Boolean        @default(false)  
+  minFreeShipping   Float?         @default(0)
+
+  hasPickup         Boolean        @default(false)
+  maxPickupDistance   Float?       @default(0)
+
+  hasFlatRate      Boolean        @default(false)
+  flatRateAmount    Float?        @default(0)
+  
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
 
   cart Cart[] @relation("StoreToCart")
+  collections Collection[] @relation("StoreToCollection")
 }
 
 model Billboard {
@@ -92,6 +104,7 @@ model Billboard {
   storeId    String
   store      Store      @relation("StoreToBillboard", fields: [storeId], references: [id])
   label      String
+  description String?
   imageUrl   String
   categories Category[]
   collections Collection[]
@@ -110,6 +123,7 @@ model Category {
   name        String
   attributes  Attribute[]
   products    Product[]   @relation("CategoryToProduct")
+  // collections Collection[] @relation("CategoryToCollection")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,6 +132,28 @@ model Category {
   @@index([billboardId])
 }
 
+model Collection {
+  id      String @id @default(uuid())
+  storeId String // Foreign Key to Store
+  store   Store  @relation("StoreToCollection", fields: [storeId], references: [id])
+
+  billboardId String // Foreign Key to Billboard
+  billboard   Billboard   @relation(fields: [billboardId], references: [id])
+  
+  isFeatured  Boolean      @default(false)
+
+
+  name    String
+  products  Product[] // Relation to Product model
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+enum ShippingType  {
+FLAT_RATE
+FREE
+LOCAL_PICKUP
+VARIABLE 
+}
 model Product {
   id          String   @id @default(uuid())
   storeId     String // Foreign Key to Store
@@ -125,42 +161,49 @@ model Product {
   categoryId  String // Foreign Key to Category
   category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
   name        String
-  price       Decimal
+  price       Float    @default(0.00)
   description String?  @db.VarChar(1000)
   quantity    Int      @default(1)
 
   isFeatured  Boolean      @default(false)
   isArchived  Boolean      @default(false)
-  sizeId      String? // Foreign Key to Size
-  size        Size?        @relation(fields: [sizeId], references: [id])
-  colorId     String? // Foreign Key to Color
-  color       Color?       @relation(fields: [colorId], references: [id])
+
   images      Image[] // Relation to Image model
   orderItems  OrderItem[] // Relation to Order model
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   variants    Variation[]
   collections Collection[]
+  featuredImage String?
 
   cartItems CartItem[] // Relation to Order model
+  weight    Float? @default(0) // in grams
+  length    Float? @default(0) // in in
+  width Float? @default(0) // in in
+  height Float? @default(0) // in in
+
+  shippingType ShippingType @default(FLAT_RATE)
+  shippingCost Float? @default(0)
+
+  estimatedCompletion Int @default(0)
 
   @@index([storeId])
   @@index([categoryId])
-  @@index([sizeId])
-  @@index([colorId])
+
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  storeId    String // Foreign Key to Store
-  store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems OrderItem[] // Relation to OrderItem model
-  isPaid     Boolean     @default(false)
-  name       String      @default("")
-  phone      String      @default("")
-  address    String      @default("")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id              String      @id @default(uuid())
+  storeId         String      // Foreign Key to Store
+  store           Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems      OrderItem[] // Relation to OrderItem model
+  isPaid          Boolean     @default(false)
+  name            String      @default("")
+  phone           String      @default("")
+  address         String      @default("")
+  // trackingNumber  String      @default("")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   @@index([storeId])
 }
@@ -181,31 +224,6 @@ model OrderItem {
   @@index([variantId])
 }
 
-model Size {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToSize", fields: [storeId], references: [id])
-  name      String
-  value     String
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([storeId])
-}
-
-model Color {
-  id        String    @id @default(uuid())
-  storeId   String // Foreign Key to Store
-  store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
-  name      String
-  value     String
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([storeId])
-}
 
 model Image {
   id        String   @id @default(uuid())
@@ -218,6 +236,16 @@ model Image {
   @@index([productId])
 }
 
+model GalleryImage {
+  id        String   @id @default(uuid())
+  storeId   String // Foreign Key to Product
+  store     Store  @relation( "StoreToGalleryImage", fields: [storeId], references: [id], onDelete: Cascade)
+  title     String
+  url       String // URL of the image
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Attribute {
   id         String   @id @default(uuid())
   categoryId String // Foreign Key to Product
@@ -226,6 +254,7 @@ model Attribute {
   values     String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  storeId    String  
 
   @@index([categoryId])
 }
@@ -238,7 +267,7 @@ model Variation {
   values     String
   orderItems OrderItem[] // Relation to Order model
   quantity   Int
-  price      Decimal
+  price      Float
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
@@ -276,19 +305,8 @@ model Cart {
   @@index([userId])
 }
 
-model Collection {
-  id      String @id @default(uuid())
-  name    String
-  storeId String // Foreign Key to Store
-  store   Store  @relation("StoreToCollection", fields: [storeId], references: [id])
 
-  billboardId String // Foreign Key to Billboard
-  billboard   Billboard   @relation(fields: [billboardId], references: [id])
 
-  products  Product[] // Relation to Product model
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
 
 enum Role {
   USER

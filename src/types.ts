@@ -1,16 +1,16 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
-export interface Product {
-  id: string;
-  category: Category;
-  name: string;
-  price: Prisma.Decimal | number | string;
-  isFeatured: boolean;
-  size?: Size;
-  color?: Color;
-  images: Image[];
-  variants: Variation[];
-}
+// export interface Product {
+//   id: string;
+//   category: Category;
+//   name: string;
+//   price: Prisma.Decimal | number | string;
+//   isFeatured: boolean;
+//   size?: Size;
+//   color?: Color;
+//   images: Image[];
+//   variants: Variation[];
+// }
 
 export interface Image {
   id: string;
@@ -36,11 +36,11 @@ export interface Size {
   value: string;
 }
 
-export interface Color {
-  id: string;
-  name: string;
-  value: string;
-}
+// export interface Color {
+//   id: string;
+//   name: string;
+//   value: string;
+// }
 
 export interface Variation {
   id: string;
@@ -55,10 +55,11 @@ export interface Attribute {
   id: string;
   name: string;
   values: string;
+  quantity: number;
 }
 
 export interface CartItem {
-  product: Product;
+  product: DetailedProductFull;
   variant: Variation | null;
   quantity: number;
 }
@@ -69,3 +70,40 @@ export interface Collection {
   products: Product[] | Partial<Product>[];
   billboard: Billboard;
 }
+
+export type DetailedProduct = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    category: {
+      include: {
+        billboard: true;
+      };
+    };
+  };
+}>;
+
+export type DetailedProductFull = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    variants: true;
+    category: {
+      include: {
+        attributes: true;
+      };
+    };
+  };
+}>;
+
+export type DetailedCategory = Prisma.CategoryGetPayload<{
+  include: {
+    billboard: true;
+    attributes: true;
+  };
+}>;
+
+export type DetailedCollection = Prisma.CollectionGetPayload<{
+  include: {
+    products: true;
+    billboard: true;
+  };
+}>;

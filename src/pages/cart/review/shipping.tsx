@@ -1,4 +1,4 @@
-import { ShippingForm } from "~/components/app/cart/shipping-form";
+import { ShippingForm } from "~/components/core/cart/shipping-form";
 import CheckoutLayout from "~/layouts/CheckoutLayout";
 
 const ShippingReview = () => {

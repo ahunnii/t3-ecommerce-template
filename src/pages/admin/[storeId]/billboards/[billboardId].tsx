@@ -1,11 +1,12 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
+import { BillboardForm } from "~/components/admin/billboards/billboard-form";
+import PageLoader from "~/components/ui/page-loader";
+
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import { BillboardForm } from "~/components/admin/billboards/billboard-form";
-import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
 
 interface IProps {
@@ -13,16 +14,17 @@ interface IProps {
 }
 
 const BillboardPage: FC<IProps> = ({ billboardId }) => {
-  const { data: billboard } = api.billboards.getBillboard.useQuery({
-    billboardId,
+  const { data: billboard, isLoading } = api.billboards.getBillboard.useQuery({
+    billboardId: billboardId,
   });
   return (
-    <AdminLayout>
+    <AdminLayout title={billboard ? "Edit Billboard" : "New Billboard"}>
       <div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {typeof billboard === "undefined" && <PageLoader />}
-          {typeof billboard === "object" && (
-            <BillboardForm initialData={billboard && null} />
+          {isLoading ? (
+            <PageLoader />
+          ) : (
+            <BillboardForm initialData={billboard ?? null} />
           )}
         </div>
       </div>

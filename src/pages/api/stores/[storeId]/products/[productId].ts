@@ -15,16 +15,6 @@ const productByIdHandler = async (
   const userId = ctx.session?.user.id;
   const { productId } = req.query;
   const { storeId } = req.query;
-  const {
-    name,
-    price,
-    categoryId,
-    images,
-    colorId,
-    sizeId,
-    isFeatured,
-    isArchived,
-  } = req.body;
 
   const storeByUserId = await ctx.prisma.store.findFirst({
     where: {
@@ -50,45 +40,13 @@ const productByIdHandler = async (
                 attributes: true,
               },
             },
-            color: true,
-            size: true,
+
+     
             variants: true,
           },
         });
         return res.status(200).json(getProduct);
-      case "PATCH":
-        if (!userId)
-          return res.status(403).json({ message: "Unauthenticated" });
-        if (!name) return res.status(400).json({ message: "Name is required" });
-        if (!productId)
-          return res.status(400).json({ message: "Product id is required" });
-        if (!images ?? !images.length)
-          return res.status(400).json({ message: "Images are required" });
-        if (!price)
-          return res.status(400).json({ message: "price is required" });
-        if (!categoryId)
-          return res.status(400).json({ message: "Category Id is required" });
-        if (!colorId)
-          return res.status(400).json({ message: "color Id is required" });
-        if (!sizeId)
-          return res.status(400).json({ message: "size Id is required" });
-        if (!storeByUserId)
-          return res.status(405).json({ message: "Unauthorized" });
 
-        const updateProduct = await caller.products.updateProduct({
-          name,
-          price,
-          categoryId,
-          colorId,
-          sizeId,
-          images,
-          isFeatured,
-          isArchived,
-          productId: productId as string,
-          storeId: storeId as string,
-        });
-        return res.status(200).json(updateProduct);
-      case "DELETE":
         if (!userId)
           return res.status(403).json({ message: "Unauthenticated" });
         if (!productId)
@@ -102,7 +60,7 @@ const productByIdHandler = async (
         });
         return res.status(200).json(deleteProduct);
       default:
-        res.setHeader("Allow", "GET, POST");
+        res.setHeader("Allow", "GET");
         return res.status(405).end("Method Not Allowed");
     }
   } catch (cause) {

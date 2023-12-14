@@ -1,20 +1,20 @@
-"use client";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { Billboard, Category } from "@prisma/client";
-
-import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Attribute, Billboard, Category } from "@prisma/client";
+import { Trash } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
+
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,11 +30,12 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
+
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
   name: z.string().min(2),
-  billboardId: z.string().min(1),
+  billboardId: z.string(),
   attributes: z.array(
     z.object({
       name: z.string().min(2),
@@ -46,7 +47,11 @@ const formSchema = z.object({
 type CategoryFormValues = z.infer<typeof formSchema>;
 
 interface CategoryFormProps {
-  initialData: Category | null;
+  initialData:
+    | (Category & {
+        attributes: Attribute[];
+      })
+    | null;
   billboards: Billboard[];
 }
 
@@ -56,6 +61,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 }) => {
   const params = useRouter();
   const router = useNavigationRouter();
+  const apiContext = api.useContext();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,10 +73,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData ?? {
-      name: "",
-      billboardId: "",
-      attributes: [],
+    defaultValues: {
+      name: initialData?.name ?? "",
+      billboardId: initialData?.billboardId ?? undefined,
+      attributes: initialData?.attributes ?? [],
     },
   });
 
@@ -88,11 +94,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       toast.error("Something went wrong");
       console.error(error);
     },
-    onMutate: () => {
-      setLoading(true);
-    },
+    onMutate: () => setLoading(true),
     onSettled: () => {
       setLoading(false);
+      void apiContext.categories.getCategory.invalidate();
     },
   });
 
@@ -105,12 +110,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       toast.error("Something went wrong");
       console.error(error);
     },
-    onMutate: () => {
-      setLoading(true);
-    },
-    onSettled: () => {
-      setLoading(false);
-    },
+    onMutate: () => setLoading(true),
+    onSettled: () => setLoading(false),
   });
 
   const { mutate: deleteCategory } = api.categories.deleteCategory.useMutation({
@@ -122,9 +123,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       toast.error("Make sure you removed all products using this color first.");
       console.error(error);
     },
-    onMutate: () => {
-      setLoading(true);
-    },
+    onMutate: () => setLoading(true),
     onSettled: () => {
       setLoading(false);
       setOpen(false);
@@ -135,17 +134,23 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     if (initialData) {
       updateCategory({
         storeId: params?.query?.storeId as string,
-        billboardId: data.billboardId,
+        billboardId: data?.billboardId ?? "",
         name: data.name,
         categoryId: params?.query?.categoryId as string,
-        attributes: data.attributes,
+        attributes: data.attributes.map((attribute) => ({
+          ...attribute,
+          storeId: params?.query?.storeId as string,
+        })),
       });
     } else {
       createCategory({
         storeId: params?.query?.storeId as string,
         name: data.name,
-        billboardId: data.billboardId,
-        attributes: data.attributes,
+        billboardId: data?.billboardId ?? "",
+        attributes: data.attributes.map((attribute) => ({
+          ...attribute,
+          storeId: params?.query?.storeId as string,
+        })),
       });
     }
   };
@@ -184,7 +189,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
           className="w-full space-y-8"
         >
-          <div className="gap-8 md:grid md:grid-cols-3">
+          <div className="gap-8 md:grid md:grid-cols-2">
             <FormField
               control={form.control}
               name="name"
@@ -229,48 +234,63 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                         </SelectItem>
                       ))}
                     </SelectContent>
-                  </Select>
+                  </Select>{" "}
+                  <FormDescription>
+                    Image associated with this category. Used in category pages.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>{" "}
+          <div className="flex flex-col space-y-3">
+            <FormLabel>Attributes</FormLabel>
+            <FormDescription>
+              Attributes are common product types associated with this category.
+              Add attributes to quickly make variants of your products. I.E.
+              sizes, colors, materials, etc.{" "}
+            </FormDescription>
 
-            <div>
-              <FormLabel>Attributes</FormLabel>
+            {fields.map((item, index) => (
+              <div key={item.id} className="flex items-center space-x-4">
+                <Controller
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Attribute (e.g., Size, Color)"
+                    />
+                  )}
+                  name={`attributes.${index}.name`}
+                  control={form.control}
+                  defaultValue={item.name}
+                />
 
-              {fields.map((item, index) => (
-                <div key={item.id} className="flex items-center space-x-4">
-                  <Controller
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="Attribute (e.g., Size, Color)"
-                      />
-                    )}
-                    name={`attributes.${index}.name`}
-                    control={form.control}
-                    defaultValue={item.name}
-                  />
+                <Controller
+                  render={({ field }) => (
+                    <Input {...field} placeholder="Value (e.g., M, Red)" />
+                  )}
+                  name={`attributes.${index}.values`}
+                  control={form.control}
+                  defaultValue={item.values}
+                />
 
-                  <Controller
-                    render={({ field }) => (
-                      <Input {...field} placeholder="Value (e.g., M, Red)" />
-                    )}
-                    name={`attributes.${index}.values`}
-                    control={form.control}
-                    defaultValue={item.values}
-                  />
+                <Button
+                  onClick={() => remove(index)}
+                  variant="destructive"
+                  type="button"
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
 
-                  <Button onClick={() => remove(index)} variant="destructive">
-                    Remove
-                  </Button>
-                </div>
-              ))}
-
-              <Button onClick={() => append({ name: "", values: "" })}>
-                Add Attribute
-              </Button>
-            </div>
+            <Button
+              onClick={() => append({ name: "", values: "" })}
+              type="button"
+              className="w-max"
+            >
+              Add Attribute
+            </Button>
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

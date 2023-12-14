@@ -1,10 +1,10 @@
-"use client";
-
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
+
+import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "react-hot-toast";
+
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+
 import { api } from "~/utils/api";
 
 import type { BillboardColumn } from "./columns";
@@ -40,9 +41,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         );
         console.error(error);
       },
-      onMutate: () => {
-        setLoading(true);
-      },
+      onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
         setOpen(false);

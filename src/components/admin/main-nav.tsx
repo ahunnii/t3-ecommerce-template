@@ -14,8 +14,6 @@ export function MainNav({
   const params = useParams();
   const router = useRouter();
 
-  console.log();
-
   if (!router?.query?.storeId) return null;
   const routes = [
     {
@@ -41,16 +39,7 @@ export function MainNav({
       active:
         pathname === `/admin/${router?.query?.storeId.toString()}/categories`,
     },
-    {
-      href: `/admin/${router?.query?.storeId.toString()}/sizes`,
-      label: "Sizes",
-      active: pathname === `/admin/${router?.query?.storeId.toString()}/sizes`,
-    },
-    {
-      href: `/admin/${router?.query?.storeId.toString()}/colors`,
-      label: "Colors",
-      active: pathname === `/admin/${router?.query?.storeId.toString()}/colors`,
-    },
+
     {
       href: `/admin/${router?.query?.storeId.toString()}/products`,
       label: "Products",
