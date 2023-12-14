@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import getProducts from "~/actions/core/get-products";
 import ProductList from "~/components/core/product/product-list";
 import GalleryCard from "~/components/core/ui/gallery-card";
@@ -8,29 +9,24 @@ import { env } from "~/env.mjs";
 import StorefrontLayout from "~/layouts/StorefrontLayout";
 import { api } from "~/utils/api";
 
+const DynamicGalleryPage = dynamic(
+  () =>
+    import(`~/components/${env.NEXT_PUBLIC_SITE_DIRECTORY}/pages/GalleryPage`),
+  {
+    ssr: false,
+  }
+);
+
 const GalleryPage = () => {
-  const { data: products } = api.products.getAllProducts.useQuery({});
-
-  const items = products?.map((product) => product.images[0]?.url) ?? [];
-
-  //   const items = [
-  //     "http://localhost:3000/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdlpkok326%2Fimage%2Fupload%2Fv1701896698%2Fykyo0as2lfldblnvebdt.jpg&w=3840&q=75",
-  //   ];
   return (
-    <StorefrontLayout>
-      <div className="space-y-10 py-10">
-        <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-          <div className="space-y-4">
-            <h3 className="text-3xl font-bold">Gallery</h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {items.map((item, idx) => (
-                <GalleryCard key={idx} data={item!} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </StorefrontLayout>
+    <>
+      <Head>
+        <title>Gallery | DreamWalker Studios</title>
+        <meta name="description" content="Admin" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <DynamicGalleryPage />
+    </>
   );
 };
 
