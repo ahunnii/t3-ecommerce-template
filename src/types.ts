@@ -59,7 +59,7 @@ export interface Attribute {
 }
 
 export interface CartItem {
-  product: Product;
+  product: DetailedProductFull;
   variant: Variation | null;
   quantity: number;
 }

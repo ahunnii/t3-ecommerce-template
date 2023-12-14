@@ -36,7 +36,9 @@ const handleStripeWebhookEvent = async (
       switch (event.type) {
         case "checkout.session.completed":
           const session = event.data.object as Stripe.Checkout.Session;
+
           const address = session?.customer_details?.address;
+          const name = session?.customer_details?.name;
 
           const addressComponents = [
             address?.line1,
@@ -50,6 +52,8 @@ const handleStripeWebhookEvent = async (
             .filter((c) => c !== null)
             .join(", ");
 
+          console.log(addressString);
+
           const order = await prisma.order.update({
             where: {
               id: session?.metadata?.orderId,
@@ -58,6 +62,7 @@ const handleStripeWebhookEvent = async (
               isPaid: true,
               address: addressString,
               phone: session?.customer_details?.phone ?? "",
+              name: name ?? "",
             },
             include: {
               orderItems: {
@@ -81,7 +86,10 @@ const handleStripeWebhookEvent = async (
                     id: orderItem.productId,
                   },
                   data: {
-                    quantity: orderItem.product.quantity - orderItem.quantity,
+                    quantity:
+                      orderItem.product.quantity - orderItem.quantity < 0
+                        ? 0
+                        : orderItem.product.quantity - orderItem.quantity,
                   },
                 })
                 .then((res) => {
@@ -102,7 +110,10 @@ const handleStripeWebhookEvent = async (
                   id: orderItem.variantId,
                 },
                 data: {
-                  quantity: orderItem.variant.quantity - orderItem.quantity,
+                  quantity:
+                    orderItem.variant.quantity - orderItem.quantity < 0
+                      ? 0
+                      : orderItem.variant.quantity - orderItem.quantity,
                 },
               });
               const variants = await prisma.variation.findMany({

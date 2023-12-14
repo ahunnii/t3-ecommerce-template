@@ -53,7 +53,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                   )[0]!.values
                 : "",
             },
-            unit_amount: product.price.toNumber() * 100,
+            unit_amount: product.price * 100,
           },
         });
       });

@@ -34,6 +34,7 @@ const ProductPage = ({ prevUrl, name }: { name: string; prevUrl: string }) => {
     categoryId: product?.category?.id ?? "",
   });
 
+  console.log(product);
   const pathway =
     prevUrl && prevUrl.includes("collections")
       ? [

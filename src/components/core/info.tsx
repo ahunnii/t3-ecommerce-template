@@ -3,7 +3,7 @@ import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
-import useCart, { withStorageDOMEvents } from "~/hooks/core/use-cart";
+import useCart from "~/hooks/core/use-cart";
 import type { DetailedProductFull, Variation } from "~/types";
 import VariantSelector from "./product/variant-selector";
 
@@ -21,6 +21,7 @@ const Info: React.FC<InfoProps> = ({ data }) => {
     cart.addCartItem({ product: data, variant: variant!, quantity });
   };
 
+  // console.log({ product: data, variant: variant!, quantity });
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900">{data.name}</h1>

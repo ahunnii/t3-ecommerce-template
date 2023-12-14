@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
+import { Switch } from "~/components/ui/switch";
 import { useOrigin } from "~/hooks/use-origin";
 import { api } from "~/utils/api";
 import { states } from "~/utils/shipping";
@@ -49,6 +50,12 @@ const formSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.coerce.number().positive().int().optional(),
+  hasFreeShipping: z.boolean(),
+  minFreeShipping: z.coerce.number().nonnegative(),
+  hasPickup: z.boolean(),
+  maxPickupDistance: z.coerce.number().nonnegative().optional(),
+  hasFlatRate: z.boolean(),
+  flatRateAmount: z.coerce.number().nonnegative().optional(),
 });
 
 type SettingsFormValues = z.infer<typeof formSchema>;
@@ -61,6 +68,8 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const origin = useOrigin();
+
+  const apiContext = api.useContext();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -82,12 +91,18 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
         address.length > 5
           ? Number(address[4]) ?? undefined
           : Number(address[3]) ?? undefined,
+
+      hasFreeShipping: initialData?.hasFreeShipping,
+      minFreeShipping: initialData?.minFreeShipping ?? undefined,
+      hasPickup: initialData?.hasPickup,
+      maxPickupDistance: initialData?.maxPickupDistance ?? undefined,
+      hasFlatRate: initialData?.hasFlatRate,
+      flatRateAmount: initialData?.flatRateAmount ?? undefined,
     },
   });
 
   const { mutate: updateStore } = api.store.updateStore.useMutation({
     onSuccess: () => {
-      router.refresh();
       toast.success("Store updated.");
     },
     onError: (error) => {
@@ -99,6 +114,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     },
     onSettled: () => {
       setLoading(false);
+      void apiContext.store.getStore.invalidate();
     },
   });
 
@@ -121,13 +137,19 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: SettingsFormValues) => {
-    console.log(data);
+    console.log("yeer");
     updateStore({
       storeId: params.query.storeId as string,
       name: data.name,
       businessAddress: `${data.street}, ${
         data.additional ? data.additional + ", " : ""
       }${data.city}, ${data.state}, ${data.zip}, US`,
+      hasFreeShipping: data.hasFreeShipping,
+      minFreeShipping: data.minFreeShipping ?? undefined,
+      hasPickup: data.hasPickup,
+      maxPickupDistance: data.maxPickupDistance ?? undefined,
+      flatRateAmount: data.flatRateAmount ?? undefined,
+      hasFlatRate: data.hasFlatRate,
     });
   };
 
@@ -163,6 +185,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       <Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          onChange={() => console.log(form.formState)}
           className="w-full space-y-8"
         >
           <div className="grid grid-cols-3 gap-8">
@@ -186,7 +209,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />{" "}
             <FormField
               control={form.control}
               name="name"
@@ -284,7 +307,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                           <CommandGroup>
                             {states.map((state) => (
                               <CommandItem
-                                value={state.label}
+                                value={state.label ?? undefined}
                                 key={state.value}
                                 onSelect={() => {
                                   form.setValue("state", state.value);
@@ -332,6 +355,171 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                   </FormItem>
                 )}
               />{" "}
+            </div>
+          </div>
+
+          <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
+            <FormLabel>Shipping</FormLabel>{" "}
+            <FormDescription className="pb-5">
+              Set how your store handles shipping.
+            </FormDescription>
+            <div
+              className={cn(
+                "grid grid-cols-1 gap-4",
+                form.watch("hasFreeShipping") && "grid-cols-2"
+              )}
+            >
+              <FormField
+                control={form.control}
+                name="hasFreeShipping"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Free Shipping</FormLabel>
+                      <FormDescription>
+                        Mark a minimum amount for order to qualify for free
+                        shipping.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              {form.watch("hasFreeShipping") && (
+                <FormField
+                  control={form.control}
+                  name="minFreeShipping"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Free Shipping Threshold</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your name"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        What is the minimum amount for a user to qualify for
+                        free shipping? Defaults to 0.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+            <div
+              className={cn(
+                "grid grid-cols-1 gap-4",
+                form.watch("hasPickup") && "grid-cols-2"
+              )}
+            >
+              <FormField
+                control={form.control}
+                name="hasPickup"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Pickup from Base
+                      </FormLabel>
+                      <FormDescription>
+                        Do you offer pickup from the address above?
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              {form.watch("hasPickup") && (
+                <FormField
+                  control={form.control}
+                  name="maxPickupDistance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pickup Distance Threshold</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your name"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        What is the max amount you want a user to see this
+                        option?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+            <div
+              className={cn(
+                "grid grid-cols-1 gap-4",
+                form.watch("hasFlatRate") && "grid-cols-2"
+              )}
+            >
+              <FormField
+                control={form.control}
+                name="hasFlatRate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Flat Rate Shipping
+                      </FormLabel>
+                      <FormDescription>
+                        Mark if you want a standard, flat rate shipping for all
+                        orders. If not selected, it will be calculated at
+                        checkout and will select the base USPS option price.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              {form.watch("hasFlatRate") && (
+                <FormField
+                  control={form.control}
+                  name="flatRateAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Flat Rate Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your name"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        What is the flat rate amount you want to charge per
+                        order? If you have free shipping enabled, it will be up
+                        until the min free shipping amount has been reached.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">

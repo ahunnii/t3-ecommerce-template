@@ -42,6 +42,12 @@ export const storeRouter = createTRPCRouter({
         storeId: z.string(),
         name: z.string(),
         businessAddress: z.string(),
+        hasFreeShipping: z.boolean(),
+        minFreeShipping: z.coerce.number().nonnegative().optional(),
+        hasPickup: z.boolean(),
+        maxPickupDistance: z.coerce.number().nonnegative().optional(),
+        hasFlatRate: z.boolean(),
+        flatRateAmount: z.coerce.number().nonnegative().optional(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -80,6 +86,12 @@ export const storeRouter = createTRPCRouter({
             data: {
               name: input.name,
               businessAddress: input.businessAddress,
+              hasFreeShipping: input.hasFreeShipping,
+              minFreeShipping: input.minFreeShipping,
+              hasPickup: input.hasPickup,
+              maxPickupDistance: input.maxPickupDistance,
+              hasFlatRate: input.hasFlatRate,
+              flatRateAmount: input.flatRateAmount,
             },
           });
         })

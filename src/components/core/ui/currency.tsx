@@ -1,7 +1,5 @@
-"use client";
-
-import { Prisma } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { cn } from "~/utils/styles";
 
 const formatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -9,10 +7,11 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 interface CurrencyProps {
-  value?: string | number | Prisma.Decimal;
+  value?: string | number;
+  className?: string;
 }
 
-const Currency: React.FC<CurrencyProps> = ({ value = 0 }) => {
+const Currency: React.FC<CurrencyProps> = ({ className, value = 0 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -23,7 +22,11 @@ const Currency: React.FC<CurrencyProps> = ({ value = 0 }) => {
     return null;
   }
 
-  return <div className="font-semibold">{formatter.format(Number(value))}</div>;
+  return (
+    <div className={cn("font-semibold", className)}>
+      {formatter.format(Number(value))}
+    </div>
+  );
 };
 
 export default Currency;

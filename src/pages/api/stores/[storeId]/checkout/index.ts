@@ -4,13 +4,16 @@ import type { NextApiRequest, NextApiResponse } from "next";
 // import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
 
+import { Cart, Product } from "@prisma/client";
+import axios from "axios";
 import type { Stripe } from "stripe";
 import { stripe } from "~/server/stripe/client";
+import { CartItem, DetailedProductFull } from "~/types";
 
 const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const ctx = await createTRPCContext({ req, res });
 
-  const { productIds, variantIds, quantity } = req.body;
+  const { productIds, variantIds, quantity, cartItems, shipping } = req.body;
   const { storeId } = req.query;
 
   try {
@@ -22,54 +25,128 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           if (!productIds || productIds.length === 0) {
             return res.status(400).json({ error: "Product ids are required" });
           }
+          const verifiedDBDataResponse = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/cartItems`,
+            {
+              cartItems,
+            }
+          );
 
-          const products = await ctx.prisma.product.findMany({
-            where: {
-              id: {
-                in: productIds,
-              },
-            },
-            include: {
-              variants: true,
-              images: true,
-            },
-          });
+          if (verifiedDBDataResponse.status !== 200) {
+            throw new Error();
+          }
 
-          const variants = await ctx.prisma.variation.findMany({
-            where: {
-              id: {
-                in: variantIds,
-              },
-            },
-          });
+          const verifiedDBData = (await verifiedDBDataResponse.data
+            .detailedCartItems) as CartItem[];
+          // const products = await ctx.prisma.product.findMany({
+          //   where: {
+          //     id: {
+          //       in: productIds,
+          //     },
+          //   },
+          //   include: {
+          //     variants: true,
+          //     images: true,
+          //   },
+          // });
+
+          // const variants = await ctx.prisma.variation.findMany({
+          //   where: {
+          //     id: {
+          //       in: variantIds,
+          //     },
+          //   },
+          // });
 
           const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
-          // Map the values key from the fetched variants to the variant IDs
-          const mapValuesToIds = () => {
-            const variantIdToValueMap: Record<string, string> = {};
-            for (const variant of variants) {
-              variantIdToValueMap[variant.id] = variant.values;
-            }
+          // const completionDates = cartItems.map((item: CartItem) => {
+          //   console.log(item.product.estimatedCompletion);
+          //   return (item.product?.estimatedCompletion ?? 1) * item.quantity;
+          // });
+          // console.log(completionDates);
+          // const longestDate = Math.max(
+          //   ...(cartItems.map(
+          //     (item: CartItem) =>
+          //       item.product?.estimatedCompletion ?? 1 * item.quantity
+          //   ) as number[])
+          // );
+          // console.log(longestDate);
+          // const estDelivery = new Date(
+          //   Date.now() + longestDate * 24 * 60 * 60 * 1000
+          // ).toLocaleDateString();
 
-            return variantIds.map((id: string) =>
-              id === "0" ? "Default" : variantIdToValueMap[id]
-            );
-          };
+          // console.log(estDelivery);
+          const shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption =
+            shipping === "FREE"
+              ? {
+                  shipping_rate_data: {
+                    type: "fixed_amount",
+                    fixed_amount: {
+                      amount: 0,
+                      currency: "usd",
+                    },
+                    display_name: "Free Shipping",
+                    delivery_estimate: {
+                      minimum: {
+                        unit: "business_day",
+                        value: 5,
+                      },
+                      maximum: {
+                        unit: "business_day",
+                        value: 7,
+                      },
+                    },
+                  },
+                }
+              : {
+                  shipping_rate_data: {
+                    type: "fixed_amount",
+                    fixed_amount: {
+                      amount: shipping * 100,
+                      currency: "usd",
+                    },
+                    display_name: `[Fixed] Standard 5-7 days after product processing.`,
 
-          const variantValues = mapValuesToIds();
+                    delivery_estimate: {
+                      minimum: {
+                        unit: "business_day",
+                        value: 5,
+                      },
+                      maximum: {
+                        unit: "business_day",
+                        value: 7,
+                      },
+                    },
+                  },
+                };
 
-          products.forEach((product, idx) => {
+          // // Map the values key from the fetched variants to the variant IDs
+          // const mapValuesToIds = () => {
+          //   const variantIdToValueMap: Record<string, string> = {};
+          //   for (const variant of variants) {
+          //     variantIdToValueMap[variant.id] = variant.values;
+          //   }
+
+          //   return variantIds.map((id: string) =>
+          //     id === "0" ? "Default" : variantIdToValueMap[id]
+          //   );
+          // };
+
+          // const variantValues = mapValuesToIds();
+
+          verifiedDBData.forEach((product, idx) => {
             line_items.push({
               quantity: Number(quantity[idx]) ?? 1,
               price_data: {
                 currency: "USD",
                 product_data: {
-                  name: product.name + variants[0]?.values,
-                  description: variantValues[idx] as string,
-                  images: product.images.map((image) => image.url),
+                  name: product.product.name,
+                  description: product.variant?.values,
+
+                  images: product.product.images.map((image) => image.url),
                 },
-                unit_amount: Math.floor(product.price.toNumber() * 100),
+                unit_amount: Math.floor(product.product.price * 100),
               },
             });
           });
@@ -79,29 +156,29 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
               storeId: storeId as string,
               isPaid: false,
               orderItems: {
-                create: productIds.map((productId: string, idx: number) => {
-                  if (variantValues[idx] === "Default")
+                create: verifiedDBData.map((product: CartItem, idx: number) => {
+                  if (product.variant === null)
                     return {
                       product: {
                         connect: {
-                          id: productId,
+                          id: product.product.id,
                         },
                       },
-                      quantity: Number(quantity[idx]) ?? 1,
+                      quantity: Number(product.quantity) ?? 1,
                     };
 
                   return {
                     product: {
                       connect: {
-                        id: productId,
+                        id: product.product.id,
                       },
                     },
                     variant: {
                       connect: {
-                        id: variantIds[idx],
+                        id: product.variant.id,
                       },
                     },
-                    quantity: Number(quantity[idx]) ?? 1,
+                    quantity: Number(product.quantity) ?? 1,
                   };
                 }),
               },
@@ -113,12 +190,21 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             mode: "payment",
             payment_method_types: ["card"],
             billing_address_collection: "required",
+
             shipping_address_collection: {
               allowed_countries: ["US", "CA"],
             },
+            shipping_options: [shippingOptions],
             phone_number_collection: {
               enabled: true,
             },
+
+            custom_text: {
+              shipping_address: {
+                message: `Please note that things made to order takes additional processing time before shipping. Check estimated delivery dates of products to see when to expect your item(s).`,
+              },
+            },
+
             success_url: `http://localhost:3000/cart?success=1`,
             cancel_url: `http://localhost:3000/cart?canceled=1`,
             metadata: {

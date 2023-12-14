@@ -91,7 +91,8 @@ const VariantSelector: FC<IProps> = ({
   }, [variant]);
 
   const availableOptions = product?.variants?.map((variant) => {
-    return `${variant.values}, ${variant.quantity}`;
+    if (variant.quantity > 1) return `${variant.values}, ${variant.quantity}`;
+    return "";
   });
 
   const isOptionAvailable = (option: string) => {
@@ -248,7 +249,7 @@ const VariantSelector: FC<IProps> = ({
                     className="w-[180px]"
                     type="number"
                     min={1}
-                    max={variant ? variant.quantity : 10}
+                    max={variant ? variant.quantity : product.quantity}
                   />
                 </FormControl>
                 <FormMessage />

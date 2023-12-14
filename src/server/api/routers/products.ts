@@ -7,6 +7,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { CartItem } from "~/types";
 
 import {
   extractQueryString,
@@ -136,6 +137,63 @@ export const productsRouter = createTRPCRouter({
       });
     }),
 
+  getCartProducts: publicProcedure
+    .input(
+      z.object({
+        products: z.array(
+          z.object({
+            productId: z.string(),
+            variantId: z.string().nullish(),
+            quantity: z.number(),
+          })
+        ),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // const productIds = input.products.map((product) => product.productId);
+
+      // Fetch all unique product IDs and variant IDs from the cart items
+      const productIds = [
+        ...new Set(input.products.map((item) => item.productId)),
+      ];
+      const variantIds = [
+        ...new Set(
+          input.products
+            .filter((item) => item.variantId !== null)
+            .map((item) => item.variantId)
+        ),
+      ];
+
+      // Fetch all products and variants in one go
+      const [products, variants] = await Promise.all([
+        ctx.prisma.product.findMany({
+          where: { id: { in: productIds } },
+          include: {
+            images: true,
+            variants: true,
+            category: {
+              include: {
+                attributes: true,
+              },
+            },
+          },
+        }),
+        ctx.prisma.variation.findMany({
+          where: { id: { in: variantIds } },
+        }),
+      ]);
+
+      const detailedCartItems = input.products.map((cartItem) => ({
+        product: products.find((p) => p.id === cartItem.productId),
+        variant: cartItem.variantId
+          ? variants.find((v) => v.id === cartItem.variantId)
+          : null,
+        quantity: cartItem.quantity,
+      })) as CartItem[];
+
+      return detailedCartItems;
+    }),
+
   getDetailedProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
@@ -180,6 +238,7 @@ export const productsRouter = createTRPCRouter({
         length: z.coerce.number().min(0).optional(),
         width: z.coerce.number().min(0).optional(),
         height: z.coerce.number().min(0).optional(),
+        estimatedCompletion: z.coerce.number().min(0).optional(),
         images: z.array(
           z.object({
             url: z.string(),
@@ -255,6 +314,7 @@ export const productsRouter = createTRPCRouter({
               isArchived: input.isArchived,
               categoryId: input.categoryId,
 
+              estimatedCompletion: input.estimatedCompletion ?? 0,
               storeId: input.storeId,
               images: {
                 createMany: {
@@ -302,7 +362,7 @@ export const productsRouter = createTRPCRouter({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
-
+        estimatedCompletion: z.coerce.number().min(0).optional(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),
         isArchived: z.boolean().optional(),
@@ -403,7 +463,7 @@ export const productsRouter = createTRPCRouter({
                 isFeatured: input.isFeatured,
                 isArchived: input.isArchived,
                 categoryId: input.categoryId,
-
+                estimatedCompletion: input.estimatedCompletion ?? 0,
                 description: input.description,
                 quantity: input.quantity,
                 images: {

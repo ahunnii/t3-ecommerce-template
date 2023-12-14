@@ -69,8 +69,8 @@ const formSchema = z.object({
     z.object({
       names: z.string().min(1),
       values: z.string().min(1),
-      price: z.coerce.number().min(1),
-      quantity: z.coerce.number().min(1),
+      price: z.coerce.number().min(0),
+      quantity: z.coerce.number().min(0),
     })
   ),
 
@@ -84,6 +84,7 @@ const formSchema = z.object({
   length: z.coerce.number().min(0).optional(),
   width: z.coerce.number().min(0).optional(),
   height: z.coerce.number().min(0).optional(),
+  estimatedCompletion: z.coerce.number().min(0).int(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -180,6 +181,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     length: initialData?.length ?? 0.0,
     width: initialData?.width ?? 0.0,
     height: initialData?.height ?? 0.0,
+    estimatedCompletion: initialData?.estimatedCompletion ?? 0,
   };
 
   const form = useForm<ProductFormValues>({
@@ -464,6 +466,32 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 />
               </>
             )}
+
+            <>
+              <FormField
+                control={form.control}
+                name="estimatedCompletion"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estimated Completion</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        placeholder="e.g 48"
+                        min={0}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      In days, roughly how long would it take you to make & ship
+                      out the product?
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
 
             <FormField
               control={form.control}

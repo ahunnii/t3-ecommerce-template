@@ -10,7 +10,10 @@ export default function StorefrontLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const cart = useCart();
   const updateStore = () => {
+    // void cart.verifyValues();
+
     void useCart.persist.rehydrate();
   };
 
