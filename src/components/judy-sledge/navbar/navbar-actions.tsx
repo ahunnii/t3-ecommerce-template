@@ -20,8 +20,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "~/components/ui/hover-card";
+import { Separator } from "~/components/ui/separator";
 import useCart from "~/hooks/core/use-cart";
-import { Separator } from "../ui/separator";
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();
