@@ -141,7 +141,8 @@ type ShippingFormValues = z.infer<typeof shippingFormSchema>;
 type PackageFormValues = z.infer<typeof formSchema>;
 
 export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
-  const { validateAddress, setCustomerAddress } = useShippingLabel();
+  const { validateAddress, setCustomerAddress, setBusinessAddress } =
+    useShippingLabel();
 
   const params = useRouter();
   const storeId = params?.query?.storeId as string;
@@ -424,182 +425,11 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
                   )}
                 </TabsContent>
                 <TabsContent value="business_address">
-                  {/* <Form {...businessShippingForm}>
-                    <form
-                      onSubmit={(e) =>
-                        void businessShippingForm.handleSubmit(onAddressSubmit)(
-                          e
-                        )
-                      }
-                      className="space-y-8"
-                    >
-                      <FormField
-                        control={businessShippingForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Your name" {...field} />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={businessShippingForm.control}
-                        name="street"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Street address</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. 1234 Main St."
-                                {...field}
-                              />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />{" "}
-                      <FormField
-                        control={businessShippingForm.control}
-                        name="additional"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              Apt / Suite / Other{" "}
-                              <span className="text-xs text-gray-500">
-                                (optional)
-                              </span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. 1234 Main St."
-                                {...field}
-                              />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />{" "}
-                      <FormField
-                        control={businessShippingForm.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. Boulder City"
-                                {...field}
-                                className="col-span-1"
-                              />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />{" "}
-                      <div className="items-center gap-8 md:grid md:grid-cols-2">
-                        <FormField
-                          control={businessShippingForm.control}
-                          name="state"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>State</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant="outline"
-                                      role="combobox"
-                                      className={cn(
-                                        "h-10 w-[200px] justify-between py-2",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value
-                                        ? states.find(
-                                            (state) =>
-                                              state.value === field.value
-                                          )?.label
-                                        : "Select state"}
-                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="max-h-96 w-[200px] overflow-y-scroll p-0">
-                                  <Command>
-                                    <CommandInput placeholder="Search state..." />
-                                    <CommandEmpty>No state found.</CommandEmpty>
-                                    <CommandGroup>
-                                      {states.map((state) => (
-                                        <CommandItem
-                                          value={state.label}
-                                          key={state.value}
-                                          onSelect={() => {
-                                            businessShippingForm.setValue(
-                                              "state",
-                                              state.value
-                                            );
-                                          }}
-                                        >
-                                          <CheckIcon
-                                            className={cn(
-                                              "mr-2 h-4 w-4",
-                                              state.value === field.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                            )}
-                                          />
-                                          {state.label}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />{" "}
-                        <FormField
-                          control={businessShippingForm.control}
-                          name="zip"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Zip Code</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g. 44444"
-                                  {...field}
-                                  type="number"
-                                  className="col-span-1"
-                                  onChange={(e) => {
-                                    field.onChange(Number(e.target.value));
-                                  }}
-                                />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />{" "}
-                      </div>
-                      <Button type="submit">Verify Address</Button>
-                    </form>
-                  </Form> */}
-
                   {businessAddress && (
                     <AddressForm
                       successCallback={(data) => {
                         toast.success("Business address is valid.");
-                        setCustomerAddress(data as ShippingAddress);
+                        setBusinessAddress(data as ShippingAddress);
                         setTabValue("package");
                       }}
                       errorCallback={() =>
