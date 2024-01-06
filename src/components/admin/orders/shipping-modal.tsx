@@ -4,6 +4,7 @@ import axios from "axios";
 import { CheckIcon, ChevronsUpDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -141,6 +142,11 @@ type PackageFormValues = z.infer<typeof formSchema>;
 
 export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
   const { validateAddress, setCustomerAddress } = useShippingLabel();
+
+  const params = useRouter();
+  const storeId = params?.query?.storeId as string;
+
+  console.log(storeId);
   const shippingModal = useShippingModal();
 
   const order = useShippingModal((state) => state.data);
@@ -179,6 +185,36 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
         zip: "",
       };
 
+  const { data: storeInfo } = api.store.getStore.useQuery({ storeId });
+
+  const businessAddress = storeInfo
+    ? storeInfo?.businessAddress?.split(", ").length > 5
+      ? {
+          name: storeInfo?.name ?? undefined,
+          street: storeInfo?.businessAddress?.split(", ")[0] ?? undefined,
+          additional: storeInfo?.businessAddress?.split(", ")[1] ?? undefined,
+          city: storeInfo?.businessAddress?.split(", ")[2] ?? undefined,
+          state: storeInfo?.businessAddress?.split(", ")[3] ?? undefined,
+          zip: storeInfo?.businessAddress?.split(", ")[4] ?? undefined,
+        }
+      : {
+          name: storeInfo?.name ?? undefined,
+          street: storeInfo?.businessAddress?.split(", ")[0] ?? undefined,
+          additional: "",
+          city: storeInfo?.businessAddress?.split(", ")[1] ?? undefined,
+          state: storeInfo?.businessAddress?.split(", ")[2] ?? undefined,
+          zip: storeInfo?.businessAddress?.split(", ")[3] ?? undefined,
+        }
+    : {
+        name: "",
+        street: "",
+        additional: "",
+        city: "",
+        state: "",
+        zip: "",
+      };
+
+  console.log(businessAddress);
   const defaultValues: Partial<ShippingFormValues> = {};
 
   const defaultBusinessAddress: Partial<ShippingFormValues> = {
@@ -388,7 +424,7 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
                   )}
                 </TabsContent>
                 <TabsContent value="business_address">
-                  <Form {...businessShippingForm}>
+                  {/* <Form {...businessShippingForm}>
                     <form
                       onSubmit={(e) =>
                         void businessShippingForm.handleSubmit(onAddressSubmit)(
@@ -557,7 +593,21 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
                       </div>
                       <Button type="submit">Verify Address</Button>
                     </form>
-                  </Form>
+                  </Form> */}
+
+                  {businessAddress && (
+                    <AddressForm
+                      successCallback={(data) => {
+                        toast.success("Business address is valid.");
+                        setCustomerAddress(data as ShippingAddress);
+                        setTabValue("package");
+                      }}
+                      errorCallback={() =>
+                        toast.error("Business address is invalid.")
+                      }
+                      initialData={businessAddress ?? null}
+                    />
+                  )}
                 </TabsContent>
                 <TabsContent value="package">
                   {" "}
