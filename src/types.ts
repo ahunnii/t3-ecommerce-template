@@ -107,3 +107,9 @@ export type DetailedCollection = Prisma.CollectionGetPayload<{
     billboard: true;
   };
 }>;
+
+export type Popup = {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+};

@@ -33,6 +33,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
     return orders.map((item: ExtendedOrder) => ({
       id: item.id,
       phone: item.phone,
+      name: item.name,
       address: item.address,
       products: item.orderItems
         .map((orderItem) => orderItem.product.name)

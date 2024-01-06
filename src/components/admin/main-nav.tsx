@@ -47,6 +47,12 @@ export function MainNav({
         pathname === `/admin/${router?.query?.storeId.toString()}/products`,
     },
     {
+      href: `/admin/${router?.query?.storeId.toString()}/shipping`,
+      label: "Shipping",
+      active:
+        pathname === `/admin/${router?.query?.storeId.toString()}/shipping`,
+    },
+    {
       href: `/admin/${router?.query?.storeId.toString()}/orders`,
       label: "Orders",
       active: pathname === `/admin/${router?.query?.storeId.toString()}/orders`,

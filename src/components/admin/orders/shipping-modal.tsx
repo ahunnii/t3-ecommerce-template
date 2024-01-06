@@ -43,8 +43,15 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { useShippingModal } from "~/hooks/use-shipping-modal";
+import useShippingLabel, {
+  ShippingAddress,
+  ShippingResponse,
+} from "~/hooks/admin/use-shipping-label";
+import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
+import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
+import AddressForm from "./address-form";
+import { OrderColumn } from "./columns";
 
 const formSchema = z.object({
   package_length: z.number().min(1),
@@ -132,8 +139,10 @@ type LabelValues = z.infer<typeof selectionSchema>;
 type ShippingFormValues = z.infer<typeof shippingFormSchema>;
 type PackageFormValues = z.infer<typeof formSchema>;
 
-export const ShippingModal = () => {
+export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
+  const { validateAddress, setCustomerAddress } = useShippingLabel();
   const shippingModal = useShippingModal();
+
   const order = useShippingModal((state) => state.data);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -143,10 +152,35 @@ export const ShippingModal = () => {
   const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
   const [label, setLabel] = useState<Shippo.Transaction | null>(null);
 
-  const defaultValues: Partial<ShippingFormValues> = {
-    // name: "Your name",
-    // dob: new Date("2023-01-23"),
-  };
+  const customerAddress = data
+    ? data?.address?.split(", ").length > 5
+      ? {
+          name: data?.name ?? undefined,
+          street: data?.address?.split(", ")[0] ?? undefined,
+          additional: data?.address?.split(", ")[1] ?? undefined,
+          city: data?.address?.split(", ")[2] ?? undefined,
+          state: data?.address?.split(", ")[3] ?? undefined,
+          zip: data?.address?.split(", ")[4] ?? undefined,
+        }
+      : {
+          name: data?.name ?? undefined,
+          street: data?.address?.split(", ")[0] ?? undefined,
+          additional: "",
+          city: data?.address?.split(", ")[1] ?? undefined,
+          state: data?.address?.split(", ")[2] ?? undefined,
+          zip: data?.address?.split(", ")[3] ?? undefined,
+        }
+    : {
+        name: "",
+        street: "",
+        additional: "",
+        city: "",
+        state: "",
+        zip: "",
+      };
+
+  const defaultValues: Partial<ShippingFormValues> = {};
+
   const defaultBusinessAddress: Partial<ShippingFormValues> = {
     name: "John Doe",
     street: "673 Lakewood Dr.",
@@ -227,29 +261,24 @@ export const ShippingModal = () => {
     console.log(label);
   };
 
-  const onAddressSubmit = async (data: ShippingFormValues) => {
+  const onAddressSubmit = (data: ShippingFormValues) => {
     setLoading(true);
-    const customerAddress = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/shipping/addresses`,
-      {
-        street1: data.street,
-        street2: data.additional,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
-        country: "US",
-      }
-    );
 
-    if (customerAddress.status === 200) {
-      if (customerAddress.data.validation_results.is_valid) {
-        toast.success("customer address  is valid.");
-      } else {
-        toast.error("customer address  is invalid.");
-      }
-      console.log(customerAddress.data);
-    }
-    setLoading(false);
+    validateAddress({
+      name: data.name,
+      street: data.street,
+      additional: data.additional,
+      city: data.city,
+      state: data.state,
+      zip: data.zip.toString(),
+    })
+      .then((res: ShippingResponse) => {
+        if (res.isValid) toast.success("customer address  is valid.");
+        else toast.error("customer address  is invalid.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const onPackageSubmit = async (data: PackageFormValues) => {
@@ -283,6 +312,7 @@ export const ShippingModal = () => {
     }
   };
 
+  const [tabValue, setTabValue] = useState<string>("customer_address");
   return (
     <Modal
       title="Create shipping label"
@@ -315,7 +345,8 @@ export const ShippingModal = () => {
             )}
             {!label && (
               <Tabs
-                defaultValue="customer_address"
+                value={tabValue}
+                onValueChange={setTabValue}
                 className="w-full"
                 // onValueChange={(e) => {
                 //   if (e === "rates") {
@@ -342,174 +373,19 @@ export const ShippingModal = () => {
                   <TabsTrigger value="rates">Get Rates</TabsTrigger>
                 </TabsList>
                 <TabsContent value="customer_address">
-                  <Form {...shippingForm}>
-                    <form
-                      onSubmit={(e) =>
-                        void shippingForm.handleSubmit(onAddressSubmit)(e)
+                  {customerAddress && (
+                    <AddressForm
+                      successCallback={(data) => {
+                        toast.success("Customer address is valid.");
+                        setCustomerAddress(data as ShippingAddress);
+                        setTabValue("business_address");
+                      }}
+                      errorCallback={() =>
+                        toast.error("Customer address is invalid.")
                       }
-                      className="space-y-8"
-                    >
-                      <FormField
-                        control={shippingForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Your name" {...field} />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={shippingForm.control}
-                        name="street"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Street address</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. 1234 Main St."
-                                {...field}
-                              />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />{" "}
-                      <FormField
-                        control={shippingForm.control}
-                        name="additional"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              Apt / Suite / Other{" "}
-                              <span className="text-xs text-gray-500">
-                                (optional)
-                              </span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. 1234 Main St."
-                                {...field}
-                              />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />{" "}
-                      <FormField
-                        control={shippingForm.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. Boulder City"
-                                {...field}
-                                className="col-span-1"
-                              />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />{" "}
-                      <div className="items-center gap-8 md:grid md:grid-cols-2">
-                        <FormField
-                          control={shippingForm.control}
-                          name="state"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>State</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant="outline"
-                                      role="combobox"
-                                      className={cn(
-                                        "h-10 w-[200px] justify-between py-2",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value
-                                        ? states.find(
-                                            (state) =>
-                                              state.value === field.value
-                                          )?.label
-                                        : "Select state"}
-                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="max-h-96 w-[200px] overflow-y-scroll p-0">
-                                  <Command>
-                                    <CommandInput placeholder="Search state..." />
-                                    <CommandEmpty>No state found.</CommandEmpty>
-                                    <CommandGroup>
-                                      {states.map((state) => (
-                                        <CommandItem
-                                          value={state.label}
-                                          key={state.value}
-                                          onSelect={() => {
-                                            shippingForm.setValue(
-                                              "state",
-                                              state.value
-                                            );
-                                          }}
-                                        >
-                                          <CheckIcon
-                                            className={cn(
-                                              "mr-2 h-4 w-4",
-                                              state.value === field.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                            )}
-                                          />
-                                          {state.label}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />{" "}
-                        <FormField
-                          control={shippingForm.control}
-                          name="zip"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Zip Code</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g. 44444"
-                                  {...field}
-                                  type="number"
-                                  className="col-span-1"
-                                  onChange={(e) => {
-                                    field.onChange(Number(e.target.value));
-                                  }}
-                                />
-                              </FormControl>
-
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />{" "}
-                      </div>
-                      <Button type="submit">Verify Address</Button>
-                    </form>
-                  </Form>
+                      initialData={customerAddress ?? null}
+                    />
+                  )}
                 </TabsContent>
                 <TabsContent value="business_address">
                   <Form {...businessShippingForm}>

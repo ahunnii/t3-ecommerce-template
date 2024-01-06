@@ -7,6 +7,7 @@ import { CellAction } from "./cell-action";
 export type OrderColumn = {
   id: string;
   phone: string;
+  name: string;
   address: string;
   isPaid: boolean;
   totalPrice: string;
@@ -22,6 +23,10 @@ export const columns: ColumnDef<OrderColumn>[] = [
   {
     accessorKey: "phone",
     header: "Phone",
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
   },
   {
     accessorKey: "address",
