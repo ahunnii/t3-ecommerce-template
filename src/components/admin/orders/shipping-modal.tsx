@@ -1,163 +1,72 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { CheckIcon, ChevronsUpDown } from "lucide-react";
-import Image from "next/image";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+
 import { toast } from "react-hot-toast";
-import Shippo from "shippo";
+import type Shippo from "shippo";
 import * as z from "zod";
-import { Badge } from "~/components/ui/badge";
+
 import { Button } from "~/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "~/components/ui/command";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+
 import { Label } from "~/components/ui/label";
 import { Modal } from "~/components/ui/modal";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import useShippingLabel, {
-  ShippingAddress,
-  ShippingResponse,
+  type RateResponse,
+  type ShippingAddress,
 } from "~/hooks/admin/use-shipping-label";
 import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
 import { api } from "~/utils/api";
-import { cn } from "~/utils/styles";
+
+import axios from "axios";
 import AddressForm from "./address-form";
-import { OrderColumn } from "./columns";
-
-const formSchema = z.object({
-  package_length: z.number().min(1),
-  package_width: z.number().min(1),
-  package_height: z.number().min(1),
-  package_weight_lbs: z.number(),
-  package_weight_oz: z.number(),
-});
-const states = [
-  { label: "Alabama", value: "AL" },
-  { label: "Alaska", value: "AK" },
-  { label: "Arizona", value: "AZ" },
-  { label: "Arkansas", value: "AR" },
-  { label: "California", value: "CA" },
-  { label: "Colorado", value: "CO" },
-  { label: "Connecticut", value: "CT" },
-  { label: "Delaware", value: "DE" },
-  { label: "District Of Columbia", value: "DC" },
-  { label: "Florida", value: "FL" },
-  { label: "Georgia", value: "GA" },
-  { label: "Hawaii", value: "HI" },
-  { label: "Idaho", value: "ID" },
-  { label: "Illinois", value: "IL" },
-  { label: "Indiana", value: "IN" },
-  { label: "Iowa", value: "IA" },
-  { label: "Kansas", value: "KS" },
-  { label: "Kentucky", value: "KY" },
-  { label: "Louisiana", value: "LA" },
-  { label: "Maine", value: "ME" },
-  { label: "Maryland", value: "MD" },
-  { label: "Massachusetts", value: "MA" },
-  { label: "Michigan", value: "MI" },
-  { label: "Minnesota", value: "MN" },
-  { label: "Mississippi", value: "MS" },
-  { label: "Missouri", value: "MO" },
-  { label: "Montana", value: "MT" },
-  { label: "Nebraska", value: "NE" },
-  { label: "Nevada", value: "NV" },
-  { label: "New Hampshire", value: "NH" },
-  { label: "New Jersey", value: "NJ" },
-  { label: "New Mexico", value: "NM" },
-  { label: "New York", value: "NY" },
-  { label: "North Carolina", value: "NC" },
-  { label: "North Dakota", value: "ND" },
-  { label: "Ohio", value: "OH" },
-  { label: "Oklahoma", value: "OK" },
-  { label: "Oregon", value: "OR" },
-  { label: "Pennsylvania", value: "PA" },
-  { label: "Puerto Rico", value: "PR" },
-  { label: "Rhode Island", value: "RI" },
-  { label: "South Carolina", value: "SC" },
-  { label: "South Dakota", value: "SD" },
-  { label: "Tennessee", value: "TN" },
-  { label: "Texas", value: "TX" },
-  { label: "Utah", value: "UT" },
-  { label: "Vermont", value: "VT" },
-  { label: "Virginia", value: "VA" },
-  { label: "Washington", value: "WA" },
-  { label: "West Virginia", value: "WV" },
-  { label: "Wisconsin", value: "WI" },
-  { label: "Wyoming", value: "WY" },
-] as const;
-
-const selectionSchema = z.object({
-  rate_selection_id: z.string(),
-});
-
-const shippingFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, {
-      message: "Name must be at least 2 characters.",
-    })
-    .max(30, {
-      message: "Name must not be longer than 30 characters.",
-    }),
-  street: z.string(),
-  additional: z.string().optional(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.number(),
-});
-
-type LabelValues = z.infer<typeof selectionSchema>;
-type ShippingFormValues = z.infer<typeof shippingFormSchema>;
-type PackageFormValues = z.infer<typeof formSchema>;
+import type { OrderColumn } from "./columns";
+import PackageForm from "./package-form";
+import RatesForm from "./rates-form";
 
 export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
-  const { validateAddress, setCustomerAddress, setBusinessAddress } =
-    useShippingLabel();
+  const {
+    setRates,
+    getRates,
+    selectedRate,
+    setCustomerAddress,
+    setBusinessAddress,
+    businessAddress: fromAddress,
+    customerAddress: toAddress,
+    parcel,
+  } = useShippingLabel();
 
+  const [tabValue, setTabValue] = useState<string>("customer_address");
   const params = useRouter();
   const storeId = params?.query?.storeId as string;
 
-  console.log(storeId);
   const shippingModal = useShippingModal();
 
-  const order = useShippingModal((state) => state.data);
-
+  // const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [rates, setRates] = useState<any[]>([]);
-
-  const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
   const [label, setLabel] = useState<Shippo.Transaction | null>(null);
+
+  const purchaseAndGenerateLabel = () => {
+    setLoading(true);
+
+    axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/shipping/label`, {
+        rate: selectedRate?.object_id,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          setLabel(res.data as Shippo.Transaction);
+          console.log(label);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const customerAddress = data
     ? data?.address?.split(", ").length > 5
@@ -215,61 +124,15 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
         zip: "",
       };
 
-  console.log(businessAddress);
-  const defaultValues: Partial<ShippingFormValues> = {};
-
-  const defaultBusinessAddress: Partial<ShippingFormValues> = {
-    name: "John Doe",
-    street: "673 Lakewood Dr.",
-    additional: "",
-    city: "South Lyon",
-    state: "MI",
-    zip: 48178,
-  };
-
-  const shippingForm = useForm<ShippingFormValues>({
-    resolver: zodResolver(shippingFormSchema),
-    defaultValues,
-  });
-  const businessShippingForm = useForm<ShippingFormValues>({
-    resolver: zodResolver(shippingFormSchema),
-    defaultValues: defaultBusinessAddress,
-  });
-
-  const form = useForm<PackageFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      package_length: 0,
-      package_width: 0,
-      package_height: 0,
-      package_weight_lbs: 0,
-      package_weight_oz: 0,
-    },
-  });
-
-  const rateForm = useForm<z.infer<typeof selectionSchema>>({
-    resolver: zodResolver(selectionSchema),
-    defaultValues: {
-      rate_selection_id: order?.address,
-    },
-  });
-
   useEffect(() => {
-    if (order) {
-      const address: string[] = (order?.address).split(", ") ?? [];
-      const hasAdditional = address.length > 5;
-      shippingForm.setValue("name", "John Doe");
-      shippingForm.setValue("street", address[0] ?? "");
-      shippingForm.setValue(
-        "additional",
-        hasAdditional ? address[1] ?? "" : ""
-      );
-      shippingForm.setValue("city", address[hasAdditional ? 2 : 1] ?? "");
-
-      shippingForm.setValue("state", address[hasAdditional ? 3 : 2] ?? "");
-      shippingForm.setValue("zip", Number(address[hasAdditional ? 4 : 3]) ?? 0);
-    }
-  }, [order]);
+    if (tabValue === "rates")
+      getRates()
+        .then((res: RateResponse) => {
+          console.log(res);
+          setRates(res?.rates ?? []);
+        })
+        .catch((err) => console.log(err));
+  }, [tabValue]);
 
   const onCopy = (id: string) => {
     navigator.clipboard
@@ -282,74 +145,6 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
       });
   };
 
-  const onSubmit = async (data: LabelValues) => {
-    setLoading(true);
-    const label = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/shipping/label`,
-      {
-        rate: selectedRate?.object_id,
-      }
-    );
-
-    if (label.status === 200) {
-      setLabel(label.data as Shippo.Transaction);
-    }
-    setLoading(false);
-    console.log(label);
-  };
-
-  const onAddressSubmit = (data: ShippingFormValues) => {
-    setLoading(true);
-
-    validateAddress({
-      name: data.name,
-      street: data.street,
-      additional: data.additional,
-      city: data.city,
-      state: data.state,
-      zip: data.zip.toString(),
-    })
-      .then((res: ShippingResponse) => {
-        if (res.isValid) toast.success("customer address  is valid.");
-        else toast.error("customer address  is invalid.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  const onPackageSubmit = async (data: PackageFormValues) => {
-    console.log("yeet");
-    const rates = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/shipping/rates`,
-      {
-        customer_name: shippingForm.getValues("name"),
-        customer_street: shippingForm.getValues("street"),
-        customer_additional: shippingForm.getValues("additional"),
-        customer_city: shippingForm.getValues("city"),
-        customer_state: shippingForm.getValues("state"),
-        customer_zip: shippingForm.getValues("zip"),
-        business_name: businessShippingForm.getValues("name"),
-        business_street: businessShippingForm.getValues("street"),
-        business_additional: businessShippingForm.getValues("additional"),
-        business_city: businessShippingForm.getValues("city"),
-        business_state: businessShippingForm.getValues("state"),
-        business_zip: businessShippingForm.getValues("zip"),
-        weight_lb: data.package_weight_lbs,
-        weight_oz: data.package_weight_oz,
-        length: data.package_length,
-        width: data.package_width,
-        height: data.package_height,
-      }
-    );
-
-    if (rates.status === 200) {
-      console.log(rates);
-      setRates(rates?.data?.rates as Shippo.Rate[]);
-    }
-  };
-
-  const [tabValue, setTabValue] = useState<string>("customer_address");
   return (
     <Modal
       title="Create shipping label"
@@ -385,29 +180,13 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
                 value={tabValue}
                 onValueChange={setTabValue}
                 className="w-full"
-                // onValueChange={(e) => {
-                //   if (e === "rates") {
-                //     axios
-                //       .post(
-                //         `${process.env.NEXT_PUBLIC_API_URL}/shipping/parcel`,
-                //         {}
-                //       )
-
-                //       .then((res) => {
-                //         console.log(res?.data?.rates);
-                //         setRates(res?.data?.rates);
-                //       })
-                //       .catch((err) => {
-                //         console.log(err);
-                //       });
-                //   }
-                // }}
               >
                 <TabsList>
                   <TabsTrigger value="customer_address">Customer</TabsTrigger>{" "}
                   <TabsTrigger value="business_address">Business</TabsTrigger>
                   <TabsTrigger value="package">Package</TabsTrigger>
                   <TabsTrigger value="rates">Get Rates</TabsTrigger>
+                  <TabsTrigger value="review">Review</TabsTrigger>
                 </TabsList>
                 <TabsContent value="customer_address">
                   {customerAddress && (
@@ -440,242 +219,100 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
                   )}
                 </TabsContent>
                 <TabsContent value="package">
-                  {" "}
-                  <Form {...form}>
-                    <form
-                      onSubmit={(e) =>
-                        void form.handleSubmit(onPackageSubmit)(e)
-                      }
-                    >
-                      <div className="flex flex-col gap-y-5">
-                        <div className="flex gap-3">
-                          <FormField
-                            control={form.control}
-                            name="package_length"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Length (in)</FormLabel>
-
-                                <FormControl>
-                                  <Input
-                                    disabled={loading}
-                                    {...field}
-                                    type="number"
-                                    min={0}
-                                    onChange={(e) => {
-                                      field.onChange(Number(e.target.value));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="package_width"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Width (in)</FormLabel>
-
-                                <FormControl>
-                                  <Input
-                                    disabled={loading}
-                                    {...field}
-                                    type="number"
-                                    min={0}
-                                    onChange={(e) => {
-                                      field.onChange(Number(e.target.value));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="package_height"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Height (in)</FormLabel>
-
-                                <FormControl>
-                                  <Input
-                                    disabled={loading}
-                                    {...field}
-                                    type="number"
-                                    min={0}
-                                    onChange={(e) => {
-                                      field.onChange(Number(e.target.value));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <div className="flex gap-3">
-                          <FormField
-                            control={form.control}
-                            name="package_weight_lbs"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Lbs</FormLabel>
-
-                                <FormControl>
-                                  <Input
-                                    disabled={loading}
-                                    {...field}
-                                    type="number"
-                                    min={0}
-                                    onChange={(e) => {
-                                      field.onChange(Number(e.target.value));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="package_weight_oz"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Ozs</FormLabel>
-
-                                <FormControl>
-                                  <Input
-                                    disabled={loading}
-                                    {...field}
-                                    type="number"
-                                    min={0}
-                                    onChange={(e) => {
-                                      field.onChange(Number(e.target.value));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </div>
-                      <div className="flex w-full items-center justify-end space-x-2 pt-6">
-                        <Button
-                          disabled={loading}
-                          variant="outline"
-                          onClick={shippingModal.onClose}
-                        >
-                          Cancel
-                        </Button>{" "}
-                        <Button disabled={loading} type="submit">
-                          Continue
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
+                  <PackageForm
+                    successCallback={() => {
+                      toast.success("Package details saved to cache");
+                      setTabValue("rates");
+                    }}
+                    errorCallback={() =>
+                      toast.error("Business address is invalid.")
+                    }
+                  />
                 </TabsContent>
+
                 <TabsContent value="rates">
-                  {" "}
-                  <Form {...rateForm}>
-                    <form
-                      onSubmit={(e) => void rateForm.handleSubmit(onSubmit)(e)}
-                    >
-                      <div className="flex flex-col gap-y-5">
-                        <FormField
-                          control={rateForm.control}
-                          name="rate_selection_id"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Rate Selection</FormLabel>
-
-                              <FormControl>
-                                <>
-                                  <Select
-                                    onValueChange={(e) => {
-                                      setSelectedRate(
-                                        (rates.find(
-                                          (rate) => rate.object_id === e
-                                        ) as Shippo.Rate) ?? null
-                                      );
-
-                                      field.onChange(e);
-                                    }}
-                                  >
-                                    <SelectTrigger className="flex h-20 w-full text-left">
-                                      <SelectValue placeholder="No variant selected" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {rates?.map((rate, idx) => (
-                                        <SelectItem
-                                          className="flex"
-                                          value={rate?.object_id}
-                                          key={idx}
-                                        >
-                                          <div className="flex items-center gap-4">
-                                            <img
-                                              src={rate?.provider_image_75}
-                                              className={cn(
-                                                rate?.provider === "USPS"
-                                                  ? "h-3"
-                                                  : "h-6"
-                                              )}
-                                              alt=""
-                                            />
-                                            <div className="flex flex-col justify-start">
-                                              <span className="flex gap-2">
-                                                {rate?.servicelevel?.name} $
-                                                {rate?.amount}
-                                                {rate?.attributes?.map(
-                                                  (attr: any, idx: any) => (
-                                                    <Badge
-                                                      key={idx}
-                                                      className="text-xs"
-                                                    >
-                                                      {attr}
-                                                    </Badge>
-                                                  )
-                                                )}
-                                              </span>
-                                              <span className="text-xs text-muted-foreground">
-                                                {rate?.duration_terms}
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-
-                                  <FormDescription>
-                                    {selectedRate
-                                      ? `Estimated to take ${selectedRate.estimated_days} day(s). Cost to be charged to Shippo account: $${selectedRate.amount}`
-                                      : "Select a rate to continue"}
-                                  </FormDescription>
-                                </>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />{" "}
+                  <RatesForm
+                    successCallback={() => {
+                      toast.success("selected");
+                      setTabValue("review");
+                    }}
+                    errorCallback={() => {
+                      toast.error("Rates could not be fetched.");
+                    }}
+                  />
+                </TabsContent>
+                <TabsContent value="review">
+                  <div className="flex flex-col gap-4 text-left">
+                    {fromAddress && (
+                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                        <h3>From: </h3>
+                        <p>{fromAddress.name}</p>
+                        <p>{fromAddress.street}</p>
+                        <p>{fromAddress.additional}</p>
+                        <p>
+                          {fromAddress.city}, {fromAddress.state}{" "}
+                          {fromAddress.zip}
+                        </p>
                       </div>
-                      <div className="flex w-full items-center justify-end space-x-2 pt-6">
-                        <Button
-                          disabled={loading}
-                          variant="outline"
-                          onClick={shippingModal.onClose}
-                        >
-                          Cancel
-                        </Button>{" "}
-                        <Button disabled={loading} type="submit">
-                          Get Label
-                        </Button>
+                    )}
+
+                    {toAddress && (
+                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                        <h3>To: </h3>
+                        <p>{toAddress.name}</p>
+                        <p>{toAddress.street}</p>
+                        <p>{toAddress.additional}</p>
+                        <p>
+                          {toAddress.city}, {toAddress.state} {toAddress.zip}
+                        </p>
                       </div>
-                    </form>
-                  </Form>
+                    )}
+
+                    {parcel && (
+                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                        <h3 className="font-bold">Package: </h3>
+                        <p>
+                          {parcel.length} x {parcel.width} x {parcel.height} in
+                        </p>
+                        {/* Convert weight to lbs and ozs */}
+
+                        <p>
+                          {Math.floor(parcel.weight % 16)} lbs{" "}
+                          {parcel.weight * 16} oz
+                        </p>
+                      </div>
+                    )}
+
+                    {selectedRate && (
+                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                        <h3 className="font-bold">Rate: </h3>
+                        <p>{selectedRate.provider}</p>
+                        <p>${selectedRate.amount}</p>
+
+                        {/* <p>
+                          {selectedRate.estimated_days}{" "}
+                          {selectedRate.estimated_days > 1 ? "days" : "day"}
+                        </p>
+
+                        <p>
+                          {selectedRate.extra?.amount}{" "}
+                          {selectedRate.extra?.currency}
+                        </p> */}
+                      </div>
+                    )}
+
+                    <div>
+                      <Button
+                        onClick={purchaseAndGenerateLabel}
+                        disabled={loading}
+                        variant={"default"}
+                        className="bg-green-500 hover:bg-green-500/90"
+                      >
+                        Purchase
+                      </Button>
+                      <Button>Cancel</Button>
+                    </div>
+                  </div>
                 </TabsContent>
               </Tabs>
             )}
