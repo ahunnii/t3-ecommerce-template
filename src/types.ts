@@ -113,3 +113,15 @@ export type Popup = {
   onOpen: () => void;
   onClose: () => void;
 };
+
+export type DetailedOrder = Prisma.OrderGetPayload<{
+  include: {
+    orderItems: {
+      include: {
+        variant: true;
+        product: true;
+      };
+    };
+    shippingLabel: true;
+  };
+}>;

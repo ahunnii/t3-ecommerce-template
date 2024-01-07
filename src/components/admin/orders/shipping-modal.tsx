@@ -43,11 +43,33 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
   const params = useRouter();
   const storeId = params?.query?.storeId as string;
 
+  const apiContext = api.useContext();
+
   const shippingModal = useShippingModal();
 
   // const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [label, setLabel] = useState<Shippo.Transaction | null>(null);
+
+  const { data: currentOrder } = api.orders.getOrder.useQuery({
+    orderId: data?.id ?? "",
+  });
+
+  console.log(currentOrder);
+
+  const { mutate: createLabel } = api.shippingLabels.createLabel.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const handleOnClose = () => {
+    void apiContext.orders.getAllOrders.invalidate();
+    shippingModal.onClose();
+  };
 
   const purchaseAndGenerateLabel = () => {
     setLoading(true);
@@ -57,9 +79,22 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
         rate: selectedRate?.object_id,
       })
       .then((res) => {
-        if (res.status === 200) {
+        if (res.status === 200 && res.data.label_url) {
+          if (data?.id === undefined)
+            return toast.error("Something went wrong.");
+          else
+            createLabel({
+              orderId: data?.id,
+              labelUrl: res.data.label_url,
+              trackingNumber: res.data.tracking_number,
+              cost: selectedRate!.amount,
+              carrier: selectedRate!.provider,
+              timeEstimate: selectedRate!.duration_terms,
+            });
           setLabel(res.data as Shippo.Transaction);
-          console.log(label);
+          console.log(res.data);
+        } else {
+          toast.error("Something went wrong.");
         }
       })
       .catch((err) => {
@@ -150,12 +185,12 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
       title="Create shipping label"
       description="Add a new store to manage products and categories."
       isOpen={shippingModal.isOpen}
-      onClose={shippingModal.onClose}
+      onClose={handleOnClose}
     >
       <div>
         <div className="space-y-4 py-2 pb-4">
           <div className="space-y-2">
-            {label && (
+            {(label ?? currentOrder?.shippingLabel?.labelUrl) && (
               <div>
                 <Label>
                   Successful! Your account has been charged{" "}
@@ -163,19 +198,29 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
                 </Label>
 
                 <Link
-                  href={label?.label_url}
+                  href={
+                    label?.label_url ??
+                    (currentOrder?.shippingLabel?.labelUrl as string)
+                  }
                   target="_blank"
                   className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
                 >
                   Click to download the label
                 </Link>
 
-                <Button onClick={() => onCopy(label?.tracking_url_provider)}>
-                  Click here to copy the tracking number
+                <Button
+                  onClick={() =>
+                    onCopy(
+                      label?.tracking_url_provider ??
+                        (currentOrder?.shippingLabel?.trackingNumber as string)
+                    )
+                  }
+                >
+                  Click here to copy the tracking number url
                 </Button>
               </div>
             )}
-            {!label && (
+            {!label && !currentOrder?.shippingLabel?.labelUrl && (
               <Tabs
                 value={tabValue}
                 onValueChange={setTabValue}

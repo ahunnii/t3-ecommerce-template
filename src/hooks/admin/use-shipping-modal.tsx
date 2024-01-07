@@ -13,5 +13,5 @@ export const useShippingModal = create<useShippingModalStore>((set) => ({
   isOpen: false,
   data: undefined,
   onOpen: (data: OrderColumn) => set({ isOpen: true, data }),
-  onClose: () => set({ isOpen: false }),
+  onClose: () => set({ isOpen: false, data: undefined }),
 }));

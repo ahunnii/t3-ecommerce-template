@@ -1,6 +1,13 @@
 "use client";
 
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Edit,
+  Link,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -68,6 +75,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       });
   };
 
+  const apiContext = api.useContext();
   return (
     <>
       <AlertModal
@@ -99,7 +107,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           {data?.isPaid && (
             <DropdownMenuItem onClick={() => shippingModal.onOpen(data)}>
-              <Edit className="mr-2 h-4 w-4" /> Create label
+              <Edit className="mr-2 h-4 w-4" />{" "}
+              {data?.labelCreated ? "Download" : "Create"} label
             </DropdownMenuItem>
           )}
 
