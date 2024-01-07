@@ -4,7 +4,6 @@ import { useState, type FC } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SelectGroup } from "@radix-ui/react-select";
 import { useForm } from "react-hook-form";
-import type Shippo from "shippo";
 
 import * as z from "zod";
 import { Badge } from "~/components/ui/badge";
@@ -36,8 +35,6 @@ const selectionSchema = z.object({
   rate_selection_id: z.string(),
 });
 
-type LabelValues = z.infer<typeof selectionSchema>;
-
 type TInitialData = {
   successCallback: (data?: unknown) => void;
   errorCallback: (data?: unknown) => void;
@@ -47,7 +44,7 @@ const RatesForm: FC<TInitialData> = ({ successCallback }) => {
   //   const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { rates, selectedRate, setSelectedRate } = useShippingLabel();
-  const [label, setLabel] = useState<Shippo.Transaction | null>(null);
+
   const rateForm = useForm<z.infer<typeof selectionSchema>>({
     resolver: zodResolver(selectionSchema),
     defaultValues: {
@@ -55,22 +52,12 @@ const RatesForm: FC<TInitialData> = ({ successCallback }) => {
     },
   });
 
-  const onSubmit = (data: LabelValues) => {
+  const onSubmit = () => {
     setLoading(true);
 
     successCallback();
-    // const label = await axios.post(
-    //   `${process.env.NEXT_PUBLIC_API_URL}/shipping/label`,
-    //   {
-    //     rate: selectedRate?.object_id,
-    //   }
-    // );
 
-    // if (label.status === 200) {
-    //   setLabel(label.data as Shippo.Transaction);
-    // }
     setLoading(false);
-    console.log(label);
   };
 
   return (

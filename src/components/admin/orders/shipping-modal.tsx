@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -6,7 +7,6 @@ import { useEffect, useState } from "react";
 
 import { toast } from "react-hot-toast";
 import type Shippo from "shippo";
-import * as z from "zod";
 
 import { Button } from "~/components/ui/button";
 
@@ -54,8 +54,6 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
   const { data: currentOrder } = api.orders.getOrder.useQuery({
     orderId: data?.id ?? "",
   });
-
-  console.log(currentOrder);
 
   const { mutate: createLabel } = api.shippingLabels.createLabel.useMutation({
     onSuccess: (data) => {
@@ -167,6 +165,7 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
           setRates(res?.rates ?? []);
         })
         .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue]);
 
   const onCopy = (id: string) => {

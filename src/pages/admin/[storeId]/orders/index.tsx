@@ -1,7 +1,6 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { Order, Product, ShippingLabel } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
 import type { OrderColumn } from "~/components/admin/orders/columns";
 

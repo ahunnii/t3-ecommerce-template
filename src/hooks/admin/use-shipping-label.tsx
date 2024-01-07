@@ -1,8 +1,8 @@
 import axios from "axios";
-import { useState } from "react";
+
 import type Shippo from "shippo";
 import { create } from "zustand";
-import { PackageFormValues } from "~/components/admin/orders/package-form";
+import type { PackageFormValues } from "~/components/admin/orders/package-form";
 
 export type ShippingAddress = {
   name: string;
@@ -33,7 +33,7 @@ export type Package = {
 };
 
 const DEFAULT_COUNTRY = "US";
-const DEFAULT_UNIT_SYSTEM = "imperial";
+// const DEFAULT_UNIT_SYSTEM = "imperial";
 
 interface useShippingLabelStore {
   rates: Shippo.Rate[];

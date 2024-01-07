@@ -1,4 +1,4 @@
-import { Prisma, Product } from "@prisma/client";
+import type { Prisma, Product } from "@prisma/client";
 
 // export interface Product {
 //   id: string;

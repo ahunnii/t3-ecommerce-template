@@ -1,21 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { CheckIcon, ChevronsUpDown, Loader2 } from "lucide-react";
-
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 
 import * as z from "zod";
 
 import { Button } from "~/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "~/components/ui/command";
+
 import {
   Form,
   FormControl,
@@ -26,19 +17,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-
-import USA_STATES from "~/data/states";
-import useShippingLabel, {
-  RateResponse,
-  type ShippingResponse,
-} from "~/hooks/admin/use-shipping-label";
-import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
-import { cn } from "~/utils/styles";
+import useShippingLabel from "~/hooks/admin/use-shipping-label";
 
 const shippingFormSchema = z.object({
   package_length: z.coerce.number().min(1),
@@ -54,12 +33,9 @@ type PackageFormProps = {
   successCallback: (data?: unknown) => void;
   errorCallback: (data?: unknown) => void;
 };
-const PackageForm: FC<PackageFormProps> = ({
-  successCallback,
-  errorCallback,
-}) => {
+const PackageForm: FC<PackageFormProps> = ({ successCallback }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { getRates, setParcelMeasurements } = useShippingLabel();
+  const { setParcelMeasurements } = useShippingLabel();
 
   const defaultValues: Partial<PackageFormValues> = {
     package_length: 0,

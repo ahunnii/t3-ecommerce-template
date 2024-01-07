@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Copy,
-  Download,
-  Edit,
-  Link,
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
+import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -75,7 +68,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       });
   };
 
-  const apiContext = api.useContext();
   return (
     <>
       <AlertModal

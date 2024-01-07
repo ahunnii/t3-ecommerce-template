@@ -1,6 +1,5 @@
-import { Order } from "@prisma/client";
 import { create } from "zustand";
-import { OrderColumn } from "~/components/admin/orders/columns";
+import type { OrderColumn } from "~/components/admin/orders/columns";
 
 interface useShippingModalStore {
   isOpen: boolean;

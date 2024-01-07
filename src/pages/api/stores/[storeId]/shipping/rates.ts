@@ -1,15 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { appRouter } from "~/server/api/root";
+
 import { createTRPCContext } from "~/server/api/trpc";
-import { easyPost } from "~/server/easypost/client";
+
 import { shippoClient } from "~/server/shippo/client";
 
 const rateHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   // Create context and caller
   const ctx = await createTRPCContext({ req, res });
-  const caller = appRouter.createCaller(ctx);
 
   const userId = ctx.session?.user.id;
   const { storeId } = req.query;

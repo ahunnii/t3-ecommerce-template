@@ -2,9 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { CheckIcon, ChevronsUpDown, Loader2 } from "lucide-react";
 
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 
 import * as z from "zod";
 
@@ -36,7 +35,7 @@ import USA_STATES from "~/data/states";
 import useShippingLabel, {
   type ShippingResponse,
 } from "~/hooks/admin/use-shipping-label";
-import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
+
 import { cn } from "~/utils/styles";
 
 const shippingFormSchema = z.object({
