@@ -12,6 +12,7 @@ import { api } from "~/utils/api";
 import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import Breadcrumbs from "~/components/core/category/breadcrumbs";
+
 import { prisma } from "~/server/db";
 import type { DetailedProductFull } from "~/types";
 
@@ -76,6 +77,7 @@ const ProductPage = ({ prevUrl, name }: { name: string; prevUrl: string }) => {
           <div className="px-4 pb-5 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
               <Gallery images={product?.images} />
+
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
                 <Info data={product} />
               </div>
@@ -103,8 +105,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
-  console.log(product);
-
+  if (!product)
+    return {
+      notFound: true,
+    };
   return {
     props: {
       prevUrl: context.req.headers.referer ?? "",

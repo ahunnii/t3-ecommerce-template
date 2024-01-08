@@ -13,7 +13,7 @@ import { Input } from "~/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Minus, Plus } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "~/components/ui/button";
@@ -67,6 +67,14 @@ const VariantSelector: FC<IProps> = ({
   });
 
   const watchedValues = form.watch();
+
+  const incrementQuantity = () => {
+    form.setValue("quantity", watchedValues.quantity + 1);
+  };
+
+  const decrementQuantity = () => {
+    form.setValue("quantity", watchedValues.quantity - 1);
+  };
 
   useEffect(() => {
     const getVariant = () => {
@@ -246,13 +254,16 @@ const VariantSelector: FC<IProps> = ({
               <FormItem>
                 <FormLabel>Quantity</FormLabel>
                 <FormControl>
+                  {/* <div className="flex gap-1"> */}
                   <Input
                     {...field}
-                    className="w-[180px]"
+                    // className="w-[180px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     type="number"
+                    className="w-[180px]"
                     min={1}
                     max={variant ? variant.quantity : product.quantity}
                   />
+                  {/* </div> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
