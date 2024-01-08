@@ -82,12 +82,34 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
               >
                 Gallery
               </Link>
+              <Link
+                href={`/policies/shipping-policy`}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-black",
+                  pathname === `/policies/shipping-policy`
+                    ? "text-black"
+                    : "text-neutral-500"
+                )}
+              >
+                Shipping Policy
+              </Link>
+              <Link
+                href={`/policies/privacy-policy`}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-black",
+                  pathname === `/policies/privacy-policy`
+                    ? "text-black"
+                    : "text-neutral-500"
+                )}
+              >
+                Privacy Policy
+              </Link>
             </div>
           </div>
         </HoverCardContent>
       </HoverCard>
       {collections?.length > 0 && (
-        <HoverCard>
+        <HoverCard openDelay={0}>
           <HoverCardTrigger>
             <Link
               href={"/collections"}

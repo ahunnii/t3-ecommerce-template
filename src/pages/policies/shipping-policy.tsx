@@ -15,52 +15,81 @@ const ShippingPolicyPage = () => {
         <div className="space-y-10 py-10">
           <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
             <div className="space-y-4">
-              <h3 className="text-3xl font-bold">About Us</h3>
-
+              <h3 className="text-3xl font-bold">Shipping Policy</h3>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-                feugiat, leo at condimentum tempus, odio sapien dictum ante,
-                blandit lacinia neque ante non nunc. Mauris scelerisque dolor
-                mi, in euismod erat finibus ac. Phasellus vulputate erat tortor.
-                Nulla laoreet, libero ac ornare gravida, orci ligula tincidunt
-                erat, sit amet pellentesque enim nisl sed augue. Proin sed augue
-                nisl. Quisque fringilla tristique nibh facilisis rutrum. Sed
-                fringilla condimentum urna non vehicula. Nam tincidunt luctus
-                velit, sed laoreet neque scelerisque non. Maecenas eu tincidunt
-                neque. Nunc pellentesque et elit a vehicula. Donec tincidunt
-                faucibus consequat. Sed quis felis rhoncus arcu commodo
-                sollicitudin. Sed tristique consequat elit id facilisis.
-                Curabitur egestas felis vel justo lacinia, ac fermentum quam
-                tempor.
+                Thank you for choosing [Your Company Name]! We are committed to
+                providing you with quality products and a delightful shopping
+                experience. Please take a moment to review our shipping policy
+                for information on how we handle the shipment of your orders.
               </p>
-
+              <h4 className="text-xl">Processing Time:</h4>
               <p>
-                Quisque mollis at nibh id lacinia. Aenean ipsum enim, iaculis
-                non accumsan id, gravida id nunc. Proin eros nulla, euismod et
-                risus vitae, dignissim tristique odio. Cras eget condimentum mi.
-                Integer sagittis velit arcu. Quisque finibus finibus mi non
-                iaculis. Nulla eu dui pulvinar, tincidunt augue at, tempus
-                tortor. Donec in ultricies lectus. Sed dignissim ipsum eu
-                volutpat ornare. Morbi mollis neque ac magna molestie, ut
-                ullamcorper sem imperdiet. Nam varius, ligula vel scelerisque
-                faucibus, metus neque pharetra augue, a ultricies nisi turpis
-                sed diam. Donec feugiat est ipsum, sed pretium augue finibus et.
+                All orders are typically processed within one week (7 days) from
+                the date of purchase. Our dedicated team ensures that your items
+                are crafted or prepared with care before being dispatched.
               </p>
-
+              <h4 className="text-xl">Shipping Fees:</h4>- Orders under $100: A
+              flat shipping fee of $15 will be applied to all orders with a
+              total value below $100. - Orders $100 and above: Enjoy free
+              shipping on all orders totaling $100 or more.
+              <h4 className="text-xl">Shipping Carriers:</h4>
               <p>
-                Sed arcu lectus, hendrerit ac mauris quis, congue facilisis
-                massa. Etiam dictum lorem eleifend, eleifend ligula fringilla,
-                faucibus urna. Vestibulum ante ipsum primis in faucibus orci
-                luctus et ultrices posuere cubilia curae; Pellentesque tincidunt
-                nulla quis congue scelerisque. Maecenas vestibulum, elit eget
-                maximus mattis, ipsum tellus mattis lorem, sit amet eleifend
-                enim lorem tempus velit. Vivamus ac diam tincidunt, elementum
-                arcu vitae, faucibus arcu. Pellentesque dapibus laoreet arcu in
-                mattis. Mauris non diam quis turpis pretium auctor et eget ante.
-                Nunc ante mauris, convallis eget velit non, hendrerit placerat
-                est. Etiam a risus ipsum. Fusce consectetur ex vel eros commodo
-                fermentum. Ut vitae tincidunt massa, vel fermentum nulla. Ut
-                iaculis sed sapien sed faucibus.
+                We primarily use trusted carriers such as USPS (United States
+                Postal Service) and UPS (United Parcel Service) to ensure the
+                secure and timely delivery of your items. The choice of carrier
+                may depend on your location and the nature of the products
+                ordered.
+              </p>
+              <h4 className="text-xl">Shipping Methods:</h4>
+              <p>
+                Standard shipping methods will be employed unless expedited
+                options are selected during checkout. The shipping method may
+                vary based on your location and the carrier chosen.
+              </p>
+              <h4 className="text-xl">Delivery Time:</h4>
+              <p>
+                Once your order has been processed and shipped, the estimated
+                delivery time will depend on your location and the selected
+                shipping method. Please note that unforeseen circumstances such
+                as customs clearance or extreme weather conditions may impact
+                delivery times.
+              </p>
+              <h4 className="text-xl">Order Tracking:</h4>
+              <p>
+                A confirmation email with tracking information will be sent to
+                you once your order has been shipped. This will enable you to
+                monitor the progress of your delivery and estimate the arrival
+                date.
+              </p>
+              <h4 className="text-xl">International Shipping:</h4>
+              <p>
+                At this time, we only offer shipping within [your
+                country/region]. We apologize for any inconvenience to our
+                international customers and hope to expand our shipping services
+                in the future.
+              </p>
+              <h4 className="text-xl">Address Accuracy:</h4>
+              <p>
+                Please ensure that you provide accurate shipping information
+                during checkout. We cannot be held responsible for delays or
+                undeliverable packages due to incorrect addresses provided by
+                customers.
+              </p>
+              <h4 className="text-xl">Order Changes and Cancellations:</h4>
+              <p>
+                If you need to make changes to your order or cancel it, please
+                contact our customer support team as soon as possible. Once an
+                order has been processed, changes may not be possible.
+              </p>
+              <h4 className="text-xl">Questions or Concerns:</h4>
+              <p>
+                If you have any questions or concerns regarding your order or
+                our shipping policy, please don&apos;t hesitate to contact our
+                customer support team at [customer support email/phone number].
+              </p>
+              <p>
+                Thank you for choosing [Your Company Name]! We appreciate your
+                business.
               </p>
             </div>
           </div>

@@ -4,8 +4,15 @@ import Footer from "~/components/core/footer";
 import Navbar from "~/components/core/navbar";
 
 import useCart from "~/hooks/core/use-cart";
+import { cn } from "~/utils/styles";
 
-const StorefrontLayout = ({ children }: { children: React.ReactNode }) => {
+const StorefrontLayout = ({
+  children,
+  bodyStyle = "",
+}: {
+  children: React.ReactNode;
+  bodyStyle?: string;
+}) => {
   const updateStore = () => void useCart.persist.rehydrate();
 
   useEffect(() => {
@@ -18,11 +25,32 @@ const StorefrontLayout = ({ children }: { children: React.ReactNode }) => {
   }, []);
   return (
     <>
-      <main className="flex h-full  min-h-screen flex-col">
+      {/* <main className="flex h-full  min-h-screen flex-col">
         <Navbar />
         <div className="mx-auto h-full w-full max-w-7xl flex-grow">
           {children}
         </div>
+
+
+
+        <Footer />
+      </main> */}
+
+      <main className="flex h-full  min-h-screen flex-col">
+        <Navbar />
+
+        <div
+          className={cn(
+            "mx-auto  h-full w-full max-w-7xl flex-grow",
+            bodyStyle
+          )}
+        >
+          {children}
+        </div>
+        {/* <div className="mx-auto h-full w-full max-w-7xl flex-grow">
+         
+        </div> */}
+
         <Footer />
       </main>
     </>
