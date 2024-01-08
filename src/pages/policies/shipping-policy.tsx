@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 
 const ShippingPolicyPage = () => {
   return (

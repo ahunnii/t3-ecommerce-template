@@ -1,19 +1,12 @@
 import { useEffect } from "react";
+
 import Footer from "~/components/core/footer";
 import Navbar from "~/components/core/navbar";
 
 import useCart from "~/hooks/core/use-cart";
 
-export default function StorefrontLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const updateStore = () => {
-    // void cart.verifyValues();
-
-    void useCart.persist.rehydrate();
-  };
+const StorefrontLayout = ({ children }: { children: React.ReactNode }) => {
+  const updateStore = () => void useCart.persist.rehydrate();
 
   useEffect(() => {
     document.addEventListener("visibilitychange", updateStore);
@@ -34,4 +27,6 @@ export default function StorefrontLayout({
       </main>
     </>
   );
-}
+};
+
+export default StorefrontLayout;

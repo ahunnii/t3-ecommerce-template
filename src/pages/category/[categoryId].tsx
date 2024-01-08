@@ -15,7 +15,7 @@ import MobileFilters from "~/components/core/category/mobile-filters";
 import Billboard from "~/components/core/ui/billboard";
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 import { api } from "~/utils/api";
 
 interface IProps {
@@ -30,15 +30,15 @@ interface Params extends ParsedUrlQuery {
   sizeVariant: string;
 }
 
-const CategoryPage: FC<IProps> = () => {
+const CategoryPage = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const { data: category } = api.categories.getCategory.useQuery({
-    categoryId: params.categoryId as string,
+    categoryId: params?.categoryId as string,
   });
 
   const { data: products } = api.products.getAllStoreProducts.useQuery({
-    categoryId: params.categoryId as string,
+    categoryId: params?.categoryId as string,
     queryString: searchParams.toString(),
   });
   return (
@@ -72,59 +72,58 @@ const CategoryPage: FC<IProps> = () => {
   );
 };
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { sizeId, categoryId } = ctx.query as Params;
+// export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+//   const { sizeId, categoryId } = ctx.query as Params;
 
-  const products = await getProducts({
-    categoryId,
+//   const products = await getProducts({
+//     categoryId,
 
-    sizeId,
-  });
+//     sizeId,
+//   });
 
-  const sizes = await getSizes();
+//   const sizes = await getSizes();
 
-  const category = await getCategory(categoryId);
+//   const category = await getCategory(categoryId);
 
-  const attributes = category.attributes.map((attribute) =>
-    attribute.name.toLowerCase()
-  );
+//   const attributes = category.attributes.map((attribute) =>
+//     attribute.name.toLowerCase()
+//   );
 
-  if (Object.keys(ctx.query).length === 1 && ctx.query?.categoryId) {
-    return {
-      props: {
-        products,
-        sizes,
+//   if (Object.keys(ctx.query).length === 1 && ctx.query?.categoryId) {
+//     return {
+//       props: {
+//         products,
+//         sizes,
 
-        category,
-      },
-    };
-  }
+//         category,
+//       },
+//     };
+//   }
 
-  const variants = products.flatMap((product) => product.variants);
+//   const variants = products.flatMap((product) => product.variants);
 
-  const filteredProductIds = variants
-    .filter((variant) => {
-      return attributes.every((attribute) => {
-        if (ctx.query?.[`${attribute}Variant`] !== undefined)
-          return variant.values.includes(
-            ctx.query?.[`${attribute}Variant`] as string
-          );
-        return true;
-      });
-    })
-    .map((variant: Variation) => variant?.productId);
+//   const filteredProductIds = variants
+//     .filter((variant) => {
+//       return attributes.every((attribute) => {
+//         if (ctx.query?.[`${attribute}Variant`] !== undefined)
+//           return variant.values.includes(
+//             ctx.query?.[`${attribute}Variant`] as string
+//           );
+//         return true;
+//       });
+//     })
+//     .map((variant: Variation) => variant?.productId);
 
-  const variantProducts = products.filter((product) =>
-    filteredProductIds.includes(product.id)
-  );
+//   const variantProducts = products.filter((product) =>
+//     filteredProductIds.includes(product.id)
+//   );
 
-  return {
-    props: {
-      products: variantProducts,
-      sizes,
-
-      category,
-    },
-  };
-};
+//   return {
+//     props: {
+//       products: variantProducts,
+//       sizes,
+//       category,
+//     },
+//   };
+// };
 export default CategoryPage;

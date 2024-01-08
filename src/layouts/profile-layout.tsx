@@ -9,7 +9,7 @@ import Container from "~/components/core/ui/container";
 import PageLoader from "~/components/ui/page-loader";
 import { Separator } from "~/components/ui/separator";
 
-import StorefrontLayout from "./StorefrontLayout";
+import StorefrontLayout from "./storefront-layout";
 
 interface SettingsLayoutProps {
   children: React.ReactNode;

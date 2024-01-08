@@ -1,6 +1,8 @@
 import { ShoppingCart } from "lucide-react";
 
-import { useState } from "react";
+import parse from "html-react-parser";
+import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
 import useCart from "~/hooks/core/use-cart";
@@ -47,6 +49,11 @@ const Info: React.FC<InfoProps> = ({ data }) => {
         >
           Add To Cart <ShoppingCart size={20} />
         </Button>
+      </div>
+
+      <div className="f mt-10 gap-x-3">
+        <h3 className="text-lg font-bold">Description</h3>
+        {parse(data.description ?? "")}
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 import { api } from "~/utils/api";
 
 const emailSchema = z.object({

@@ -4,7 +4,7 @@ import { CollectionCard } from "~/components/core/category/collection-card";
 import NoResults from "~/components/core/ui/no-results";
 
 import PageLoader from "~/components/ui/page-loader";
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
 

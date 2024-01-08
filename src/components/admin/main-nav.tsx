@@ -1,67 +1,67 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
+import type { FC, HTMLAttributes } from "react";
 
 import { cn } from "~/utils/styles";
 
-export function MainNav({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLElement>) {
-  const pathname = usePathname();
+interface Route {
+  href: string;
+  label: string;
+  active: boolean;
+}
 
-  const router = useRouter();
+interface MainNavProps extends HTMLAttributes<HTMLElement> {
+  className?: string;
+}
 
-  if (!router?.query?.storeId) return null;
-  const routes = [
+export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
+  const { asPath, query } = useRouter();
+  const { storeId } = query as { storeId: string };
+
+  const encodedStoreId = encodeURIComponent(storeId);
+
+  if (!storeId) return null;
+
+  const routes: Route[] = [
     {
-      href: `/admin/${router?.query?.storeId.toString()}`,
+      href: `/admin/${encodedStoreId}`,
       label: "Overview",
-      active: pathname === `/admin/${router?.query?.storeId.toString()}`,
+      active: asPath === `/admin/${encodedStoreId}`,
     },
     {
-      href: `/admin/${router?.query?.storeId.toString()}/billboards`,
+      href: `/admin/${encodedStoreId}/billboards`,
       label: "Billboards",
-      active:
-        pathname === `/admin/${router?.query?.storeId.toString()}/billboards`,
+      active: asPath === `/admin/${encodedStoreId}/billboards`,
     },
     {
-      href: `/admin/${router?.query?.storeId.toString()}/categories`,
+      href: `/admin/${encodedStoreId}/categories`,
       label: "Categories",
-      active:
-        pathname === `/admin/${router?.query?.storeId.toString()}/categories`,
+      active: asPath === `/admin/${encodedStoreId}/categories`,
     },
     {
-      href: `/admin/${router?.query?.storeId.toString()}/collections`,
+      href: `/admin/${encodedStoreId}/collections`,
       label: "Collections",
-      active:
-        pathname === `/admin/${router?.query?.storeId.toString()}/categories`,
+      active: asPath === `/admin/${encodedStoreId}/collections`,
     },
-
     {
-      href: `/admin/${router?.query?.storeId.toString()}/products`,
+      href: `/admin/${encodedStoreId}/products`,
       label: "Products",
-      active:
-        pathname === `/admin/${router?.query?.storeId.toString()}/products`,
+      active: asPath === `/admin/${encodedStoreId}/products`,
     },
     {
-      href: `/admin/${router?.query?.storeId.toString()}/shipping`,
+      href: `/admin/${encodedStoreId}/shipping`,
       label: "Shipping",
-      active:
-        pathname === `/admin/${router?.query?.storeId.toString()}/shipping`,
+      active: asPath === `/admin/${encodedStoreId}/shipping`,
     },
     {
-      href: `/admin/${router?.query?.storeId.toString()}/orders`,
+      href: `/admin/${encodedStoreId}/orders`,
       label: "Orders",
-      active: pathname === `/admin/${router?.query?.storeId.toString()}/orders`,
+      active: asPath === `/admin/${encodedStoreId}/orders`,
     },
     {
-      href: `/admin/${router?.query?.storeId.toString()}/settings`,
+      href: `/admin/${encodedStoreId}/settings`,
       label: "Settings",
-      active:
-        pathname === `/admin/${router?.query?.storeId.toString()}/settings`,
+      active: asPath === `/admin/${encodedStoreId}/settings`,
     },
   ];
 
@@ -86,4 +86,4 @@ export function MainNav({
       ))}
     </nav>
   );
-}
+};

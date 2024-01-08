@@ -7,7 +7,7 @@ export type BreadCrumbPath = {
 
 const Breadcrumbs = ({ pathway }: { pathway: BreadCrumbPath[] }) => {
   return (
-    <nav className="mb-4 flex   px-5 pb-5 pt-10 " aria-label="Breadcrumb">
+    <nav className="mb-4 flex px-5 pb-5 pt-10 " aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         <li className="inline-flex items-center">
           <Link

@@ -50,7 +50,7 @@ const MainNav: React.FC<MainNavProps> = ({ data, collections }) => {
         </Link>
       ))} */}
 
-      <HoverCard>
+      <HoverCard openDelay={0}>
         <HoverCardTrigger>
           <p
             className={cn(

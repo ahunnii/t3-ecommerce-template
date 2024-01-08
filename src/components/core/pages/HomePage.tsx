@@ -1,6 +1,6 @@
 import ProductList from "~/components/core/product/product-list";
 
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 

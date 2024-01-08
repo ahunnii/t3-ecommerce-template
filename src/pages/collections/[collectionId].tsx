@@ -7,7 +7,7 @@ import Breadcrumbs from "~/components/core/category/breadcrumbs";
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import PageLoader from "~/components/ui/page-loader";
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 

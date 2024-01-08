@@ -1,4 +1,4 @@
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 
 const AboutUsPage = () => {
   return (

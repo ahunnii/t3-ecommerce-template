@@ -52,6 +52,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/utils/api";
+import MarkdownEditor from "../markdown-editor";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -499,10 +500,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea
+                    {/* <Textarea
                       disabled={loading}
                       placeholder="e.g. This product is a ...."
                       {...field}
+                    /> */}
+
+                    <MarkdownEditor
+                      description={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />

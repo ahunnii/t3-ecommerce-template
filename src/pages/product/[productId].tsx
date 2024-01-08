@@ -5,7 +5,7 @@ import Info from "~/components/core/info";
 import ProductList from "~/components/core/product/product-list";
 import PageLoader from "~/components/ui/page-loader";
 
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
@@ -34,7 +34,6 @@ const ProductPage = ({ prevUrl, name }: { name: string; prevUrl: string }) => {
     categoryId: product?.category?.id ?? "",
   });
 
-  console.log(product);
   const pathway =
     prevUrl && prevUrl.includes("collections")
       ? [
@@ -74,7 +73,7 @@ const ProductPage = ({ prevUrl, name }: { name: string; prevUrl: string }) => {
         {isLoading && <PageLoader />}
         <Breadcrumbs pathway={pathway} />
         {!isLoading && product && (
-          <div className="px-4 py-10 sm:px-6 lg:px-8">
+          <div className="px-4 pb-5 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
               <Gallery images={product?.images} />
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">

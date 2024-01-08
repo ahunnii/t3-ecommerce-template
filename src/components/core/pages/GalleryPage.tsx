@@ -1,6 +1,6 @@
 import GalleryCard from "~/components/core/ui/gallery-card";
 
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 import { api } from "~/utils/api";
 
 const GalleryPage = () => {

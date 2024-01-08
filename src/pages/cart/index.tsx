@@ -6,7 +6,7 @@ import Head from "next/head";
 import CartItem from "~/components/core/cart/cart-item";
 import Summary from "~/components/core/cart/summary";
 import { Button } from "~/components/ui/button";
-import StorefrontLayout from "~/layouts/StorefrontLayout";
+import StorefrontLayout from "~/layouts/storefront-layout";
 
 const CartPage = () => {
   const [isMounted, setIsMounted] = useState(false);
