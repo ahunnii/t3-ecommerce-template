@@ -6,6 +6,7 @@ import { createTRPCContext } from "~/server/api/trpc";
 
 import axios from "axios";
 import type { Stripe } from "stripe";
+import { env } from "~/env.mjs";
 import { stripe } from "~/server/stripe/client";
 import { type CartItem } from "~/types";
 
@@ -189,7 +190,6 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             mode: "payment",
             payment_method_types: ["card"],
             billing_address_collection: "required",
-
             shipping_address_collection: {
               allowed_countries: ["US", "CA"],
             },
@@ -204,8 +204,10 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
               },
             },
 
-            success_url: `http://localhost:3000/cart?success=1`,
-            cancel_url: `http://localhost:3000/cart?canceled=1`,
+            // success_url: `http://localhost:3000/cart?success=1`,
+            success_url: `${env.NEXT_PUBLIC_URL}/cart/success`,
+            cancel_url: `${env.NEXT_PUBLIC_URL}/cart?canceled=1`,
+
             metadata: {
               orderId: order.id,
             },

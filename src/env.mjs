@@ -40,6 +40,7 @@ export const env = createEnv({
     SHOP_EMAIL: z.string().email(),
     NEXT_PUBLIC_API_URL: z.string().url(),
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
+    NEXT_PUBLIC_URL: z.string().url(),
   },
 
   /**
@@ -55,6 +56,7 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_NAME: z.string(),
     NEXT_PUBLIC_API_URL: z.string().url(),
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
+    NEXT_PUBLIC_URL: z.string().url(),
   },
 
   /**
@@ -84,6 +86,7 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     SHOP_EMAIL: process.env.SHOP_EMAIL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
   },

@@ -23,6 +23,8 @@ const handleStripeWebhookEvent = async (
     const buf = await buffer(req);
     const sig = req.headers["stripe-signature"];
 
+    let data: unknown;
+
     let event: Stripe.Event;
 
     try {
@@ -141,6 +143,7 @@ const handleStripeWebhookEvent = async (
             }
           });
           console.log(`Payment successful for session ID: ${session.id}`);
+          data = session;
           break;
 
         default:
@@ -148,7 +151,7 @@ const handleStripeWebhookEvent = async (
         // Unexpected event type
       }
 
-      res.json({ received: true });
+      res.json({ received: true, data });
     } catch (err) {
       res.status(400).send(err);
       return;
