@@ -1,18 +1,17 @@
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useState, type FC } from "react";
-import { toast } from "react-hot-toast";
+
 import { TrashModal } from "~/components/admin/modals/trash-modal";
 
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
 
-import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import useCart from "~/features/cart/hooks/use-cart";
 import useNotification from "~/features/notifications/use-notification";
 import type { CartItem as TCartItem } from "~/types";
-import { cn } from "~/utils/styles";
+
 import CartItemQuantity from "./cart-item-quantity";
 import CartItemVariant from "./cart-item-variant";
 
@@ -78,34 +77,7 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
                 onQuantityEmpty={onCartRemove}
                 onQuantityMax={() => showInfo("Maximum quantity reached")}
               />
-              {/* <div className="flex space-y-2 max-sm:items-center max-sm:gap-2 md:flex-col">
-                <Label>Quantity</Label>{" "}
-                <Input
-                  type="number"
-                  min={0}
-                  max={
-                    data?.variant
-                      ? data.variant?.quantity
-                      : data?.product?.quantity
-                  }
-                  defaultValue={data.quantity}
-                  onChange={(e) => {
-                    if (
-                      Number(e.target.value) >
-                      (data?.variant
-                        ? data.variant?.quantity - 1
-                        : data?.product?.quantity - 1)
-                    ) {
-                      toast.error("Maximum quantity reached", {
-                        icon: null,
-                      });
-                    }
-                    cart.updateQuantity(data, Number(e.target.value));
 
-                    if (Number(e.target.value) === 0) onCartRemove();
-                  }}
-                />
-              </div> */}
               <div className="flex space-y-2 max-sm:items-center max-sm:gap-2 md:flex-col">
                 <Label>Estimated Delivery:</Label>{" "}
                 <p className="text-sm text-gray-600">{estDelivery} </p>

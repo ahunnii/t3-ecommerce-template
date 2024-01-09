@@ -223,62 +223,72 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="street"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Street address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. 1234 Main St." {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
             />{" "}
-            <FormField
-              control={form.control}
-              name="additional"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Apt / Suite / Other{" "}
-                    <span className="text-xs text-gray-500">(optional)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. 1234 Main St." {...field} />
-                  </FormControl>
+          </div>
+          <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
+            <div>
+              <FormLabel>Business address</FormLabel>{" "}
+              <FormDescription>
+                Set your business address for shipping and pickup.
+              </FormDescription>
+            </div>
+            <div className="flex items-center gap-4">
+              <FormField
+                control={form.control}
+                name="street"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Street address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. 1234 Main St." {...field} />
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. Boulder City"
-                      {...field}
-                      className="col-span-1"
-                    />
-                  </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
+              <FormField
+                control={form.control}
+                name="additional"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>
+                      Apt / Suite / Other{" "}
+                      <span className="text-xs text-gray-500">(optional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. 1234 Main St." {...field} />
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
-            <div className="items-center gap-8 md:grid md:grid-cols-2">
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
+            </div>
+            <div className="flex items-center gap-4">
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. Boulder City"
+                        {...field}
+                        className="col-span-1"
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />{" "}
               <FormField
                 control={form.control}
                 name="state"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel>State</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -287,7 +297,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                             variant="outline"
                             role="combobox"
                             className={cn(
-                              "h-10 w-[200px] justify-between py-2",
+                              " w-full  justify-between ",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -337,7 +347,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                 control={form.control}
                 name="zip"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel>Zip Code</FormLabel>
                     <FormControl>
                       <Input
@@ -359,10 +369,12 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           </div>
 
           <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
-            <FormLabel>Shipping</FormLabel>{" "}
-            <FormDescription className="pb-5">
-              Set how your store handles shipping.
-            </FormDescription>
+            <div>
+              <FormLabel>Shipping</FormLabel>{" "}
+              <FormDescription className="pb-5">
+                Set how your store handles shipping.
+              </FormDescription>
+            </div>
             <div
               className={cn(
                 "grid grid-cols-1 gap-4",
