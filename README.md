@@ -26,3 +26,12 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+## About Stripe
+
+In order to test order purchases and the webhook, you NEED to use the stripe CLI.
+
+- stripe login (if you don't already have auth)
+- stripe listen --forward-to localhost:3000/api/stores/[storeId]/webhooks/checkout
+
+Once that is done, now orders will be processed correctly. After, you need to register the webhook within Stripe.

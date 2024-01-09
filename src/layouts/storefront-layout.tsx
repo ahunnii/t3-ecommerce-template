@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import Footer from "~/components/core/footer";
 import Navbar from "~/components/core/navbar";
 
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
 import { cn } from "~/utils/styles";
 
 const StorefrontLayout = ({

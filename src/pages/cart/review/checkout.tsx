@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
 
-import CartItem from "~/components/core/cart/cart-item";
-import Summary from "~/components/core/cart/summary";
+import CartItem from "~/features/cart/components/cart-item";
+import Summary from "~/features/cart/components/summary";
 import CheckoutLayout from "~/layouts/CheckoutLayout";
 
 const CheckoutPage = () => {

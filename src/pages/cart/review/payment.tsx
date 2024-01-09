@@ -1,4 +1,4 @@
-import { PaymentForm } from "~/components/core/cart/payment-form";
+import { PaymentForm } from "~/features/cart/components/payment-form";
 import CheckoutLayout from "~/layouts/CheckoutLayout";
 const PaymentReview = () => {
   return (

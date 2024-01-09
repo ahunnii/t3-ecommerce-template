@@ -10,7 +10,7 @@ import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
 import { env } from "~/env.mjs";
 
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
 import { api } from "~/utils/api";
 
 const Summary = () => {

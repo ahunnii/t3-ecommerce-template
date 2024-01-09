@@ -9,9 +9,12 @@ import IconButton from "~/components/core/ui/icon-button";
 
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
+import useNotification from "~/features/notifications/use-notification";
 import type { CartItem as TCartItem } from "~/types";
 import { cn } from "~/utils/styles";
+import CartItemQuantity from "./cart-item-quantity";
+import CartItemVariant from "./cart-item-variant";
 
 type TCartItemProps = { data: TCartItem };
 
@@ -23,20 +26,8 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
     cart.removeCartItem(data);
   };
 
-  console.log(data.quantity);
+  const { showInfo } = useNotification();
 
-  // const completionDates = cartItems.map((item: CartItem) => {
-  //   console.log(item.product.estimatedCompletion);
-  //   return (item.product?.estimatedCompletion ?? 1) * item.quantity;
-  // });
-  // console.log(completionDates);
-  // const longestDate = Math.max(
-  //   ...(cartItems.map(
-  //     (item: CartItem) =>
-  //       item.product?.estimatedCompletion ?? 1 * item.quantity
-  //   ) as number[])
-  // );
-  // console.log(longestDate);
   const estDelivery = new Date(
     Date.now() +
       (data?.product?.estimatedCompletion ?? 1) *
@@ -47,7 +38,6 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
         1000
   ).toLocaleDateString();
 
-  // console.log(estDelivery);
   return (
     <>
       <TrashModal
@@ -79,23 +69,16 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
                 value={data.product.price}
                 className="col-span-2 w-full items-center  py-1 text-right md:col-span-1"
               />
-
-              <div className=" col-span-2 flex text-sm ">
-                {data.variant?.values.split(", ").map((item, idx) => (
-                  <p
-                    className={cn(
-                      "border-gray-200  text-gray-500",
-                      idx > 0 ? "ml-4 border-l pl-4" : ""
-                    )}
-                    key={idx}
-                  >
-                    {item}
-                  </p>
-                ))}
-              </div>
+              <CartItemVariant variant={data?.variant ?? null} />
             </div>
             <div className="relative items-center justify-between pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
-              <div className="flex space-y-2 max-sm:items-center max-sm:gap-2 md:flex-col">
+              <CartItemQuantity
+                cartItem={data}
+                onQuantityChange={(val) => cart.updateQuantity(data, val)}
+                onQuantityEmpty={onCartRemove}
+                onQuantityMax={() => showInfo("Maximum quantity reached")}
+              />
+              {/* <div className="flex space-y-2 max-sm:items-center max-sm:gap-2 md:flex-col">
                 <Label>Quantity</Label>{" "}
                 <Input
                   type="number"
@@ -122,7 +105,7 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
                     if (Number(e.target.value) === 0) onCartRemove();
                   }}
                 />
-              </div>
+              </div> */}
               <div className="flex space-y-2 max-sm:items-center max-sm:gap-2 md:flex-col">
                 <Label>Estimated Delivery:</Label>{" "}
                 <p className="text-sm text-gray-600">{estDelivery} </p>

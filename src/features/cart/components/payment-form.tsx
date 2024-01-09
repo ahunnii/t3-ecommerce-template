@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/form";
 
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
 import { toast } from "~/hooks/use-toast";
 
 const paymentFormSchema = z.object({

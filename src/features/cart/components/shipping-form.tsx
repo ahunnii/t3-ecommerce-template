@@ -27,7 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
 import { toast } from "~/hooks/use-toast";
 import { cn } from "~/utils/styles";
 

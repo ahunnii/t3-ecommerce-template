@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
-import useCart from "~/hooks/core/use-cart";
+import useCart from "~/features/cart/hooks/use-cart";
 import type { DetailedProductFull, Variation } from "~/types";
 import VariantSelector from "./product/variant-selector";
 
