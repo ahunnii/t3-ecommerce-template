@@ -61,6 +61,19 @@ const useCheckout = () => {
     }
   }, [store, totalPrice, cartItems]);
 
+  const checkIfCheckoutWasSuccessful = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if (searchParams.get("orderId")) {
+      // showSuccess("Payment completed.");
+      removeAll();
+    }
+
+    // if (searchParams.get("canceled")) {
+    //   showInfo("Payment canceled.");
+    // }
+  };
+
   const onCheckout = async () => {
     const productIds = cartItems?.map((item) => item.product.id);
     const variantIds = cartItems?.map((item) => item?.variant?.id ?? "0");
@@ -81,6 +94,7 @@ const useCheckout = () => {
     totalPrice,
     calculateShippingCost,
     onCheckout,
+    checkIfCheckoutWasSuccessful,
   };
 };
 

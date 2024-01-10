@@ -33,6 +33,17 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const userId = session.user.id;
+  const userRole = session.user.role;
+
+  console.log(session.user);
+
+  if (userRole !== "ADMIN")
+    return {
+      redirect: {
+        destination: "/unauthorized",
+        permanent: false,
+      },
+    };
 
   const store = await prisma.store.findFirst({
     where: {
@@ -40,16 +51,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   });
 
-  if (store) {
-    console.log("redirecting to store", store.id);
-
+  if (store)
     return {
       redirect: {
         destination: `/admin/${store.id.toString()}`,
         permanent: false,
       },
     };
-  }
 
   return {
     props: {},

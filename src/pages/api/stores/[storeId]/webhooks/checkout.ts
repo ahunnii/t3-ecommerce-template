@@ -2,6 +2,7 @@ import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type Stripe from "stripe";
 import { env } from "~/env.mjs";
+import { createTRPCContext } from "~/server/api/trpc";
 
 import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe/client";
@@ -22,7 +23,7 @@ const handleStripeWebhookEvent = async (
   if (req.method === "POST") {
     const buf = await buffer(req);
     const sig = req.headers["stripe-signature"];
-
+    const ctx = await createTRPCContext({ req, res });
     let data: unknown;
 
     let event: Stripe.Event;
@@ -53,8 +54,6 @@ const handleStripeWebhookEvent = async (
           const addressString = addressComponents
             .filter((c) => c !== null)
             .join(", ");
-
-          console.log(addressString);
 
           const order = await prisma.order.update({
             where: {

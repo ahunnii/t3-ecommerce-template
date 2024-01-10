@@ -40,9 +40,11 @@ const NavbarActions = () => {
   return (
     <div className="ml-auto flex items-center gap-x-4">
       {!sessionData && (
-        <Button variant={"ghost"} onClick={() => void signIn()}>
-          Sign in
-        </Button>
+        <>
+          <Button variant={"ghost"} onClick={() => void signIn()}>
+            Sign in
+          </Button>
+        </>
       )}
       {sessionData && (
         <DropdownMenu>
@@ -73,7 +75,7 @@ const NavbarActions = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/profile")}>
+            <DropdownMenuItem onClick={() => router.push("/account")}>
               Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator />

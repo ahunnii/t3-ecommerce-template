@@ -151,10 +151,12 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             });
           });
 
+          const currentUser = ctx?.session?.user;
           const order = await ctx.prisma.order.create({
             data: {
               storeId: storeId as string,
               isPaid: false,
+              userId: currentUser?.id ?? null,
               orderItems: {
                 create: verifiedDBData.map((product: CartItem) => {
                   if (product.variant === null)
@@ -198,6 +200,9 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
               enabled: true,
             },
 
+            // invoice_creation: {
+            //   enabled: true,
+            // },
             custom_text: {
               shipping_address: {
                 message: `Please note that things made to order takes additional processing time before shipping. Check estimated delivery dates of products to see when to expect your item(s).`,
@@ -205,7 +210,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
 
             // success_url: `http://localhost:3000/cart?success=1`,
-            success_url: `${env.NEXT_PUBLIC_URL}/cart/success`,
+            success_url: `${env.NEXT_PUBLIC_URL}/cart/success?orderId=${order.id}`,
             cancel_url: `${env.NEXT_PUBLIC_URL}/cart?canceled=1`,
 
             metadata: {

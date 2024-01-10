@@ -10,6 +10,7 @@ import StorefrontLayout from "~/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
+import { useSession } from "next-auth/react";
 import type { DetailedProductFull } from "~/types";
 
 const AllProductsPage = () => {

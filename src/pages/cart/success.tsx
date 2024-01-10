@@ -10,15 +10,19 @@ import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Confetti from "react-confetti";
 import { Button } from "~/components/ui/button";
+import useCheckout from "~/features/cart/hooks/use-checkout";
 import useWindowSize from "~/hooks/use-window-size";
 import StorefrontLayout from "~/layouts/storefront-layout";
 const SuccessfulPurchasePage = () => {
   const [isMounted, setIsMounted] = useState(false);
   const cart = useCart();
+
+  const { checkIfCheckoutWasSuccessful } = useCheckout();
   const { width, height } = useWindowSize();
 
   useEffect(() => {
     setIsMounted(true);
+    checkIfCheckoutWasSuccessful();
   }, []);
 
   if (!isMounted) {

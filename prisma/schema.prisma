@@ -58,6 +58,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role      @default(USER)
+  orders        Order[]   @relation("UserToOrder")
 
   cart Cart[] @relation("UserToCart")
 }
@@ -204,6 +205,8 @@ model Order {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   shippingLabel   ShippingLabel?
+  userId          String?
+  user            User?       @relation("UserToOrder", fields: [userId], references: [id])
 
   @@index([storeId])
 
@@ -229,7 +232,7 @@ model ShippingLabel {
 model OrderItem {
   id        String     @id @default(uuid())
   orderId   String // Foreign Key to Order
-  order     Order      @relation(fields: [orderId], references: [id])
+  order     Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String // Foreign Key to Product
   product   Product    @relation(fields: [productId], references: [id])
   variantId String? // Foreign Key to Variant

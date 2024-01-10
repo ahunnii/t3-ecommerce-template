@@ -17,7 +17,7 @@ const Navbar = () => {
   });
 
   return (
-    <div className="border-b">
+    <div className="fixed left-0 top-0 z-50 w-full border-b bg-white">
       <Container>
         <div className="relative flex h-16 items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="ml-4 flex gap-x-2 lg:ml-0">

@@ -1,8 +1,31 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const ordersRouter = createTRPCRouter({
+  getOrdersByUserId: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.order.findMany({
+        where: {
+          storeId: env.NEXT_PUBLIC_STORE_ID,
+          id: input.userId,
+        },
+        include: {
+          orderItems: {
+            include: {
+              product: true,
+              variant: true,
+            },
+          },
+          shippingLabel: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
   getAllOrders: protectedProcedure
     .input(z.object({ storeId: z.string() }))
     .query(({ ctx, input }) => {

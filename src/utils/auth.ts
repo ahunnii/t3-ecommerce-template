@@ -16,6 +16,16 @@ export const authenticateSession = async (ctx: GetServerSidePropsContext) => {
   }
 
   const userId = session.user.id;
+  const userRole = session.user.role;
+
+  if (userRole !== "ADMIN") {
+    return {
+      redirect: {
+        destination: "/unauthorized",
+        permanent: false,
+      },
+    };
+  }
 
   const store = await prisma.store.findFirst({
     where: {
@@ -26,6 +36,41 @@ export const authenticateSession = async (ctx: GetServerSidePropsContext) => {
 
   return store;
 };
+
+// export const authenticateAdminSession = async (
+//   ctx: GetServerSidePropsContext
+// ) => {
+//   const session = await getServerAuthSession(ctx);
+
+//   if (!session || !session.user) {
+//     return {
+//       redirect: {
+//         destination: "/auth/signin",
+//         permanent: false,
+//       },
+//     };
+//   }
+
+//   const userId = session.user.id;
+//   const userRole = session.user.role;
+
+//   if (userRole !== "ADMIN") {
+//     return {
+//       redirect: {
+//         destination: "/unauthorized",
+//         permanent: false,
+//       },
+//     };
+//   }
+//   const store = await prisma.store.findFirst({
+//     where: {
+//       id: ctx.query.storeId as string,
+//       userId,
+//     },
+//   });
+
+//   return store;
+// };
 
 // export const authenticateStaticSession = async (ctx: GetStaticPropsContext) => {
 //   const session = await getSession();
