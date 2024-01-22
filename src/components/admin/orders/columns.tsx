@@ -2,6 +2,8 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { CellAction } from "./cell-action";
 
 export type OrderColumn = {

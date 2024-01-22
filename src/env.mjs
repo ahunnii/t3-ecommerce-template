@@ -43,6 +43,7 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
+    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
   },
 
   /**
@@ -61,6 +62,7 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
+    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
   },
 
   /**
@@ -96,6 +98,8 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_TYPE: process.env.NEXT_PUBLIC_STORE_TYPE,
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT:
       process.env.NEXT_PUBLIC_WORDPRESS_API_ENDPOINT,
+    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL:
+      process.env.NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

@@ -38,6 +38,7 @@ const handleStripeWebhookEvent = async (
       // Handle the event
       switch (event.type) {
         case "checkout.session.completed":
+          console.log(event);
           const session = event.data.object as Stripe.Checkout.Session;
 
           const address = session?.customer_details?.address;
@@ -64,6 +65,22 @@ const handleStripeWebhookEvent = async (
               address: addressString,
               phone: session?.customer_details?.phone ?? "",
               name: name ?? "",
+              email: session?.customer_details?.email ?? "",
+              total: session?.amount_total ?? 0,
+              subtotal: session?.amount_subtotal ?? 0,
+              taxes: session?.total_details?.amount_tax ?? 0,
+              referenceId: (session?.payment_intent as string) ?? "",
+
+              timeline: {
+                create: {
+                  type: "ORDER_PLACED",
+                  title: "Order placed",
+                  description: `Total amount paid: $ ${(
+                    (session?.amount_total ?? 0) / 100
+                  ).toFixed(2)}`,
+                  createdAt: new Date(),
+                },
+              },
             },
             include: {
               orderItems: {

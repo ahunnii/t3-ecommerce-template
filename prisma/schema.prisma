@@ -198,18 +198,64 @@ model Order {
   storeId         String      // Foreign Key to Store
   store           Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems      OrderItem[] // Relation to OrderItem model
+  timeline        TimeLineEntry[]
+
   isPaid          Boolean     @default(false)
+  isRefunded      Boolean     @default(false)
+  isShipped       Boolean     @default(false)
+
+  whenPaid        DateTime?
+  total           Float       @default(0.00)
+  taxes           Float?       @default(0.00)
+  subtotal        Float       @default(0.00)
+  shippingCost    Float?       @default(0.00)
+
+
+  referenceId     String @default("")
+  refundId        String? 
+
+
   name            String      @default("")
+  email           String      @default("")
   phone           String      @default("")
   address         String      @default("")
+
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
   shippingLabel   ShippingLabel?
+  whenShipped     DateTime?
+
+
   userId          String?
   user            User?       @relation("UserToOrder", fields: [userId], references: [id])
 
   @@index([storeId])
 
+}
+
+model TimeLineEntry {
+  id              String      @id @default(uuid())
+  title           String
+  description     String?
+  type            TimeLineEntryType @default(ORDER_GENERIC)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  order           Order?      @relation( fields: [orderId], references: [id])
+  orderId         String?     @unique
+  @@index([orderId])
+}
+
+enum TimeLineEntryType{
+  ORDER_PLACED
+  ORDER_PAID
+  ORDER_SHIPPED
+  ORDER_COMPLETED
+  ORDER_CANCELLED
+  ORDER_REFUNDED
+  ORDER_RETURNED
+  ORDER_NOTE
+  ORDER_GENERIC
 }
 
 

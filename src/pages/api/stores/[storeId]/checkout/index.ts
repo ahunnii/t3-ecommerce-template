@@ -199,6 +199,9 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             phone_number_collection: {
               enabled: true,
             },
+            automatic_tax: {
+              enabled: true,
+            },
 
             // invoice_creation: {
             //   enabled: true,

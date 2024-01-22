@@ -27,7 +27,7 @@ import type { OrderColumn } from "./columns";
 import PackageForm from "./package-form";
 import RatesForm from "./rates-form";
 
-export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
+export const ShippingModal = ({ data }: { data: string }) => {
   const {
     setRates,
     getRates,
@@ -52,7 +52,7 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
   const [label, setLabel] = useState<Shippo.Transaction | null>(null);
 
   const { data: currentOrder } = api.orders.getOrder.useQuery({
-    orderId: data?.id ?? "",
+    orderId: data ?? "",
   });
 
   const { mutate: createLabel } = api.shippingLabels.createLabel.useMutation({
@@ -78,11 +78,10 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
       })
       .then((res) => {
         if (res.status === 200 && res.data.label_url) {
-          if (data?.id === undefined)
-            return toast.error("Something went wrong.");
+          if (data === undefined) return toast.error("Something went wrong.");
           else
             createLabel({
-              orderId: data?.id,
+              orderId: data,
               labelUrl: res.data.label_url,
               trackingNumber: res.data.tracking_number,
               cost: selectedRate!.amount,
@@ -102,22 +101,22 @@ export const ShippingModal = ({ data }: { data: OrderColumn | undefined }) => {
   };
 
   const customerAddress = data
-    ? data?.address?.split(", ").length > 5
+    ? currentOrder?.address && currentOrder?.address?.split(", ").length > 5
       ? {
-          name: data?.name ?? undefined,
-          street: data?.address?.split(", ")[0] ?? undefined,
-          additional: data?.address?.split(", ")[1] ?? undefined,
-          city: data?.address?.split(", ")[2] ?? undefined,
-          state: data?.address?.split(", ")[3] ?? undefined,
-          zip: data?.address?.split(", ")[4] ?? undefined,
+          name: currentOrder?.name ?? undefined,
+          street: currentOrder?.address?.split(", ")[0] ?? undefined,
+          additional: currentOrder?.address?.split(", ")[1] ?? undefined,
+          city: currentOrder?.address?.split(", ")[2] ?? undefined,
+          state: currentOrder?.address?.split(", ")[3] ?? undefined,
+          zip: currentOrder?.address?.split(", ")[4] ?? undefined,
         }
       : {
-          name: data?.name ?? undefined,
-          street: data?.address?.split(", ")[0] ?? undefined,
+          name: currentOrder?.name ?? undefined,
+          street: currentOrder?.address?.split(", ")[0] ?? undefined,
           additional: "",
-          city: data?.address?.split(", ")[1] ?? undefined,
-          state: data?.address?.split(", ")[2] ?? undefined,
-          zip: data?.address?.split(", ")[3] ?? undefined,
+          city: currentOrder?.address?.split(", ")[1] ?? undefined,
+          state: currentOrder?.address?.split(", ")[2] ?? undefined,
+          zip: currentOrder?.address?.split(", ")[3] ?? undefined,
         }
     : {
         name: "",

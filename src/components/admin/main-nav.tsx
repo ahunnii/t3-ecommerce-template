@@ -70,11 +70,17 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
           key={route.href}
           href={route.href}
           className={cn(
-            "text-sm font-medium transition-colors hover:text-primary",
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
             route.active
               ? "text-black dark:text-white"
               : "text-muted-foreground"
           )}
+          // className={cn(
+          //   "text-sm font-medium transition-colors hover:text-primary",
+          //   route.active
+          //     ? "text-black dark:text-white"
+          //     : "text-muted-foreground"
+          // )}
         >
           {route.label}
         </Link>

@@ -52,7 +52,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {" "}
-      <ShippingModal data={data} />
+      <ShippingModal data={data ?? ""} />
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
           {!orders && <PageLoader />}

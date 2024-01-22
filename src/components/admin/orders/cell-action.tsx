@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -87,23 +87,35 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => onCopy(data.id)}>
             <Copy className="mr-2 h-4 w-4" /> Copy Id
+          </DropdownMenuItem>{" "}
+          <DropdownMenuItem
+            onClick={() =>
+              router.push(
+                `/admin/${params.query.storeId as string}/orders/${
+                  data.id
+                }/view`
+              )
+            }
+          >
+            <Eye className="mr-2 h-4 w-4" /> View
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
               router.push(
-                `/admin/${params.query.storeId as string}/orders/${data.id}`
+                `/admin/${params.query.storeId as string}/orders/${
+                  data.id
+                }/edit`
               )
             }
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
           {data?.isPaid && (
-            <DropdownMenuItem onClick={() => shippingModal.onOpen(data)}>
+            <DropdownMenuItem onClick={() => shippingModal.onOpen(data.id)}>
               <Edit className="mr-2 h-4 w-4" />{" "}
               {data?.labelCreated ? "Download" : "Create"} label
             </DropdownMenuItem>
           )}
-
           <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>

@@ -63,12 +63,14 @@ export const ordersRouter = createTRPCRouter({
         },
         include: {
           shippingLabel: true,
+          timeline: true,
           orderItems: {
             include: {
               variant: true,
               product: {
                 include: {
                   variants: true,
+                  images: true,
                 },
               },
             },

@@ -34,7 +34,9 @@ const Summary = ({ type = "default" }: { type: "default" | "dark" }) => {
         </div>
 
         <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-          <div className="text-base font-medium text-gray-900">Order total</div>
+          <div className="text-base font-medium text-gray-900">
+            *Order total
+          </div>
           <Currency
             value={
               totalPrice +
@@ -53,7 +55,7 @@ const Summary = ({ type = "default" }: { type: "default" | "dark" }) => {
         Checkout
       </Button>
       <p className="mt-3 w-full text-center text-muted-foreground">
-        Shipping and taxes calculated at checkout
+        * Shipping and taxes calculated at checkout
       </p>
     </div>
   );
