@@ -7,6 +7,14 @@ import type { Image } from "~/types";
 
 import GalleryTab from "./gallery-tab";
 
+import { DialogOverlay } from "@radix-ui/react-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+
 interface GalleryProps {
   images: Image[];
 }
@@ -24,14 +32,32 @@ const Gallery: React.FC<GalleryProps> = ({ images = [] }) => {
       <Tab.Panels className="aspect-square w-full">
         {images.map((image) => (
           <Tab.Panel key={image.id}>
-            <div className="relative aspect-square h-full w-full overflow-hidden sm:rounded-lg">
-              <NextImage
-                fill
-                src={image.url}
-                alt="Image"
-                className="object-cover object-center"
-              />
-            </div>
+            <div
+              className="relative aspect-square h-full w-full overflow-hidden bg-cover bg-no-repeat sm:rounded-lg"
+              style={{ backgroundImage: `url(${image.url})` }}
+            >
+              <div className="h-full w-full bg-purple-500/50 backdrop-blur-md"></div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <NextImage
+                    fill
+                    src={image.url}
+                    alt="Image"
+                    className="object-contain object-center"
+                  />
+                </DialogTrigger>
+                <DialogContent className="w-full ">
+                  <NextImage
+                    src={image.url ?? ""}
+                    alt=""
+                    width={462}
+                    height={825}
+                    layout="responsive"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>{" "}
           </Tab.Panel>
         ))}
       </Tab.Panels>

@@ -35,8 +35,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const userId = session.user.id;
   const userRole = session.user.role;
 
-  console.log(session.user);
-
   if (userRole !== "ADMIN")
     return {
       redirect: {

@@ -2,53 +2,23 @@ import type { GetServerSidePropsContext } from "next";
 
 import type { FC } from "react";
 
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
+import { SingleCollectionPage as DefaultSingleCollectionPage } from "~/shop/core/pages/single-collection";
+import { SingleCollectionPage as CustomSingleCollectionPage } from "~/shop/custom/pages/single-collection";
 
-import NoResults from "~/components/core/ui/no-results";
-import ProductCard from "~/components/core/ui/product-card";
-import PageLoader from "~/components/ui/page-loader";
-import StorefrontLayout from "~/layouts/storefront-layout";
-
-import { api } from "~/utils/api";
+import useStorePageRender from "~/hooks/use-store-page-render";
 
 type ICollectionPageProps = {
   collectionId: string;
 };
-const CollectionPage: FC<ICollectionPageProps> = ({ collectionId }) => {
-  const { data: collection, isLoading: isCollectionLoading } =
-    api.collections.getCollection.useQuery({ collectionId });
+const SingleCollectionPage: FC<ICollectionPageProps> = (props) => {
+  const { isTemplate } = useStorePageRender();
 
-  const pathway = [
-    {
-      name: "Collections",
-      link: "/collections",
-    },
-    {
-      name: collection?.name ?? "",
-    },
-  ];
-  return (
-    <StorefrontLayout>
-      <Breadcrumbs pathway={pathway} />
-      <div className="px-4 pb-24 sm:px-6 lg:px-8">
-        {isCollectionLoading ? (
-          <PageLoader />
-        ) : (
-          <div className="mt-6 lg:col-span-4 lg:mt-0">
-            {collection?.products.length === 0 && <NoResults />}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {collection?.products.map((item) => (
-                <ProductCard key={item.id} data={item} />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </StorefrontLayout>
-  );
+  if (isTemplate) return <DefaultSingleCollectionPage {...props} />;
+
+  return <CustomSingleCollectionPage {...props} />;
 };
 
-export default CollectionPage;
+export default SingleCollectionPage;
 
 export const getServerSideProps = (ctx: GetServerSidePropsContext) => {
   const { collectionId } = ctx.query;

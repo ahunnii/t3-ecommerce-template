@@ -18,6 +18,11 @@ module.exports = {
     },
     extend: {
       colors: {
+        "ta-primary": "#00040f", // Your primary background color
+        "ta-secondary": "#00f6ff", // Your secondary accent color
+        "ta-dimWhite": "rgba(255, 255, 255, 0.7)", // A dimmed white color
+        "ta-dimBlue": "rgba(9, 151, 124, 0.1)", // A dimmed blue color
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -82,6 +87,17 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"], // Use the Poppins font family
+      },
+      screens: {
+        "ta-xs": "480px",
+        "ta-ss": "620px",
+        "ta-sm": "768px",
+        "ta-md": "1060px",
+        "ta-lg": "1200px",
+        "ta-xl": "1700px",
       },
     },
   },

@@ -1,13 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FC } from "react";
 
 import MainNav from "~/components/core/main-nav";
 import NavbarActions from "~/components/core/navbar-actions";
 import Container from "~/components/core/ui/container";
 import { env } from "~/env.mjs";
 import { api } from "~/utils/api";
+import { cn } from "~/utils/styles";
 
-const Navbar = () => {
+export const Navbar: FC<{
+  navStyles?: string;
+  linkStyles?: string;
+}> = ({ navStyles = "", linkStyles = "" }) => {
   const { data: categories } = api.collections.getAllCollections.useQuery({
     isFeatured: true,
   });
@@ -17,7 +22,12 @@ const Navbar = () => {
   });
 
   return (
-    <div className="fixed left-0 top-0 z-50 w-full border-b bg-white">
+    <div
+      className={cn(
+        "fixed left-0 top-0 z-50 w-full border-b bg-white",
+        navStyles
+      )}
+    >
       <Container>
         <div className="relative flex h-16 items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="ml-4 flex gap-x-2 lg:ml-0">
@@ -27,7 +37,7 @@ const Navbar = () => {
 
             <>
               <Image
-                src={`/${env.NEXT_PUBLIC_SITE_DIRECTORY}/logo.png`}
+                src={`/${env.NEXT_PUBLIC_STORE_TYPE}/logo.png`}
                 width={50}
                 height={50}
                 alt="logo"
@@ -43,5 +53,3 @@ const Navbar = () => {
     </div>
   );
 };
-
-export default Navbar;

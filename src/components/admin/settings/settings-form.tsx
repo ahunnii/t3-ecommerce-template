@@ -137,7 +137,6 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: SettingsFormValues) => {
-    console.log("yeer");
     updateStore({
       storeId: params.query.storeId as string,
       name: data.name,

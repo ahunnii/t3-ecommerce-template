@@ -1,17 +1,25 @@
 import { useEffect } from "react";
 
-import Footer from "~/components/core/footer";
-import Navbar from "~/components/core/navbar";
+import { Footer as DefaultFooter } from "~/components/core/footer";
+import { Navbar as DefaultNavbar } from "~/components/core/navbar";
 
 import useCart from "~/features/cart/hooks/use-cart";
 import { cn } from "~/utils/styles";
 
 const StorefrontLayout = ({
   children,
+  NavBar = DefaultNavbar,
+  Footer = DefaultFooter,
   bodyStyle = "",
+  mainStyle = "",
+  navStyles = "",
 }: {
   children: React.ReactNode;
+  NavBar?: React.FC<{ navStyles?: string; linkStyles?: string }>;
+  Footer?: React.FC;
   bodyStyle?: string;
+  mainStyle?: string;
+  navStyles?: string;
 }) => {
   const updateStore = () => void useCart.persist.rehydrate();
 
@@ -36,8 +44,8 @@ const StorefrontLayout = ({
         <Footer />
       </main> */}
 
-      <main className="flex h-full  min-h-screen flex-col">
-        <Navbar />
+      <main className={cn("flex h-full  min-h-screen flex-col", mainStyle)}>
+        <NavBar navStyles={navStyles} />
 
         <div
           className={cn(

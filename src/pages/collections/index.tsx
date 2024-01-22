@@ -1,48 +1,14 @@
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
-import { CollectionCard } from "~/components/core/category/collection-card";
+import { CollectionPage as DefaultCollectionPage } from "~/shop/core/pages/all-collections";
+import { CollectionPage as CustomCollectionPage } from "~/shop/custom/pages/all-collections";
 
-import NoResults from "~/components/core/ui/no-results";
-
-import PageLoader from "~/components/ui/page-loader";
-import StorefrontLayout from "~/layouts/storefront-layout";
-import type { DetailedCollection } from "~/types";
-import { api } from "~/utils/api";
+import useStorePageRender from "~/hooks/use-store-page-render";
 
 const CollectionPage = () => {
-  const { data: collections, isLoading } =
-    api.collections.getAllCollections.useQuery({});
+  const { isTemplate } = useStorePageRender();
 
-  const pathway = [
-    {
-      name: "Collections",
-    },
-  ];
+  if (isTemplate) return <DefaultCollectionPage />;
 
-  return (
-    <StorefrontLayout>
-      <Breadcrumbs pathway={pathway} />
-      <div className="px-4 pb-24 sm:px-6 lg:px-8">
-        {isLoading ? (
-          <PageLoader />
-        ) : (
-          <div className="mt-6 lg:col-span-4 lg:mt-0">
-            {collections?.length === 0 && <NoResults />}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {collections?.map((item: DetailedCollection) => (
-                <CollectionCard
-                  key={item.id}
-                  collection={item}
-                  // aspectRatio="square"
-                  // width={150}
-                  // height={150}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </StorefrontLayout>
-  );
+  return <CustomCollectionPage />;
 };
 
 export default CollectionPage;

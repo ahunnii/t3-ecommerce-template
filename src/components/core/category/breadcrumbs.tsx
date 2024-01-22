@@ -1,18 +1,35 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import Link from "next/link";
-
+import { cn } from "~/utils/styles";
 export type BreadCrumbPath = {
   name: string;
   link?: string;
-};
-
-const Breadcrumbs = ({ pathway }: { pathway: BreadCrumbPath[] }) => {
+} & VariantProps<typeof infoVariants>;
+const infoVariants = cva("", {
+  variants: {
+    variant: {
+      default: "text-neutral-500 hover:text-black",
+      dark: " hover:text-purple-500 text-neutral-500",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+const Breadcrumbs = ({
+  pathway,
+  ...props
+}: { pathway: BreadCrumbPath[] } & VariantProps<typeof infoVariants>) => {
   return (
     <nav className="mb-4 flex px-5 pb-5 pt-10 " aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         <li className="inline-flex items-center">
           <Link
             href="/"
-            className="inline-flex items-center text-sm font-medium text-neutral-500 transition-colors hover:text-black"
+            className={cn(
+              "inline-flex items-center text-sm font-medium  transition-colors ",
+              infoVariants({ variant: props?.variant ?? "default" })
+            )}
           >
             <svg
               className="mr-2.5 h-5 w-5"
@@ -27,7 +44,7 @@ const Breadcrumbs = ({ pathway }: { pathway: BreadCrumbPath[] }) => {
         </li>
 
         {pathway.map((path, idx) => (
-          <BreadcrumbPath pathway={path} key={idx} />
+          <BreadcrumbPath pathway={path} key={idx} variant={props?.variant} />
         ))}
         {/* <li>
           <div className="flex items-center">
@@ -77,12 +94,13 @@ const Breadcrumbs = ({ pathway }: { pathway: BreadCrumbPath[] }) => {
 
 const BreadcrumbPath = ({
   pathway,
+  ...props
 }: {
   pathway: {
     name: string;
     link?: string;
   };
-}) => {
+} & VariantProps<typeof infoVariants>) => {
   const params = pathway?.link
     ? ({
         "aria-current": "page",
@@ -108,12 +126,22 @@ const BreadcrumbPath = ({
         {pathway?.link ? (
           <Link
             href={pathway?.link}
-            className="ml-1 text-sm font-medium text-neutral-500 transition-colors hover:text-black md:ml-2"
+            className={cn(
+              "ml-1 text-sm font-medium transition-colors  md:ml-2",
+              props?.variant === "dark"
+                ? "text-black hover:text-purple-500"
+                : "text-black"
+            )}
           >
             {pathway.name}
           </Link>
         ) : (
-          <span className="ml-1 text-sm font-medium  text-black md:ml-2">
+          <span
+            className={cn(
+              "ml-1 text-sm font-medium   md:ml-2",
+              props?.variant === "dark" ? "text-fuchsia-700" : "text-black"
+            )}
+          >
             {pathway.name}
           </span>
         )}

@@ -1,43 +1,14 @@
-import Head from "next/head";
+import { HomePage as DefaultHomePage } from "~/shop/core/pages/homepage";
+import { HomePage as CustomHomePage } from "~/shop/custom/pages/homepage";
 
-import ProductList from "~/components/core/product/product-list";
-
-import StorefrontLayout from "~/layouts/storefront-layout";
-
-import { api } from "~/utils/api";
+import useStorePageRender from "~/hooks/use-store-page-render";
 
 const HomePage = () => {
-  const { data: products, isLoading } = api.products.getAllProducts.useQuery({
-    isFeatured: true,
-  });
-  return (
-    <>
-      <Head>
-        <title>Homepage | Store Co.</title>
-        <meta name="description" content="Admin" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+  const { isTemplate } = useStorePageRender();
 
-      <StorefrontLayout>
-        <div className="space-y-10 pb-10">
-          <div className="overflow-hidden rounded-xl p-4 sm:p-6 lg:p-8">
-            <div
-              style={{ backgroundImage: `url(${"/hero.png"})` }}
-              className="relative aspect-square overflow-hidden rounded-xl bg-cover md:aspect-[2.4/1]"
-            ></div>
-          </div>
+  if (isTemplate) return <DefaultHomePage />;
 
-          <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              <ProductList title="Featured Products" items={products! ?? []} />
-            )}
-          </div>
-        </div>
-      </StorefrontLayout>
-    </>
-  );
+  return <CustomHomePage />;
 };
 
 export default HomePage;

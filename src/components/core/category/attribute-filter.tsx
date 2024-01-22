@@ -7,11 +7,18 @@ import { cn } from "~/utils/styles";
 
 interface FilterProps {
   data: Attribute;
-
   valueKey: string;
+  textStyles?: string;
+  buttonStyles?: string;
+  selectedStyles?: string;
+  dividerStyles?: string;
 }
 
-const AttributeFilter: React.FC<FilterProps> = ({ data, valueKey }) => {
+const AttributeFilter: React.FC<FilterProps> = ({
+  data,
+  valueKey,
+  ...props
+}) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -42,15 +49,19 @@ const AttributeFilter: React.FC<FilterProps> = ({ data, valueKey }) => {
 
   return (
     <div className="mb-8">
-      <h3 className="text-lg font-semibold">{data.name}</h3>
-      <hr className="my-4" />
+      <h3 className={cn("text-lg font-semibold text-white", props.textStyles)}>
+        {data.name}
+      </h3>
+      <hr className={cn("my-4", props.dividerStyles)} />
       <div className="flex flex-wrap gap-2">
         {data.values.split(";").map((filter) => (
           <div key={filter} className="flex items-center">
             <Button
               className={cn(
                 "rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-800",
-                selectedValue === filter && "bg-black text-white"
+                selectedValue === filter &&
+                  `bg-black text-white ${props.selectedStyles}`,
+                props.buttonStyles
               )}
               onClick={() => onClick(filter)}
             >

@@ -13,7 +13,7 @@ import useCart from "~/features/cart/hooks/use-cart";
 import ShoppingBagBtn from "./shopping-bag-btn";
 import ShoppingBagItem from "./shopping-bag-item";
 
-const CartShoppingBag = () => {
+const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
   const cart = useCart();
 
   const cartItems = cart.cartItems;
@@ -23,7 +23,7 @@ const CartShoppingBag = () => {
   return (
     <HoverCard>
       <HoverCardTrigger>
-        <ShoppingBagBtn quantity={cartItemCount} />
+        <ShoppingBagBtn quantity={cartItemCount} className={btnClassName} />
       </HoverCardTrigger>
       <HoverCardContent className="w-80">
         <div className="space-y-1">

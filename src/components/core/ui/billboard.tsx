@@ -6,17 +6,22 @@ type TBillboardProps = {
   data: BillboardType;
   textStyle?: string;
   bgStyle?: string;
+  disableImage?: boolean;
 };
 
 const Billboard: FC<TBillboardProps> = ({
   data,
   textStyle = "text-black",
   bgStyle = "",
+  ...props
 }) => {
+  const imageStyle = props?.disableImage
+    ? {}
+    : { backgroundImage: `url(${data?.imageUrl})` };
   return (
     <div className="overflow-hidden rounded-xl p-4 sm:p-6 lg:p-8">
       <div
-        style={{ backgroundImage: `url(${data?.imageUrl})` }}
+        style={imageStyle}
         className={cn(
           "relative aspect-square overflow-hidden rounded-xl bg-cover saturate-50 md:aspect-[3.4/1]",
           bgStyle

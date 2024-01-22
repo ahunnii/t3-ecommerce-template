@@ -9,7 +9,9 @@ import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
 import { OrderClient } from "~/components/admin/orders/client";
+import { ShippingModal } from "~/components/admin/orders/shipping-modal";
 import PageLoader from "~/components/ui/page-loader";
+import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
 import AdminLayout from "~/layouts/AdminLayout";
 import type { DetailedOrder } from "~/types";
 
@@ -22,7 +24,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
   const { data: orders } = api.orders.getAllOrders.useQuery({
     storeId,
   });
-
+  const { data } = useShippingModal();
   const formatOrders = useCallback((orders: DetailedOrder[]) => {
     return orders.map((item: DetailedOrder) => ({
       id: item.id,
@@ -49,6 +51,8 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
 
   return (
     <AdminLayout>
+      {" "}
+      <ShippingModal data={data} />
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
           {!orders && <PageLoader />}

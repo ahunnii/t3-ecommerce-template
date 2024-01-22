@@ -41,6 +41,8 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: z.string().url(),
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
     NEXT_PUBLIC_URL: z.string().url(),
+    NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
+    NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
   },
 
   /**
@@ -57,6 +59,8 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: z.string().url(),
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
     NEXT_PUBLIC_URL: z.string().url(),
+    NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
+    NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
   },
 
   /**
@@ -89,6 +93,9 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+    NEXT_PUBLIC_STORE_TYPE: process.env.NEXT_PUBLIC_STORE_TYPE,
+    NEXT_PUBLIC_WORDPRESS_API_ENDPOINT:
+      process.env.NEXT_PUBLIC_WORDPRESS_API_ENDPOINT,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

@@ -1,6 +1,7 @@
+import type { FC } from "react";
 import { env } from "~/env.mjs";
 
-const Footer = () => {
+export const Footer: FC = () => {
   return (
     <footer className="border-t bg-white">
       <div className="mx-auto py-10">
@@ -11,5 +12,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-export default Footer;

@@ -1,48 +1,14 @@
-import Head from "next/head";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Button } from "~/components/ui/button";
+import { UnauthorizedPage as DefaultUnauthorizedPage } from "~/shop/core/pages/unauthorized";
+import { UnauthorizedPage as CustomUnauthorizedPage } from "~/shop/custom/pages/unauthorized";
 
-import StorefrontLayout from "~/layouts/storefront-layout";
+import useStorePageRender from "~/hooks/use-store-page-render";
 
 const UnauthorizedPage = () => {
-  const router = useRouter();
+  const { isTemplate } = useStorePageRender();
 
-  const navigateToShop = () => {
-    router.replace("/collections/all-products");
-  };
-  const askQuestion = () => {
-    router.replace("/contact-us");
-  };
+  if (isTemplate) return <DefaultUnauthorizedPage />;
 
-  return (
-    <>
-      <Head>
-        <title>Homepage | Store Co.</title>
-        <meta name="description" content="Admin" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <StorefrontLayout bodyStyle="items-center justify-center flex">
-        <div className="flex flex-col items-center">
-          <Image
-            src="/img/lost.svg"
-            width={500}
-            height={500}
-            alt="Unauthorized"
-          />
-          <h1 className="mt-5 text-7xl font-bold">Unauthorized</h1>
-          <h2 className="text-xl text-muted-foreground">
-            Oh no, it looks like you don&apos;t have access to this page.
-          </h2>
-
-          <div className="mt-5 flex justify-around gap-4">
-            <Button onClick={navigateToShop}>Head back to the shop</Button>
-          </div>
-        </div>
-      </StorefrontLayout>
-    </>
-  );
+  return <CustomUnauthorizedPage />;
 };
 
 export default UnauthorizedPage;

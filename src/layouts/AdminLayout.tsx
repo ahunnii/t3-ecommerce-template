@@ -1,4 +1,5 @@
 import Head from "next/head";
+
 import Navbar from "~/components/admin/navbar";
 
 export default function AdminLayout({
@@ -11,7 +12,7 @@ export default function AdminLayout({
   return (
     <>
       <Head>
-        <title>{title ?? "Admin"} | Admin</title>
+        <title> Admin</title>
         <meta name="description" content="Admin" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

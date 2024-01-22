@@ -13,9 +13,9 @@ import { Input } from "~/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
+import { cva, type VariantProps } from "class-variance-authority";
 import { Check, ChevronsUpDown, Minus, Plus } from "lucide-react";
 import * as React from "react";
-
 import { Button } from "~/components/ui/button";
 import {
   Command,
@@ -35,7 +35,19 @@ import * as z from "zod";
 import type { DetailedProductFull, Variation } from "~/types";
 import { cn } from "~/utils/styles";
 
-interface IProps {
+const infoVariants = cva("", {
+  variants: {
+    labels: {
+      default: "",
+      dark: "text-white/75",
+    },
+  },
+  defaultVariants: {
+    labels: "default",
+  },
+});
+
+interface IProps extends VariantProps<typeof infoVariants> {
   product: DetailedProductFull;
   variant: Variation | null;
 
@@ -55,6 +67,7 @@ const VariantSelector: FC<IProps> = ({
   variant,
   setVariant,
   setQuantity,
+  ...props
 }) => {
   // Define a zod schema for validation
 
@@ -101,7 +114,7 @@ const VariantSelector: FC<IProps> = ({
   }, [variant]);
 
   const availableOptions = product?.variants?.map((variant) => {
-    if (variant.quantity > 1) return `${variant.values}, ${variant.quantity}`;
+    if (variant.quantity >= 1) return `${variant.values}, ${variant.quantity}`;
     return "";
   });
 
@@ -153,7 +166,8 @@ const VariantSelector: FC<IProps> = ({
   }
 
   // console.log(availableOptions);
-
+  const textStyles = infoVariants({ labels: props?.labels ?? "default" });
+  // const btnStyles = infoVariants({ button: props?.button ?? "default" });
   return (
     <>
       <Form {...form}>
@@ -161,7 +175,9 @@ const VariantSelector: FC<IProps> = ({
           {product.variants?.length > 0 &&
             possibleOptions?.map((field, idx) => (
               <FormItem key={idx} className="flex flex-col">
-                <FormLabel>{field.name}</FormLabel>{" "}
+                <FormLabel className={cn("", textStyles)}>
+                  {field.name}
+                </FormLabel>{" "}
                 <Controller
                   name={`selection.${field.name}`}
                   control={form.control}
@@ -252,7 +268,7 @@ const VariantSelector: FC<IProps> = ({
             name="quantity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Quantity</FormLabel>
+                <FormLabel className={cn("", textStyles)}>Quantity</FormLabel>
                 <FormControl>
                   {/* <div className="flex gap-1"> */}
                   <Input
