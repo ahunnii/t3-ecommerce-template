@@ -20,7 +20,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "~/components/ui/hover-card";
-import CartShoppingBag from "~/features/cart/components/cart-shopping-bag";
+import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
 
 import { cn } from "~/utils/styles";
 import { Separator } from "../ui/separator";

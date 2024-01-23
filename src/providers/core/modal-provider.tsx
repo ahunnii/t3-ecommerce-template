@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import PreviewModal from "~/components/core/product/preview-modal";
+import PreviewModal from "~/modules/products/core/preview-modal";
 
 const StorefrontModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);

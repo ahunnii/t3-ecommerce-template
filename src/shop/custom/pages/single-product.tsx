@@ -2,10 +2,10 @@ import Head from "next/head";
 import { useParams } from "next/navigation";
 import type { FC } from "react";
 
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
-import Gallery from "~/components/core/gallery";
 import Info from "~/components/core/info";
 import PageLoader from "~/components/ui/page-loader";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
+import Gallery from "~/modules/gallery/core";
 
 import StorefrontLayout from "~/layouts/storefront-layout";
 

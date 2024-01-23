@@ -8,14 +8,14 @@ import getCategory from "~/actions/core/get-category";
 import getProducts from "~/actions/core/get-products";
 import getSizes from "~/actions/core/get-sizes";
 
-import AttributeFilter from "~/components/core/category/attribute-filter";
+import AttributeFilter from "~/modules/categories/core/attribute-filter";
 
 import { useParams, useSearchParams } from "next/navigation";
-import MobileFilters from "~/components/core/category/mobile-filters";
 import Billboard from "~/components/core/ui/billboard";
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/layouts/storefront-layout";
+import MobileFilters from "~/modules/categories/core/mobile-filters";
 import { api } from "~/utils/api";
 
 interface IProps {

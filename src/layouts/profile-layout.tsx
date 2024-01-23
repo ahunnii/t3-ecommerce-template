@@ -3,8 +3,8 @@ import Head from "next/head";
 
 import { useMemo } from "react";
 
-import { SidebarNav } from "~/components/core/profile/sidebar-nav";
 import Container from "~/components/core/ui/container";
+import { SidebarNav } from "~/modules/account/core/sidebar-nav";
 
 import PageLoader from "~/components/ui/page-loader";
 import { Separator } from "~/components/ui/separator";

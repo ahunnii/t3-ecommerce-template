@@ -6,10 +6,10 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
-import useCart from "~/features/cart/hooks/use-cart";
+import useCart from "~/modules/cart/hooks/use-cart";
 import type { DetailedProductFull, Variation } from "~/types";
 import { cn } from "~/utils/styles";
-import VariantSelector from "./product/variant-selector";
+import VariantSelector from "../../modules/products/core/variant-selector";
 
 interface InfoProps extends VariantProps<typeof infoVariants> {
   data: DetailedProductFull;

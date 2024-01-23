@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import useCart from "~/features/cart/hooks/use-cart";
+import useCart from "~/modules/cart/hooks/use-cart";
 
-import CartItem from "~/features/cart/components/cart-item";
-import Summary from "~/features/cart/components/summary";
 import CheckoutLayout from "~/layouts/CheckoutLayout";
+import CartItem from "~/modules/cart/components/cart-item";
+import Summary from "~/modules/cart/components/summary";
 
 const CheckoutPage = () => {
   const [isMounted, setIsMounted] = useState(false);

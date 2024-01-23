@@ -1,5 +1,5 @@
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
-import { CollectionCard } from "~/components/core/category/collection-card";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
+import { CollectionCard } from "~/modules/categories/core/collection-card";
 
 import NoResults from "~/components/core/ui/no-results";
 

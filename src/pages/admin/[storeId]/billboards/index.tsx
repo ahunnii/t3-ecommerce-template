@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState, type FC } from "react";
 import type { Billboard } from "@prisma/client";
 import { format } from "date-fns";
 
-import { BillboardClient } from "~/components/admin/shipping/client";
-import type { BillboardColumn } from "~/components/admin/shipping/columns";
 import PageLoader from "~/components/ui/page-loader";
+import { BillboardClient } from "~/modules/billboards/admin/client";
+import type { BillboardColumn } from "~/modules/billboards/admin/columns";
 
 import AdminLayout from "~/layouts/AdminLayout";
 
@@ -26,13 +26,17 @@ const BillboardsPage: FC<IProps> = ({ storeId }) => {
       storeId,
     });
 
-  const formatBillboards = useCallback((billboards: Billboard[]) => {
-    return billboards.map((item: Billboard) => ({
-      id: item.id,
-      label: item.label,
-      createdAt: format(item.createdAt, "MMMM do, yyyy"),
-    }));
-  }, []);
+  const formatBillboards = useCallback(
+    (billboards: Billboard[]) => {
+      return billboards.map((item: Billboard) => ({
+        id: item.id,
+        storeId: storeId,
+        label: item.label,
+        createdAt: format(item.createdAt, "MMMM do, yyyy"),
+      }));
+    },
+    [storeId]
+  );
 
   useEffect(() => {
     if (billboards) setFormattedBillboards(formatBillboards(billboards));

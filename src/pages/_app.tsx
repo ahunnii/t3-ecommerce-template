@@ -1,10 +1,8 @@
+import "@uploadthing/react/styles.css";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 import Router from "next/router";
-import "~/styles/globals.css";
-import { api } from "~/utils/api";
-
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Toaster } from "~/components/ui/toaster";
@@ -12,6 +10,8 @@ import { ModalProvider } from "~/providers/admin/modal-provider";
 import StorefrontModalProvider from "~/providers/core/modal-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/providers/toast-provider";
+import "~/styles/globals.css";
+import { api } from "~/utils/api";
 
 Router.events.on("routeChangeStart", () => {
   NProgress.start();

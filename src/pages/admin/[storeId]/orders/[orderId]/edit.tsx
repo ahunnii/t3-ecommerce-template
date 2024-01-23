@@ -5,9 +5,9 @@ import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
 import Head from "next/head";
-import { OrderForm } from "~/components/admin/orders/order-form";
 import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
+import { OrderForm } from "~/modules/orders/components/admin/order-form";
 
 interface IProps {
   orderId: string;

@@ -1,7 +1,7 @@
 import Head from "next/head";
 
-import ProductList from "~/components/core/product/product-list";
 import StorefrontLayout from "~/layouts/storefront-layout";
+import ProductList from "~/modules/products/core/product-list";
 
 import { api } from "~/utils/api";
 

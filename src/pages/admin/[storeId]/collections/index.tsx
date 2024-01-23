@@ -3,9 +3,9 @@ import { useCallback, useEffect, useState, type FC } from "react";
 
 import { format } from "date-fns";
 
-import { CollectionsClient } from "~/components/admin/collections/client";
-import type { CollectionColumn } from "~/components/admin/collections/columns";
 import PageLoader from "~/components/ui/page-loader";
+import { CollectionsClient } from "~/modules/collections/client";
+import type { CollectionColumn } from "~/modules/collections/columns";
 
 import AdminLayout from "~/layouts/AdminLayout";
 

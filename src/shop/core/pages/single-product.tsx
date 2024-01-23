@@ -1,9 +1,9 @@
 import { useParams } from "next/navigation";
 
-import Gallery from "~/components/core/gallery";
 import Info from "~/components/core/info";
-import ProductList from "~/components/core/product/product-list";
 import PageLoader from "~/components/ui/page-loader";
+import Gallery from "~/modules/gallery/core";
+import ProductList from "~/modules/products/core/product-list";
 
 import StorefrontLayout from "~/layouts/storefront-layout";
 
@@ -11,7 +11,7 @@ import { api } from "~/utils/api";
 
 import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
 
 import { prisma } from "~/server/db";
 import type { DetailedProductFull } from "~/types";

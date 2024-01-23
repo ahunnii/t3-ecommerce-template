@@ -4,9 +4,9 @@ import type { FC } from "react";
 
 import { authenticateSession } from "~/utils/auth";
 
-import { SettingsForm } from "~/components/admin/settings/settings-form";
 import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
+import { SettingsForm } from "~/modules/settings/settings-form";
 
 interface IProps {
   store: Store & { gallery: { url: string }[] };

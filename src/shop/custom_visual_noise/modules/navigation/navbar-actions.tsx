@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-import CartShoppingBag from "~/features/cart/components/cart-shopping-bag";
+import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
 
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);

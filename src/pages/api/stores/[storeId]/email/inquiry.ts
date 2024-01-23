@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Resend } from "resend";
 import type { CreateEmailOptions } from "resend/build/src/emails/interfaces";
-import { InquiryTemplate } from "~/components/core/email/inquiry-template";
 import { env } from "~/env.mjs";
+import { InquiryTemplate } from "~/modules/email/inquiry-template";
 
 const resend = new Resend(env.RESEND_API_KEY);
 

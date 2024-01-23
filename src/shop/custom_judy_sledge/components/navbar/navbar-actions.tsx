@@ -21,7 +21,7 @@ import {
   HoverCardTrigger,
 } from "~/components/ui/hover-card";
 import { Separator } from "~/components/ui/separator";
-import useCart from "~/features/cart/hooks/use-cart";
+import useCart from "~/modules/cart/hooks/use-cart";
 
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);

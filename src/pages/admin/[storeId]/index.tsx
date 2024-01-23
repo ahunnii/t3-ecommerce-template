@@ -4,10 +4,10 @@ import Head from "next/head";
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { getGraphRevenue } from "~/actions/admin/get-graph-revenue";
-import { getSalesCount } from "~/actions/admin/get-sales-count";
-import { getStockCount } from "~/actions/admin/get-stock-count";
-import { getTotalRevenue } from "~/actions/admin/get-total-revenue";
+import { getGraphRevenue } from "~/modules/admin-overview/actions/get-graph-revenue";
+import { getSalesCount } from "~/modules/admin-overview/actions/get-sales-count";
+import { getStockCount } from "~/modules/admin-overview/actions/get-stock-count";
+import { getTotalRevenue } from "~/modules/admin-overview/actions/get-total-revenue";
 
 import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";

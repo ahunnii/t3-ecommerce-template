@@ -2,11 +2,11 @@ import Head from "next/head";
 import { useSearchParams } from "next/navigation";
 
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
-import AttributeFilter from "~/components/core/category/attribute-filter";
-import MobileFilters from "~/components/core/category/mobile-filters";
 import Billboard from "~/components/core/ui/billboard";
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
+import AttributeFilter from "~/modules/categories/core/attribute-filter";
+import MobileFilters from "~/modules/categories/core/mobile-filters";
 
 import StorefrontLayout from "~/layouts/storefront-layout";
 

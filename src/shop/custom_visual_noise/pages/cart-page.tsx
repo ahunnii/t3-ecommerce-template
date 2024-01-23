@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-import useCart from "~/features/cart/hooks/use-cart";
+import useCart from "~/modules/cart/hooks/use-cart";
 
 import Head from "next/head";
 import Container from "~/components/core/ui/container";
-import CartItem from "~/features/cart/components/cart-item";
-import Summary from "~/features/cart/components/summary";
 import StorefrontLayout from "~/layouts/storefront-layout";
+import CartItem from "~/modules/cart/components/cart-item";
+import Summary from "~/modules/cart/components/summary";
 import Footer from "../components/footer";
 import Navbar from "../modules/navigation/navbar";
 

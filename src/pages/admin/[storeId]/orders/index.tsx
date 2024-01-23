@@ -1,18 +1,17 @@
-import { format } from "date-fns";
+import type { GetServerSidePropsContext } from "next";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { GetServerSidePropsContext } from "next";
-import type { OrderColumn } from "~/components/admin/orders/columns";
+import PageLoader from "~/components/ui/page-loader";
+import { OrderClient } from "~/modules/orders/components/admin/client";
+import type { OrderColumn } from "~/modules/orders/components/admin/columns";
+import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
-import { formatter } from "~/utils/styles";
 
-import { OrderClient } from "~/components/admin/orders/client";
-import { ShippingModal } from "~/components/admin/orders/shipping-modal";
-import PageLoader from "~/components/ui/page-loader";
 import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
 import AdminLayout from "~/layouts/AdminLayout";
+import { formatOrderTableData } from "~/modules/orders/utils/format-order-table-data";
 import type { DetailedOrder } from "~/types";
 
 interface IProps {
@@ -26,23 +25,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
   });
   const { data } = useShippingModal();
   const formatOrders = useCallback((orders: DetailedOrder[]) => {
-    return orders.map((item: DetailedOrder) => ({
-      id: item.id,
-      phone: item.phone,
-      name: item.name,
-      address: item.address,
-      products: item.orderItems
-        .map((orderItem) => orderItem.product.name)
-        .join(", "),
-      totalPrice: formatter.format(
-        item.orderItems.reduce((total, item) => {
-          return total + Number(item.product.price);
-        }, 0)
-      ),
-      isPaid: item.isPaid,
-      labelCreated: item.shippingLabel?.labelUrl ? true : false,
-      createdAt: format(item.createdAt, "MMMM do, yyyy"),
-    }));
+    return orders.map((item: DetailedOrder) => formatOrderTableData(item));
   }, []);
 
   useEffect(() => {

@@ -1,37 +1,33 @@
 import type { GetServerSidePropsContext } from "next";
+import Head from "next/head";
 import type { FC } from "react";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import { CheckCircle } from "lucide-react";
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import toast from "react-hot-toast";
-import { OrderForm } from "~/components/admin/orders/order-form";
-import { ShippingModal } from "~/components/admin/orders/shipping-modal";
-import Currency from "~/components/core/ui/currency";
-import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";
-import { Input } from "~/components/ui/input";
 import PageLoader from "~/components/ui/page-loader";
-import { Separator } from "~/components/ui/separator";
-import { env } from "~/env.mjs";
+import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
+
 import AdminLayout from "~/layouts/AdminLayout";
-import { ViewOrderCustomer } from "~/modules/orders/components/view-order-customer";
-import { ViewOrderDetails } from "~/modules/orders/components/view-order-details";
-import { ViewOrderFulfillment } from "~/modules/orders/components/view-order-fulfillment";
-import { ViewOrderPayment } from "~/modules/orders/components/view-order-payment";
-import { ViewOrderSummary } from "~/modules/orders/components/view-order-summary";
-import { ViewOrderTimeline } from "~/modules/orders/components/view-order-timeline";
-import { ordersRouter } from "~/server/api/routers/orders";
-import { cn } from "~/utils/styles";
+
+import { Pencil } from "lucide-react";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
+import {
+  ViewOrderCustomer,
+  ViewOrderDetails,
+  ViewOrderFulfillment,
+  ViewOrderPayment,
+  ViewOrderSummary,
+  ViewOrderTimeline,
+} from "~/modules/orders";
 
 interface IProps {
   orderId: string;
+  storeId: string;
 }
-const OrderPage: FC<IProps> = ({ orderId }) => {
+const OrderPage: FC<IProps> = ({ orderId, storeId }) => {
   const { data: order, isLoading } = api.orders.getOrder.useQuery({
     orderId,
   });
@@ -52,12 +48,21 @@ const OrderPage: FC<IProps> = ({ orderId }) => {
         {order && (
           <div className="flex h-full w-full flex-col">
             <div className="flex-1 space-y-4 p-8 pt-6">
-              <Heading
-                title={`Order for ${
-                  order?.name
-                } on ${order?.createdAt.toDateString()}`}
-                description={order?.id}
-              />
+              <div className="flex items-center justify-between">
+                <Heading
+                  title={`Order for ${
+                    order?.name
+                  } on ${order?.createdAt.toDateString()}`}
+                  description={order?.id}
+                />
+                <Link href={`/admin/${storeId}/orders/${order?.id}/edit`}>
+                  <Button className="flex gap-2">
+                    {" "}
+                    <Pencil className="h-5 w-5" />
+                    Edit...
+                  </Button>
+                </Link>
+              </div>
 
               <section className="flex w-full gap-4 max-lg:flex-col">
                 <div className="flex w-full flex-col space-y-4 lg:w-8/12">
@@ -94,6 +99,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       orderId: ctx.query.orderId,
+      storeId: ctx.query.storeId,
     },
   };
 }

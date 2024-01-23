@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 
-import useCart from "~/features/cart/hooks/use-cart";
+import useCart from "~/modules/cart/hooks/use-cart";
 
 import Head from "next/head";
-import CartItem from "~/features/cart/components/cart-item";
-import Summary from "~/features/cart/components/summary";
+import CartItem from "~/modules/cart/components/cart-item";
+import Summary from "~/modules/cart/components/summary";
 
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Confetti from "react-confetti";
 import { Button } from "~/components/ui/button";
-import useCheckout from "~/features/cart/hooks/use-checkout";
 import useWindowSize from "~/hooks/use-window-size";
 import StorefrontLayout from "~/layouts/storefront-layout";
+import useCheckout from "~/modules/cart/hooks/use-checkout";
 export const SuccessfulPurchasePage = () => {
   const [isMounted, setIsMounted] = useState(false);
   const cart = useCart();

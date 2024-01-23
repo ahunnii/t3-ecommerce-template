@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
-import { MainNav } from "~/components/admin/main-nav";
-import Navbar from "~/components/admin/navbar";
 import StoreSwitcher from "~/components/admin/store-switcher";
 import { Button } from "~/components/ui/button";
 import {
@@ -43,6 +41,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
+import { MainNav } from "~/modules/navigation/admin/main-nav";
+import Navbar from "~/modules/navigation/admin/navbar";
 import { api } from "~/utils/api";
 
 export default function AdminLayout({

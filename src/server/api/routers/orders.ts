@@ -27,11 +27,21 @@ export const ordersRouter = createTRPCRouter({
       });
     }),
   getAllOrders: protectedProcedure
-    .input(z.object({ storeId: z.string() }))
+    .input(
+      z.object({
+        storeId: z.string(),
+        searchParams: z
+          .object({
+            isShipped: z.boolean().optional(),
+          })
+          .optional(),
+      })
+    )
     .query(({ ctx, input }) => {
       return ctx.prisma.order.findMany({
         where: {
           storeId: input.storeId,
+          ...input.searchParams,
         },
         include: {
           orderItems: {
@@ -47,6 +57,7 @@ export const ordersRouter = createTRPCRouter({
         },
       });
     }),
+
   getOrder: protectedProcedure
     .input(z.object({ orderId: z.string() }))
     .query(({ ctx, input }) => {

@@ -39,11 +39,14 @@ export const env = createEnv({
     RESEND_API_KEY: z.string(),
     SHOP_EMAIL: z.string().email(),
     NEXT_PUBLIC_API_URL: z.string().url(),
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
     NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
+    NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
+    UPLOADTHING_SECRET: z.string(),
   },
 
   /**
@@ -58,11 +61,13 @@ export const env = createEnv({
     NEXT_PUBLIC_SITE_DIRECTORY: z.string(),
     NEXT_PUBLIC_STORE_NAME: z.string(),
     NEXT_PUBLIC_API_URL: z.string().url(),
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string(),
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
     NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
+    NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
   },
 
   /**
@@ -95,11 +100,15 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     NEXT_PUBLIC_STORE_TYPE: process.env.NEXT_PUBLIC_STORE_TYPE,
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT:
       process.env.NEXT_PUBLIC_WORDPRESS_API_ENDPOINT,
     NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL:
       process.env.NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL,
+    NEXT_PUBLIC_UPLOADTHING_APP_ID: process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID,
+    UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

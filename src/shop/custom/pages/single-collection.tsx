@@ -1,9 +1,9 @@
 import type { FC } from "react";
 
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
 
 import StorefrontLayout from "~/layouts/storefront-layout";
 

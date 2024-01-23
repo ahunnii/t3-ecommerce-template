@@ -1,7 +1,7 @@
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
-import { CollectionCard } from "~/components/core/category/collection-card";
 import NoResults from "~/components/core/ui/no-results";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
+import { CollectionCard } from "~/modules/categories/core/collection-card";
 
 import StorefrontLayout from "~/layouts/storefront-layout";
 

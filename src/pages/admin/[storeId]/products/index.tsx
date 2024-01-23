@@ -3,15 +3,15 @@ import { useCallback, useEffect, useState, type FC } from "react";
 
 import type { Category, Product } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
-import type { ProductColumn } from "~/components/admin/products/columns";
+import type { ProductColumn } from "~/modules/products/admin/columns";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
-import { ProductsClient } from "~/components/admin/products/client";
 import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
+import { ProductsClient } from "~/modules/products/admin/client";
 
 interface IProps {
   storeId: string;

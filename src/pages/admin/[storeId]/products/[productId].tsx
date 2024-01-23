@@ -5,9 +5,9 @@ import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
 import Head from "next/head";
-import { ProductForm } from "~/components/admin/products/product-form";
 import PageLoader from "~/components/ui/page-loader";
 import AdminLayout from "~/layouts/AdminLayout";
+import { ProductForm } from "~/modules/products/admin/product-form";
 
 interface IProps {
   storeId: string;

@@ -1,6 +1,6 @@
 import type { FC } from "react";
 
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
 
 import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";

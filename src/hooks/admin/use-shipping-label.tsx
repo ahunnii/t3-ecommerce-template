@@ -2,7 +2,7 @@ import axios from "axios";
 
 import type Shippo from "shippo";
 import { create } from "zustand";
-import type { PackageFormValues } from "~/components/admin/orders/package-form";
+import type { PackageFormValues } from "~/modules/shipping/components/package-form";
 
 export type ShippingAddress = {
   name: string;

@@ -1,7 +1,7 @@
 import Head from "next/head";
 import type { FC } from "react";
 
-import Breadcrumbs from "~/components/core/category/breadcrumbs";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
 
 import Container from "~/components/core/ui/container";
 import NoResults from "~/components/core/ui/no-results";

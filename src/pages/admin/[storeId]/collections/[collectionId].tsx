@@ -1,8 +1,8 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { CollectionForm } from "~/components/admin/collections/collection-form";
 import PageLoader from "~/components/ui/page-loader";
+import { CollectionForm } from "~/modules/collections/collection-form";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";

@@ -52,6 +52,7 @@ const config = {
       "shippo-static-v2.s3.amazonaws.com",
       "shippo-static.s3.amazonaws.com",
       "images.unsplash.com",
+      "utfs.io",
     ],
   },
 };
