@@ -53,6 +53,7 @@ const config = {
       "shippo-static.s3.amazonaws.com",
       "images.unsplash.com",
       "utfs.io",
+      "placehold.co",
     ],
   },
 };

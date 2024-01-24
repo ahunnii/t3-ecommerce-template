@@ -1,4 +1,5 @@
 import { type ShippingType } from "@prisma/client";
+
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -128,6 +129,8 @@ export const productsRouter = createTRPCRouter({
         include: {
           images: true,
           variants: true,
+          materials: true,
+          tags: true,
           category: {
             include: {
               attributes: true,
@@ -222,6 +225,7 @@ export const productsRouter = createTRPCRouter({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
+        featuredImage: z.string(),
 
         description: z.string().optional(),
         quantity: z.number(),
@@ -234,11 +238,15 @@ export const productsRouter = createTRPCRouter({
           "FREE" as ShippingType,
           "VARIABLE" as ShippingType,
         ]),
+        handle: z.string().optional(),
         weight: z.coerce.number().min(0).optional(),
         length: z.coerce.number().min(0).optional(),
         width: z.coerce.number().min(0).optional(),
         height: z.coerce.number().min(0).optional(),
         estimatedCompletion: z.coerce.number().min(0).optional(),
+        tags: z.array(z.object({ name: z.string() })),
+        materials: z.array(z.object({ name: z.string() })),
+
         images: z.array(
           z.object({
             url: z.string(),
@@ -307,15 +315,38 @@ export const productsRouter = createTRPCRouter({
         })
         .then(() => {
           return ctx.prisma.product.create({
+            // name: input.name,
+            // price: input.price,
+            // isFeatured: input.isFeatured,
+            // isArchived: input.isArchived,
+            // categoryId: input.categoryId,
+            // estimatedCompletion: input.estimatedCompletion ?? 0,
+            // description: input.description,
+            // quantity: input.quantity,
+            // images: {
+            //   deleteMany: {},
+            // },
+            // variants: {
+            //   deleteMany: {},
+            // },
+            // shippingCost: input.shippingCost,
+            // shippingType: input.shippingType,
+            // weight: input.weight,
+            // length: input.length,
+            // width: input.width,
+            // height: input.height,
+
             data: {
               name: input.name,
               price: input.price,
               isFeatured: input.isFeatured,
               isArchived: input.isArchived,
               categoryId: input.categoryId,
-
+              description: input.description,
               estimatedCompletion: input.estimatedCompletion ?? 0,
               storeId: input.storeId,
+              quantity: input.quantity,
+              featuredImage: input.featuredImage,
               images: {
                 createMany: {
                   data: [
@@ -334,6 +365,25 @@ export const productsRouter = createTRPCRouter({
                         quantity: number;
                       }) => variant
                     ),
+                  ],
+                },
+              },
+
+              tags: {
+                createMany: {
+                  data: [
+                    ...input.tags.map((tag: { name: string }) => ({
+                      name: tag.name,
+                    })),
+                  ],
+                },
+              },
+              materials: {
+                createMany: {
+                  data: [
+                    ...input.materials.map((tag: { name: string }) => ({
+                      name: tag.name,
+                    })),
                   ],
                 },
               },
@@ -367,6 +417,7 @@ export const productsRouter = createTRPCRouter({
         isFeatured: z.boolean().optional(),
         isArchived: z.boolean().optional(),
         description: z.string().optional(),
+        handle: z.string().optional(),
         quantity: z.number(),
         images: z.array(
           z.object({
@@ -381,6 +432,9 @@ export const productsRouter = createTRPCRouter({
             quantity: z.number(),
           })
         ),
+        tags: z.array(z.object({ name: z.string() })),
+        materials: z.array(z.object({ name: z.string() })),
+        featuredImage: z.string(),
         shippingCost: z.coerce.number().min(0).optional(),
         shippingType: z.enum([
           "FLAT_RATE" as ShippingType,
@@ -393,7 +447,7 @@ export const productsRouter = createTRPCRouter({
         height: z.coerce.number().min(0).optional(),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (!input.name) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -436,88 +490,107 @@ export const productsRouter = createTRPCRouter({
       //   });
       // }
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Product id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.product
-            .update({
-              where: {
-                id: input.productId,
-              },
-              data: {
-                name: input.name,
-                price: input.price,
-                isFeatured: input.isFeatured,
-                isArchived: input.isArchived,
-                categoryId: input.categoryId,
-                estimatedCompletion: input.estimatedCompletion ?? 0,
-                description: input.description,
-                quantity: input.quantity,
-                images: {
-                  deleteMany: {},
-                },
-                variants: {
-                  deleteMany: {},
-                },
-                shippingCost: input.shippingCost,
-                shippingType: input.shippingType,
-                weight: input.weight,
-                length: input.length,
-                width: input.width,
-                height: input.height,
-              },
-            })
-            .then(() => {
-              return ctx.prisma.product.update({
-                where: {
-                  id: input.productId,
-                },
-                data: {
-                  images: {
-                    createMany: {
-                      data: [
-                        ...input.images.map((image: { url: string }) => image),
-                      ],
-                    },
-                  },
-                  variants: {
-                    createMany: {
-                      data: [
-                        ...input.variants.map(
-                          (variant: {
-                            names: string;
-                            values: string;
-                            price: number;
-                            quantity: number;
-                          }) => variant
-                        ),
-                      ],
-                    },
-                  },
-                },
-              });
-            });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
+      const store = await ctx.prisma.store.findFirst({
+        where: {
+          id: input.storeId,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (!store) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Product id does not belong to current user",
         });
+      }
+
+      try {
+        await ctx.prisma.product.update({
+          where: {
+            id: input.productId,
+          },
+          data: {
+            name: input.name,
+            price: input.price,
+            isFeatured: input.isFeatured,
+            isArchived: input.isArchived,
+            categoryId: input.categoryId,
+            estimatedCompletion: input.estimatedCompletion ?? 0,
+            description: input.description,
+            quantity: input.quantity,
+            featuredImage: input.featuredImage,
+            images: {
+              deleteMany: {},
+            },
+            variants: {
+              deleteMany: {},
+            },
+            tags: {
+              deleteMany: {},
+            },
+            materials: {
+              deleteMany: {},
+            },
+            shippingCost: input.shippingCost,
+            shippingType: input.shippingType,
+            weight: input.weight,
+            length: input.length,
+            width: input.width,
+            height: input.height,
+          },
+        });
+
+        return ctx.prisma.product.update({
+          where: {
+            id: input.productId,
+          },
+          data: {
+            images: {
+              createMany: {
+                data: [...input.images.map((image: { url: string }) => image)],
+              },
+            },
+            tags: {
+              createMany: {
+                data: [
+                  ...input.tags.map((tag: { name: string }) => ({
+                    name: tag.name,
+                  })),
+                ],
+              },
+            },
+            materials: {
+              createMany: {
+                data: [
+                  ...input.materials.map((material: { name: string }) => ({
+                    name: material.name,
+                  })),
+                ],
+              },
+            },
+            variants: {
+              createMany: {
+                data: [
+                  ...input.variants.map(
+                    (variant: {
+                      names: string;
+                      values: string;
+                      price: number;
+                      quantity: number;
+                    }) => variant
+                  ),
+                ],
+              },
+            },
+          },
+        });
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong. Please try again later.",
+          cause: err,
+        });
+      }
     }),
   deleteProduct: protectedProcedure
     .input(

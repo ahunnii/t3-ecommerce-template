@@ -3,7 +3,7 @@
 import { CldUploadWidget } from "next-cloudinary";
 import { useEffect, useState } from "react";
 
-import { ImagePlus, Trash } from "lucide-react";
+import { ImagePlus, Star, StarIcon, Trash } from "lucide-react";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { CloudinaryUpload } from "./cloudinary-upload";
@@ -11,6 +11,7 @@ import { UploadThingUpload } from "./uploadthing-upload";
 
 interface ImageUploadProps {
   disabled?: boolean;
+
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
   value: string[];
@@ -24,6 +25,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   disabled,
   onChange,
   onRemove,
+
   value,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -58,6 +60,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 <Trash className="h-4 w-4" />
               </Button>
             </div>
+
             <Image fill className="object-cover" alt="Image" src={url} />
           </div>
         ))}

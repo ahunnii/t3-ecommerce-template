@@ -1,8 +1,7 @@
 import { CldUploadWidget } from "next-cloudinary";
-import { useEffect, useState } from "react";
 
-import { ImagePlus, Trash } from "lucide-react";
-import Image from "next/image";
+import { ImagePlus } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
 

@@ -26,10 +26,7 @@ export const env = createEnv({
     AUTH0_CLIENT_ID: z.string(),
     AUTH0_CLIENT_SECRET: z.string(),
     AUTH0_ISSUER: z.string(),
-    NEXT_PUBLIC_STRIPE_PK: z.string(),
-    STRIPE_SK: z.string(),
 
-    STRIPE_WEBHOOK_SECRET: z.string(),
     NEXT_PUBLIC_ENCRYPTION_KEY: z.string().min(32),
     NEXT_PUBLIC_STORE_ID: z.string(),
     EASYPOST_API_KEY: z.string(),
@@ -44,9 +41,19 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
-    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
+
     NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
     UPLOADTHING_SECRET: z.string(),
+
+    // Payment Processing
+    STRIPE_WEBHOOK_SECRET: z.string(),
+    NEXT_PUBLIC_STRIPE_PK: z.string(),
+    STRIPE_SK: z.string(),
+    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
+
+    PAYPAL_CLIENT_ID: z.string(),
+    PAYPAL_CLIENT_SECRET: z.string(),
+    NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
   },
 
   /**
@@ -66,8 +73,13 @@ export const env = createEnv({
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
-    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
+
     NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
+
+    // Payment Processing
+    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
+
+    NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
   },
 
   /**
@@ -84,10 +96,7 @@ export const env = createEnv({
     AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
     AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
     AUTH0_ISSUER: process.env.AUTH0_ISSUER,
-    NEXT_PUBLIC_STRIPE_PK: process.env.NEXT_PUBLIC_STRIPE_PK,
-    STRIPE_SK: process.env.STRIPE_SK,
 
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NEXT_PUBLIC_ENCRYPTION_KEY: process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
     NEXT_PUBLIC_STORE_ID: process.env.NEXT_PUBLIC_STORE_ID,
     EASYPOST_API_KEY: process.env.EASYPOST_API_KEY,
@@ -105,10 +114,20 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_TYPE: process.env.NEXT_PUBLIC_STORE_TYPE,
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT:
       process.env.NEXT_PUBLIC_WORDPRESS_API_ENDPOINT,
-    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL:
-      process.env.NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL,
+
     NEXT_PUBLIC_UPLOADTHING_APP_ID: process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID,
     UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
+
+    // Payment Processing
+    NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL:
+      process.env.NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL,
+    NEXT_PUBLIC_STRIPE_PK: process.env.NEXT_PUBLIC_STRIPE_PK,
+    STRIPE_SK: process.env.STRIPE_SK,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+
+    PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID,
+    PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET,
+    NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

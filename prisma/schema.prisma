@@ -38,6 +38,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -47,6 +48,8 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   role         Role     @default(USER)
+
+  @@index([userId])
 }
 
 model User {
@@ -148,6 +151,9 @@ model Collection {
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([storeId])
+  @@index([billboardId])
 }
 enum ShippingType  {
 FLAT_RATE
@@ -165,6 +171,7 @@ model Product {
   price       Float    @default(0.00)
   description String?  @db.VarChar(1000)
   quantity    Int      @default(1)
+  // handle      String?  @unique @default(uuid())
 
   isFeatured  Boolean      @default(false)
   isArchived  Boolean      @default(false)
@@ -176,6 +183,7 @@ model Product {
   variants    Variation[]
   collections Collection[]
   featuredImage String?
+  // handle       String? @unique
 
   cartItems CartItem[] // Relation to Order model
   weight    Float? @default(0) // in grams
@@ -183,15 +191,52 @@ model Product {
   width Float? @default(0) // in in
   height Float? @default(0) // in in
 
+
   shippingType ShippingType @default(FLAT_RATE)
   shippingCost Float? @default(0)
 
   estimatedCompletion Int @default(0)
 
+  productType ProductType @default(PHYSICAL)
+
+  materials ProductMaterial[] @relation("ProductMaterialToTag")
+  tags Tag[] @relation("ProductToTag")
+
+
+
   @@index([storeId])
   @@index([categoryId])
 
 }
+
+model Tag {
+  id          String   @id @default(uuid())
+  productId   String // Foreign Key to Store
+  product     Product    @relation("ProductToTag", fields: [productId], references: [id], onDelete: Cascade)
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([productId])
+}
+
+model ProductMaterial {
+  id          String   @id @default(uuid())
+  productId   String // Foreign Key to Store
+  product     Product    @relation("ProductMaterialToTag", fields: [productId], references: [id], onDelete: Cascade)
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([productId])
+}
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+  SERVICE
+}
+
 
 model Order {
   id              String      @id @default(uuid())
@@ -232,6 +277,7 @@ model Order {
 
   @@index([storeId])
 
+  @@index([userId])
 }
 
 model TimeLineEntry {
@@ -310,6 +356,8 @@ model GalleryImage {
   url       String // URL of the image
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([storeId])
 }
 
 model Attribute {

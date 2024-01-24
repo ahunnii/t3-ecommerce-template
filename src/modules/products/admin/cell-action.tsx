@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -80,6 +80,17 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={() =>
               router.push(
                 `/admin/${params.query.storeId as string}/products/${data.id}`
+              )
+            }
+          >
+            <Eye className="mr-2 h-4 w-4" /> View
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              router.push(
+                `/admin/${params.query.storeId as string}/products/${
+                  data.id
+                }/edit`
               )
             }
           >
