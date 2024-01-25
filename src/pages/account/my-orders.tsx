@@ -1,63 +1,32 @@
-import { Order } from "@prisma/client";
-import { GetServerSidePropsContext } from "next";
-import { Session, User } from "next-auth/core/types";
-import { Button } from "~/components/ui/button";
-import ProfileLayout from "~/layouts/profile-layout";
-import { UserOrderTable } from "~/modules/account/components/user-order-table";
-import { filterOrdersByLastWeek } from "~/modules/account/libs/handle-recent-orders";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
-import { api } from "~/utils/api";
+import type { GetServerSidePropsContext } from "next";
 
-const ProfilePage = ({ orders, user }: { orders: Order[]; user: User }) => {
-  console.log(orders);
-  return (
-    <ProfileLayout>
-      <h1 className="text-3xl font-bold">My Orders</h1>
-      {/* <p className="text-foreground-muted">Welcome back, {user?.name}!</p> */}
-      <section className="flex w-full flex-col space-y-6 py-8">
-        <div>
-          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-            <UserOrderTable orders={orders} />
-          </div>
-        </div>
-      </section>
-    </ProfileLayout>
-  );
+import type { Order } from "@prisma/client";
+
+import useStorePageRender from "~/hooks/use-store-page-render";
+
+import { getUserOrdersServerSide } from "~/modules/orders/utils/get-user-orders-server-side";
+
+import { AccountOrdersPage as DefaultAccountOrdersPage } from "~/shop/core/pages/account-orders";
+import { AccountOrdersPage as CustomAccountOrdersPage } from "~/shop/custom/pages/account-orders";
+
+import { authenticateUser, redirectToSignIn } from "~/utils/auth";
+
+const MyOrdersPage = (props: { orders: Order[] }) => {
+  const { isTemplate } = useStorePageRender();
+
+  if (isTemplate) return <DefaultAccountOrdersPage {...props} />;
+
+  return <CustomAccountOrdersPage {...props} />;
 };
 
-export default ProfilePage;
+export default MyOrdersPage;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
+  const user = await authenticateUser(ctx);
 
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/auth/signin",
-        permanent: false,
-      },
-    };
-  }
+  if (!user) return redirectToSignIn();
 
-  const user = session.user;
+  const orders = await getUserOrdersServerSide(user.id);
 
-  const orders = await prisma.order.findMany({
-    where: { userId: user.id },
-  });
-
-  const formattedOrders = orders.map((order) => {
-    return {
-      ...order,
-      createdAt: order.createdAt.toISOString(),
-      updatedAt: order.updatedAt.toISOString(),
-    };
-  });
-
-  return {
-    props: {
-      user,
-      orders: formattedOrders,
-    },
-  };
+  return { props: { orders } };
 }

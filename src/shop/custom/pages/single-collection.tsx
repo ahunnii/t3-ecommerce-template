@@ -38,7 +38,7 @@ export const SingleCollectionPage: FC<ICollectionPageProps> = ({
 
         {!isLoading && (
           <>
-            <Breadcrumbs pathway={pathway} variant={"dark"} />
+            <Breadcrumbs pathway={pathway} />
             <div className="px-4 pb-24 sm:px-6 lg:px-8">
               <div className="mt-6 lg:col-span-4 lg:mt-0">
                 {collection?.products.length === 0 && <NoResults />}

@@ -81,7 +81,9 @@ const Info: React.FC<InfoProps> = (props) => {
 
       <div className={cn("mt-10 gap-x-3", textStyles)}>
         <h3 className="text-lg font-bold">Description</h3>
-        <div className={cn("", "")}>{parse(props?.data.description ?? "")}</div>
+        <div className={cn("", "")}>
+          {parse(props?.data.description ?? "No description provided.")}
+        </div>
       </div>
     </div>
   );

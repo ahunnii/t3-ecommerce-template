@@ -32,11 +32,13 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
   const formatProducts = useCallback((products: ExtendedProduct[]) => {
     return products.map((item: ExtendedProduct) => ({
       id: item.id,
+      storeId: item.storeId,
       name: item.name,
       isFeatured: item.isFeatured,
       isArchived: item.isArchived,
       price: formatter.format(parseFloat(item.price.toString())),
       category: item.category.name,
+      featuredImage: item.featuredImage,
 
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));

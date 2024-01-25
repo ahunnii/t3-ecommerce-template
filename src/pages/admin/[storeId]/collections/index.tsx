@@ -30,6 +30,7 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
   const formatCategories = useCallback((collections: DetailedCollection[]) => {
     return collections.map((item: DetailedCollection) => ({
       id: item.id,
+      storeId: item.storeId,
       name: item.name,
       products: item.products.length,
       createdAt: format(item.createdAt, "MMMM do, yyyy"),

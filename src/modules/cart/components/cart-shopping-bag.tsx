@@ -10,6 +10,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import useCart from "~/modules/cart/hooks/use-cart";
 
+import Link from "next/link";
 import ShoppingBagBtn from "./shopping-bag-btn";
 import ShoppingBagItem from "./shopping-bag-item";
 
@@ -33,7 +34,7 @@ const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
 
           <Separator />
 
-          {cartItemCount &&
+          {cartItemCount > 0 &&
             cartItems.map((item, idx) => (
               <ShoppingBagItem key={idx} cartItem={item} />
             ))}
@@ -47,7 +48,11 @@ const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
             </span>
           </div>
 
-          <Button className="w-full rounded-full">View cart & check out</Button>
+          <Link href="/cart">
+            <Button className="mt-4 w-full rounded-full">
+              View cart & check out
+            </Button>
+          </Link>
         </div>
       </HoverCardContent>
     </HoverCard>

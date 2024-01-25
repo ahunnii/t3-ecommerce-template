@@ -8,8 +8,10 @@ import "nprogress/nprogress.css";
 import { Toaster } from "~/components/ui/toaster";
 import { ModalProvider } from "~/providers/admin/modal-provider";
 import StorefrontModalProvider from "~/providers/core/modal-provider";
+import { ConfigProvider } from "~/providers/style-config-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/providers/toast-provider";
+import { storeTheme } from "~/shop/custom/config";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -55,7 +57,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
             }}
             className="base-page-size"
           > */}
-        <Component {...pageProps} /> <Toaster />
+        <ConfigProvider config={storeTheme}>
+          <>
+            <Component {...pageProps} /> <Toaster />
+          </>
+        </ConfigProvider>
         {/* </motion.div>{" "}
         </AnimatePresence> */}
       </ThemeProvider>

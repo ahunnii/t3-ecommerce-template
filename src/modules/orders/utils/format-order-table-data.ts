@@ -4,6 +4,7 @@ import type { DetailedOrder } from "../types";
 
 export const formatOrderTableData = (item: DetailedOrder) => ({
   id: item.id,
+  storeId: item.storeId,
   phone: item.phone,
   name: item.name,
   address: item.address,

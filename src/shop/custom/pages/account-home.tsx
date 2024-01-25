@@ -1,11 +1,9 @@
-import { Order } from "@prisma/client";
-import { GetServerSidePropsContext } from "next";
-import { Session, User } from "next-auth/core/types";
+import type { Order } from "@prisma/client";
+
+import type { User } from "next-auth/core/types";
 import { Button } from "~/components/ui/button";
 import { filterOrdersByLastWeek } from "~/modules/account/libs/handle-recent-orders";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
-import { api } from "~/utils/api";
+
 import ProfileLayout from "../profile-layout";
 
 export const AccountHomePage = ({
@@ -19,12 +17,12 @@ export const AccountHomePage = ({
 
   return (
     <ProfileLayout>
-      <h1 className="text-3xl font-bold text-white">Overview</h1>
-      <p className="text-muted">Welcome back, {user?.name}!</p>
+      <h1 className="text-3xl font-bold text-black">Overview</h1>
+      <p className="text-muted-foreground">Welcome back, {user?.name}!</p>
       <section className="flex w-full flex-col space-y-6 py-8">
         <div>
-          <h3 className="text-xl text-white">Recent Orders</h3>
-          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+          <h3 className="text-xl text-black">Recent Orders</h3>
+          <div className="flex flex-row items-center justify-between rounded-lg border border-black/25 p-4">
             <div className="space-y-0.5">
               {recentOrders.length > 0 ? (
                 <>

@@ -37,6 +37,21 @@ export const authenticateSession = async (ctx: GetServerSidePropsContext) => {
   return store;
 };
 
+export const authenticateUser = async (ctx: GetServerSidePropsContext) => {
+  const session = await getServerAuthSession(ctx);
+  if (!session || !session.user) return null;
+  return session.user;
+};
+
+export const redirectToSignIn = () => {
+  return {
+    redirect: {
+      destination: "/auth/signin",
+      permanent: false,
+    },
+  };
+};
+
 // export const authenticateAdminSession = async (
 //   ctx: GetServerSidePropsContext
 // ) => {

@@ -1,10 +1,13 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
 import { cn } from "~/utils/styles";
 import { CellAction } from "./cell-action";
 
 export type OrderColumn = {
   id: string;
+  storeId: string;
   phone: string;
   name: string;
   address: string;
@@ -21,7 +24,13 @@ export const columns: ColumnDef<OrderColumn>[] = [
     accessorKey: "id",
     header: "Order Id",
     cell: ({ row }) => {
-      return <p className="max-w-[6em] truncate">{row.original.id}</p>;
+      return (
+        <Link href={`/admin/${row.original.storeId}/orders/${row.original.id}`}>
+          <Button variant={"link"} className="mx-0 truncate px-0">
+            {row.original.id}
+          </Button>
+        </Link>
+      );
     },
   },
   {

@@ -18,21 +18,23 @@ import { storeTheme } from "~/shop/custom/config";
 export const HomePage = () => {
   const [hover, setHover] = useState(false);
   const [bleach, setBleach] = useState(false);
+  const [custom, setCustom] = useState(false);
   const { data: products } = api.products.getAllProducts.useQuery({
-    isFeatured: true,
+    // isFeatured: true,
   });
 
   return (
     <>
       <SEO title={`Trend Anomaly`} description={"Break out the system!"} />
 
-      <StorefrontLayout {...storeTheme.layout}>
+      <StorefrontLayout {...storeTheme.layout} mainStyle="bg-black">
         <div className="mx-auto my-8  max-w-7xl bg-black py-4">
           <Hero />
         </div>
 
         <ProductList items={products ?? []} />
 
+        <h2 className="text-7xl font-bold text-purple-600">Collections</h2>
         <Container>
           {" "}
           <div className="mx-auto mb-8 flex  max-w-7xl gap-4">
@@ -79,11 +81,24 @@ export const HomePage = () => {
             </Link>
             <Link
               href="/contact-us"
-              className="relative aspect-square h-96 w-1/3 bg-purple-500"
+              className="relative aspect-square h-96 w-1/3 overflow-hidden bg-purple-500 bg-[url(/custom/ta_custom.png)] bg-cover bg-center transition-all duration-500 ease-in-out"
+              onMouseOver={() => setCustom(true)}
+              onMouseLeave={() => setCustom(false)}
             >
               <p className="absolute bottom-0 text-2xl font-bold text-white">
-                Custom Made
+                Custom Clothing
               </p>
+              {custom ? (
+                <video
+                  src="/custom/ta_custom.mp4"
+                  className=" z-20 aspect-square object-cover object-center transition-all duration-500 ease-in-out"
+                  autoPlay
+                  loop
+                  muted
+                />
+              ) : (
+                <div className="h-full w-full bg-black/20 "></div>
+              )}{" "}
             </Link>
           </div>
         </Container>

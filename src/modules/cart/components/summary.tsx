@@ -15,26 +15,60 @@ const Summary = ({ type = "default" }: { type: "default" | "dark" }) => {
     <div
       className={cn(
         "mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8",
-        type === "dark" ? "bg-purple-300" : "bg-gray-50"
+        type === "dark" ? "bg-black" : "bg-gray-50"
       )}
     >
-      <h2 className="text-lg font-medium text-gray-900">Order summary</h2>
+      <h2
+        className={cn(
+          "text-lg font-medium ",
+          type === "dark" ? "text-white" : "text-gray-900"
+        )}
+      >
+        Order summary
+      </h2>
       <div className="mt-6 space-y-4">
         <div className="flex items-center justify-between   ">
-          <div className="text-base font-medium text-gray-500">Subtotal</div>
-          <Currency value={totalPrice} />
+          <div
+            className={cn(
+              "text-base font-medium ",
+              type === "dark" ? "text-white/50" : "text-gray-500"
+            )}
+          >
+            Subtotal
+          </div>
+          <Currency
+            value={totalPrice}
+            className={type === "dark" ? "text-white" : ""}
+          />
         </div>
         <div className="flex items-center justify-between   ">
-          <div className="text-base font-medium text-gray-500">Shipping</div>
+          <div
+            className={cn(
+              "text-base font-medium ",
+              type === "dark" ? "text-white/50" : "text-gray-500"
+            )}
+          >
+            Shipping
+          </div>
           {typeof calculateShippingCost === "string" ? (
-            calculateShippingCost
+            <span className={cn(type === "dark" ? "text-white" : "")}>
+              {calculateShippingCost}
+            </span>
           ) : (
-            <Currency value={calculateShippingCost ?? 0} />
+            <Currency
+              value={calculateShippingCost ?? 0}
+              className={type === "dark" ? "text-white" : ""}
+            />
           )}
         </div>
 
         <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-          <div className="text-base font-medium text-gray-900">
+          <div
+            className={cn(
+              "text-base font-medium ",
+              type === "dark" ? "text-white" : "text-gray-900"
+            )}
+          >
             *Order total
           </div>
           <Currency
@@ -44,17 +78,26 @@ const Summary = ({ type = "default" }: { type: "default" | "dark" }) => {
                 ? 0
                 : (calculateShippingCost as number))
             }
+            className={type === "dark" ? "text-white" : ""}
           />
         </div>
       </div>
       <Button
         onClick={() => void onCheckout()}
         disabled={cartItems.length === 0}
-        className={cn("mt-6 w-full", type === "dark" ? "bg-purple-500" : "")}
+        className={cn(
+          "mt-6 w-full",
+          type === "dark" ? "bg-white text-black" : ""
+        )}
       >
         Checkout
       </Button>
-      <p className="mt-3 w-full text-center text-muted-foreground">
+      <p
+        className={cn(
+          "mt-3 w-full text-center",
+          type === "dark" ? "text-white/75" : "text-muted-foreground"
+        )}
+      >
         * Shipping and taxes calculated at checkout
       </p>
     </div>
