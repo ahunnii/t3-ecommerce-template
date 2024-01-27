@@ -1,6 +1,6 @@
 // contexts/ConfigContext.js
 import React, { createContext, useContext, type ReactNode } from "react";
-import type { dataConfig, themeConfig } from "~/shop/custom/config";
+import type { dataConfig, themeConfig } from "~/data/config.custom";
 
 type Config = {
   theme: themeConfig;

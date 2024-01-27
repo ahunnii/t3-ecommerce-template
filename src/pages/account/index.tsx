@@ -2,8 +2,8 @@ import type { Order } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
 import type { User } from "next-auth/core/types";
 
-import { AccountHomePage as DefaultAccountHomePage } from "~/shop/core/pages/account-home";
-import { AccountHomePage as CustomAccountHomePage } from "~/shop/custom/pages/account-home";
+import { AccountHomePage as DefaultAccountHomePage } from "~/blueprints/core/account-home-blueprint";
+import { AccountHomePage as CustomAccountHomePage } from "~/blueprints/custom/account-home-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 import { getUserOrdersServerSide } from "~/modules/orders/utils/get-user-orders-server-side";

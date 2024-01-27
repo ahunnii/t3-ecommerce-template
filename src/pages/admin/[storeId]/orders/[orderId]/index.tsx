@@ -9,7 +9,7 @@ import { Heading } from "~/components/ui/heading";
 import PageLoader from "~/components/ui/page-loader";
 import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 import { Pencil } from "lucide-react";
 import Link from "next/link";

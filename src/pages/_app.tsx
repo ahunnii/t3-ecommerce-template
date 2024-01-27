@@ -12,7 +12,10 @@ import { ConfigProvider } from "~/providers/style-config-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/services/toast/toaster-provider";
 // import { ToastProvider } from "~/providers/toast-provider";
-import { storeData, storeTheme } from "~/shop/custom/config";
+import { storeTheme } from "~/data/config.custom";
+
+import { storeTheme as storeThemeCore } from "~/data/config.core";
+import { env } from "~/env.mjs";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -59,7 +62,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
             }}
             className="base-page-size"
           > */}
-        <ConfigProvider config={storeTheme}>
+        <ConfigProvider
+          config={
+            env.NEXT_PUBLIC_STORE_TYPE === "custom"
+              ? storeTheme
+              : storeThemeCore
+          }
+        >
           <>
             <Component {...pageProps} /> <Toaster />
           </>

@@ -1,5 +1,5 @@
-import { GalleryPage as DefaultGalleryPage } from "~/shop/core/pages/gallery";
-import { GalleryPage as CustomGalleryPage } from "~/shop/custom/pages/gallery";
+import { GalleryPage as DefaultGalleryPage } from "~/blueprints/core/gallery-page-blueprint";
+import { GalleryPage as CustomGalleryPage } from "~/blueprints/custom/gallery-page-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 

@@ -1,15 +1,12 @@
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
 
-import useCart from "~/modules/cart/hooks/use-cart";
-
 import { useConfig } from "~/providers/style-config-provider";
 import { cn } from "~/utils/styles";
 import useCheckout from "../hooks/use-checkout";
 
-const Summary = () => {
+const Summary = ({ cartSize }: { cartSize: number }) => {
   const { onCheckout, totalPrice, calculateShippingCost } = useCheckout();
-  const { cartItems } = useCart((state) => state);
   const config = useConfig();
 
   return (
@@ -37,7 +34,7 @@ const Summary = () => {
           <Currency value={totalPrice} className={cn("", config.cart.price)} />
         </div>
         <div className="flex items-center justify-between">
-          {cartItems?.length > 0 && (
+          {cartSize > 0 && (
             <>
               <div
                 className={cn(
@@ -47,13 +44,12 @@ const Summary = () => {
               >
                 Shipping
               </div>
-              {typeof calculateShippingCost === "string" ? (
-                <span className={cn("", config.cart.price)}>
-                  {calculateShippingCost}
-                </span>
-              ) : (
+              {calculateShippingCost === 0 && (
+                <span className={cn("", config.cart.price)}>FREE</span>
+              )}
+              {calculateShippingCost > 0 && (
                 <Currency
-                  value={calculateShippingCost ?? 0}
+                  value={calculateShippingCost}
                   className={cn("", config.cart.price)}
                 />
               )}
@@ -71,19 +67,14 @@ const Summary = () => {
             *Order total
           </div>
           <Currency
-            value={
-              totalPrice +
-              ((calculateShippingCost as string) === "FREE"
-                ? 0
-                : (calculateShippingCost as number))
-            }
+            value={totalPrice + calculateShippingCost}
             className={cn("", config.cart.price)}
           />
         </div>
       </div>
       <Button
         onClick={() => void onCheckout()}
-        disabled={cartItems.length === 0}
+        disabled={cartSize === 0}
         className={cn("mt-6 w-full", config.cart.button)}
       >
         Checkout

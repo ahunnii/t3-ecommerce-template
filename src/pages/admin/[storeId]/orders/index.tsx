@@ -9,8 +9,8 @@ import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
+import AdminLayout from "~/components/layouts/AdminLayout";
 import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
-import AdminLayout from "~/layouts/AdminLayout";
 import { formatOrderTableData } from "~/modules/orders/utils/format-order-table-data";
 import type { DetailedOrder } from "~/types";
 

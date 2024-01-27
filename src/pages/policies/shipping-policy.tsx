@@ -1,5 +1,5 @@
-import { ShippingPolicyPage as DefaultShippingPolicyPage } from "~/shop/core/pages/shipping-policy";
-import { ShippingPolicyPage as CustomShippingPolicyPage } from "~/shop/custom/pages/shipping-policy";
+import { ShippingPolicyPage as DefaultShippingPolicyPage } from "~/blueprints/core/shipping-policy-blueprint";
+import { ShippingPolicyPage as CustomShippingPolicyPage } from "~/blueprints/custom/shipping-policy-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 

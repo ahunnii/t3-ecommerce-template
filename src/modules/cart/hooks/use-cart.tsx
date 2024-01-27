@@ -1,34 +1,25 @@
-import axios from "axios";
-import { toast } from "react-hot-toast";
+// import { toast } from "react-hot-toast";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { toastService } from "~/services/toast";
 
 import type { CartItem, DetailedProductFull } from "~/types";
 
 interface CartStore {
   items: DetailedProductFull[];
   cartItems: CartItem[];
-  paymentType: string;
-  shippingType: string;
-  shippingAddress: string;
-  shippingAdditional?: string;
-  shippingCity: string;
-  shippingState: string;
-  shippingZip: string;
-  customerName: string;
 
   addCartItem: (data: CartItem) => void;
-
   removeCartItem: (data: CartItem) => void;
-  // removeCartItem: (id: string, variant: string | null) => void;
+  removeAll: () => void;
 
   updateQuantity: (data: CartItem, quantity: number) => void;
-  removeAll: () => void;
   getQuantity: () => number;
+
   getTotal: () => number;
 
-  verifyValues: () => Promise<void>;
-  setValue: (key: string, value: string) => void;
+  isShoppingBagOpen: boolean;
+  setIsShoppingBagOpen: (value: boolean) => void;
 }
 
 const useCart = create(
@@ -36,14 +27,11 @@ const useCart = create(
     (set, get) => ({
       items: [],
       cartItems: [],
-      paymentType: "",
-      customerName: "",
-      shippingType: "",
-      shippingAddress: "",
-      shippingAdditional: "",
-      shippingCity: "",
-      shippingState: "",
-      shippingZip: "",
+      isShoppingBagOpen: false,
+
+      setIsShoppingBagOpen: (value: boolean) => {
+        set({ isShoppingBagOpen: value });
+      },
 
       setValue: (key: string, value: string) => {
         set({ [key]: value });
@@ -56,6 +44,7 @@ const useCart = create(
         });
         return cost;
       },
+
       addCartItem: (data: CartItem) => {
         const currentItems = get().cartItems;
 
@@ -88,8 +77,10 @@ const useCart = create(
 
           // Check quantity constraints
           if (existingItem.quantity + data.quantity > quantity!) {
-            console.log(existingItem);
-            return toast.error("Cannot add more of this item to the cart.");
+            return toastService.error(
+              "Cannot add more of this item to the cart.",
+              null
+            );
           } else {
             const updatedItems = [...currentItems];
             updatedItems[existingItemIndex] = {
@@ -98,30 +89,14 @@ const useCart = create(
             };
 
             set({ cartItems: updatedItems });
-            return toast.success("Quantity updated in cart.");
+            return toastService.success("Quantity updated in cart.");
           }
         } else {
           // Item (with or without variant) is not in the cart
           set({ cartItems: [...currentItems, data] });
-          return toast.success("Item added to cart.");
+          return toastService.success("Item added to cart.");
         }
       },
-
-      updateQuantity: (data: CartItem, quantity: number) => {
-        const currentItems = get().cartItems;
-
-        const existingItem = currentItems.find(
-          (item) =>
-            item.product.id === data?.product?.id &&
-            (data?.variant ? item.variant?.id === data?.variant?.id : true)
-        );
-        if (existingItem) {
-          existingItem.quantity = quantity;
-          set({ cartItems: [...get().cartItems] });
-          toast.success("Item quantity updated.");
-        }
-      },
-
       removeCartItem: (data: CartItem) => {
         const currentItems = get().cartItems;
 
@@ -143,30 +118,30 @@ const useCart = create(
 
         // Update the state with the filtered items
         set({ cartItems: updatedItems });
-        toast.success("Item removed from cart.");
+        toastService.success("Item removed from cart.");
       },
       removeAll: () => set({ cartItems: [] }),
 
+      updateQuantity: (data: CartItem, quantity: number) => {
+        const currentItems = get().cartItems;
+
+        const existingItem = currentItems.find(
+          (item) =>
+            item.product.id === data?.product?.id &&
+            (data?.variant ? item.variant?.id === data?.variant?.id : true)
+        );
+        if (existingItem) {
+          existingItem.quantity = quantity;
+          set({ cartItems: [...get().cartItems] });
+          toastService.success("Item quantity updated.");
+        }
+      },
       getQuantity: () => {
         let quantity = 0;
         get().cartItems.forEach((item) => {
           quantity += Number(item.quantity);
         });
         return quantity;
-      },
-
-      verifyValues: async () => {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/cartItems`,
-          {
-            cartItems: get().cartItems,
-          }
-        );
-
-        if (response.status === 200) {
-          return response.data.detailedCartItems;
-        }
-        return null;
       },
     }),
     {

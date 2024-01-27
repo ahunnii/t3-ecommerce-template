@@ -7,7 +7,7 @@ import { BillboardForm } from "~/modules/billboards/admin/billboard-form";
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 interface IProps {
   billboardId: string;

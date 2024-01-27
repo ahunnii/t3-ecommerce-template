@@ -6,8 +6,8 @@ import useStorePageRender from "~/hooks/use-store-page-render";
 
 import { getUserOrdersServerSide } from "~/modules/orders/utils/get-user-orders-server-side";
 
-import { AccountOrdersPage as DefaultAccountOrdersPage } from "~/shop/core/pages/account-orders";
-import { AccountOrdersPage as CustomAccountOrdersPage } from "~/shop/custom/pages/account-orders";
+import { AccountOrdersPage as DefaultAccountOrdersPage } from "~/blueprints/core/account-orders-blueprint";
+import { AccountOrdersPage as CustomAccountOrdersPage } from "~/blueprints/custom/account-orders-blueprint.custom";
 
 import { authenticateUser, redirectToSignIn } from "~/utils/auth";
 

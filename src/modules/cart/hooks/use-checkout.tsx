@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { toast } from "react-hot-toast";
 
@@ -43,25 +43,21 @@ const useCheckout = () => {
   }, [searchParams, removeAll]);
 
   const calculateShippingCost = useMemo(() => {
-    if (!store) return "";
-
-    if (cartItems.length === 0) return "";
+    if (!store) return 0;
+    if (cartItems.length === 0) return 0;
 
     const { hasFreeShipping, hasFlatRate, minFreeShipping, flatRateAmount } =
       store;
 
-    if (hasFreeShipping && totalPrice >= (minFreeShipping ?? 0)) {
-      return "FREE";
-    } else if (hasFlatRate) {
-      console.log(flatRateAmount);
-      return flatRateAmount;
-    } else {
-      console.error("Flat rate not set up");
-      return "FREE";
+    if (hasFreeShipping && totalPrice >= (minFreeShipping ?? 0)) return 0;
+    else if (hasFlatRate) return flatRateAmount ?? 0;
+    else {
+      console.error("Checkout Summary Error: Flat rate not set up");
+      return 0;
     }
   }, [store, totalPrice, cartItems]);
 
-  const checkIfCheckoutWasSuccessful = () => {
+  const checkIfCheckoutWasSuccessful = useCallback(() => {
     const searchParams = new URLSearchParams(window.location.search);
 
     if (searchParams.get("orderId")) {
@@ -72,7 +68,7 @@ const useCheckout = () => {
     // if (searchParams.get("canceled")) {
     //   showInfo("Payment canceled.");
     // }
-  };
+  }, [removeAll]);
 
   const onCheckout = async () => {
     const productIds = cartItems?.map((item) => item.product.id);

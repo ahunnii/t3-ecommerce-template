@@ -6,8 +6,8 @@ import type {
 import { getServerSession } from "next-auth/next";
 import { getProviders, signIn } from "next-auth/react";
 import Image from "next/image";
+import AuthLayout from "~/components/layouts/AuthLayout";
 import { Button } from "~/components/ui/button";
-import AuthLayout from "~/layouts/AuthLayout";
 import { authOptions } from "~/server/auth";
 
 export default function SignIn({

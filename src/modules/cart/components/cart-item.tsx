@@ -1,8 +1,6 @@
 import { X } from "lucide-react";
 import Image from "next/image";
-import { useState, type FC } from "react";
-
-import { TrashModal } from "~/components/admin/modals/trash-modal";
+import { type FC } from "react";
 
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
@@ -19,11 +17,8 @@ type TCartItemProps = { data: TCartItem };
 
 const CartItem: FC<TCartItemProps> = ({ data }) => {
   const cart = useCart();
-  const [open, setOpen] = useState(false);
 
-  const onCartRemove = () => {
-    cart.removeCartItem(data);
-  };
+  const onCartRemove = () => cart.removeCartItem(data);
 
   const { showInfo } = useNotification();
 
@@ -39,13 +34,6 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
 
   return (
     <>
-      <TrashModal
-        isOpen={open}
-        onClose={() => {
-          setOpen(false);
-        }}
-        onConfirm={onCartRemove}
-      />
       <li className="flex border-b py-6">
         <div className="relative h-24 w-24 overflow-hidden rounded-md sm:h-48 sm:w-48">
           <Image

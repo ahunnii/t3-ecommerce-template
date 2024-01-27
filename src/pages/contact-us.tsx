@@ -1,5 +1,5 @@
-import { ContactUsPage as DefaultContactUsPage } from "~/shop/core/pages/contact-us";
-import { ContactUsPage as CustomContactUsPage } from "~/shop/custom/pages/contact-us";
+import { ContactUsPage as DefaultContactUsPage } from "~/blueprints/core/contact-us-blueprint";
+import { ContactUsPage as CustomContactUsPage } from "~/blueprints/custom/contact-us-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 

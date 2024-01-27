@@ -1,5 +1,5 @@
-import { PrivacyPolicyPage as DefaultPrivacyPolicyPage } from "~/shop/core/pages/privacy-policy";
-import { PrivacyPolicyPage as CustomPrivacyPolicyPage } from "~/shop/custom/pages/privacy-policy";
+import { PrivacyPolicyPage as DefaultPrivacyPolicyPage } from "~/blueprints/core/privacy-policy-blueprint";
+import { PrivacyPolicyPage as CustomPrivacyPolicyPage } from "~/blueprints/custom/privacy-policy-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 

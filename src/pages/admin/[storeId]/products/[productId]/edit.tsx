@@ -5,8 +5,8 @@ import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
 import Head from "next/head";
+import AdminLayout from "~/components/layouts/AdminLayout";
 import PageLoader from "~/components/ui/page-loader";
-import AdminLayout from "~/layouts/AdminLayout";
 import { ProductForm } from "~/modules/products/admin/product-form";
 
 interface IProps {

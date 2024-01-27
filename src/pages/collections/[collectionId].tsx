@@ -2,8 +2,8 @@ import type { GetServerSidePropsContext } from "next";
 
 import type { FC } from "react";
 
-import { SingleCollectionPage as DefaultSingleCollectionPage } from "~/shop/core/pages/single-collection";
-import { SingleCollectionPage as CustomSingleCollectionPage } from "~/shop/custom/pages/single-collection";
+import { SingleCollectionPage as DefaultSingleCollectionPage } from "~/blueprints/core/single-collection-blueprint";
+import { SingleCollectionPage as CustomSingleCollectionPage } from "~/blueprints/custom/single-collection-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 

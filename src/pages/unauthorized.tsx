@@ -1,5 +1,5 @@
-import { UnauthorizedPage as DefaultUnauthorizedPage } from "~/shop/core/pages/unauthorized";
-import { UnauthorizedPage as CustomUnauthorizedPage } from "~/shop/custom/pages/unauthorized";
+import { UnauthorizedPage as DefaultUnauthorizedPage } from "~/blueprints/core/unauthorized-blueprint";
+import { UnauthorizedPage as CustomUnauthorizedPage } from "~/blueprints/custom/unauthorized-blueprint.custom";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 

@@ -7,7 +7,7 @@ import PageLoader from "~/components/ui/page-loader";
 import { CategoriesClient } from "~/modules/categories/admin/client";
 import type { CategoryColumn } from "~/modules/categories/admin/columns";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";

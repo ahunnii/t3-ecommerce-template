@@ -4,8 +4,8 @@ import type { FC } from "react";
 
 import { authenticateSession } from "~/utils/auth";
 
+import AdminLayout from "~/components/layouts/AdminLayout";
 import PageLoader from "~/components/ui/page-loader";
-import AdminLayout from "~/layouts/AdminLayout";
 import { SettingsForm } from "~/modules/settings/settings-form";
 
 interface IProps {

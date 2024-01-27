@@ -2,8 +2,8 @@ import type { GetServerSidePropsContext } from "next";
 
 import useStorePageRender from "~/hooks/use-store-page-render";
 
-import { AccountSettingsPage as DefaultAccountSettingsPage } from "~/shop/core/pages/account-settings";
-import { AccountSettingsPage as CustomAccountSettingsPage } from "~/shop/custom/pages/account-settings";
+import { AccountSettingsPage as DefaultAccountSettingsPage } from "~/blueprints/core/account-settings";
+import { AccountSettingsPage as CustomAccountSettingsPage } from "~/blueprints/custom/account-settings-blueprint.custom";
 import { authenticateUser, redirectToSignIn } from "~/utils/auth";
 
 const AccountSettingsPage = () => {

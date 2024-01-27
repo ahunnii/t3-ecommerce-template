@@ -9,8 +9,8 @@ import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
+import AdminLayout from "~/components/layouts/AdminLayout";
 import PageLoader from "~/components/ui/page-loader";
-import AdminLayout from "~/layouts/AdminLayout";
 import { ProductsClient } from "~/modules/products/admin/client";
 
 interface IProps {

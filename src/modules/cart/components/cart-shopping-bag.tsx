@@ -22,7 +22,12 @@ const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
   const cartItemCount = cart.getQuantity();
 
   return (
-    <HoverCard>
+    <HoverCard
+      open={cart.isShoppingBagOpen}
+      onOpenChange={cart.setIsShoppingBagOpen}
+      openDelay={50}
+      closeDelay={50}
+    >
       <HoverCardTrigger>
         <ShoppingBagBtn quantity={cartItemCount} className={btnClassName} />
       </HoverCardTrigger>

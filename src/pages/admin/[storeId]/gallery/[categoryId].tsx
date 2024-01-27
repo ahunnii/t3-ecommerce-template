@@ -7,7 +7,7 @@ import { CategoryForm } from "~/modules/categories/admin/category-form";
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 interface IProps {
   categoryId: string;

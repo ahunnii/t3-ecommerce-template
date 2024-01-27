@@ -3,7 +3,7 @@ import { CheckCircle } from "lucide-react";
 
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
-import { timeSinceDate } from "~/lib/utils/calculate-time-difference";
+import { timeSinceDate } from "~/utils/calculate-time-difference";
 import { cn } from "~/utils/styles";
 
 type VierOrderTimelineProps = {
@@ -25,7 +25,7 @@ export const ViewOrderTimeline = ({ timeline }: VierOrderTimelineProps) => {
             {" "}
             <p className="text-sm font-semibold">{item.title}</p>
             <p className="text-sm text-muted-foreground">
-              {timeSinceDate(item.createdAt.getTime() as number)}
+              {timeSinceDate(item.createdAt.getTime())}
             </p>{" "}
             <p className="my-2 w-full rounded-md bg-slate-100 p-2 text-sm">
               {item.description}

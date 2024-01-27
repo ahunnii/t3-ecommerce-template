@@ -7,7 +7,7 @@ import PageLoader from "~/components/ui/page-loader";
 import { CollectionsClient } from "~/modules/collections/client";
 import type { CollectionColumn } from "~/modules/collections/columns";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";

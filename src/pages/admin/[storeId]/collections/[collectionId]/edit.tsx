@@ -7,7 +7,7 @@ import { CollectionForm } from "~/modules/collections/collection-form";
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 interface IProps {
   collectionId: string;

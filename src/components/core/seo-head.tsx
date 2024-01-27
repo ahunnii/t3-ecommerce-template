@@ -1,13 +1,13 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 
+import appleTouchIcon from "~/assets/favicons/apple-touch-icon.png";
 import { env } from "~/env.mjs";
-import appleTouchIcon from "~/shop/custom/assets/favicons/apple-touch-icon.png";
 
-import favicon16Custom from "~/shop/custom/assets/favicons/favicon-16x16.png";
-import favicon32Custom from "~/shop/custom/assets/favicons/favicon-32x32.png";
-import faviconIcoCustom from "~/shop/custom/assets/favicons/favicon.ico";
-// import defaultImage from "~/shop/custom/assets/images/default.jpg";
+import favicon16Custom from "~/assets/favicons/favicon-16x16.png";
+import favicon32Custom from "~/assets/favicons/favicon-32x32.png";
+import faviconIcoCustom from "~/assets/favicons/favicon.ico";
+// import defaultImage from "~/assets/images/default.jpg";
 
 interface SEOProps {
   title: string;

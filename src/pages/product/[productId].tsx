@@ -3,8 +3,8 @@ import type { GetServerSidePropsContext } from "next";
 import useStorePageRender from "~/hooks/use-store-page-render";
 import { prisma } from "~/server/db";
 
-import { SingleProductPage as DefaultSingleProductPage } from "~/shop/core/pages/single-product";
-import { SingleProductPage as CustomSingleProductPage } from "~/shop/custom/pages/single-product";
+import { SingleProductPage as DefaultSingleProductPage } from "~/blueprints/core/single-product-blueprint";
+import { SingleProductPage as CustomSingleProductPage } from "~/blueprints/custom/single-product-blueprint.custom";
 
 const ProductPage = (props: { name: string; prevUrl: string }) => {
   const { isTemplate } = useStorePageRender();

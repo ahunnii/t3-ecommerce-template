@@ -12,10 +12,10 @@ import Link from "next/link";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import Currency from "~/components/core/ui/currency";
+import AdminLayout from "~/components/layouts/AdminLayout";
 import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import AdminLayout from "~/layouts/AdminLayout";
 import { CollectionCard } from "~/modules/categories/core/collection-card";
 
 interface IProps {

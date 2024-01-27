@@ -8,7 +8,7 @@ import PageLoader from "~/components/ui/page-loader";
 import { BillboardClient } from "~/modules/billboards/admin/client";
 import type { BillboardColumn } from "~/modules/billboards/admin/columns";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";

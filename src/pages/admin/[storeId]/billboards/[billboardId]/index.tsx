@@ -11,7 +11,7 @@ import Billboard from "~/components/core/ui/billboard";
 import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";
 
-import AdminLayout from "~/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/AdminLayout";
 
 interface IProps {
   billboardId: string;

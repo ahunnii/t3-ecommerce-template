@@ -1,6 +1,6 @@
-import StorefrontLayout from "~/layouts/storefront-layout";
+import StorefrontLayout from "~/components/layouts/storefront-layout";
 
-import { storeTheme } from "~/shop/custom/config";
+import { storeTheme } from "~/data/config.custom";
 
 const metadata = {
   title: `Custom Orders | Trend Anomaly`,

@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 
-import StorefrontLayout from "~/layouts/storefront-layout";
+import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 const ErrorPage = () => {
   const router = useRouter();
