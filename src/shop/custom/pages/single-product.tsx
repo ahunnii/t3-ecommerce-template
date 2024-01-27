@@ -1,9 +1,8 @@
-import Head from "next/head";
 import { useParams } from "next/navigation";
 import type { FC } from "react";
 
 import Info from "~/components/core/info";
-import PageLoader from "~/components/ui/page-loader";
+
 import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
 import Gallery from "~/modules/gallery/core";
 
@@ -13,6 +12,7 @@ import { api } from "~/utils/api";
 
 import type { DetailedProductFull } from "~/types";
 
+import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import { RelatedItemsList } from "~/shop/custom/components/related-items-list";
 import { storeTheme } from "~/shop/custom/config";
 
@@ -63,20 +63,19 @@ export const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
             name: product?.name ?? "",
           },
         ];
+  const metadata = {
+    title: `${name} | Trend Anomaly`,
+    description: "Browse all products available in our shop.",
+  };
 
   return (
-    <>
-      <Head>
-        <title>{name} | Trend Anomaly</title>
-        <meta name="description" content="Admin" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <StorefrontLayout {...storeTheme.layout}>
-        {isLoading && <PageLoader />}
+    <StorefrontLayout {...storeTheme.layout} metadata={metadata}>
+      {isLoading && <AbsolutePageLoader />}
 
-        <Breadcrumbs pathway={pathway} variant={"dark"} />
-        {!isLoading && product && (
-          <div className="px-4 pb-5 sm:px-6 lg:px-8">
+      {!isLoading && product && (
+        <>
+          <Breadcrumbs pathway={pathway} />
+          <div className="mt-6">
             <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
               <Gallery images={product?.images} />
 
@@ -87,14 +86,14 @@ export const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
             <hr className="my-10" />
             {suggested && (
               <RelatedItemsList
-                title="Related Items"
+                title="You may also like"
                 items={(suggested as DetailedProductFull[]) ?? []}
                 variant={"dark"}
               />
             )}
           </div>
-        )}
-      </StorefrontLayout>
-    </>
+        </>
+      )}
+    </StorefrontLayout>
   );
 };

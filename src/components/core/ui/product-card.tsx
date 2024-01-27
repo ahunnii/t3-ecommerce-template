@@ -1,13 +1,16 @@
 import { Expand, ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import type { MouseEventHandler } from "react";
 
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
 import usePreviewModal from "~/hooks/core/use-preview-modal";
 import useCart from "~/modules/cart/hooks/use-cart";
+import { useConfig } from "~/providers/style-config-provider";
 import type { DetailedProductFull } from "~/types";
+import { cn } from "~/utils/styles";
 
 interface ProductCard {
   data: DetailedProductFull;
@@ -16,11 +19,7 @@ interface ProductCard {
 const ProductCard: React.FC<ProductCard> = ({ data }) => {
   const previewModal = usePreviewModal();
   const cart = useCart();
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push(`/product/${data?.id}`);
-  };
+  const config = useConfig();
 
   const onPreview: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.stopPropagation();
@@ -39,17 +38,35 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
 
   return (
     <div
-      onClick={handleClick}
-      className="group cursor-pointer space-y-4 rounded-xl border bg-white p-3"
+      className={cn(
+        "group space-y-4 rounded-xl border bg-white p-3",
+        config.product.card.body
+      )}
     >
       {/* Image & actions */}
-      <div className="relative aspect-square rounded-xl bg-gray-100">
-        <Image
-          src={data.images?.[0]?.url ?? ""}
-          alt=""
-          fill
-          className="aspect-square rounded-md object-cover"
-        />
+      <div
+        className={cn(
+          "relative aspect-square rounded-xl bg-gray-100",
+          config.product.card.imageBody
+        )}
+      >
+        <Link href={`/product/${data?.id}`}>
+          <>
+            <Image
+              src={data.images?.[0]?.url ?? "/placeholder-image.webp"}
+              alt=""
+              fill
+              className="aspect-square rounded-md object-cover"
+            />
+            <Image
+              src={data.featuredImage ?? "/placeholder-image.webp"}
+              alt=""
+              fill
+              className="aspect-square rounded-md object-cover transition-opacity duration-500 ease-in-out hover:opacity-0"
+            />
+          </>
+        </Link>
+
         <div className="absolute bottom-5 w-full px-6 opacity-0 transition group-hover:opacity-100">
           <div className="flex justify-center gap-x-6">
             <IconButton
@@ -66,14 +83,24 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
         </div>
       </div>
       {/* Description */}
-      <div>
-        <p className="text-lg font-semibold">{data.name}</p>
-        <p className="text-sm text-gray-500">{data.category?.name}</p>
-      </div>
-      {/* Price & Reiew */}
-      <div className="flex items-center justify-between">
-        <Currency value={data?.price} />
-      </div>
+      <Link href={`/product/${data?.id}`} className="flex flex-col ">
+        <h5 className={cn("text-lg font-semibold", config.product.card.name)}>
+          {data.name}
+        </h5>
+        <p
+          className={cn(
+            "text-sm text-gray-500",
+            config.product.card.description
+          )}
+        >
+          {data.category?.name}
+        </p>
+
+        <Currency
+          value={data?.price}
+          className={cn("mt-2 ", config.product.card.price)}
+        />
+      </Link>
     </div>
   );
 };

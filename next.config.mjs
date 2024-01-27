@@ -5,6 +5,21 @@
  */
 await import("./src/env.mjs");
 
+import NextMdx from "@next/mdx";
+
+const withMDX = NextMdx({
+  // Optionally provide remark and rehype plugins
+  options: {
+    // If you use remark-gfm, you'll need to use next.config.mjs
+    // as the package is ESM only
+    // https://github.com/remarkjs/remark-gfm#install
+    remarkPlugins: [],
+    rehypePlugins: [],
+    // If you use `MDXProvider`, uncomment the following line.
+    // providerImportSource: "@mdx-js/react",
+  },
+});
+
 /** @type {import("next").NextConfig} */
 const config = {
   async headers() {
@@ -30,6 +45,7 @@ const config = {
   },
 
   reactStrictMode: true,
+  pageExtensions: ["mdx", "ts", "tsx"],
 
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
@@ -58,4 +74,4 @@ const config = {
   },
 };
 
-export default config;
+export default withMDX(config);

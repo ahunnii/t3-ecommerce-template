@@ -38,10 +38,6 @@ export const AccountHomePage = ({
                   </p>
                 </>
               )}
-
-              {/* <p className="text-sm text-gray-500">
-                It has been a while since your last order.
-              </p> */}
             </div>{" "}
             <Button size={"lg"} className="bg-purple-500">
               Shop Now

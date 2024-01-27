@@ -56,7 +56,7 @@ interface IProps extends VariantProps<typeof infoVariants> {
 }
 const formSchema = z.object({
   selection: z.record(z.string(), z.string()),
-  quantity: z.number().min(1),
+  quantity: z.coerce.number().min(1),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -86,6 +86,7 @@ const VariantSelector: FC<IProps> = ({
   };
 
   const decrementQuantity = () => {
+    if (watchedValues.quantity <= 0) return;
     form.setValue("quantity", watchedValues.quantity - 1);
   };
 
@@ -271,14 +272,45 @@ const VariantSelector: FC<IProps> = ({
                 <FormLabel className={cn("", textStyles)}>Quantity</FormLabel>
                 <FormControl>
                   {/* <div className="flex gap-1"> */}
-                  <Input
-                    {...field}
-                    // className="w-[180px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                    type="number"
-                    className="w-[180px]"
-                    min={1}
-                    max={variant ? variant.quantity : product.quantity}
-                  />
+
+                  <div className="relative w-36 rounded-md border border-slate-100 ">
+                    <div className=" absolute inset-y-0 left-0 z-30 flex items-center">
+                      <Button
+                        variant={"ghost"}
+                        type="button"
+                        onClick={decrementQuantity}
+                      >
+                        -
+                      </Button>
+                    </div>
+                    <Input
+                      {...field}
+                      // className="w-[180px] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      type="text"
+                      min={1}
+                      onChange={(e) => {
+                        if (isNaN(Number(e.target.value))) {
+                          if (!isNaN(field.value)) return;
+                          field.onChange(1);
+                          return;
+                        }
+                        field.onChange(Number(e.target.value));
+                      }}
+                      inputMode="numeric"
+                      className="z-10 block  rounded-md px-12 py-1.5  text-center     text-gray-900 sm:text-sm sm:leading-6"
+                      max={variant ? variant.quantity : product.quantity}
+                    />
+
+                    <div className=" absolute inset-y-0 right-0 z-30 flex items-center">
+                      <Button
+                        variant={"ghost"}
+                        type="button"
+                        onClick={incrementQuantity}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
                   {/* </div> */}
                 </FormControl>
                 <FormMessage />

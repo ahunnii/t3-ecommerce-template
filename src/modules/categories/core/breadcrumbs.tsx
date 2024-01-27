@@ -8,14 +8,14 @@ const Breadcrumbs = ({ pathway }: { pathway: CrumbPath[] }) => {
   const config = useConfig();
 
   return (
-    <nav className="mb-4 flex px-5 pb-5 pt-10 " aria-label="Breadcrumb">
-      <ol className="inline-flex items-center space-x-1 md:space-x-3">
+    <nav className="mb-4 flex pb-5 pt-16 " aria-label="Breadcrumb">
+      <ol className="inline-flex items-center space-x-1 md:space-x-1">
         <li className="inline-flex items-center">
           <Link
             href="/"
             className={cn(
               "inline-flex items-center text-sm font-medium text-neutral-500 transition-colors hover:text-black",
-              config?.breadCrumbs?.["primary-link"]
+              config.breadCrumbs.primary
             )}
           >
             <HomeIcon /> Home

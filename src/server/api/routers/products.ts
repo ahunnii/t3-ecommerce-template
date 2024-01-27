@@ -28,6 +28,8 @@ export const productsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const results = extractQueryString(input.queryString ?? "");
 
+      console.log(results);
+
       const products = await ctx.prisma.product.findMany({
         where: {
           storeId: env.NEXT_PUBLIC_STORE_ID,
@@ -42,6 +44,8 @@ export const productsRouter = createTRPCRouter({
           },
           variants: true,
           images: true,
+          tags: true,
+          materials: true,
         },
         orderBy: {
           createdAt: "desc",

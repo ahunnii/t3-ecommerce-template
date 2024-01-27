@@ -103,6 +103,8 @@ model Store {
   collections Collection[] @relation("StoreToCollection")
 }
 
+
+
 model Billboard {
   id         String     @id @default(uuid())
   storeId    String
@@ -389,6 +391,8 @@ model Variation {
 
   @@index([productId])
 }
+
+
 
 model CartItem {
   id        String     @id @default(uuid())

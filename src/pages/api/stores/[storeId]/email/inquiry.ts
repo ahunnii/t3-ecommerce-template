@@ -1,10 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Resend } from "resend";
-import type { CreateEmailOptions } from "resend/build/src/emails/interfaces";
-import { env } from "~/env.mjs";
-import { InquiryTemplate } from "~/modules/email/inquiry-template";
 
-const resend = new Resend(env.RESEND_API_KEY);
+import { emailService } from "~/services/email";
 
 const inquiryHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
@@ -13,12 +9,14 @@ const inquiryHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const { name, email, body } = req.body;
-    const data = await resend.emails.send({
-      from: `Shop Inquiry <contact@dreamwalkerstudios.co>`,
-      to: env.SHOP_EMAIL,
-      subject: "Shop Inquiry from " + name,
-      react: InquiryTemplate({ fullName: name, message: body, email }),
-    } as CreateEmailOptions);
+    const data = await emailService.sendEmail({
+      type: "contactUs",
+      data: {
+        name,
+        email,
+        body,
+      },
+    });
 
     res.status(200).json(data);
   } catch (error) {

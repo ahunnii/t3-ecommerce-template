@@ -9,11 +9,9 @@ import StorefrontLayout from "~/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
-import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
 
-import { prisma } from "~/server/db";
 import type { DetailedProductFull } from "~/types";
 
 export const SingleProductPage = ({

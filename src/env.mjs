@@ -54,6 +54,12 @@ export const env = createEnv({
     PAYPAL_CLIENT_ID: z.string(),
     PAYPAL_CLIENT_SECRET: z.string(),
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
+
+    // Email
+    NEXT_PUBLIC_EMAIL_SERVICE: z.string().optional(),
+
+    //Toasts
+    NEXT_PUBLIC_TOAST_SERVICE: z.string().optional(),
   },
 
   /**
@@ -78,8 +84,13 @@ export const env = createEnv({
 
     // Payment Processing
     NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
-
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
+
+    // Email
+    NEXT_PUBLIC_EMAIL_SERVICE: z.string().optional(),
+
+    //Toasts
+    NEXT_PUBLIC_TOAST_SERVICE: z.string().optional(),
   },
 
   /**
@@ -128,6 +139,12 @@ export const env = createEnv({
     PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID,
     PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET,
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+
+    // Email
+    NEXT_PUBLIC_EMAIL_SERVICE: process.env.NEXT_PUBLIC_EMAIL_SERVICE,
+
+    //Toasts
+    NEXT_PUBLIC_TOAST_SERVICE: process.env.NEXT_PUBLIC_TOAST_SERVICE,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

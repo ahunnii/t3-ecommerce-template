@@ -1,4 +1,4 @@
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 
@@ -13,6 +13,9 @@ import { api } from "~/utils/api";
 import ProductCard from "~/shop/custom/components/product-card";
 import { storeTheme } from "~/shop/custom/config";
 
+import { Button } from "~/components/ui/button";
+import Breadcrumbs from "~/modules/categories/core/breadcrumbs";
+import { useConfig } from "~/providers/style-config-provider";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
 import { SelectableFilter } from "../components/selectable-filter";
@@ -33,42 +36,45 @@ export const AllProductsPage = () => {
   const { data: attributes } =
     api.categories.getAllStoreCategoryAttributes.useQuery();
 
+  const config = useConfig();
+  const router = useRouter();
   return (
     <StorefrontLayout {...storeTheme.layout} metadata={metadata}>
       {areProductsLoading && <AbsolutePageLoader />}
       {!areProductsLoading && (
         <>
-          <div
-            className={cn(
-              "mx-auto w-full px-4 py-8 text-left text-3xl font-bold sm:text-5xl lg:text-6xl"
-            )}
-          >
-            All Products
-          </div>
+          <Breadcrumbs pathway={[{ name: "All Products" }]} />
+          <h1 className={cn("", config.typography.h1)}>All Products</h1>
 
-          <div className="px-4 pb-24 sm:px-6 lg:px-8">
+          <div className="mt-6 lg:col-span-4 ">
             <div className="lg:grid lg:grid-cols-4 lg:gap-x-8">
               {attributes && <MobileFilters data={attributes} />}
 
-              <div className="mt-6 pb-8 lg:col-span-4 lg:mt-0 ">
-                <div className="hidden items-center gap-4 pb-4 lg:flex ">
-                  <h2 className="py-4 text-lg text-slate-700">Filters</h2>
-                  {attributes?.map((attribute, idx) => (
-                    <SelectableFilter
-                      key={idx}
-                      valueKey={`${attribute.name.toLowerCase()}Variant`}
-                      data={attribute}
-                    />
-                  ))}
-                </div>
+              <div className="mt-6 hidden items-center gap-4 py-4 lg:col-span-4 lg:mt-0 lg:flex">
+                {/* <h2 className="py-4 text-lg text-slate-700">Filters</h2> */}
 
-                {products?.length === 0 && <NoResults />}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                  {products?.map((item: DetailedProductFull) => (
-                    <ProductCard key={item.id} data={item} />
-                  ))}
-                </div>
+                {attributes?.map((attribute, idx) => (
+                  <SelectableFilter
+                    key={idx}
+                    valueKey={`${attribute.name.toLowerCase()}Variant`}
+                    data={attribute}
+                  />
+                ))}
+
+                <Button
+                  onClick={() => router.replace("/collections/all-products")}
+                  size={"sm"}
+                >
+                  Clear
+                </Button>
               </div>
+            </div>
+
+            {products?.length === 0 && <NoResults />}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              {products?.map((item: DetailedProductFull) => (
+                <ProductCard key={item.id} data={item} />
+              ))}
             </div>
           </div>
         </>
@@ -76,3 +82,24 @@ export const AllProductsPage = () => {
     </StorefrontLayout>
   );
 };
+
+import { FilterIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+
+export function PopoverDemo({ children }: { children: ReactNode }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">
+          Filter <FilterIcon />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-screen">{children}</PopoverContent>
+    </Popover>
+  );
+}

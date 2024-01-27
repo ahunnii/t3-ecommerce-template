@@ -48,7 +48,7 @@ const StorefrontLayout = ({
 
         <div
           className={cn(
-            "mx-auto  h-full w-full max-w-7xl flex-grow pb-10 pt-16",
+            "mx-auto  h-full w-full max-w-7xl flex-grow px-4 pb-10 pt-16 sm:px-6 lg:px-8",
             bodyStyle
           )}
         >

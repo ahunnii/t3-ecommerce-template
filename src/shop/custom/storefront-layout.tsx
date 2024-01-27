@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import Footer from "./components/footer";
 import Navbar from "./modules/navigation/navbar";
 
+import { Navbar as DefaultNavbar } from "~/components/core/navbar";
+
 import useCart from "~/modules/cart/hooks/use-cart";
 import { cn } from "~/utils/styles";
 
@@ -41,8 +43,8 @@ const StorefrontLayout = ({
       </main> */}
 
       <main className={cn("flex h-full  min-h-screen flex-col", mainStyle)}>
-        <Navbar navStyles={navStyles} />
-
+        {/* <Navbar navStyles={navStyles} /> */}
+        <DefaultNavbar navStyles={navStyles} />
         <div
           className={cn(
             "mx-auto  h-full w-full max-w-7xl flex-grow pb-10 pt-16",

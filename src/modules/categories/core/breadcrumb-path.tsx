@@ -20,15 +20,13 @@ export const BreadCrumbPath = ({ name, link }: CrumbPath) => {
   return (
     <li {...params}>
       <div className="flex items-center">
-        <ArrowIcon
-          color={(config?.breadCrumbs?.["icon-color"] as string) ?? ""}
-        />
+        <ArrowIcon color={config.breadCrumbs.icon ?? ""} />
         {link ? (
           <Link
             href={link}
             className={cn(
-              "ml-1 text-sm font-medium text-black transition-colors md:ml-2",
-              config?.breadCrumbs?.["secondary-link"]
+              " text-sm font-medium text-black transition-colors ",
+              config.breadCrumbs.secondary
             )}
           >
             {name}
@@ -36,8 +34,8 @@ export const BreadCrumbPath = ({ name, link }: CrumbPath) => {
         ) : (
           <span
             className={cn(
-              "ml-1 text-sm font-medium text-black transition-colors md:ml-2",
-              config?.breadCrumbs?.["current-link"]
+              "text-sm font-medium text-black transition-colors",
+              config.breadCrumbs.current
             )}
           >
             {name}

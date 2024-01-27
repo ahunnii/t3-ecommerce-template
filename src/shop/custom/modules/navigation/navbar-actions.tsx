@@ -16,8 +16,9 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
+import { cn } from "~/utils/styles";
 
-const NavbarActions = () => {
+const NavbarActions = ({ className }: { className?: string }) => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();
   useEffect(() => {
@@ -31,7 +32,7 @@ const NavbarActions = () => {
   }
 
   return (
-    <div className="ml-auto flex items-center gap-x-4">
+    <div className={cn("ml-auto flex items-center gap-x-4", className)}>
       {!sessionData && (
         <>
           <Button

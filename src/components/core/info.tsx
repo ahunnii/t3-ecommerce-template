@@ -70,7 +70,10 @@ const Info: React.FC<InfoProps> = (props) => {
       <div className="mt-10 flex items-center gap-x-3">
         <Button
           onClick={onAddToCart}
-          className={cn("flex items-center gap-x-2", btnStyles)}
+          className={cn(
+            "flex w-full items-center justify-center gap-x-2 text-center",
+            btnStyles
+          )}
           disabled={
             props?.data?.variants?.length > 0 ? variant === null : false
           }
@@ -79,10 +82,33 @@ const Info: React.FC<InfoProps> = (props) => {
         </Button>
       </div>
 
-      <div className={cn("mt-10 gap-x-3", textStyles)}>
-        <h3 className="text-lg font-bold">Description</h3>
-        <div className={cn("", "")}>
-          {parse(props?.data.description ?? "No description provided.")}
+      <div className={cn("mt-10 gap-x-3 space-y-4", textStyles)}>
+        <div>
+          <h3 className="text-lg font-bold">Description</h3>
+          <div className={cn("", "")}>
+            {parse(props?.data.description ?? "No description provided.")}
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-bold">Materials</h3>
+          <div className={cn("", "")}>
+            {props?.data?.materials?.map((material, idx) => {
+              return (
+                <>
+                  <span key={idx} className="text-black">
+                    {material.name}
+                  </span>
+                </>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-bold">Tags</h3>
+          <div className={cn("", "")}>
+            {props?.data?.tags?.map((tag) => tag.name).join(", ")}
+          </div>
         </div>
       </div>
     </div>

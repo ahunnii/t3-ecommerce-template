@@ -9,49 +9,49 @@ import StorefrontLayout from "~/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
-import { SEO } from "~/shop/custom/components/seo-head";
-import { storeTheme } from "~/shop/custom/config";
+import { useConfig } from "~/providers/style-config-provider";
+
+import { cn } from "~/utils/styles";
 
 type ICollectionPageProps = {
   collectionId: string;
 };
+
 export const SingleCollectionPage: FC<ICollectionPageProps> = ({
   collectionId,
 }) => {
   const { data: collection, isLoading } =
     api.collections.getCollection.useQuery({ collectionId });
 
+  const config = useConfig();
   const pathway = [
     { name: "Collections", link: "/collections" },
     { name: collection?.name ?? "" },
   ];
-  return (
-    <>
-      <SEO
-        title={`${collection?.name} | Trend Anomaly`}
-        description={
-          "Check out our product collections and find something to break out the system!"
-        }
-      />
-      <StorefrontLayout {...storeTheme.layout}>
-        {isLoading && <AbsolutePageLoader />}
 
-        {!isLoading && (
-          <>
-            <Breadcrumbs pathway={pathway} />
-            <div className="px-4 pb-24 sm:px-6 lg:px-8">
-              <div className="mt-6 lg:col-span-4 lg:mt-0">
-                {collection?.products.length === 0 && <NoResults />}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  {collection?.products.map((item) => (
-                    <ProductCard key={item.id} data={item} />
-                  ))}
-                </div>
-              </div>
+  const metadata = {
+    title: `${collection?.name} | Trend Anomaly`,
+    description:
+      "Check out our product collections and find something to break out the system!",
+  };
+  return (
+    <StorefrontLayout {...config.layout} metadata={metadata}>
+      {isLoading && <AbsolutePageLoader />}
+
+      {!isLoading && (
+        <>
+          <Breadcrumbs pathway={pathway} />
+          <h1 className={cn("", config.typography.h1)}>{collection?.name}</h1>
+          <div className="mt-6 lg:col-span-4">
+            {collection?.products.length === 0 && <NoResults />}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {collection?.products.map((item) => (
+                <ProductCard key={item.id} data={item} />
+              ))}{" "}
             </div>
-          </>
-        )}
-      </StorefrontLayout>
-    </>
+          </div>
+        </>
+      )}
+    </StorefrontLayout>
   );
 };

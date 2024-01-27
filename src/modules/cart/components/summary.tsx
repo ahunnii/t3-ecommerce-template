@@ -3,70 +3,69 @@ import Currency from "~/components/core/ui/currency";
 
 import useCart from "~/modules/cart/hooks/use-cart";
 
+import { useConfig } from "~/providers/style-config-provider";
 import { cn } from "~/utils/styles";
 import useCheckout from "../hooks/use-checkout";
 
-const Summary = ({ type = "default" }: { type: "default" | "dark" }) => {
+const Summary = () => {
   const { onCheckout, totalPrice, calculateShippingCost } = useCheckout();
-
   const { cartItems } = useCart((state) => state);
+  const config = useConfig();
 
   return (
     <div
       className={cn(
         "mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8",
-        type === "dark" ? "bg-black" : "bg-gray-50"
+        config.cart.background
       )}
     >
       <h2
-        className={cn(
-          "text-lg font-medium ",
-          type === "dark" ? "text-white" : "text-gray-900"
-        )}
+        className={cn("text-lg font-medium text-gray-900", config.cart.header)}
       >
         Order summary
       </h2>
       <div className="mt-6 space-y-4">
-        <div className="flex items-center justify-between   ">
+        <div className="flex items-center justify-between">
           <div
             className={cn(
-              "text-base font-medium ",
-              type === "dark" ? "text-white/50" : "text-gray-500"
+              "text-base font-medium text-gray-500",
+              config.cart.subheader
             )}
           >
             Subtotal
           </div>
-          <Currency
-            value={totalPrice}
-            className={type === "dark" ? "text-white" : ""}
-          />
+          <Currency value={totalPrice} className={cn("", config.cart.price)} />
         </div>
-        <div className="flex items-center justify-between   ">
-          <div
-            className={cn(
-              "text-base font-medium ",
-              type === "dark" ? "text-white/50" : "text-gray-500"
-            )}
-          >
-            Shipping
-          </div>
-          {typeof calculateShippingCost === "string" ? (
-            <span className={cn(type === "dark" ? "text-white" : "")}>
-              {calculateShippingCost}
-            </span>
-          ) : (
-            <Currency
-              value={calculateShippingCost ?? 0}
-              className={type === "dark" ? "text-white" : ""}
-            />
+        <div className="flex items-center justify-between">
+          {cartItems?.length > 0 && (
+            <>
+              <div
+                className={cn(
+                  "text-base font-medium text-gray-500",
+                  config.cart.subheader
+                )}
+              >
+                Shipping
+              </div>
+              {typeof calculateShippingCost === "string" ? (
+                <span className={cn("", config.cart.price)}>
+                  {calculateShippingCost}
+                </span>
+              ) : (
+                <Currency
+                  value={calculateShippingCost ?? 0}
+                  className={cn("", config.cart.price)}
+                />
+              )}
+            </>
           )}
         </div>
 
         <div className="flex items-center justify-between border-t border-gray-200 pt-4">
           <div
             className={cn(
-              "text-base font-medium ",
-              type === "dark" ? "text-white" : "text-gray-900"
+              "text-base font-medium text-gray-900",
+              config.cart.header
             )}
           >
             *Order total
@@ -78,24 +77,21 @@ const Summary = ({ type = "default" }: { type: "default" | "dark" }) => {
                 ? 0
                 : (calculateShippingCost as number))
             }
-            className={type === "dark" ? "text-white" : ""}
+            className={cn("", config.cart.price)}
           />
         </div>
       </div>
       <Button
         onClick={() => void onCheckout()}
         disabled={cartItems.length === 0}
-        className={cn(
-          "mt-6 w-full",
-          type === "dark" ? "bg-white text-black" : ""
-        )}
+        className={cn("mt-6 w-full", config.cart.button)}
       >
         Checkout
       </Button>
       <p
         className={cn(
-          "mt-3 w-full text-center",
-          type === "dark" ? "text-white/75" : "text-muted-foreground"
+          "mt-3 w-full text-center text-muted-foreground",
+          config.cart.finePrint
         )}
       >
         * Shipping and taxes calculated at checkout

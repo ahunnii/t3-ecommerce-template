@@ -7,7 +7,7 @@ import { env } from "~/env.mjs";
 const Footer = () => {
   const year = new Date().getFullYear();
   return (
-    <div className="w-full bg-black">
+    <div className="w-full bg-black px-4 sm:px-6 lg:px-8">
       <Container>
         <footer className="border-t border-t-white/20 ">
           <div className="mx-auto flex items-center justify-between py-10">

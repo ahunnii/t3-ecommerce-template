@@ -597,7 +597,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                             className="sm:min-w-[450px]"
                             setTags={(newTags) => {
                               setMaterials(newTags);
-                              setValue("tags", newTags as [Tag, ...Tag[]]);
+                              setValue("materials", newTags as [Tag, ...Tag[]]);
                             }}
                           />
                         </FormControl>

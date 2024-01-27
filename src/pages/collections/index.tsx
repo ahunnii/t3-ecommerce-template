@@ -7,7 +7,6 @@ const CollectionPage = () => {
   const { isTemplate } = useStorePageRender();
 
   if (isTemplate) return <DefaultCollectionPage />;
-
   return <CustomCollectionPage />;
 };
 

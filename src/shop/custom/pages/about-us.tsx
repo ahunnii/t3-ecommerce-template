@@ -1,17 +1,17 @@
 import StorefrontLayout from "~/layouts/storefront-layout";
-
-import { storeTheme } from "~/shop/custom/config";
+import { useConfig } from "~/providers/style-config-provider";
 
 const metadata = {
   title: `About Trend Anomaly`,
   description: "Break out the system!",
 };
 export const AboutUsPage = () => {
+  const config = useConfig();
   return (
-    <StorefrontLayout {...storeTheme.layout} metadata={metadata}>
+    <StorefrontLayout {...config.layout} metadata={metadata}>
       <div className="py-10">
-        <h1 className={storeTheme.layout.h1}>About Trend Anomaly</h1>
-        <p className={storeTheme.layout.p}>
+        <h1 className={config.layout.h1}>About Trend Anomaly</h1>
+        <p className={config.layout.p}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis feugiat,
           leo at condimentum tempus, odio sapien dictum ante, blandit lacinia
           neque ante non nunc. Mauris scelerisque dolor mi, in euismod erat
@@ -26,7 +26,7 @@ export const AboutUsPage = () => {
           justo lacinia, ac fermentum quam tempor.
         </p>
 
-        <p className={storeTheme.layout.p}>
+        <p className={config.layout.p}>
           Quisque mollis at nibh id lacinia. Aenean ipsum enim, iaculis non
           accumsan id, gravida id nunc. Proin eros nulla, euismod et risus
           vitae, dignissim tristique odio. Cras eget condimentum mi. Integer
@@ -39,7 +39,7 @@ export const AboutUsPage = () => {
           et.
         </p>
 
-        <p className={storeTheme.layout.p}>
+        <p className={config.layout.p}>
           Sed arcu lectus, hendrerit ac mauris quis, congue facilisis massa.
           Etiam dictum lorem eleifend, eleifend ligula fringilla, faucibus urna.
           Vestibulum ante ipsum primis in faucibus orci luctus et ultrices

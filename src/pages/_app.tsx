@@ -10,8 +10,9 @@ import { ModalProvider } from "~/providers/admin/modal-provider";
 import StorefrontModalProvider from "~/providers/core/modal-provider";
 import { ConfigProvider } from "~/providers/style-config-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
-import { ToastProvider } from "~/providers/toast-provider";
-import { storeTheme } from "~/shop/custom/config";
+import { ToastProvider } from "~/services/toast/toaster-provider";
+// import { ToastProvider } from "~/providers/toast-provider";
+import { storeData, storeTheme } from "~/shop/custom/config";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -30,6 +31,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {/* <ToastProvider /> */}
         <ToastProvider />
         <ModalProvider />
         <StorefrontModalProvider />
