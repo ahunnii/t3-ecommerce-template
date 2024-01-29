@@ -382,7 +382,7 @@ model GalleryImage {
   id        String   @id @default(uuid())
   storeId   String // Foreign Key to Product
   store     Store  @relation( "StoreToGalleryImage", fields: [storeId], references: [id], onDelete: Cascade)
-  title     String
+  title     String?
   url       String // URL of the image
   caption   String?
   createdAt DateTime @default(now())

@@ -11,6 +11,7 @@ import { shippingLabelRouter } from "./routers/admin/shipping-labels";
 import { attributesRouter } from "./routers/attributes";
 import { blogPostRouter } from "./routers/blog-posts";
 import { emailRouter } from "./routers/core/emails";
+import { galleryRouter } from "./routers/gallery";
 import { productsRouter } from "./routers/products";
 import { shippingRouter } from "./routers/shipping";
 import { userRouter } from "./routers/users";
@@ -24,6 +25,7 @@ export const appRouter = createTRPCRouter({
   example: exampleRouter,
   store: storeRouter,
   blogPosts: blogPostRouter,
+  gallery: galleryRouter,
   // sizes: sizesRouter,
 
   categories: categoriesRouter,

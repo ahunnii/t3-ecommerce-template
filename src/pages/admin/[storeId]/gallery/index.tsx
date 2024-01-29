@@ -4,42 +4,45 @@ import { useCallback, useEffect, useState, type FC } from "react";
 import { format } from "date-fns";
 
 import PageLoader from "~/components/ui/page-loader";
-import { CategoriesClient } from "~/modules/categories/admin/client";
-import type { CategoryColumn } from "~/modules/categories/admin/columns";
 
 import AdminLayout from "~/components/layouts/AdminLayout";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import type { DetailedCategory } from "~/types";
+import type { GalleryImage } from "@prisma/client";
+import { GalleryImageClient } from "~/modules/gallery/admin/client";
+import type { GalleryImageColumn } from "~/modules/gallery/admin/columns";
 
 interface IProps {
   storeId: string;
 }
-const CategoriesPage: FC<IProps> = ({ storeId }) => {
-  const [formattedCategories, setFormattedCategories] = useState<
-    CategoryColumn[]
+const GalleryImagesPage: FC<IProps> = ({ storeId }) => {
+  const [formattedGalleryImage, setFormattedGalleryImage] = useState<
+    GalleryImageColumn[]
   >([]);
 
-  const { data: categories, isLoading } =
-    api.categories.getAllCategories.useQuery({
+  const { data: galleryImages, isLoading } =
+    api.gallery.getAllGalleryImages.useQuery({
       storeId,
     });
 
-  const formatCategories = useCallback((categories: DetailedCategory[]) => {
-    return categories.map((item: DetailedCategory) => ({
+  const formatGalleryImages = useCallback((images: GalleryImage[]) => {
+    return images.map((item: GalleryImage) => ({
       id: item.id,
-      name: item.name,
-      billboardLabel: item?.billboard?.label,
+      title: item?.title === "" ? null : item.title,
+      url: item.url,
+      storeId: item.storeId,
       createdAt: format(item.createdAt, "MMMM do, yyyy"),
     }));
   }, []);
 
   useEffect(() => {
-    if (categories)
-      setFormattedCategories(formatCategories(categories) as CategoryColumn[]);
-  }, [categories, formatCategories]);
+    if (galleryImages)
+      setFormattedGalleryImage(
+        formatGalleryImages(galleryImages) as GalleryImageColumn[]
+      );
+  }, [galleryImages, formatGalleryImages]);
 
   return (
     <AdminLayout>
@@ -48,7 +51,7 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
           {isLoading ? (
             <PageLoader />
           ) : (
-            <CategoriesClient data={formattedCategories} />
+            <GalleryImageClient data={formattedGalleryImage} />
           )}
         </div>
       </div>
@@ -75,4 +78,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export default CategoriesPage;
+export default GalleryImagesPage;

@@ -11,9 +11,9 @@ const metadata = {
   description: "Browse our gallery of products, events, and other coolness! ",
 };
 export const GalleryPage = () => {
-  const { data: products } = api.products.getAllProducts.useQuery({});
+  const { data: galleryImages } = api.gallery.getAllGalleryImages.useQuery({});
 
-  const items = products?.map((product) => product.images[0]?.url) ?? [];
+  const items = galleryImages?.map((image) => image.url) ?? [];
 
   return (
     <>
@@ -26,7 +26,7 @@ export const GalleryPage = () => {
               </h1>
               <div className=" grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {items.map((item, idx) => (
-                  <GalleryCard key={idx} data={item!} />
+                  <GalleryCard key={idx} data={item} />
                 ))}
               </div>
             </div>

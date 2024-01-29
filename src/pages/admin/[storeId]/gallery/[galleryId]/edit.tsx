@@ -2,39 +2,32 @@ import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
 import PageLoader from "~/components/ui/page-loader";
-import { CategoryForm } from "~/modules/categories/admin/category-form";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
 import AdminLayout from "~/components/layouts/AdminLayout";
+import { GalleryForm } from "~/modules/gallery/admin/gallery-form";
 
 interface IProps {
-  categoryId: string;
+  galleryId: string;
   storeId: string;
 }
-const CategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
-  const { data: category, isLoading: isCategoryLoading } =
-    api.categories.getCategory.useQuery({
-      categoryId,
-    });
-
-  const { data: billboards, isLoading: areBillboardsLoading } =
-    api.billboards.getAllBillboards.useQuery({
-      storeId,
+const EditGalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
+  const { data: galleryImage, isLoading } =
+    api.gallery.getGalleryImage.useQuery({
+      id: galleryId,
     });
 
   return (
     <AdminLayout>
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {isCategoryLoading || areBillboardsLoading ? (
-            <PageLoader />
-          ) : (
-            <CategoryForm
-              billboards={billboards ?? []}
-              initialData={category ?? null}
-            />
+          {isLoading && <PageLoader />}
+          {!galleryImage && <div>Gallery image not found</div>}
+
+          {!isLoading && galleryImage && (
+            <GalleryForm initialData={galleryImage} />
           )}
         </div>
       </div>
@@ -56,10 +49,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      categoryId: ctx.query.categoryId,
+      categoryId: ctx.query.galleryId,
       storeId: ctx.query.storeId,
     },
   };
 }
 
-export default CategoryPage;
+export default EditGalleryImagePage;
