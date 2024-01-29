@@ -7,12 +7,19 @@ export const storeTheme = {
   logo: {
     default: "/custom/logo.png",
   },
+  buttons: {
+    accent: "bg-purple-500 hover:bg-purple-400",
+  },
   layout: {
     mainStyle: "bg-fuchsia-200",
     // bodyStyle: "max-w-full",
     navStyles: "bg-black border-b-black",
     p: "leading-7 [&:not(:first-child)]:mt-6",
     h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+    h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+    h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
+    h4: "scroll-m-20 text-xl font-semibold tracking-tight",
+
     NavBar: Navbar,
     Footer: Footer,
   },
@@ -20,6 +27,9 @@ export const storeTheme = {
   typography: {
     p: "leading-7 [&:not(:first-child)]:mt-6",
     h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+    h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+    h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
+    h4: "scroll-m-20 text-xl font-semibold tracking-tight",
   },
   breadCrumbs: {
     primary: "hover:text-purple-500 text-neutral-500",
@@ -62,6 +72,12 @@ export const storeTheme = {
   },
   contact: {
     submit: "", //"bg-purple-600 hover:bg-purple-500",
+  },
+  account: {
+    typography: {
+      h1: "text-3xl font-bold text-black",
+      p: "text-muted-foreground",
+    },
   },
 };
 

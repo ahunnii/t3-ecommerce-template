@@ -84,7 +84,7 @@ model Store {
   products          Product[]    @relation("StoreToProduct")
   orders            Order[]      @relation("StoreToOrder")
   gallery           GalleryImage[] @relation("StoreToGalleryImage")
-
+  blog              BlogPost[] @relation("StoreToBlogPost")
 
   hasFreeShipping   Boolean        @default(false)  
   minFreeShipping   Float?         @default(0)
@@ -102,6 +102,7 @@ model Store {
   cart Cart[] @relation("StoreToCart")
   collections Collection[] @relation("StoreToCollection")
 }
+
 
 
 
@@ -213,13 +214,17 @@ model Product {
 
 model Tag {
   id          String   @id @default(uuid())
-  productId   String // Foreign Key to Store
-  product     Product    @relation("ProductToTag", fields: [productId], references: [id], onDelete: Cascade)
+  productId   String? // Foreign Key to Store
+  product     Product?   @relation("ProductToTag", fields: [productId], references: [id], onDelete: Cascade)
+
+  blogPostId   String? // Foreign Key to Store
+  blogPost     BlogPost?   @relation("BlogPostToTag", fields: [blogPostId], references: [id], onDelete: Cascade)
   name        String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   @@index([productId])
+  @@index([blogPostId])
 }
 
 model ProductMaterial {
@@ -258,7 +263,8 @@ model Order {
   shippingCost    Float?       @default(0.00)
 
 
-  referenceId     String @default("")
+  referenceId     String      @default("")
+  paymentId       String?
   refundId        String? 
 
 
@@ -281,6 +287,26 @@ model Order {
 
   @@index([userId])
 }
+
+
+model BlogPost {
+  id          String    @id @default(uuid())
+  storeId     String // Foreign Key to Product
+  store       Store  @relation( "StoreToBlogPost", fields: [storeId], references: [id], onDelete: Cascade)
+  title       String
+  content     String @db.Text
+  author      String?
+  slug        String?
+  tags        Tag[]     @relation("BlogPostToTag")
+  featuredImg String?   
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([storeId])
+}
+
+
 
 model TimeLineEntry {
   id              String      @id @default(uuid())
@@ -341,13 +367,15 @@ model OrderItem {
 
 model Image {
   id        String   @id @default(uuid())
-  productId String // Foreign Key to Product
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  productId String? // Foreign Key to Product
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
   url       String // URL of the image
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([productId])
+  
 }
 
 model GalleryImage {
@@ -356,6 +384,7 @@ model GalleryImage {
   store     Store  @relation( "StoreToGalleryImage", fields: [storeId], references: [id], onDelete: Cascade)
   title     String
   url       String // URL of the image
+  caption   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

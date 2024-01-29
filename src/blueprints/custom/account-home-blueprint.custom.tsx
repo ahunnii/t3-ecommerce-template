@@ -1,23 +1,24 @@
 import type { Order } from "@prisma/client";
-
 import type { User } from "next-auth/core/types";
+
 import { Button } from "~/components/ui/button";
+import ProfileLayout from "~/components/wip/profile-layout.wip";
+
 import { filterOrdersByLastWeek } from "~/modules/account/libs/handle-recent-orders";
+import { useConfig } from "~/providers/style-config-provider";
+import { cn } from "~/utils/styles";
 
-import ProfileLayout from "../../components/wip/profile-layout.wip";
-
-export const AccountHomePage = ({
-  orders,
-  user,
-}: {
+type AccountHomePageProps = {
   orders: Order[];
   user: User;
-}) => {
+};
+export const AccountHomePage = ({ orders, user }: AccountHomePageProps) => {
   const recentOrders = filterOrdersByLastWeek(orders);
+  const config = useConfig();
 
   return (
     <ProfileLayout>
-      <h1 className="text-3xl font-bold text-black">Overview</h1>
+      <h1 className={cn(config.typography.h3)}>Overview</h1>
       <p className="text-muted-foreground">Welcome back, {user?.name}!</p>
       <section className="flex w-full flex-col space-y-6 py-8">
         <div>
@@ -38,8 +39,8 @@ export const AccountHomePage = ({
                   </p>
                 </>
               )}
-            </div>{" "}
-            <Button size={"lg"} className="bg-purple-500">
+            </div>
+            <Button size={"lg"} className={cn("")}>
               Shop Now
             </Button>
           </div>

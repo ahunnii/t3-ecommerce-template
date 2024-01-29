@@ -1,5 +1,6 @@
 import { User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,11 +17,14 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
+import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 
 const NavbarActions = ({ className }: { className?: string }) => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();
+
+  const { data: store } = api.store.getStore.useQuery({});
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -76,6 +80,16 @@ const NavbarActions = ({ className }: { className?: string }) => {
             <DropdownMenuItem onClick={() => router.push("/account")}>
               Profile
             </DropdownMenuItem>
+            {sessionData?.user?.id === store?.userId ||
+            sessionData?.user?.role === "ADMIN" ? (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link href="/admin" target="_blank">
+                    Admin{" "}
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => void signOut()}>
               Log out

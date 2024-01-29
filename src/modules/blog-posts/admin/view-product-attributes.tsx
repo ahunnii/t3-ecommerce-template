@@ -1,4 +1,7 @@
-import { Order } from "@prisma/client";
+import parse from "html-react-parser";
+import Currency from "~/components/core/ui/currency";
+import { cn } from "~/utils/styles";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -14,6 +17,7 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import * as React from "react";
 
+import { Variation } from "@prisma/client";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -34,16 +38,66 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { OrderDetailsCustomerModal } from "~/components/wip/order-details-customer-modal.wip";
 
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+type ViewProductVariantsProps = {
+  weight: number | null;
+  materials: { id: string; name: string }[];
+  length: number | null;
+  width: number | null;
+  height: number | null;
+
+  //   name: string;
+  // };
+  // price: number;
+  // estimatedCompletion: number;
+  // description: string;
+};
+export const ViewProductAttributes = ({
+  weight,
+  materials,
+  length,
+  width,
+  height,
+}: // category,
+// price,
+// estimatedCompletion,
+// description,
+ViewProductVariantsProps) => {
+  return (
+    <div className="w-full rounded-md border border-border bg-background/50 p-4">
+      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+        Attributes
+      </h3>
+      <h4>Dimensions</h4>
+      <p>
+        Weight:{" "}
+        {weight
+          ? `${Math.floor(weight / 16)} lbs ${weight % 16} oz`
+          : "No weight provided"}
+      </p>
+
+      <p>Length: {length}in </p>
+      <p>Width: {width}in </p>
+      <p>Height: {height}in </p>
+
+      <h4>Materials: </h4>
+
+      {materials?.length > 0 &&
+        materials.map((material) => <p key={material.id}>{material.name}</p>)}
+
+      {materials?.length === 0 && <p>No materials provided</p>}
+    </div>
+  );
 };
 
-export const columns: ColumnDef<Order>[] = [
+// export type Payment = {
+//   id: string;
+//   amount: number;
+//   status: "pending" | "processing" | "success" | "failed";
+//   email: string;
+// };
+
+export const columns: ColumnDef<Variation>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -67,34 +121,34 @@ export const columns: ColumnDef<Order>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "Order ID",
+    accessorKey: "values",
+    header: "Values",
     cell: ({ row }) => (
-      <OrderDetailsCustomerModal data={row.original}>
-        {row.getValue("id")}
-      </OrderDetailsCustomerModal>
+      <div className="capitalize">{row.getValue("values")}</div>
     ),
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "quantity",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Date
+          Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue("createdAt")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("quantity")}</div>
+    ),
   },
   {
-    accessorKey: "total",
-    header: () => <div className="text-right">Total</div>,
+    accessorKey: "price",
+    header: () => <div className="text-right">Price</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("total")) / 100;
+      const amount = parseFloat(row.getValue("price"));
 
       // Format the amount as a dollar amount
       const formatted = new Intl.NumberFormat("en-US", {
@@ -136,7 +190,7 @@ export const columns: ColumnDef<Order>[] = [
   },
 ];
 
-export function UserOrderTable({ orders }: { orders: Order[] }) {
+export function VariantsTable({ data }: { data: Variation[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -146,7 +200,7 @@ export function UserOrderTable({ orders }: { orders: Order[] }) {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: orders,
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -168,12 +222,10 @@ export function UserOrderTable({ orders }: { orders: Order[] }) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by date..."
-          value={
-            (table.getColumn("createdAt")?.getFilterValue() as string) ?? ""
-          }
+          placeholder="Filter emails..."
+          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("createdAt")?.setFilterValue(event.target.value)
+            table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

@@ -22,11 +22,19 @@ import {
 } from "~/components/ui/hover-card";
 import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
 
+import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 import { Separator } from "../ui/separator";
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();
+
+  const { data: session } = useSession();
+
+  const { data: store } = api.store.getStore.useQuery({});
+
+  console.log(session?.user?.id, store?.userId);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -75,6 +83,17 @@ const NavbarActions = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/account")}>
+              Profile
+            </DropdownMenuItem>
+            {session?.user?.id === store?.userId ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/admin")}>
+                  Admin
+                </DropdownMenuItem>
+              </>
+            ) : null}
             <DropdownMenuItem onClick={() => router.push("/account")}>
               Profile
             </DropdownMenuItem>

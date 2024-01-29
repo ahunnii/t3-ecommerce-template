@@ -34,47 +34,15 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        {/* <ToastProvider /> */}
         <ToastProvider />
         <ModalProvider />
         <StorefrontModalProvider />
-        {/* <AnimatePresence mode="wait">
-          <motion.div
-            key={router.route}
-            initial="initialState"
-            animate="animateState"
-            exit="exitState"
-            transition={{
-              duration: 0.75,
-            }}
-            variants={{
-              initialState: {
-                opacity: 0,
-                clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)",
-              },
-              animateState: {
-                opacity: 1,
-                clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)",
-              },
-              exitState: {
-                clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)",
-              },
-            }}
-            className="base-page-size"
-          > */}
-        <ConfigProvider
-          config={
-            env.NEXT_PUBLIC_STORE_TYPE === "custom"
-              ? storeTheme
-              : storeThemeCore
-          }
-        >
+
+        <ConfigProvider config={storeTheme}>
           <>
             <Component {...pageProps} /> <Toaster />
           </>
         </ConfigProvider>
-        {/* </motion.div>{" "}
-        </AnimatePresence> */}
       </ThemeProvider>
     </SessionProvider>
   );
