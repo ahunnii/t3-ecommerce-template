@@ -8,28 +8,31 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import type { CartItem } from "~/types";
-
-import {
-  extractQueryString,
-  filterProductsByVariants,
-} from "~/utils/filtering";
 
 export const blogPostRouter = createTRPCRouter({
   getBlogPost: publicProcedure
     .input(
       z.object({
-        blogPostId: z.string(),
+        blogPostId: z.string().optional(),
         storeId: z.string().optional(),
+        slug: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      // const results = extractQueryString(input.queryString ?? "");
+      if (!input.blogPostId && !input.slug) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "blogPostId or slug is required",
+        });
+      }
 
+      // if (input.slug) {
+      // console.log()
       const blogPost = await ctx.prisma.blogPost.findUnique({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           id: input?.blogPostId,
+          slug: input?.slug,
         },
         include: {
           tags: true,
@@ -37,6 +40,7 @@ export const blogPostRouter = createTRPCRouter({
       });
 
       return blogPost;
+      // }
     }),
   getAllBlogPosts: publicProcedure
     .input(
@@ -48,8 +52,6 @@ export const blogPostRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      // const results = extractQueryString(input.queryString ?? "");
-
       const blogPosts = await ctx.prisma.blogPost.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
@@ -68,9 +70,10 @@ export const blogPostRouter = createTRPCRouter({
     .input(
       z.object({
         title: z.string(),
-        // description: z.string(),
+        slug: z.string().optional(),
         content: z.string(),
         tags: z.array(z.object({ name: z.string() })),
+        featuredImg: z.string().optional(),
         published: z.boolean().optional(),
         storeId: z.string().optional(),
       })
@@ -93,7 +96,9 @@ export const blogPostRouter = createTRPCRouter({
         data: {
           title: input.title,
           // description: input.description,
+          featuredImg: input.featuredImg,
           content: input.content,
+          slug: input.slug ?? input.title.toLowerCase().replace(/ /g, "-"),
           tags: {
             createMany: {
               data: [
@@ -115,8 +120,9 @@ export const blogPostRouter = createTRPCRouter({
     .input(
       z.object({
         blogPostId: z.string(),
-
+        featuredImg: z.string().optional(),
         title: z.string(),
+        slug: z.string().optional(),
         // description: z.string(),
         content: z.string(),
         tags: z.array(z.object({ name: z.string() })),
@@ -151,12 +157,14 @@ export const blogPostRouter = createTRPCRouter({
           },
           data: {
             title: input.title,
+            slug: input?.slug,
             // description: input.description,
             content: input.content,
             tags: {
               deleteMany: {},
             },
             published: input.published,
+            featuredImg: input.featuredImg,
           },
         });
 

@@ -83,7 +83,8 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                     href={item.href}
                     className={cn(
                       "flex items-center text-xl font-medium  transition-colors hover:text-purple-500",
-                      pathname === item.href
+                      pathname === item.href ||
+                        item.href?.startsWith(`${pathname}/`)
                         ? "text-purple-500"
                         : "text-neutral-500"
                     )}

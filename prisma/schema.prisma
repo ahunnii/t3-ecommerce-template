@@ -296,7 +296,7 @@ model BlogPost {
   title       String
   content     String @db.Text
   author      String?
-  slug        String?
+  slug        String    @unique
   tags        Tag[]     @relation("BlogPostToTag")
   featuredImg String?   
   published   Boolean   @default(false)

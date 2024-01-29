@@ -7,7 +7,7 @@ import { authenticateSession } from "~/utils/auth";
 import Head from "next/head";
 import AdminLayout from "~/components/layouts/AdminLayout";
 import PageLoader from "~/components/ui/page-loader";
-import { BlogPostForm } from "~/modules/blog-posts/admin/product-form";
+import { BlogPostForm } from "~/modules/blog-posts/admin/blog-post-form";
 
 interface IProps {
   storeId: string;

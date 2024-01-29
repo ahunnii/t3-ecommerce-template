@@ -40,7 +40,10 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                     className={cn(
                       navigationMenuTriggerStyle(),
                       primaryLinkStyle,
-                      pathname === navlink.href && highlightStyle
+
+                      (pathname === navlink.href ||
+                        pathname.startsWith(`${navlink.href}`)) &&
+                        highlightStyle
                     )}
                   >
                     {navlink.title}
@@ -50,7 +53,14 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
             if (navlink.links) {
               return (
                 <NavigationMenuItem key={idx}>
-                  <NavigationMenuTrigger className={cn(primaryLinkStyle, " ")}>
+                  <NavigationMenuTrigger
+                    className={cn(
+                      primaryLinkStyle,
+                      (pathname === navlink?.pathname ||
+                        pathname?.startsWith(`${navlink?.pathname}`)) &&
+                        highlightStyle
+                    )}
+                  >
                     {navlink.title}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -61,7 +71,9 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                           title={component.title}
                           href={component.href}
                           className={cn(
-                            pathname === component.href && highlightStyle
+                            (pathname === component.href ||
+                              pathname?.startsWith(`${component.href}`)) &&
+                              highlightStyle
                           )}
                         >
                           {component.description}

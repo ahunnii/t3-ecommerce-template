@@ -1,32 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  Attribute,
-  Category,
-  Image,
-  Product,
-  ProductType,
-  ShippingType,
-  Tag,
-  Variation,
-} from "@prisma/client";
+import type { Tag } from "@prisma/client";
 
 import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import { useForm } from "react-hook-form";
+
 import * as z from "zod";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -43,28 +26,20 @@ import {
 import { Heading } from "~/components/ui/heading";
 // import ImageLoader from "~/components/ui/image-loader";
 
-import { StringOrTemplateHeader } from "@tanstack/react-table";
-import { title } from "process";
 import { Input } from "~/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+
 import { Separator } from "~/components/ui/separator";
 import { TagInput } from "~/components/ui/tag-input";
-import { Textarea } from "~/components/ui/textarea";
+
+import MarkdownEditor from "~/components/common/inputs/markdown-editor";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import MarkdownEditor from "../../../components/common/inputs/markdown-editor";
-import { BlogPost } from "../types";
+import type { BlogPost } from "../types";
 
 const formSchema = z.object({
   title: z.string().min(1),
-  featuredImg: z.string().min(1),
+  featuredImg: z.string().optional(),
   tags: z.array(z.object({ name: z.string(), id: z.string() })),
   content: z.string(),
   author: z.string().optional(),
@@ -93,11 +68,11 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
   const action = initialData ? "Save changes" : "Create";
 
   const defaultValues = {
-    title: initialData?.title ?? "",
-    featuredImg: initialData?.featuredImg ?? "",
-    content: initialData?.content ?? "",
-    author: initialData?.author ?? "",
-    slug: initialData?.slug ?? "",
+    title: initialData?.title ?? undefined,
+    featuredImg: initialData?.featuredImg ?? undefined,
+    content: initialData?.content ?? undefined,
+    author: initialData?.author ?? undefined,
+    slug: initialData?.slug ?? undefined,
     published: initialData?.published ?? false,
     tags: initialData?.tags ?? [],
   };
@@ -157,12 +132,18 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
     if (initialData) {
       updateBlogPost({
         ...data,
+        slug: data?.slug
+          ? data?.slug.toLowerCase().replace(/ /g, "-")
+          : undefined,
         storeId: params.query.storeId as string,
         blogPostId: params.query.blogPostId as string,
       });
     } else {
       createBlogPost({
         ...data,
+        slug: data?.slug
+          ? data?.slug.toLowerCase().replace(/ /g, "-")
+          : undefined,
         storeId: params.query.storeId as string,
       });
     }
@@ -234,7 +215,27 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
                       </FormItem>
                     )}
                   />
-
+                  <FormField
+                    control={form.control}
+                    name="slug"
+                    render={({ field }) => (
+                      <FormItem className="col-span-full">
+                        <FormLabel>Slug</FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={loading}
+                            placeholder="e.g. Cool new blog post!"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Defaults to title if left blank. The url of your blog
+                          post.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="content"

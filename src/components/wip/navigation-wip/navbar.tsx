@@ -18,6 +18,7 @@ export type SiteLinks = {
   title: string;
   href?: string | undefined;
   description?: string;
+  pathname?: string;
   links?:
     | [
         {
@@ -46,6 +47,7 @@ const Navbar = ({
       },
       {
         title: "The Shop",
+
         links: [
           {
             title: "About Us",
@@ -73,8 +75,10 @@ const Navbar = ({
           },
         ],
       },
+
       collections && {
         title: "Collections",
+        pathname: "/collections",
         links: [
           ...collections?.map((collection) => ({
             title: collection?.name,
@@ -87,6 +91,10 @@ const Navbar = ({
             description: "",
           },
         ],
+      },
+      {
+        title: "Blog",
+        href: "/blog",
       },
       {
         title: "Contact Us",
