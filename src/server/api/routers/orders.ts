@@ -51,6 +51,7 @@ export const ordersRouter = createTRPCRouter({
             },
           },
           shippingLabel: true,
+          timeline: true,
         },
         orderBy: {
           createdAt: "desc",

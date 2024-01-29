@@ -8,6 +8,8 @@ export const formatOrderTableData = (item: DetailedOrder) => ({
   phone: item.phone,
   name: item.name,
   address: item.address,
+  shippingLabel: item.shippingLabel,
+  timeline: item.timeline,
   products: item.orderItems
     .map((orderItem) => orderItem.product.name)
     .join(", "),

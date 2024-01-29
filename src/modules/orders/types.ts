@@ -21,5 +21,19 @@ export type DetailedOrder = Prisma.OrderGetPayload<{
       };
     };
     shippingLabel: true;
+    timeline: true;
+  };
+}>;
+
+export type PaymentOrder = Prisma.OrderGetPayload<{
+  include: {
+    orderItems: {
+      include: {
+        variant: true;
+        product: true;
+      };
+    };
+
+    timeline: true;
   };
 }>;

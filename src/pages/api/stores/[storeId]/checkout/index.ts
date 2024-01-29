@@ -5,10 +5,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createTRPCContext } from "~/server/api/trpc";
 
 import axios from "axios";
-import type { Stripe } from "stripe";
-import { env } from "~/env.mjs";
-import { stripe } from "~/server/stripe/client";
+
 import { type CartItem } from "~/types";
+
+import paymentService from "~/services/payment";
 
 const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const ctx = await createTRPCContext({ req, res });
@@ -38,120 +38,28 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const verifiedDBData = (await verifiedDBDataResponse.data
             .detailedCartItems) as CartItem[];
-          // const products = await ctx.prisma.product.findMany({
-          //   where: {
-          //     id: {
-          //       in: productIds,
-          //     },
-          //   },
-          //   include: {
-          //     variants: true,
-          //     images: true,
-          //   },
-          // });
 
-          // const variants = await ctx.prisma.variation.findMany({
-          //   where: {
-          //     id: {
-          //       in: variantIds,
-          //     },
-          //   },
-          // });
-
-          const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-
-          // const completionDates = cartItems.map((item: CartItem) => {
-          //   console.log(item.product.estimatedCompletion);
-          //   return (item.product?.estimatedCompletion ?? 1) * item.quantity;
-          // });
-          // console.log(completionDates);
-          // const longestDate = Math.max(
-          //   ...(cartItems.map(
-          //     (item: CartItem) =>
-          //       item.product?.estimatedCompletion ?? 1 * item.quantity
-          //   ) as number[])
-          // );
-          // console.log(longestDate);
-          // const estDelivery = new Date(
-          //   Date.now() + longestDate * 24 * 60 * 60 * 1000
-          // ).toLocaleDateString();
-
-          // console.log(estDelivery);
-          const shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption =
-            shipping === "FREE"
-              ? {
-                  shipping_rate_data: {
-                    type: "fixed_amount",
-                    fixed_amount: {
-                      amount: 0,
-                      currency: "usd",
-                    },
-                    display_name: "Free Shipping",
-                    delivery_estimate: {
-                      minimum: {
-                        unit: "business_day",
-                        value: 5,
-                      },
-                      maximum: {
-                        unit: "business_day",
-                        value: 7,
-                      },
-                    },
-                  },
-                }
-              : {
-                  shipping_rate_data: {
-                    type: "fixed_amount",
-                    fixed_amount: {
-                      amount: shipping * 100,
-                      currency: "usd",
-                    },
-                    display_name: `[Fixed] Standard 5-7 days after product processing.`,
-
-                    delivery_estimate: {
-                      minimum: {
-                        unit: "business_day",
-                        value: 5,
-                      },
-                      maximum: {
-                        unit: "business_day",
-                        value: 7,
-                      },
-                    },
-                  },
-                };
-
-          // // Map the values key from the fetched variants to the variant IDs
-          // const mapValuesToIds = () => {
-          //   const variantIdToValueMap: Record<string, string> = {};
-          //   for (const variant of variants) {
-          //     variantIdToValueMap[variant.id] = variant.values;
-          //   }
-
-          //   return variantIds.map((id: string) =>
-          //     id === "0" ? "Default" : variantIdToValueMap[id]
-          //   );
-          // };
-
-          // const variantValues = mapValuesToIds();
-
-          verifiedDBData.forEach((product, idx) => {
-            line_items.push({
-              quantity: Number(quantity[idx]) ?? 1,
-              price_data: {
-                currency: "USD",
-                product_data: {
-                  name: product.product.name,
-                  description: product.variant?.values,
-
-                  images: product.product.images.map((image) => image.url),
-                },
-                unit_amount: Math.floor(product.product.price * 100),
-              },
-            });
+          const line_items = paymentService.createLineItems({
+            cartItems: verifiedDBData,
+            quantities: quantity,
           });
 
+          const shipping_options = paymentService.createShippingOptions([
+            shipping === "FREE"
+              ? {
+                  type: "FREE",
+                  label: "Free Shipping",
+                  cost: 0,
+                }
+              : {
+                  type: "FLAT_RATE",
+                  label: "[Fixed] Standard 5-7 days after product processing.",
+                  cost: shipping,
+                },
+          ]);
+
           const currentUser = ctx?.session?.user;
+
           const order = await ctx.prisma.order.create({
             data: {
               storeId: storeId as string,
@@ -187,41 +95,13 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           });
 
-          const session = await stripe.checkout.sessions.create({
-            line_items,
-            mode: "payment",
-            payment_method_types: ["card"],
-            billing_address_collection: "required",
-            shipping_address_collection: {
-              allowed_countries: ["US", "CA"],
-            },
-            shipping_options: [shippingOptions],
-            phone_number_collection: {
-              enabled: true,
-            },
-            automatic_tax: {
-              enabled: true,
-            },
-
-            // invoice_creation: {
-            //   enabled: true,
-            // },
-            custom_text: {
-              shipping_address: {
-                message: `Please note that things made to order takes additional processing time before shipping. Check estimated delivery dates of products to see when to expect your item(s).`,
-              },
-            },
-
-            // success_url: `http://localhost:3000/cart?success=1`,
-            success_url: `${env.NEXT_PUBLIC_URL}/cart/success?orderId=${order.id}`,
-            cancel_url: `${env.NEXT_PUBLIC_URL}/cart?canceled=1`,
-
-            metadata: {
-              orderId: order.id,
-            },
+          const session = await paymentService.createCheckoutSession({
+            items: line_items,
+            shippingOptions: shipping_options,
+            orderId: order.id,
           });
 
-          return res.json({ url: session.url });
+          return res.json(session);
         } catch (err) {
           return res
             .status(500)

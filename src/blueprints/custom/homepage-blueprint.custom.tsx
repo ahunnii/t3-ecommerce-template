@@ -12,6 +12,7 @@ import { TaProductList } from "~/components/custom/ta-product-list.custom";
 
 import Link from "next/link";
 
+import { FeaturedBanner } from "~/components/wip/featured-banner.wip";
 import { storeTheme } from "~/data/config.custom";
 
 const metadata = {
@@ -34,6 +35,7 @@ export const HomePage = () => {
         mainStyle="bg-black"
         metadata={metadata}
       >
+        {/* <FeaturedBanner /> */}
         <div className="mx-auto my-8  max-w-7xl bg-black py-4">
           <TaHero />
         </div>

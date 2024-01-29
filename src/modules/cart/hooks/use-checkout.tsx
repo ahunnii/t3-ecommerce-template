@@ -49,12 +49,15 @@ const useCheckout = () => {
     const { hasFreeShipping, hasFlatRate, minFreeShipping, flatRateAmount } =
       store;
 
+    console.log(store);
     if (hasFreeShipping && totalPrice >= (minFreeShipping ?? 0)) return 0;
-    else if (hasFlatRate) return flatRateAmount ?? 0;
+    else if (hasFlatRate) return flatRateAmount;
     else {
       console.error("Checkout Summary Error: Flat rate not set up");
       return 0;
     }
+
+    console.log();
   }, [store, totalPrice, cartItems]);
 
   const checkIfCheckoutWasSuccessful = useCallback(() => {

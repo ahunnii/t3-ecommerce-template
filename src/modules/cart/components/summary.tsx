@@ -2,6 +2,8 @@ import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
 
 import { useConfig } from "~/providers/style-config-provider";
+
+import { CreditCard } from "lucide-react";
 import { cn } from "~/utils/styles";
 import useCheckout from "../hooks/use-checkout";
 

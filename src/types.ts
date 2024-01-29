@@ -1,4 +1,4 @@
-import type { Prisma, Product } from "@prisma/client";
+import type { Prisma, Product, ShippingType } from "@prisma/client";
 
 // export interface Product {
 //   id: string;
@@ -125,5 +125,12 @@ export type DetailedOrder = Prisma.OrderGetPayload<{
       };
     };
     shippingLabel: true;
+    timeline: true;
   };
 }>;
+
+export type CustomerShippingRate = {
+  type: ShippingType;
+  cost: number;
+  label: string;
+};

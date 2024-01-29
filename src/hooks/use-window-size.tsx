@@ -1,4 +1,5 @@
-import { useLayoutEffect, useState } from "react";
+import { useIsomorphicLayoutEffect } from "framer-motion";
+import { useState } from "react";
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
@@ -10,7 +11,7 @@ const useWindowSize = () => {
     });
   };
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     handleSize();
 
     window.addEventListener("resize", handleSize);

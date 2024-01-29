@@ -21,6 +21,19 @@ model Example {
   updatedAt DateTime @updatedAt
 }
 
+
+model Address {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  street     String
+  additional String?
+  city       String
+  state      String
+  zip        String
+  country    String?
+}
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
@@ -316,7 +329,7 @@ model TimeLineEntry {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   order           Order?      @relation( fields: [orderId], references: [id])
-  orderId         String?     @unique
+  orderId         String? 
   @@index([orderId])
 }
 
@@ -330,6 +343,13 @@ enum TimeLineEntryType{
   ORDER_RETURNED
   ORDER_NOTE
   ORDER_GENERIC
+  PAYMENT_FAILED
+  PAYMENT_SUCCESSFUL
+  PAYMENT_PENDING
+  PAYMENT_REFUNDED
+  PAYMENT_INITIATED
+  ORDER_PENDING
+  ORDER_SUCCESSFUL
 }
 
 
