@@ -31,6 +31,8 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 
+import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
@@ -63,6 +65,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const router = useNavigationRouter();
   const apiContext = api.useContext();
 
+  const { storeId, categoryId } = params.query as {
+    storeId: string;
+    categoryId: string;
+  };
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +81,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: initialData?.name ?? "",
+      name: initialData?.name ?? undefined,
       billboardId: initialData?.billboardId ?? undefined,
       attributes: initialData?.attributes ?? [],
     },
@@ -86,57 +93,58 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   });
 
   const { mutate: updateCategory } = api.categories.updateCategory.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/categories`);
-      toast.success(toastMessage);
-    },
-    onError: (error) => {
-      toast.error("Something went wrong");
-      console.error(error);
-    },
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error) =>
+      toastService.error(
+        "Something went wrong with updating the category.",
+        error
+      ),
     onMutate: () => setLoading(true),
     onSettled: () => {
       setLoading(false);
-      void apiContext.categories.getCategory.invalidate();
+      router.push(`/admin/${storeId}/categories`);
+      void apiContext.categories.invalidate();
     },
   });
 
   const { mutate: createCategory } = api.categories.createCategory.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/categories/`);
-      toast.success(toastMessage);
-    },
-    onError: (error) => {
-      toast.error("Something went wrong");
-      console.error(error);
-    },
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error) =>
+      toastService.error(
+        "Something went wrong with creating the category.",
+        error
+      ),
     onMutate: () => setLoading(true),
-    onSettled: () => setLoading(false),
+    onSettled: () => {
+      setLoading(false);
+      router.push(`/admin/${storeId}/categories`);
+      void apiContext.categories.invalidate();
+    },
   });
 
   const { mutate: deleteCategory } = api.categories.deleteCategory.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/categories`);
-      toast.success("Category deleted.");
-    },
-    onError: (error) => {
-      toast.error("Make sure you removed all products using this color first.");
-      console.error(error);
-    },
+    onSuccess: () => toastService.success("Category was successfully deleted."),
+    onError: (error) =>
+      toastService.error(
+        "Make sure you remove all products using this category first before deleting.",
+        error
+      ),
     onMutate: () => setLoading(true),
     onSettled: () => {
       setLoading(false);
       setOpen(false);
+      router.push(`/admin/${storeId}/categories`);
+      void apiContext.categories.invalidate();
     },
   });
 
   const onSubmit = (data: CategoryFormValues) => {
     if (initialData) {
       updateCategory({
-        storeId: params?.query?.storeId as string,
+        storeId,
+        categoryId,
         billboardId: data?.billboardId ?? "",
         name: data.name,
-        categoryId: params?.query?.categoryId as string,
         attributes: data.attributes.map((attribute) => ({
           ...attribute,
           storeId: params?.query?.storeId as string,
@@ -144,7 +152,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       });
     } else {
       createCategory({
-        storeId: params?.query?.storeId as string,
+        storeId,
         name: data.name,
         billboardId: data?.billboardId ?? "",
         attributes: data.attributes.map((attribute) => ({
@@ -169,6 +177,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
+      />
+      <BackToButton
+        link={`/admin/${storeId}/categories/${categoryId ?? ""}`}
+        title="Back to Category"
       />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
@@ -249,6 +261,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               Attributes are common product types associated with this category.
               Add attributes to quickly make variants of your products. I.E.
               sizes, colors, materials, etc.{" "}
+              <strong>
+                Note: Variant values are a single string separated by a
+                semicolon.(S;M;L;XL){" "}
+              </strong>
             </FormDescription>
 
             {fields.map((item, index) => (
@@ -267,7 +283,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 
                 <Controller
                   render={({ field }) => (
-                    <Input {...field} placeholder="Value (e.g., M, Red)" />
+                    <Input
+                      {...field}
+                      placeholder="String of values i.e. S;M;L;XL"
+                    />
                   )}
                   name={`attributes.${index}.values`}
                   control={form.control}

@@ -13,7 +13,7 @@ import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
 import { Overview } from "~/components/admin/overview";
-import AdminLayout from "~/components/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";

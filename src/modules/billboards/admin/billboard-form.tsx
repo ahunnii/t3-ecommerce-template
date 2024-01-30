@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Billboard } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+
 import * as z from "zod";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
@@ -17,6 +17,8 @@ import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 
+import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
@@ -57,57 +59,59 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const form = useForm<BillboardFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      label: initialData?.label ?? "",
-      imageUrl: initialData?.imageUrl ?? "",
+      label: initialData?.label ?? undefined,
+      imageUrl: initialData?.imageUrl ?? undefined,
       description: initialData?.description ?? undefined,
     },
   });
 
-  const onMutateSuccess = () => {
-    router.push(`/admin/${storeId}/billboards`);
-    toast.success(toastMessage);
-  };
-
-  const onMutateError = (error: unknown) => {
-    toast.error("Something went wrong");
-    console.error(error);
-  };
-
   const { mutate: updateBillboard } =
     api.billboards.updateBillboard.useMutation({
-      onSuccess: onMutateSuccess,
-      onError: onMutateError,
+      onSuccess: () => toastService.success(toastMessage),
+      onError: (error: unknown) =>
+        toastService.error(
+          "Something went wrong updating your billboard.",
+          error
+        ),
       onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
-        void apiContext.billboards.getBillboard.invalidate();
+        router.push(`/admin/${storeId}/billboards`);
+        void apiContext.billboards.invalidate();
       },
     });
 
   const { mutate: createBillboard } =
     api.billboards.createBillboard.useMutation({
-      onSuccess: onMutateSuccess,
-      onError: onMutateError,
+      onSuccess: () => toastService.success(toastMessage),
+      onError: (error: unknown) =>
+        toastService.error(
+          "Something went wrong creating your billboard.",
+          error
+        ),
       onMutate: () => setLoading(true),
-      onSettled: () => setLoading(false),
+      onSettled: () => {
+        setLoading(false);
+        router.push(`/admin/${storeId}/billboards`);
+        void apiContext.billboards.invalidate();
+      },
     });
 
   const { mutate: deleteBillboard } =
     api.billboards.deleteBillboard.useMutation({
-      onSuccess: () => {
-        router.push(`/admin/${storeId}/billboards`);
-        toast.success("Billboards deleted.");
-      },
-      onError: (error) => {
-        toast.error(
-          "Make sure you removed all products using this billboards first."
-        );
-        console.error(error);
-      },
+      onSuccess: () =>
+        toastService.success("Billboard was successfully deleted."),
+      onError: (error: unknown) =>
+        toastService.error(
+          "Make sure to remove all items using this billboard first before deleting.",
+          error
+        ),
       onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
         setOpen(false);
+        router.push(`/admin/${storeId}/billboards`);
+        void apiContext.billboards.invalidate();
       },
     });
 
@@ -138,6 +142,10 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
+      />
+      <BackToButton
+        link={`/admin/${storeId}/billboards/${billboardId ?? ""}`}
+        title="Back to Billboard"
       />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />

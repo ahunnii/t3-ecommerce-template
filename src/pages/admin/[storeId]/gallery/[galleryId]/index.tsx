@@ -5,12 +5,15 @@ import PageLoader from "~/components/ui/page-loader";
 import { GalleryForm } from "~/modules/gallery/admin/gallery-form";
 
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner, authenticateSession } from "~/utils/auth";
 
 import { Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import AdminLayout from "~/components/layouts/AdminLayout";
+import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
+import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/utils/styles";
 
@@ -26,12 +29,15 @@ const GalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
 
   return (
     <AdminLayout>
-      <div className="flex h-full flex-col">
+      {isLoading && <AbsolutePageLoader />}
+      {!isLoading && (
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {isLoading && <PageLoader />}
-          {!galleryImage && <div>Gallery image not found</div>}
-          {!isLoading && galleryImage && (
+          {galleryImage && (
             <>
+              <BackToButton
+                link={`/admin/${storeId}/gallery`}
+                title="Back to Gallery"
+              />
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
@@ -72,23 +78,19 @@ const GalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
               </div>
             </>
           )}
+          {!galleryImage && (
+            <DataFetchErrorMessage message="There seems to be an issue with loading the image." />
+          )}
         </div>
-      </div>
+      )}
     </AdminLayout>
   );
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
+  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
 
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
+  if (!store || !user) return { redirect };
 
   return {
     props: {

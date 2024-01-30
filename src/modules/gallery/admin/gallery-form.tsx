@@ -37,6 +37,7 @@ import { Heading } from "~/components/ui/heading";
 
 import { Input } from "~/components/ui/input";
 
+import { BackToButton } from "~/components/common/buttons/back-to-button";
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
 import { Separator } from "~/components/ui/separator";
 import ImageUpload from "~/services/image-upload/components/image-upload";
@@ -85,11 +86,15 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
   });
 
   const apiContext = api.useContext();
+  const { storeId, galleryId } = params.query as {
+    storeId: string;
+    galleryId: string;
+  };
 
   const { mutate: updateBlogPost } = api.gallery.updateGalleryImage.useMutation(
     {
       onSuccess: () => toastService.success(toastMessage),
-      onError: (error) =>
+      onError: (error: unknown) =>
         toastService.error(
           "Something went wrong with updating. Please try again later.",
           error
@@ -106,7 +111,7 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
   const { mutate: createBlogPost } = api.gallery.createGalleryImage.useMutation(
     {
       onSuccess: () => toastService.success(toastMessage),
-      onError: (error) =>
+      onError: (error: unknown) =>
         toastService.error(
           "Something went wrong with creating. Please try again later.",
           error
@@ -168,6 +173,10 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
         onConfirm={onDelete}
         loading={loading}
       />{" "}
+      <BackToButton
+        link={`/admin/${storeId}/gallery/${galleryId ?? ""}`}
+        title="Back to Gallery"
+      />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
 

@@ -1,6 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { format } from "date-fns";
 import Link from "next/link";
+import Currency from "~/components/core/ui/currency";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/utils/styles";
 import { CellAction } from "./cell-action";
@@ -8,14 +10,12 @@ import { CellAction } from "./cell-action";
 export type OrderColumn = {
   id: string;
   storeId: string;
-  phone: string;
-  name: string;
-  address: string;
+
   isPaid: boolean;
-  totalPrice: string;
-  products: string;
-  createdAt: string;
-  labelCreated: boolean;
+  total: number;
+
+  createdAt: Date;
+
   isShipped: boolean;
 };
 
@@ -37,7 +37,9 @@ export const columns: ColumnDef<OrderColumn>[] = [
     accessorKey: "createdAt",
     header: "Date added",
     cell: ({ row }) => {
-      return <p className="">{row.original.createdAt}</p>;
+      return (
+        <p className="">{format(row.original.createdAt, "MMMM do, yyyy")}</p>
+      );
     },
   },
 
@@ -70,8 +72,13 @@ export const columns: ColumnDef<OrderColumn>[] = [
     },
   },
   {
-    accessorKey: "totalPrice",
+    accessorKey: "total",
     header: "Total price",
+    cell: ({ row }) => {
+      return (
+        <Currency className="font-base" value={row.original.total / 100} />
+      );
+    },
   },
 
   {

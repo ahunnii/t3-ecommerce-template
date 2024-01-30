@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
@@ -11,14 +12,20 @@ export type ProductColumn = {
   id: string;
   storeId: string;
   name: string;
-  price: string;
-  category: string;
+  price: number;
+  category: {
+    id: string;
+    name: string;
+  };
 
-  createdAt: string;
+  createdAt: Date;
   isFeatured: boolean;
   isArchived: boolean;
   featuredImage?: string | null;
-  images?: string[] | null;
+  // images?: {
+  //   id: string;
+  //   url: string;
+  // }[];
 };
 
 export const columns: ColumnDef<ProductColumn>[] = [
@@ -61,15 +68,34 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "price",
     header: "Price",
+    cell: ({ row }) => {
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(row.original.price);
+
+      return <div>{formatted}</div>;
+    },
   },
   {
     accessorKey: "category",
     header: "Category",
+    cell: ({ row }) => (
+      <Link
+        href={`/admin/${row.original.storeId}/categories/${row.original.category.id}`}
+        className="text-sm font-medium text-gray-900"
+      >
+        <Button variant={"link"} className="mx-0 px-0">
+          {row.original.category.name}
+        </Button>
+      </Link>
+    ),
   },
 
   {
     accessorKey: "createdAt",
     header: "Date",
+    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
   },
   {
     id: "actions",

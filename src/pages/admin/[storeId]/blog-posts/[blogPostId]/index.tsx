@@ -5,7 +5,7 @@ import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
 import Head from "next/head";
-import AdminLayout from "~/components/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
 
 import { Pencil } from "lucide-react";

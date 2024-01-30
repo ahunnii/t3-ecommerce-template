@@ -9,7 +9,8 @@ import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 
-import AdminLayout from "~/components/layouts/AdminLayout";
+import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import AdminLayout from "~/components/layouts/admin-layout";
 import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
 import { formatOrderTableData } from "~/modules/orders/utils/format-order-table-data";
 import type { DetailedOrder } from "~/types";
@@ -19,27 +20,19 @@ interface IProps {
 }
 
 const OrdersPage: FC<IProps> = ({ storeId }) => {
-  const [formattedOrders, setFormattedOrders] = useState<OrderColumn[]>([]);
-  const { data: orders } = api.orders.getAllOrders.useQuery({
+  const { data: orders, isLoading } = api.orders.getAllOrders.useQuery({
     storeId,
   });
   const { data } = useShippingModal();
-  const formatOrders = useCallback((orders: DetailedOrder[]) => {
-    return orders.map((item: DetailedOrder) => formatOrderTableData(item));
-  }, []);
-
-  useEffect(() => {
-    if (orders) setFormattedOrders(formatOrders(orders) as OrderColumn[]);
-  }, [orders, formatOrders]);
 
   return (
     <AdminLayout>
-      {" "}
-      <ShippingModal data={data ?? ""} />
+      {isLoading && <AbsolutePageLoader />}
+
+      {orders && <ShippingModal data={data ?? ""} />}
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {!orders && <PageLoader />}
-          {orders && <OrderClient data={formattedOrders} />}
+          <OrderClient data={orders ?? []} />
         </div>
       </div>
     </AdminLayout>

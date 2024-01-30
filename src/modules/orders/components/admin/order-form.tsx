@@ -41,6 +41,7 @@ import { Separator } from "~/components/ui/separator";
 
 import { Label } from "~/components/ui/label";
 
+import { BackToButton } from "~/components/common/buttons/back-to-button";
 import {
   Select,
   SelectContent,
@@ -99,6 +100,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   const router = useNavigationRouter();
   const utils = api.useContext();
 
+  const { storeId, orderId } = params.query as {
+    storeId: string;
+    orderId: string;
+  };
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -232,6 +237,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
+      />
+      <BackToButton
+        link={`/admin/${storeId}/orders/${orderId ?? ""}`}
+        title="Back to Order"
       />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />

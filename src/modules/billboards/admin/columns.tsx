@@ -4,11 +4,13 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { CellAction } from "./cell-action";
 
+import { format } from "date-fns";
+
 export type BillboardColumn = {
   id: string;
   storeId: string;
   label: string;
-  createdAt: string;
+  createdAt: Date;
 };
 
 export const columns: ColumnDef<BillboardColumn>[] = [
@@ -28,6 +30,7 @@ export const columns: ColumnDef<BillboardColumn>[] = [
   {
     accessorKey: "createdAt",
     header: "Date",
+    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
   },
   {
     id: "actions",

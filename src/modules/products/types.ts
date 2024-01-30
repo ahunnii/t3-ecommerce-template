@@ -13,3 +13,15 @@ export type SingleProduct = Prisma.ProductGetPayload<{
     };
   };
 }>;
+
+export type CategoryProduct = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    variants: true;
+    category: {
+      include: {
+        attributes: true;
+      };
+    };
+  };
+}>;

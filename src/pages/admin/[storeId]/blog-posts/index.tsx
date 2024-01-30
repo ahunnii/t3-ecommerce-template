@@ -9,7 +9,7 @@ import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
-import AdminLayout from "~/components/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
 import { ProductsClient } from "~/modules/blog-posts/admin/client";
 import { BlogPost } from "~/modules/blog-posts/types";

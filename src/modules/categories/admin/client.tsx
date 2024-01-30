@@ -1,15 +1,14 @@
-"use client";
-
-import { Plus } from "lucide-react";
-import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 
+import { Plus } from "lucide-react";
+
+import { ApiList } from "~/components/ui/api-list";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
-import { ApiList } from "~/components/ui/api-list";
+import Link from "next/link";
 import { columns, type CategoryColumn } from "./columns";
 
 interface CategoriesClientProps {
@@ -18,7 +17,7 @@ interface CategoriesClientProps {
 
 export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
   const params = useRouter();
-  const navigate = useNavigationRouter();
+  const storeId = params.query.storeId as string;
 
   return (
     <>
@@ -27,19 +26,15 @@ export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
           title={`Categories (${data.length})`}
           description="Manage categories for your store. Products are assigned a category, which includes shared attributes that can used to generate product variants."
         />
-        <Button
-          onClick={() =>
-            navigate.push(
-              `/admin/${params.query.storeId as string}/categories/new`
-            )
-          }
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add New
-        </Button>
+        <Link href={`/admin/${storeId}/categories/new`}>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Add New
+          </Button>
+        </Link>
       </div>
       <Separator />
       <DataTable searchKey="name" columns={columns} data={data} />
-      <Heading title="API" description="API Calls for Categories" />
+      <Heading title="Public API" description="API Calls for Categories" />
       <Separator />
       <ApiList entityName="categories" entityIdName="categoryId" />
     </>

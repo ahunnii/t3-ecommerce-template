@@ -1,11 +1,7 @@
-"use client";
-
-import axios from "axios";
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
-import { useRouter as useNavigationRouter } from "next/navigation";
+
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -17,6 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
+import Link from "next/link";
+import { toastService } from "~/services/toast";
+import { api } from "~/utils/api";
 import type { ProductColumn } from "./columns";
 
 interface CellActionProps {
@@ -26,35 +25,42 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const router = useNavigationRouter();
+
   const params = useRouter();
 
-  const onConfirm = async () => {
-    try {
-      setLoading(true);
-      await axios.delete(
-        `/api/${params.query.storeId as string}/products/${data.id}`
-      );
-      toast.success("Product deleted.");
-      router.refresh();
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
+  const apiContext = api.useContext();
+
+  const { storeId } = params.query as { storeId: string };
+  const productId = data.id;
+
+  const baseUrl = `/admin/${storeId}/products/${productId}`;
+
+  const { mutate: deleteProduct } = api.products.deleteProduct.useMutation({
+    onSuccess: () => toastService.success("Product was successfully deleted"),
+    onError: (error) =>
+      toastService.error(
+        "Make sure you removed all products using this collection first.",
+        error
+      ),
+    onMutate: () => setLoading(true),
+    onSettled: () => {
+      void apiContext.products.invalidate();
       setLoading(false);
       setOpen(false);
-    }
+    },
+  });
+
+  const onCopySelection = () => {
+    navigator.clipboard
+      .writeText(productId)
+      .then(() => toastService.success("Collection ID copied to clipboard."))
+      .catch((e) =>
+        toastService.error("Failed to copy collection ID to clipboard.", e)
+      );
   };
 
-  const onCopy = (id: string) => {
-    navigator.clipboard
-      .writeText(id)
-      .then(() => {
-        toast.success("Product ID copied to clipboard.");
-      })
-      .catch(() => {
-        toast.error("Failed to copy Product ID to clipboard.");
-      });
-  };
+  const onConfirm = () => deleteProduct({ storeId, productId });
+  const onDeleteSelection = () => setOpen(true);
 
   return (
     <>
@@ -73,30 +79,22 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(data.id)}>
+          <DropdownMenuItem onClick={onCopySelection}>
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              router.push(
-                `/admin/${params.query.storeId as string}/products/${data.id}`
-              )
-            }
-          >
-            <Eye className="mr-2 h-4 w-4" /> View
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              router.push(
-                `/admin/${params.query.storeId as string}/products/${
-                  data.id
-                }/edit`
-              )
-            }
-          >
-            <Edit className="mr-2 h-4 w-4" /> Update
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+
+          <Link href={baseUrl}>
+            <DropdownMenuItem>
+              <Eye className="mr-2 h-4 w-4" /> View
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`${baseUrl}/edit`}>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-4 w-4" /> Update
+            </DropdownMenuItem>
+          </Link>
+
+          <DropdownMenuItem onClick={onDeleteSelection}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

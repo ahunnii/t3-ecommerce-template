@@ -6,7 +6,7 @@ import { authenticateSession } from "~/utils/auth";
 
 import Head from "next/head";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
-import AdminLayout from "~/components/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
 import { BlogPostForm } from "~/modules/blog-posts/admin/blog-post-form";
 

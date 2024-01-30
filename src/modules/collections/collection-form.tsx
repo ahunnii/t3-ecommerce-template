@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
+import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -32,6 +33,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
+import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
 
@@ -61,6 +63,12 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
 }) => {
   const params = useRouter();
   const router = useNavigationRouter();
+  const apiContext = api.useContext();
+
+  const { storeId, collectionId } = params.query as {
+    storeId: string;
+    collectionId: string;
+  };
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -77,13 +85,11 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   const form = useForm<CollectionFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: initialData?.name ?? "",
+      name: initialData?.name ?? undefined,
       billboardId: initialData?.billboardId ?? undefined,
       products: initialData?.products ?? [],
     },
   });
-
-  const apiContext = api.useContext();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -127,58 +133,57 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   const { mutate: updateCollection } =
     api.collections.updateCollection.useMutation({
       onSuccess: () => {
-        router.push(`/admin/${params.query.storeId as string}/collections`);
-        toast.success(toastMessage);
+        toastService.success(toastMessage),
+          router.push(`/admin/${params.query.storeId as string}/collections`);
       },
-      onError: (error) => {
-        toast.error("Something went wrong");
-        console.error(error);
-      },
-      onMutate: () => {
-        setLoading(true);
-      },
+
+      onError: (error: unknown) =>
+        toastService.error(
+          "Something went wrong with updating your collection.",
+          error
+        ),
+      onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
-        void apiContext.collections.getCollection.invalidate();
+        void apiContext.collections.invalidate();
       },
     });
 
   const { mutate: createCollection } =
     api.collections.createCollection.useMutation({
       onSuccess: () => {
-        router.push(`/admin/${params.query.storeId as string}/collections/`);
-        toast.success(toastMessage);
+        toastService.success(toastMessage),
+          router.push(`/admin/${params.query.storeId as string}/collections`);
       },
-      onError: (error) => {
-        toast.error("Something went wrong");
-        console.error(error);
-      },
-      onMutate: () => {
-        setLoading(true);
-      },
+      onError: (error: unknown) =>
+        toastService.error(
+          "Something went wrong with creating your collection.",
+          error
+        ),
+      onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
+        void apiContext.collections.invalidate();
       },
     });
 
   const { mutate: deleteCollection } =
     api.collections.deleteCollection.useMutation({
       onSuccess: () => {
-        router.push(`/admin/${params.query.storeId as string}/collections`);
-        toast.success("Collection deleted.");
+        toastService.success("Collection was successfully deleted"),
+          router.push(`/admin/${params.query.storeId as string}/collections`);
       },
-      onError: (error) => {
-        toast.error(
-          "Make sure you removed all products using this color first."
-        );
-        console.error(error);
-      },
-      onMutate: () => {
-        setLoading(true);
-      },
+
+      onError: (error: unknown) =>
+        toastService.error(
+          "Something went wrong with creating your collection.",
+          error
+        ),
+      onMutate: () => setLoading(true),
       onSettled: () => {
         setLoading(false);
         setOpen(false);
+        void apiContext.collections.invalidate();
       },
     });
 
@@ -217,6 +222,10 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
+      />
+      <BackToButton
+        link={`/admin/${storeId}/collections/${collectionId ?? ""}`}
+        title="Back to Collection"
       />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />

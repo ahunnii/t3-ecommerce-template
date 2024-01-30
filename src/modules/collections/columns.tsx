@@ -1,7 +1,6 @@
-"use client";
-
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { CellAction } from "./cell-action";
@@ -10,8 +9,11 @@ export type CollectionColumn = {
   id: string;
   storeId: string;
   name: string;
-  products: number;
-  createdAt: string;
+  products: {
+    id: string;
+    name: string;
+  }[];
+  createdAt: Date;
 };
 
 export const columns: ColumnDef<CollectionColumn>[] = [
@@ -33,11 +35,15 @@ export const columns: ColumnDef<CollectionColumn>[] = [
   },
   {
     accessorKey: "products",
-    header: "Products",
+    header: "# of Products",
+    cell: ({ row }) => (
+      <div className="flex items-center">{row.original.products.length}</div>
+    ),
   },
   {
     accessorKey: "createdAt",
     header: "Date",
+    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
   },
   {
     id: "actions",

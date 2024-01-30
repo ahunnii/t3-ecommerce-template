@@ -90,6 +90,7 @@ model VerificationToken {
 model Store {
   id                String       @id @default(uuid())
   name              String
+  slug              String?        @unique
   userId            String
   businessAddress   String       @default("")
   billboards        Billboard[]  @relation("StoreToBillboard")

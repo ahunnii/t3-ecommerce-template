@@ -1,72 +1,43 @@
 import type { GetServerSidePropsContext } from "next";
-import { useCallback, useEffect, useState, type FC } from "react";
+import { type FC } from "react";
 
-import { format } from "date-fns";
-
-import PageLoader from "~/components/ui/page-loader";
 import { CollectionsClient } from "~/modules/collections/client";
-import type { CollectionColumn } from "~/modules/collections/columns";
 
-import AdminLayout from "~/components/layouts/AdminLayout";
+import AdminLayout from "~/components/layouts/admin-layout";
 
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import type { DetailedCollection } from "~/types";
+import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 
 interface IProps {
   storeId: string;
 }
 
 const CategoriesPage: FC<IProps> = ({ storeId }) => {
-  const [formattedCollections, setFormattedCollections] = useState<
-    CollectionColumn[]
-  >([]);
-
-  const { data: collections } = api.collections.getAllCollections.useQuery({
-    storeId,
-  });
-
-  const formatCategories = useCallback((collections: DetailedCollection[]) => {
-    return collections.map((item: DetailedCollection) => ({
-      id: item.id,
-      storeId: item.storeId,
-      name: item.name,
-      products: item.products.length,
-      createdAt: format(item.createdAt, "MMMM do, yyyy"),
-    }));
-  }, []);
-
-  useEffect(() => {
-    if (collections)
-      setFormattedCollections(
-        formatCategories(collections) as CollectionColumn[]
-      );
-  }, [collections, formatCategories]);
+  const { data: collections, isLoading } =
+    api.collections.getAllCollections.useQuery({
+      storeId,
+    });
 
   return (
     <AdminLayout>
-      <div className="flex h-full flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {!collections && <PageLoader />}
-          {collections && <CollectionsClient data={formattedCollections} />}
+      {isLoading && <AbsolutePageLoader />}
+      {!isLoading && (
+        <div className="flex h-full flex-col">
+          <div className="flex-1 space-y-4 p-8 pt-6">
+            <CollectionsClient data={collections ?? []} />
+          </div>
         </div>
-      </div>
+      )}
     </AdminLayout>
   );
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
+  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
 
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
+  if (!store || !user) return { redirect };
 
   return {
     props: {

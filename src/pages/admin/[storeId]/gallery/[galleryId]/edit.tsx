@@ -1,19 +1,19 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import PageLoader from "~/components/ui/page-loader";
-
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import AdminLayout from "~/components/layouts/AdminLayout";
+import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
+import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import AdminLayout from "~/components/layouts/admin-layout";
 import { GalleryForm } from "~/modules/gallery/admin/gallery-form";
 
 interface IProps {
   galleryId: string;
   storeId: string;
 }
-const EditGalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
+const EditGalleryImagePage: FC<IProps> = ({ galleryId }) => {
   const { data: galleryImage, isLoading } =
     api.gallery.getGalleryImage.useQuery({
       id: galleryId,
@@ -21,36 +21,27 @@ const EditGalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
 
   return (
     <AdminLayout>
-      <div className="flex h-full flex-col">
+      {isLoading && <AbsolutePageLoader />}
+      {!isLoading && (
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {isLoading && <PageLoader />}
-          {!galleryImage && <div>Gallery image not found</div>}
-
-          {!isLoading && galleryImage && (
-            <GalleryForm initialData={galleryImage} />
+          {galleryImage && <GalleryForm initialData={galleryImage} />}
+          {!galleryImage && (
+            <DataFetchErrorMessage message="There seems to be an issue with loading the image." />
           )}
         </div>
-      </div>
+      )}
     </AdminLayout>
   );
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
+  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
 
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
+  if (!store || !user) return { redirect };
 
   return {
     props: {
-      categoryId: ctx.query.galleryId,
-      storeId: ctx.query.storeId,
+      galleryId: ctx.query.galleryId,
     },
   };
 }

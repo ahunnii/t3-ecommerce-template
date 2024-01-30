@@ -4,12 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   Attribute,
   Category,
-  Image,
-  Product,
   ProductType,
   ShippingType,
   Tag,
-  Variation,
 } from "@prisma/client";
 
 import { Trash } from "lucide-react";
@@ -44,6 +41,7 @@ import { Heading } from "~/components/ui/heading";
 // import ImageLoader from "~/components/ui/image-loader";
 
 import { StringOrTemplateHeader } from "@tanstack/react-table";
+import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { Input } from "~/components/ui/input";
 import {
   Select,
@@ -56,9 +54,10 @@ import { Separator } from "~/components/ui/separator";
 import { TagInput } from "~/components/ui/tag-input";
 import { Textarea } from "~/components/ui/textarea";
 import ImageUpload from "~/services/image-upload/components/image-upload";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import MarkdownEditor from "../../../components/common/inputs/markdown-editor";
-import { SingleProduct } from "../types";
+import type { SingleProduct } from "../types";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -117,6 +116,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const params = useRouter();
   const router = useNavigationRouter();
 
+  const { storeId, productId } = params.query as {
+    storeId: string;
+    productId: string;
+  };
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -173,12 +177,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const { mutate: updateProduct } = api.products.updateProduct.useMutation({
     onSuccess: () => {
       router.push(`/admin/${params.query.storeId as string}/products`);
-      toast.success(toastMessage);
+      toastService.success(toastMessage);
     },
-    onError: (error) => {
-      toast.error("Something went wrong");
-      console.error(error);
-    },
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong with updating the product",
+        error
+      ),
     onMutate: () => setLoading(true),
     onSettled: async () => {
       setLoading(false);
@@ -189,35 +194,35 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const { mutate: createProduct } = api.products.createProduct.useMutation({
     onSuccess: () => {
       router.push(`/admin/${params.query.storeId as string}/products`);
-      toast.success(toastMessage);
+      toastService.success(toastMessage);
     },
-    onError: (error) => {
-      toast.error("Something went wrong");
-      console.error(error);
-    },
-    onMutate: () => {
-      setLoading(true);
-    },
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong with creating the product",
+        error
+      ),
+    onMutate: () => setLoading(true),
     onSettled: () => {
       setLoading(false);
+      void apiContext.products.invalidate();
     },
   });
 
   const { mutate: deleteProduct } = api.products.deleteProduct.useMutation({
     onSuccess: () => {
       router.push(`/admin/${params.query.storeId as string}/products`);
-      toast.success("Product deleted.");
+      toastService.success("Product was successfully deleted");
     },
-    onError: (error) => {
-      toast.error("Something went wrong.");
-      console.error(error);
-    },
-    onMutate: () => {
-      setLoading(true);
-    },
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong with deleting the product",
+        error
+      ),
+    onMutate: () => setLoading(true),
     onSettled: () => {
       setLoading(false);
       setOpen(false);
+      void apiContext.products.invalidate();
     },
   });
 
@@ -307,6 +312,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         onConfirm={onDelete}
         loading={loading}
       />{" "}
+      <BackToButton
+        link={`/admin/${storeId}/products/${productId ?? ""}`}
+        title="Back to Product"
+      />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
 

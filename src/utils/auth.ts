@@ -52,61 +52,65 @@ export const redirectToSignIn = () => {
   };
 };
 
-// export const authenticateAdminSession = async (
-//   ctx: GetServerSidePropsContext
-// ) => {
-//   const session = await getServerAuthSession(ctx);
+export const authenticateAdminOrOwner = async (
+  ctx: GetServerSidePropsContext
+) => {
+  const session = await getServerAuthSession(ctx);
 
-//   if (!session || !session.user) {
-//     return {
-//       redirect: {
-//         destination: "/auth/signin",
-//         permanent: false,
-//       },
-//     };
-//   }
+  if (!session || !session.user) {
+    return {
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
+    };
+  }
 
-//   const userId = session.user.id;
-//   const userRole = session.user.role;
+  const userId = session.user.id;
+  const userRole = session.user.role;
 
-//   if (userRole !== "ADMIN") {
-//     return {
-//       redirect: {
-//         destination: "/unauthorized",
-//         permanent: false,
-//       },
-//     };
-//   }
-//   const store = await prisma.store.findFirst({
-//     where: {
-//       id: ctx.query.storeId as string,
-//       userId,
-//     },
-//   });
+  if (userRole !== "ADMIN") {
+    return {
+      store: null,
+      user: null,
+      redirect: {
+        destination: "/unauthorized",
+        permanent: false,
+      },
+    };
+  }
 
-//   return store;
-// };
+  const store = await prisma.store.findFirst({
+    where: {
+      id: ctx.query.storeId as string,
+    },
+  });
 
-// export const authenticateStaticSession = async (ctx: GetStaticPropsContext) => {
-//   const session = await getSession();
+  if (!store) {
+    return {
+      store: null,
+      user: null,
+      redirect: {
+        destination: "/admin",
+        permanent: false,
+      },
+    };
+  }
 
-//   if (!session || !session.user) {
-//     return {
-//       redirect: {
-//         destination: "/auth/signin",
-//         permanent: false,
-//       },
-//     };
-//   }
+  if (store.userId !== userId) {
+    return {
+      store: null,
+      user: null,
+      redirect: {
+        destination: "/unauthorized",
+        permanent: false,
+      },
+    };
+  }
 
-//   const userId = session.user.id;
-
-//   const store = await prisma.store.findFirst({
-//     where: {
-//       id: ctx.query.storeId as string,
-//       userId,
-//     },
-//   });
-
-//   return store;
-// };
+  return {
+    store,
+    user: session.user,
+    redirect: null,
+  };
+};

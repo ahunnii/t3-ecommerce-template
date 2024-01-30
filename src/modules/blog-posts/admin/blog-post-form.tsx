@@ -31,6 +31,7 @@ import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { TagInput } from "~/components/ui/tag-input";
 
+import { BackToButton } from "~/components/common/buttons/back-to-button";
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
@@ -56,6 +57,11 @@ interface BlogPostFormProps {
 export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
+
+  const { storeId, blogPostId } = params.query as {
+    storeId: string;
+    blogPostId: string;
+  };
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -170,6 +176,10 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
         onConfirm={onDelete}
         loading={loading}
       />{" "}
+      <BackToButton
+        link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
+        title="Back to Blog Post"
+      />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
 

@@ -1,9 +1,8 @@
-import { useRouter as useNavigationRouter } from "next/navigation";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -11,6 +10,7 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 
 import { api } from "~/utils/api";
 
+import { toastService } from "~/services/toast";
 import type { BillboardColumn } from "./columns";
 
 interface CellActionProps {
@@ -18,44 +18,40 @@ interface CellActionProps {
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const params = useRouter();
-  const router = useNavigationRouter();
+  const [open, setOpen] = useState(false);
 
+  const params = useRouter();
+  const apiContext = api.useContext();
   const { storeId } = params.query as { storeId: string };
   const billboardId = data.id;
 
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const baseUrl = `/admin/${storeId}/billboards/${billboardId}`;
 
-  const { mutate: deleteBillboard } =
+  const { mutate: deleteBillboard, isLoading } =
     api.billboards.deleteBillboard.useMutation({
-      onSuccess: () => {
-        router.refresh();
-        toast.success("Billboard deleted.");
-      },
-      onError: (error) => {
-        toast.error(
-          "Make sure you removed all categories using this billboard first."
+      onSuccess: () => toastService.success("Billboard deleted."),
+      onError: (error: unknown) => {
+        toastService.error(
+          "Make sure you removed all items using this billboard first.",
+          error
         );
-        console.error(error);
       },
-      onMutate: () => setLoading(true),
       onSettled: () => {
-        setLoading(false);
+        void apiContext.billboards.invalidate();
         setOpen(false);
       },
     });
 
   const onConfirm = () => deleteBillboard({ storeId, billboardId });
   const onDeleteSelection = () => setOpen(true);
-  const onUpdateSelection = () =>
-    router.push(`/admin/${storeId}/billboards/${billboardId}/edit`);
 
   const onCopySelection = () => {
     navigator.clipboard
       .writeText(billboardId)
-      .then(() => toast.success("Billboard ID copied to clipboard."))
-      .catch(() => toast.error("Failed to copy billboard ID to clipboard."));
+      .then(() => toastService.success("Billboard ID copied to clipboard."))
+      .catch((e) =>
+        toastService.error("Failed to copy billboard ID to clipboard.", e)
+      );
   };
 
   return (
@@ -64,7 +60,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onConfirm}
-        loading={loading}
+        loading={isLoading}
       />
       <Dropdown.DropdownMenu>
         <Dropdown.DropdownMenuTrigger asChild>
@@ -75,13 +71,26 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </Dropdown.DropdownMenuTrigger>
         <Dropdown.DropdownMenuContent align="end">
           <Dropdown.DropdownMenuLabel>Actions</Dropdown.DropdownMenuLabel>
-          <Dropdown.DropdownMenuItem onClick={onCopySelection}>
+          <Dropdown.DropdownMenuItem
+            onClick={onCopySelection}
+            className="cursor-pointer"
+          >
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </Dropdown.DropdownMenuItem>
-          <Dropdown.DropdownMenuItem onClick={onUpdateSelection}>
-            <Edit className="mr-2 h-4 w-4" /> Update
-          </Dropdown.DropdownMenuItem>
-          <Dropdown.DropdownMenuItem onClick={onDeleteSelection}>
+          <Link href={baseUrl}>
+            <Dropdown.DropdownMenuItem className="cursor-pointer">
+              <Eye className="mr-2 h-4 w-4" /> View
+            </Dropdown.DropdownMenuItem>
+          </Link>
+          <Link href={`${baseUrl}/edit`}>
+            <Dropdown.DropdownMenuItem className="cursor-pointer">
+              <Edit className="mr-2 h-4 w-4" /> Update
+            </Dropdown.DropdownMenuItem>
+          </Link>
+          <Dropdown.DropdownMenuItem
+            onClick={onDeleteSelection}
+            className="cursor-pointer"
+          >
             <Trash className="mr-2 h-4 w-4" /> Delete
           </Dropdown.DropdownMenuItem>
         </Dropdown.DropdownMenuContent>

@@ -40,7 +40,7 @@ export const CollectionsClient: React.FC<CollectionsClientProps> = ({
       </div>
       <Separator />
       <DataTable searchKey="name" columns={columns} data={data} />
-      <Heading title="API" description="API Calls for Collections" />
+      <Heading title="Public API" description="API Calls for Collections" />
       <Separator />
       <ApiList entityName="collections" entityIdName="categoryId" />
     </>

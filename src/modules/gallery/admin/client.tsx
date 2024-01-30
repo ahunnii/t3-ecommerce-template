@@ -34,8 +34,8 @@ export const GalleryImageClient: React.FC<ProductsClientProps> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
-      <Heading title="API" description="API Calls for Gallery Images" />
+      <DataTable searchKey="title" columns={columns} data={data} />
+      <Heading title="Public API" description="API Calls for Gallery Images" />
       <Separator />
       <ApiList entityName="gallery" entityIdName="galleryId" />
     </>

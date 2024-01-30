@@ -1,6 +1,5 @@
-import { type FC } from "react";
-
 import type { GetServerSidePropsContext } from "next";
+import { type FC } from "react";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
@@ -8,25 +7,26 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
-import { ProductsClient } from "~/modules/products/admin/client";
+import { ProductForm } from "~/modules/products/admin/product-form";
 
 interface IProps {
   storeId: string;
 }
 
-const ProductsPage: FC<IProps> = ({ storeId }) => {
-  const { data: products, isLoading } = api.products.getAllProducts.useQuery({
-    storeId,
-  });
+const NewProductPage: FC<IProps> = ({ storeId }) => {
+  const { data: categories, isLoading } =
+    api.categories.getAllCategories.useQuery({
+      storeId,
+    });
 
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      <div className="flex h-full flex-col">
+      {!isLoading && (
         <div className="flex-1 space-y-4 p-8 pt-6">
-          <ProductsClient data={products ?? []} />
+          <ProductForm categories={categories ?? []} initialData={null} />
         </div>
-      </div>
+      )}
     </AdminLayout>
   );
 };
@@ -43,4 +43,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export default ProductsPage;
+export default NewProductPage;

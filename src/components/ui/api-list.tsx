@@ -30,7 +30,8 @@ export const ApiList: React.FC<ApiListProps> = ({
         variant="public"
         description={`${baseUrl}/${entityName}/{${entityIdName}}`}
       />
-      <ApiAlert
+      {/* For right now, I don't think that the api should be editable outside of admin... */}
+      {/* <ApiAlert
         title="POST"
         variant="admin"
         description={`${baseUrl}/${entityName}`}
@@ -44,7 +45,7 @@ export const ApiList: React.FC<ApiListProps> = ({
         title="DELETE"
         variant="admin"
         description={`${baseUrl}/${entityName}/{${entityIdName}}`}
-      />
+      /> */}
     </>
   );
 };
