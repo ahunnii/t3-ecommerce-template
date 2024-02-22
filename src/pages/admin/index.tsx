@@ -26,7 +26,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (!session || !session.user) {
     return {
       redirect: {
-        destination: "/auth/signin",
+        destination: "/sign-in",
         permanent: false,
       },
     };

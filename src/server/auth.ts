@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/require-await */
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { User as PrismaUser, Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import Auth0Provider from "next-auth/providers/auth0";
+
 import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
@@ -38,6 +38,11 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
+/**
+ * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
+ *
+ * @see https://next-auth.js.org/configuration/options
+ */
 export const authOptions: NextAuthOptions = {
   callbacks: {
     session: ({ session, user }) => ({
@@ -49,17 +54,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
 
-    // async signIn({ user, account, profile, email, credentials }) {
-    //   const authUser = await prisma.user.findUnique({
-    //     where: { id: user.id },
-    //   });
-
-    //   if (!authUser) {
-    //     return false;
-    //   }
-
-    //   return true;
-    // },
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`;
@@ -73,22 +67,12 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
-      // profile: (profile) => {
-      //   return {
-      //     ...profile,
-      //     role: profile.role ?? "USER",
-      //   };
-      // },
     }),
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
-    // Auth0Provider({
-    //   clientId: env.AUTH0_CLIENT_ID,
-    //   clientSecret: env.AUTH0_CLIENT_SECRET,
-    //   issuer: env.AUTH0_ISSUER,
-    // }),
+
     /**
      * ...add more providers here.
      *
@@ -100,7 +84,7 @@ export const authOptions: NextAuthOptions = {
      */
   ],
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/sign-in",
   },
 };
 

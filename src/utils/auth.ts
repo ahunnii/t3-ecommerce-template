@@ -9,7 +9,7 @@ export const authenticateSession = async (ctx: GetServerSidePropsContext) => {
   if (!session || !session.user) {
     return {
       redirect: {
-        destination: "/auth/signin",
+        destination: "/sign-in",
         permanent: false,
       },
     };
@@ -46,7 +46,7 @@ export const authenticateUser = async (ctx: GetServerSidePropsContext) => {
 export const redirectToSignIn = () => {
   return {
     redirect: {
-      destination: "/auth/signin",
+      destination: "/sign-in",
       permanent: false,
     },
   };
@@ -60,7 +60,7 @@ export const authenticateAdminOrOwner = async (
   if (!session || !session.user) {
     return {
       redirect: {
-        destination: "/auth/signin",
+        destination: "/sign-in",
         permanent: false,
       },
     };

@@ -66,22 +66,22 @@ export default function SignIn({
                 }
               })}
               {/* 
-              <div className="my-3 flex items-center px-3">
-                <hr className="w-full border-slate-600" />
-                <span className="mx-3 text-slate-500">or</span>
-                <hr className="w-full border-slate-600" />
-              </div> */}
+                <div className="my-3 flex items-center px-3">
+                  <hr className="w-full border-slate-600" />
+                  <span className="mx-3 text-slate-500">or</span>
+                  <hr className="w-full border-slate-600" />
+                </div> */}
 
               {/* <div>
-                <Button
-                  onClick={() => void signIn("auth0")}
-                  variant={"outline"}
-                  className="flex w-full gap-x-5 rounded-full"
-                >
-                  <MailIcon className="mr-2 text-gray-400" size={25} />
-                  Sign in with email using Auth0
-                </Button>
-              </div> */}
+                  <Button
+                    onClick={() => void signIn("auth0")}
+                    variant={"outline"}
+                    className="flex w-full gap-x-5 rounded-full"
+                  >
+                    <MailIcon className="mr-2 text-gray-400" size={25} />
+                    Sign in with email using Auth0
+                  </Button>
+                </div> */}
             </div>
           </div>
         </div>
