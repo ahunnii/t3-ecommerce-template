@@ -73,12 +73,12 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
-      profile: (profile) => {
-        return {
-          ...profile,
-          role: profile.role ?? "USER",
-        };
-      },
+      // profile: (profile) => {
+      //   return {
+      //     ...profile,
+      //     role: profile.role ?? "USER",
+      //   };
+      // },
     }),
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
