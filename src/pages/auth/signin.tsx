@@ -7,23 +7,40 @@ import { getServerSession } from "next-auth/next";
 import { getProviders, signIn } from "next-auth/react";
 import Image from "next/image";
 import AuthLayout from "~/components/layouts/AuthLayout";
+import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { Button } from "~/components/ui/button";
+import { useConfig } from "~/providers/style-config-provider";
 import { authOptions } from "~/server/auth";
+import { cn } from "~/utils/styles";
 
 export default function SignIn({
   providers,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const config = useConfig();
   return (
-    <AuthLayout>
-      <div className=" my-auto flex h-full w-full items-center gap-5">
-        <div className="justify-left flex w-4/12">
-          {" "}
-          <div className="w-96 rounded bg-white p-4 ">
+    <StorefrontLayout
+      {...config.layout}
+      bodyStyle="items-center justify-center flex"
+    >
+      <div className=" my-auto flex h-full w-full items-center gap-5 max-md:flex-col-reverse">
+        <div className="justify-left flex lg:w-4/12">
+          <div
+            className={cn(
+              "w-96 rounded bg-white p-4 ",
+              config.signIn.background
+            )}
+          >
             {error && (
               <p className="text-center font-semibold text-red-700">{error}</p>
             )}
-            <h1 className="mb-4 text-center text-2xl">Sign In to Store</h1>
+
+            <h1
+              className={cn("mb-4 text-center text-2xl", config.signIn.title)}
+            >
+              Sign In to {config.brand.name}
+            </h1>
+
             <div className="flex flex-col gap-y-2">
               {Object.values(providers).map((provider) => {
                 if (provider.name !== "Auth0") {
@@ -47,14 +64,14 @@ export default function SignIn({
                   );
                 }
               })}
-
+              {/* 
               <div className="my-3 flex items-center px-3">
                 <hr className="w-full border-slate-600" />
                 <span className="mx-3 text-slate-500">or</span>
                 <hr className="w-full border-slate-600" />
-              </div>
+              </div> */}
 
-              <div>
+              {/* <div>
                 <Button
                   onClick={() => void signIn("auth0")}
                   variant={"outline"}
@@ -63,11 +80,11 @@ export default function SignIn({
                   <MailIcon className="mr-2 text-gray-400" size={25} />
                   Sign in with email using Auth0
                 </Button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
-        <div className=" flex w-8/12 justify-end  ">
+        <div className=" flex justify-end px-4  lg:w-8/12">
           <Image
             src="/img/web_shopping.svg"
             alt="under development"
@@ -76,7 +93,7 @@ export default function SignIn({
           />
         </div>
       </div>
-    </AuthLayout>
+    </StorefrontLayout>
   );
 }
 
@@ -101,6 +118,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     : null;
 
   const providers = await getProviders();
+  console.log(providers);
 
   return {
     props: { providers: providers ?? [], error: error },

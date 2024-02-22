@@ -58,6 +58,7 @@
     "@uploadthing/react": "^6.2.0",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.0.1",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
     "crypto": "^1.0.1",

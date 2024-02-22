@@ -1,7 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const storeRouter = createTRPCRouter({
   getAllStores: protectedProcedure.query(({ ctx }) => {
@@ -12,14 +16,11 @@ export const storeRouter = createTRPCRouter({
     });
   }),
 
-  getStore: protectedProcedure
+  getStore: publicProcedure
     .input(z.object({ storeId: z.string().optional() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.store.findUnique({
-        where: {
-          id: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          userId: ctx.session.user.id,
-        },
+        where: { id: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
         include: {
           gallery: true,
         },

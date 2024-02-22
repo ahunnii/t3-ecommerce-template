@@ -4,6 +4,10 @@ import Navbar from "~/components/wip/navigation-wip/navbar";
 export const STORE_NAME = "Trend Anomaly";
 
 export const storeTheme = {
+  brand: {
+    name: STORE_NAME,
+    url: "https://trendanomaly.com",
+  },
   logo: {
     default: "/custom/logo.png",
   },
@@ -23,10 +27,17 @@ export const storeTheme = {
     NavBar: Navbar,
     Footer: Footer,
   },
+  textColors: {
+    primary: "text-black",
+  },
+  signIn: {
+    title: "text-black",
+    background: "bg-transparent",
+  },
   navigation: {},
   typography: {
     p: "leading-7 [&:not(:first-child)]:mt-6",
-    h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+    h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-black",
     h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
     h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
     h4: "scroll-m-20 text-xl font-semibold tracking-tight",

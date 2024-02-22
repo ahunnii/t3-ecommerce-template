@@ -9,6 +9,7 @@ import {
 } from "next-auth";
 import Auth0Provider from "next-auth/providers/auth0";
 import DiscordProvider from "next-auth/providers/discord";
+import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
@@ -48,19 +49,17 @@ export const authOptions: NextAuthOptions = {
       },
     }),
 
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log("signIn", { user, account, profile, email, credentials });
+    // async signIn({ user, account, profile, email, credentials }) {
+    //   const authUser = await prisma.user.findUnique({
+    //     where: { id: user.id },
+    //   });
 
-      const authUser = await prisma.user.findUnique({
-        where: { id: user.id },
-      });
+    //   if (!authUser) {
+    //     return false;
+    //   }
 
-      if (!authUser) {
-        return false;
-      }
-
-      return true;
-    },
+    //   return true;
+    // },
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`;
@@ -81,11 +80,15 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
-    Auth0Provider({
-      clientId: env.AUTH0_CLIENT_ID,
-      clientSecret: env.AUTH0_CLIENT_SECRET,
-      issuer: env.AUTH0_ISSUER,
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
+    // Auth0Provider({
+    //   clientId: env.AUTH0_CLIENT_ID,
+    //   clientSecret: env.AUTH0_CLIENT_SECRET,
+    //   issuer: env.AUTH0_ISSUER,
+    // }),
     /**
      * ...add more providers here.
      *

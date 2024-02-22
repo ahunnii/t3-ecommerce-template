@@ -21,11 +21,6 @@ export const env = createEnv({
       process.env.VERCEL ? z.string().min(1) : z.string().url()
     ),
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
-    DISCORD_CLIENT_ID: z.string(),
-    DISCORD_CLIENT_SECRET: z.string(),
-    AUTH0_CLIENT_ID: z.string(),
-    AUTH0_CLIENT_SECRET: z.string(),
-    AUTH0_ISSUER: z.string(),
 
     NEXT_PUBLIC_ENCRYPTION_KEY: z.string().min(32),
     NEXT_PUBLIC_STORE_ID: z.string(),
@@ -33,17 +28,13 @@ export const env = createEnv({
     SHIPPO_API_KEY: z.string(),
     NEXT_PUBLIC_SITE_DIRECTORY: z.string(),
     NEXT_PUBLIC_STORE_NAME: z.string(),
-    RESEND_API_KEY: z.string(),
+
     SHOP_EMAIL: z.string().email(),
     NEXT_PUBLIC_API_URL: z.string().url(),
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
+
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
-
-    NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
-    UPLOADTHING_SECRET: z.string(),
 
     // Payment Processing
     STRIPE_WEBHOOK_SECRET: z.string(),
@@ -56,10 +47,31 @@ export const env = createEnv({
     NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
 
     // Email
+    RESEND_API_KEY: z.string(),
     NEXT_PUBLIC_EMAIL_SERVICE: z.string().optional(),
 
     //Toasts
     NEXT_PUBLIC_TOAST_SERVICE: z.string().optional(),
+
+    //Authentication
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
+    DISCORD_CLIENT_ID: z.string(),
+    DISCORD_CLIENT_SECRET: z.string(),
+    // AUTH0_CLIENT_ID: z.string(),
+    // AUTH0_CLIENT_SECRET: z.string(),
+    // AUTH0_ISSUER: z.string(),
+    //End Authentication
+
+    // Uploads
+    NEXT_PUBLIC_CLOUDINARY_API_KEY: z.string().optional(),
+    CLOUDINARY_API_SECRET: z.string().optional(),
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
+    UPLOADTHING_SECRET: z.string(),
+    NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
+
+    //End Uploads
   },
 
   /**
@@ -74,13 +86,10 @@ export const env = createEnv({
     NEXT_PUBLIC_SITE_DIRECTORY: z.string(),
     NEXT_PUBLIC_STORE_NAME: z.string(),
     NEXT_PUBLIC_API_URL: z.string().url(),
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
+
     NEXT_PUBLIC_URL: z.string().url(),
     NEXT_PUBLIC_STORE_TYPE: z.enum(["core", "custom"]),
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT: z.string().url().optional(),
-
-    NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
 
     // Payment Processing
     NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL: z.string().url().optional(),
@@ -91,6 +100,12 @@ export const env = createEnv({
 
     //Toasts
     NEXT_PUBLIC_TOAST_SERVICE: z.string().optional(),
+
+    // Uploads
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
+    NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
+    NEXT_PUBLIC_CLOUDINARY_API_KEY: z.string().optional(),
   },
 
   /**
@@ -102,11 +117,6 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
-    DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
-    AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
-    AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
-    AUTH0_ISSUER: process.env.AUTH0_ISSUER,
 
     NEXT_PUBLIC_ENCRYPTION_KEY: process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
     NEXT_PUBLIC_STORE_ID: process.env.NEXT_PUBLIC_STORE_ID,
@@ -118,16 +128,10 @@ export const env = createEnv({
     SHOP_EMAIL: process.env.SHOP_EMAIL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
-    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
-      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
-      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+
     NEXT_PUBLIC_STORE_TYPE: process.env.NEXT_PUBLIC_STORE_TYPE,
     NEXT_PUBLIC_WORDPRESS_API_ENDPOINT:
       process.env.NEXT_PUBLIC_WORDPRESS_API_ENDPOINT,
-
-    NEXT_PUBLIC_UPLOADTHING_APP_ID: process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID,
-    UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
 
     // Payment Processing
     NEXT_PUBLIC_STRIPE_PAYMENT_INTENT_URL:
@@ -145,6 +149,26 @@ export const env = createEnv({
 
     //Toasts
     NEXT_PUBLIC_TOAST_SERVICE: process.env.NEXT_PUBLIC_TOAST_SERVICE,
+
+    //Authentication
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
+    DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+    // AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
+    // AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
+    // AUTH0_ISSUER: process.env.AUTH0_ISSUER,
+    //End Authentication
+
+    // Uploads
+    NEXT_PUBLIC_CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:
+      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    NEXT_PUBLIC_UPLOADTHING_APP_ID: process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID,
+    UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

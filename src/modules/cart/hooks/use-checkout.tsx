@@ -2,12 +2,6 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
-import { toast } from "react-hot-toast";
-
-import Button from "~/components/core/ui/button";
-import Currency from "~/components/core/ui/currency";
-import { env } from "~/env.mjs";
-
 import useCart from "~/modules/cart/hooks/use-cart";
 import useNotification from "~/modules/notifications/use-notification";
 import { api } from "~/utils/api";
@@ -22,9 +16,7 @@ const useCheckout = () => {
     return total + Number(item.product.price) * Number(item.quantity);
   }, 0);
 
-  const { data: store } = api.store.getStore.useQuery({
-    storeId: env.NEXT_PUBLIC_STORE_ID,
-  });
+  const { data: store } = api.store.getStore.useQuery({});
 
   useEffect(() => {
     if (searchParams.size === 0) return;

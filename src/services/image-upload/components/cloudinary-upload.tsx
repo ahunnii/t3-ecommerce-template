@@ -17,8 +17,8 @@ export const CloudinaryUpload = ({ disabled, onChange }: ImageUploadProps) => {
     onChange(result.info.secure_url as string);
   };
   if (
-    !env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
-    !env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+    !env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+    // !env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
   )
     return null;
 
@@ -26,7 +26,8 @@ export const CloudinaryUpload = ({ disabled, onChange }: ImageUploadProps) => {
     <>
       <CldUploadWidget
         onUpload={onUpload}
-        uploadPreset={env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+        // uploadPreset={env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+        signatureEndpoint="/api/cloudinary"
       >
         {({ open }) => {
           const onClick = () => open();
