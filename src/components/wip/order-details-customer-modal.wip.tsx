@@ -20,7 +20,7 @@ export function OrderDetailsCustomerModal({
   data,
   children,
 }: {
-  data: DetailedOrder;
+  data: Order;
   children: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);

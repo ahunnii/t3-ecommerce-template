@@ -104,6 +104,8 @@ export const productsRouter = createTRPCRouter({
         include: {
           images: true,
           variants: true,
+          materials: true,
+          tags: true,
           category: {
             include: {
               attributes: true,

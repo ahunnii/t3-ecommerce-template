@@ -1,3 +1,4 @@
+import { Order } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -20,7 +21,7 @@ export const usePayment = () => {
 
   const [paymentDetails, setPaymentDetails] =
     useState<retrievePaymentResult | null>(null);
-  const fetchPaymentDetails = async (order: DetailedOrder) => {
+  const fetchPaymentDetails = async (order: Order) => {
     console.log(order.referenceId);
     setIsLoading(true);
     const results = await axios.post(

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { DetailedProductFull } from "~/types";
 
 import {
   extractQueryString,
@@ -20,7 +21,7 @@ export const productsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const results = extractQueryString(input.queryString ?? "");
 
-      const products = await ctx.prisma.product.findMany({
+      const products = (await ctx.prisma.product.findMany({
         where: {
           storeId: env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured,
@@ -38,7 +39,7 @@ export const productsRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-      });
+      })) as DetailedProductFull[];
 
       const filteredProducts = filterProductsByVariants(
         products,

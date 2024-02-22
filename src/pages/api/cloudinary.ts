@@ -1,9 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { v2 as cloudinary } from "cloudinary";
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { env } from "~/env.mjs";
 // const cloudinary = require('cloudinary').v2;
+
+export type SignApiOptions = Record<string, unknown>;
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -15,7 +17,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
           const { paramsToSign } = JSON.parse(req.body as string);
 
           const signature = cloudinary.utils.api_sign_request(
-            paramsToSign,
+            paramsToSign as SignApiOptions,
             env.CLOUDINARY_API_SECRET
           );
 

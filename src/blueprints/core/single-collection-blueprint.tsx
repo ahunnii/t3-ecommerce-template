@@ -6,6 +6,7 @@ import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import PageLoader from "~/components/ui/page-loader";
+import { DetailedProductFull } from "~/types";
 
 import { api } from "~/utils/api";
 
@@ -37,7 +38,7 @@ export const SingleCollectionPage: FC<ICollectionPageProps> = ({
           <div className="mt-6 lg:col-span-4 lg:mt-0">
             {collection?.products.length === 0 && <NoResults />}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {collection?.products.map((item) => (
+              {collection?.products.map((item: DetailedProductFull) => (
                 <ProductCard key={item.id} data={item} />
               ))}
             </div>

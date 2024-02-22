@@ -18,6 +18,11 @@ interface IProps {
   storeId: string;
 }
 
+const metadata = {
+  title: "Blog Posts",
+  description: "Manage your blog posts here.",
+};
+
 const ProductsPage: FC<IProps> = ({ storeId }) => {
   const [formattedBlogPosts, setFormattedBlogPosts] = useState<
     BlogPostColumn[]
@@ -39,11 +44,11 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
 
   useEffect(() => {
     if (blogPosts)
-      setFormattedBlogPosts(formatBlogPosts(blogPosts) as ProductColumn[]);
+      setFormattedBlogPosts(formatBlogPosts(blogPosts as BlogPost[]));
   }, [blogPosts, formatBlogPosts]);
 
   return (
-    <AdminLayout title="Blog Posts">
+    <AdminLayout>
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
           {!blogPosts && <PageLoader />}

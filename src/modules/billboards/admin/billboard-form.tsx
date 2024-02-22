@@ -13,9 +13,9 @@ import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import * as Form from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
-import ImageUpload from "~/components/ui/image-upload";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
+import ImageUpload from "~/services/image-upload/components/image-upload";
 
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { toastService } from "~/services/toast";

@@ -22,8 +22,8 @@ import {
 } from "~/components/ui/hover-card";
 import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
 
+import { Separator } from "~/components/ui/separator";
 import { cn } from "~/utils/styles";
-import { Separator } from "../ui/separator";
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();

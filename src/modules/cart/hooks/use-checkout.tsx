@@ -34,22 +34,24 @@ const useCheckout = () => {
     if (searchParams.get("canceled")) onCanceledCheckout();
   }, [searchParams, removeAll]);
 
-  const calculateShippingCost = useMemo(() => {
+  const calculateShippingCost: number = useMemo(() => {
     if (!store) return 0;
     if (cartItems.length === 0) return 0;
 
     const { hasFreeShipping, hasFlatRate, minFreeShipping, flatRateAmount } =
       store;
 
-    console.log(store);
     if (hasFreeShipping && totalPrice >= (minFreeShipping ?? 0)) return 0;
-    else if (hasFlatRate) return flatRateAmount;
-    else {
+    else if (hasFlatRate) {
+      if (flatRateAmount) return flatRateAmount ?? 0;
+      else {
+        console.error("Checkout Summary Error: Flat rate not set up");
+        return 0;
+      }
+    } else {
       console.error("Checkout Summary Error: Flat rate not set up");
       return 0;
     }
-
-    console.log();
   }, [store, totalPrice, cartItems]);
 
   const checkIfCheckoutWasSuccessful = useCallback(() => {

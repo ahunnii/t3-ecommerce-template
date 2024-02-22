@@ -4,6 +4,7 @@ import { type NextApiRequest, type NextApiResponse } from "next";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
 import paymentService from "~/services/payment";
+import { DetailedOrder } from "~/types";
 
 const paymentDetailsHandler = async (
   req: NextApiRequest,
@@ -42,7 +43,9 @@ const paymentDetailsHandler = async (
   try {
     switch (req.method) {
       case "POST":
-        const paymentDetails = await paymentService.retrievePayment(order);
+        const paymentDetails = await paymentService.retrievePayment(
+          order as DetailedOrder
+        );
         console.log(paymentDetails);
 
         if (paymentDetails === null) {

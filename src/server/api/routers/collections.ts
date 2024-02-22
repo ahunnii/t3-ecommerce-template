@@ -22,7 +22,19 @@ export const collectionsRouter = createTRPCRouter({
           isFeatured: input.isFeatured,
         },
         include: {
-          products: true,
+          products: {
+            include: {
+              images: true,
+              variants: true,
+              materials: true,
+              tags: true,
+              category: {
+                include: {
+                  attributes: true,
+                },
+              },
+            },
+          },
           billboard: true,
         },
         orderBy: { createdAt: "desc" },
@@ -48,6 +60,8 @@ export const collectionsRouter = createTRPCRouter({
             include: {
               images: true,
               variants: true,
+              materials: true,
+              tags: true,
               category: {
                 include: {
                   attributes: true,

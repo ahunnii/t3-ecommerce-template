@@ -49,7 +49,7 @@ const Summary = ({ cartSize }: { cartSize: number }) => {
               {calculateShippingCost === 0 && (
                 <span className={cn("", config.cart.price)}>FREE</span>
               )}
-              {calculateShippingCost > 0 && (
+              {calculateShippingCost !== null && calculateShippingCost > 0 && (
                 <Currency
                   value={calculateShippingCost}
                   className={cn("", config.cart.price)}

@@ -1,5 +1,5 @@
 import type { GetServerSidePropsContext } from "next";
-import { useCallback, useEffect, useState, type FC } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
 import PageLoader from "~/components/ui/page-loader";
 import { OrderClient } from "~/modules/orders/components/admin/client";
@@ -25,6 +25,11 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
   });
   const { data } = useShippingModal();
 
+  const orderData: OrderColumn[] = useMemo(() => {
+    if (!orders) return [];
+    return orders?.map((order: DetailedOrder) => formatOrderTableData(order));
+  }, [orders]);
+
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
@@ -32,7 +37,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
       {orders && <ShippingModal data={data ?? ""} />}
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          <OrderClient data={orders ?? []} />
+          <OrderClient data={orderData ?? []} />
         </div>
       </div>
     </AdminLayout>

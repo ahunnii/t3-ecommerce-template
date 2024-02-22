@@ -18,7 +18,7 @@ export default async function Handler(
   const { orderID }: { orderID: string } = req.body;
 
   const request = new paypal.orders.OrdersCaptureRequest(orderID);
-  request.requestBody({});
+
   const response = await paypalClient.execute(request);
   if (!response) {
     return res
