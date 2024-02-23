@@ -3,7 +3,7 @@
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -28,6 +28,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const shippingModal = useShippingModal();
   const params = useRouter();
   const [open, setOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { mutate: deleteOrder } = api.orders.deleteOrder.useMutation({
@@ -67,7 +68,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         toast.error("Failed to copy order ID to clipboard.");
       });
   };
-
+  useEffect(() => {
+    if (openDropdown)
+      setTimeout(() => {
+        document.body.style.pointerEvents = "";
+      }, 500);
+  }, [openDropdown]);
   return (
     <>
       <AlertModal
@@ -76,7 +82,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         onConfirm={onConfirm}
         loading={loading}
       />
-      <DropdownMenu>
+      <DropdownMenu open={openDropdown} onOpenChange={setOpenDropdown}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>

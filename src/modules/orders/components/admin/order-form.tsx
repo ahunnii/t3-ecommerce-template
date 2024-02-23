@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Prisma,
   type Order,
   type OrderItem,
   type Product,
@@ -50,17 +51,41 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
+import { CheckIcon, ChevronsUpDown } from "lucide-react";
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "~/components/ui/command";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+
+import { states } from "~/utils/shipping";
+import { cn } from "~/utils/styles";
+
 const formSchema = z.object({
   isPaid: z.boolean(),
   phone: z.string().min(9).max(12),
-  address: z.string().min(2),
+  street: z.string(),
+  additional: z.string().optional(),
+  city: z.string(),
+  state: z.string(),
+  zip: z.string().regex(/^\d{5}(?:[-\s]\d{4})?$/),
+  country: z.string(),
   name: z.string().min(2),
   orderItems: z.array(
     z.object({
       // productId: z.string(),
       variantId: z.union([z.string(), z.null()]),
       // variant: z.any(),
-      quantity: z.number().min(0),
+      quantity: z.coerce.number().min(0),
       // product: z.object({
       //   name: z.string(),
       //   variants: z.array(
@@ -92,7 +117,21 @@ interface FetchedOrder extends Order {
   orderItems: ExtendedOrderItem[];
 }
 interface OrderFormProps {
-  initialData: FetchedOrder | null;
+  initialData: Prisma.OrderGetPayload<{
+    include: {
+      address: true;
+      orderItems: {
+        include: {
+          variant: true;
+          product: {
+            include: {
+              variants: true;
+            };
+          };
+        };
+      };
+    };
+  }>;
 }
 
 export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
@@ -126,15 +165,21 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
     : "Create";
   const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData ?? {
+    defaultValues: {
       isPaid: false,
-      phone: "",
-      address: "",
-      name: "",
-      orderItems: [],
+      phone: initialData?.phone ?? "",
+      street: initialData?.address?.street ?? "",
+      additional: initialData?.address?.additional ?? "",
+      city: initialData?.address?.city ?? "",
+      state: initialData?.address?.state ?? "",
+      zip: initialData?.address?.postal_code ?? "",
+      country: initialData?.address?.country ?? "US",
+      name: initialData?.name ?? "",
+      orderItems: initialData?.orderItems ?? [],
     },
   });
 
+  console.log(initialData);
   const { mutate: updateOrder } = api.orders.updateOrder.useMutation({
     onSuccess: () => {
       router.push(`/admin/${params.query.storeId as string}/orders`);
@@ -193,7 +238,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: ColorFormValues) => {
-    console.log(data);
     if (params.query.mode === "view") {
       router.push(`/admin/${params.query.storeId as string}/orders`);
       return;
@@ -204,7 +248,14 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         orderId: params?.query?.orderId as string,
         isPaid: data.isPaid,
         phone: data.phone,
-        address: data.address,
+        address: {
+          street: data.street,
+          additional: data.additional,
+          city: data.city,
+          state: data.state,
+          postalCode: data.zip,
+          country: data.country,
+        },
         name: data.name,
       });
     } else {
@@ -212,7 +263,14 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
         storeId: params?.query?.storeId as string,
         isPaid: data.isPaid,
         phone: data.phone,
-        address: data.address,
+        address: {
+          street: data.street,
+          additional: data.additional,
+          city: data.city,
+          state: data.state,
+          postalCode: data.zip,
+          country: data.country,
+        },
         name: data.name,
       });
     }
@@ -311,23 +369,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
                 />{" "}
                 <FormField
                   control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="Address"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />{" "}
-                <FormField
-                  control={form.control}
                   name="isPaid"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
@@ -346,6 +387,143 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
                           order and awaiting shipment.
                         </FormDescription>
                       </div>
+                    </FormItem>
+                  )}
+                />{" "}
+              </div>
+            </div>{" "}
+            <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
+              <div>
+                <FormLabel>Address</FormLabel>{" "}
+              </div>
+              <div className="flex items-center gap-4">
+                <FormField
+                  control={form.control}
+                  name="street"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Street address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. 1234 Main St." {...field} />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="additional"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>
+                        Apt / Suite / Other{" "}
+                        <span className="text-xs text-gray-500">
+                          (optional)
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. 1234 Main St." {...field} />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+              </div>
+              <div className="flex items-center gap-4">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Boulder City"
+                          {...field}
+                          className="col-span-1"
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>State</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                " w-full  justify-between ",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? states.find(
+                                    (state) => state.value === field.value
+                                  )?.label
+                                : "Select state"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="max-h-96 w-[200px] overflow-y-scroll p-0">
+                          <Command>
+                            <CommandInput placeholder="Search state..." />
+                            <CommandEmpty>No state found.</CommandEmpty>
+                            <CommandGroup>
+                              {states.map((state) => (
+                                <CommandItem
+                                  value={state.label ?? undefined}
+                                  key={state.value}
+                                  onSelect={() => {
+                                    form.setValue("state", state.value);
+                                  }}
+                                >
+                                  <CheckIcon
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      state.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {state.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+                <FormField
+                  control={form.control}
+                  name="zip"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Zip Code</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. 44444"
+                          {...field}
+                          className="col-span-1"
+                        />
+                      </FormControl>
+
+                      <FormMessage />
                     </FormItem>
                   )}
                 />{" "}
@@ -422,16 +600,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
                                 <TableCell>
                                   <Controller
                                     render={({ field }) => (
-                                      <Input
-                                        {...field}
-                                        type="number"
-                                        defaultValue={
-                                          Number(item.quantity) ?? 1
-                                        }
-                                        onChange={(e) =>
-                                          field.onChange(Number(e.target.value))
-                                        }
-                                      />
+                                      <Input {...field} type="number" />
                                     )}
                                     name={`orderItems.${index}.quantity`}
                                     control={form.control}

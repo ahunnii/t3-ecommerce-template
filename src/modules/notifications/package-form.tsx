@@ -17,7 +17,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
-import useShippingLabel, { Package } from "~/hooks/admin/use-shipping-label";
+import useShippingLabel from "~/hooks/admin/use-shipping-label";
 
 const shippingFormSchema = z.object({
   package_length: z.coerce.number().min(1),
@@ -30,7 +30,7 @@ const shippingFormSchema = z.object({
 export type PackageFormValues = z.infer<typeof shippingFormSchema>;
 
 type PackageFormProps = {
-  initialData: Package | null;
+  initialData: PackageFormValues | null;
   successCallback: (data?: unknown) => void;
   errorCallback: (data?: unknown) => void;
 };
@@ -42,11 +42,11 @@ const PackageForm: FC<PackageFormProps> = ({
   const { setParcelMeasurements } = useShippingLabel();
 
   const defaultValues: Partial<PackageFormValues> = {
-    package_length: initialData?.length ?? 0,
-    package_width: initialData?.width ?? 0,
-    package_height: initialData?.height ?? 0,
-    package_weight_lbs: Math.floor((initialData?.weight ?? 0) % 16) ?? 0,
-    package_weight_oz: (initialData?.weight ?? 0) * 16 ?? 0,
+    package_length: initialData?.package_length ?? 0,
+    package_width: initialData?.package_width ?? 0,
+    package_height: initialData?.package_height ?? 0,
+    package_weight_lbs: initialData?.package_weight_lbs ?? 0,
+    package_weight_oz: initialData?.package_weight_oz ?? 0,
   };
 
   const form = useForm<PackageFormValues>({

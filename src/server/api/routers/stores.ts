@@ -23,6 +23,7 @@ export const storeRouter = createTRPCRouter({
         where: { id: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
         include: {
           gallery: true,
+          address: true,
         },
       });
     }),
@@ -43,7 +44,14 @@ export const storeRouter = createTRPCRouter({
       z.object({
         storeId: z.string(),
         name: z.string(),
-        businessAddress: z.string(),
+        address: z.object({
+          street: z.string(),
+          additional: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postalCode: z.string(),
+          country: z.string(),
+        }),
         hasFreeShipping: z.boolean(),
         minFreeShipping: z.coerce.number().nonnegative().optional(),
         hasPickup: z.boolean(),
@@ -87,7 +95,16 @@ export const storeRouter = createTRPCRouter({
             },
             data: {
               name: input.name,
-              businessAddress: input.businessAddress,
+              address: {
+                create: {
+                  street: input.address.street,
+                  additional: input.address.additional,
+                  city: input.address.city,
+                  state: input.address.state,
+                  postal_code: input.address.postalCode,
+                  country: input.address.country,
+                },
+              },
               hasFreeShipping: input.hasFreeShipping,
               minFreeShipping: input.minFreeShipping,
               hasPickup: input.hasPickup,

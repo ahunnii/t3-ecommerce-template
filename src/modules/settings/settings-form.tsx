@@ -38,6 +38,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { Switch } from "~/components/ui/switch";
 import { useOrigin } from "~/hooks/use-origin";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import { states } from "~/utils/shipping";
 import { cn } from "~/utils/styles";
@@ -45,14 +46,12 @@ import { cn } from "~/utils/styles";
 const formSchema = z.object({
   name: z.string().min(2),
 
-  street: z.string().optional(),
+  street: z.string(),
   additional: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z
-    .string()
-    .regex(/^\d{5}-\d{3}$/)
-    .optional(),
+  city: z.string(),
+  state: z.string(),
+  zip: z.string().regex(/^\d{5}(?:[-\s]\d{4})?$/),
+  country: z.string(),
   hasFreeShipping: z.boolean(),
   minFreeShipping: z.coerce.number().nonnegative(),
   hasPickup: z.boolean(),
@@ -67,6 +66,7 @@ interface SettingsFormProps {
   initialData: Prisma.StoreGetPayload<{
     include: {
       gallery: true;
+      address: true;
     };
   }>;
 }
@@ -81,24 +81,17 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const address = initialData.businessAddress?.split(", ") ?? [
-    "",
-    "",
-    "",
-    "",
-    "",
-  ];
-
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData.name,
 
-      street: address[0] ?? "",
-      additional: address.length > 5 ? address[1] ?? "" : "",
-      city: address.length > 5 ? address[2] ?? "" : address[1] ?? "",
-      state: address.length > 5 ? address[3] ?? "" : address[2] ?? "",
-      zip: address.length > 5 ? address[4] ?? "" : address[3] ?? "",
+      street: initialData?.address?.street ?? "",
+      additional: initialData?.address?.additional ?? "",
+      city: initialData?.address?.city ?? "",
+      state: initialData?.address?.state ?? "",
+      zip: initialData?.address?.postal_code ?? "",
+      country: initialData?.address?.country ?? "US",
 
       hasFreeShipping: initialData?.hasFreeShipping,
       minFreeShipping: initialData?.minFreeShipping ?? 0,
@@ -111,11 +104,10 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
 
   const { mutate: updateStore } = api.store.updateStore.useMutation({
     onSuccess: () => {
-      toast.success("Store updated.");
+      toastService.success("Store successfully updated.");
     },
     onError: (error) => {
-      toast.error("Something went wrong");
-      console.error(error);
+      toastService.error("Something went wrong", error);
     },
     onMutate: () => {
       setLoading(true);
@@ -129,10 +121,13 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const { mutate: deleteStore } = api.store.deleteStore.useMutation({
     onSuccess: () => {
       router.push("/admin");
-      toast.success("Store deleted.");
+      toastService.success("Store deleted.");
     },
     onError: (error) => {
-      toast.error("Make sure you removed all products using this color first.");
+      toastService.error(
+        "Something went wrong with deleting your store. Please try again.",
+        error
+      );
       console.error(error);
     },
     onMutate: () => {
@@ -148,9 +143,14 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     updateStore({
       storeId: params.query.storeId as string,
       name: data.name,
-      businessAddress: `${data.street}, ${
-        data.additional ? data.additional + ", " : ""
-      }${data.city}, ${data.state}, ${data.zip}, US`,
+      address: {
+        street: data.street,
+        additional: data.additional,
+        city: data.city,
+        state: data.state,
+        postalCode: data.zip,
+        country: data.country,
+      },
       hasFreeShipping: data.hasFreeShipping,
       minFreeShipping: data.minFreeShipping ?? undefined,
       hasPickup: data.hasPickup,

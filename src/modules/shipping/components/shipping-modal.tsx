@@ -51,9 +51,10 @@ export const ShippingModal = ({ data }: { data: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [label, setLabel] = useState<Shippo.Transaction | null>(null);
 
-  const { data: currentOrder } = api.orders.getOrder.useQuery({
-    orderId: data ?? "",
-  });
+  const { data: currentOrder } = api.orders.getOrder.useQuery(
+    { orderId: data ?? "" },
+    { enabled: shippingModal.isOpen }
+  );
 
   const { mutate: createLabel } = api.shippingLabels.createLabel.useMutation({
     onSuccess: (data) => {
@@ -68,6 +69,12 @@ export const ShippingModal = ({ data }: { data: string }) => {
     void apiContext.orders.getAllOrders.invalidate();
     shippingModal.onClose();
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      document.body.style.pointerEvents = "";
+    }, 500);
+  }, []);
 
   const purchaseAndGenerateLabel = () => {
     setLoading(true);
@@ -100,26 +107,18 @@ export const ShippingModal = ({ data }: { data: string }) => {
       .finally(() => setLoading(false));
   };
 
-  const customerAddress = data
-    ? currentOrder?.address && currentOrder?.address?.split(", ").length > 5
-      ? {
-          name: currentOrder?.name ?? undefined,
-          street: currentOrder?.address?.split(", ")[0] ?? undefined,
-          additional: currentOrder?.address?.split(", ")[1] ?? undefined,
-          city: currentOrder?.address?.split(", ")[2] ?? undefined,
-          state: currentOrder?.address?.split(", ")[3] ?? undefined,
-          zip: currentOrder?.address?.split(", ")[4] ?? undefined,
-        }
-      : {
-          name: currentOrder?.name ?? undefined,
-          street: currentOrder?.address?.split(", ")[0] ?? undefined,
-          additional: "",
-          city: currentOrder?.address?.split(", ")[1] ?? undefined,
-          state: currentOrder?.address?.split(", ")[2] ?? undefined,
-          zip: currentOrder?.address?.split(", ")[3] ?? undefined,
-        }
+  const customerAddress = currentOrder?.address
+    ? {
+        name: toAddress?.name ?? currentOrder?.name ?? undefined,
+        street: toAddress?.street ?? currentOrder?.address?.street ?? "",
+        additional:
+          toAddress?.additional ?? currentOrder?.address?.additional ?? "",
+        city: toAddress?.city ?? currentOrder?.address?.city ?? "",
+        state: toAddress?.state ?? currentOrder?.address?.state ?? "",
+        zip: toAddress?.zip ?? currentOrder?.address?.postal_code ?? "",
+      }
     : {
-        name: "",
+        name: currentOrder?.name ?? undefined,
         street: "",
         additional: "",
         city: "",
@@ -127,28 +126,23 @@ export const ShippingModal = ({ data }: { data: string }) => {
         zip: "",
       };
 
-  const { data: storeInfo } = api.store.getStore.useQuery({ storeId });
+  const { data: storeInfo } = api.store.getStore.useQuery(
+    { storeId },
+    { enabled: shippingModal.isOpen }
+  );
 
-  const businessAddress = storeInfo
-    ? storeInfo?.businessAddress?.split(", ").length > 5
-      ? {
-          name: storeInfo?.name ?? undefined,
-          street: storeInfo?.businessAddress?.split(", ")[0] ?? undefined,
-          additional: storeInfo?.businessAddress?.split(", ")[1] ?? undefined,
-          city: storeInfo?.businessAddress?.split(", ")[2] ?? undefined,
-          state: storeInfo?.businessAddress?.split(", ")[3] ?? undefined,
-          zip: storeInfo?.businessAddress?.split(", ")[4] ?? undefined,
-        }
-      : {
-          name: storeInfo?.name ?? undefined,
-          street: storeInfo?.businessAddress?.split(", ")[0] ?? undefined,
-          additional: "",
-          city: storeInfo?.businessAddress?.split(", ")[1] ?? undefined,
-          state: storeInfo?.businessAddress?.split(", ")[2] ?? undefined,
-          zip: storeInfo?.businessAddress?.split(", ")[3] ?? undefined,
-        }
+  const businessAddress = storeInfo?.address
+    ? {
+        name: fromAddress?.name ?? storeInfo?.name ?? undefined,
+        street: fromAddress?.street ?? storeInfo?.address?.street ?? "",
+        additional:
+          fromAddress?.additional ?? storeInfo?.address?.additional ?? "",
+        city: fromAddress?.city ?? storeInfo?.address?.city ?? "",
+        state: fromAddress?.state ?? storeInfo?.address?.state ?? "",
+        zip: fromAddress?.zip ?? storeInfo?.address?.postal_code ?? "",
+      }
     : {
-        name: "",
+        name: storeInfo?.name ?? undefined,
         street: "",
         additional: "",
         city: "",
@@ -156,6 +150,7 @@ export const ShippingModal = ({ data }: { data: string }) => {
         zip: "",
       };
 
+  console.log(selectedRate);
   useEffect(() => {
     if (tabValue === "rates")
       getRates()
@@ -262,27 +257,33 @@ export const ShippingModal = ({ data }: { data: string }) => {
                   )}
                 </TabsContent>
                 <TabsContent value="package">
-                  <PackageForm
-                    successCallback={() => {
-                      toast.success("Package details saved to cache");
-                      setTabValue("rates");
-                    }}
-                    errorCallback={() =>
-                      toast.error("Business address is invalid.")
-                    }
-                  />
+                  {parcel && (
+                    <PackageForm
+                      successCallback={() => {
+                        toast.success("Package details saved to cache");
+                        setTabValue("rates");
+                      }}
+                      errorCallback={() =>
+                        toast.error("Business address is invalid.")
+                      }
+                      initialData={parcel ?? null}
+                    />
+                  )}
                 </TabsContent>
 
                 <TabsContent value="rates">
-                  <RatesForm
-                    successCallback={() => {
-                      toast.success("selected");
-                      setTabValue("review");
-                    }}
-                    errorCallback={() => {
-                      toast.error("Rates could not be fetched.");
-                    }}
-                  />
+                  {selectedRate && (
+                    <RatesForm
+                      successCallback={() => {
+                        toast.success("selected");
+                        setTabValue("review");
+                      }}
+                      errorCallback={() => {
+                        toast.error("Rates could not be fetched.");
+                      }}
+                      initialData={selectedRate ?? null}
+                    />
+                  )}
                 </TabsContent>
                 <TabsContent value="review">
                   <div className="flex flex-col gap-4 text-left">

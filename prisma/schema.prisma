@@ -24,15 +24,19 @@ model Example {
 
 model Address {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  street        String
+  additional    String?
+  city          String
+  state         String
+  postal_code   String
+  country       String?
 
-  street     String
-  additional String?
-  city       String
-  state      String
-  zip        String
-  country    String?
+ storeId  String?                  @unique  
+  store    Store?                 @relation( fields: [storeId], references: [id], onDelete: Cascade) 
+
+    orderId  String?               @unique  //Main Address of the order
+  order    Order?               @relation( fields: [orderId], references: [id], onDelete: Cascade) 
+
 }
 // Necessary for Next auth
 model Account {
@@ -91,6 +95,9 @@ model Store {
   slug              String?         @unique
   userId            String
   businessAddress   String          @default("")
+
+  address         Address ?
+
  
   billboards        Billboard[]     @relation("StoreToBillboard")
   categories        Category[]      @relation("StoreToCategory")
@@ -285,7 +292,8 @@ model Order {
   name            String      @default("")
   email           String      @default("")
   phone           String      @default("")
-  address         String      @default("")
+  address         Address?
+  // address         String      @default("")
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -301,6 +309,8 @@ model Order {
 
   @@index([userId])
 }
+
+
 
 
 model BlogPost {
@@ -537,3 +547,5 @@ enum Role {
   ADMIN
   BUSINESS_OWNER
 }
+
+

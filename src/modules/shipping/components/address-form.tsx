@@ -39,19 +39,12 @@ import useShippingLabel, {
 import { cn } from "~/utils/styles";
 
 const shippingFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, {
-      message: "Name must be at least 2 characters.",
-    })
-    .max(30, {
-      message: "Name must not be longer than 30 characters.",
-    }),
+  name: z.string().min(2),
   street: z.string(),
   additional: z.string().optional(),
   city: z.string(),
   state: z.string(),
-  zip: z.coerce.number(),
+  zip: z.string().regex(/^\d{5}(?:[-\s]\d{4})?$/),
 });
 
 type ShippingFormValues = z.infer<typeof shippingFormSchema>;
@@ -84,7 +77,7 @@ const AddressForm: FC<AddressFormProps> = ({
     additional: initialData?.additional ?? undefined,
     city: initialData?.city ?? undefined,
     state: initialData?.state ?? undefined,
-    zip: Number(initialData?.zip) ?? 0,
+    zip: initialData?.zip ?? undefined,
   };
 
   const shippingForm = useForm<ShippingFormValues>({
@@ -101,7 +94,7 @@ const AddressForm: FC<AddressFormProps> = ({
       additional: data.additional,
       city: data.city,
       state: data.state,
-      zip: data.zip.toString(),
+      zip: data.zip,
     })
       .then((res: ShippingResponse) => {
         if (res.isValid) successCallback(data);

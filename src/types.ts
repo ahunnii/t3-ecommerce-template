@@ -118,6 +118,7 @@ export type Popup = {
 
 export type DetailedOrder = Prisma.OrderGetPayload<{
   include: {
+    address: true;
     orderItems: {
       include: {
         variant: true;

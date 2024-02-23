@@ -44,6 +44,7 @@ export const ordersRouter = createTRPCRouter({
           ...input.searchParams,
         },
         include: {
+          address: true,
           orderItems: {
             include: {
               product: true,
@@ -75,6 +76,7 @@ export const ordersRouter = createTRPCRouter({
         },
         include: {
           shippingLabel: true,
+          address: true,
           timeline: true,
           orderItems: {
             include: {
@@ -96,58 +98,83 @@ export const ordersRouter = createTRPCRouter({
         storeId: z.string(),
         isPaid: z.boolean().optional(),
         phone: z.string(),
-        address: z.string(),
+        address: z.object({
+          street: z.string(),
+          additional: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postalCode: z.string(),
+          country: z.string(),
+        }),
         name: z.string(),
       })
     )
-    .mutation(({ ctx, input }) => {
-      if (!input.phone) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
-        });
-      }
+    .mutation(async ({ ctx, input }) => {
+      try {
+        if (!input.phone) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Name is required",
+          });
+        }
 
-      if (!input.address) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Value is required",
-        });
-      }
+        if (!input.address) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Value is required",
+          });
+        }
 
-      return ctx.prisma.store
-        .findFirst({
+        const store = await ctx.prisma.store.findFirst({
           where: {
             id: input.storeId,
             userId: ctx.session.user.id,
           },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Size id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.order.create({
-            data: {
-              storeId: input.storeId,
-              isPaid: input.isPaid,
-              address: input.address,
-              phone: input.phone,
-              name: input.name,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
         });
+
+        if (!store) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Size id does not belong to current user",
+          });
+        }
+
+        const order = await ctx.prisma.order.create({
+          data: {
+            storeId: input.storeId,
+            isPaid: input.isPaid,
+
+            phone: input.phone,
+            name: input.name,
+          },
+        });
+
+        if (!input.address) return order;
+
+        return ctx.prisma.order.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            address: {
+              create: {
+                street: input.address.street,
+                additional: input.address.additional,
+                city: input.address.city,
+                state: input.address.state,
+                postal_code: input.address.postalCode,
+                country: input.address.country,
+              },
+            },
+          },
+        });
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong. Please try again later.",
+          cause: err,
+        });
+      }
     }),
 
   updateOrder: protectedProcedure
@@ -157,63 +184,90 @@ export const ordersRouter = createTRPCRouter({
         orderId: z.string(),
         isPaid: z.boolean().optional(),
         phone: z.string(),
-        address: z.string(),
+        address: z.object({
+          street: z.string(),
+          additional: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postalCode: z.string(),
+          country: z.string(),
+        }),
         name: z.string(),
       })
     )
-    .mutation(({ ctx, input }) => {
-      if (!input.orderId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "order Id is required",
-        });
+    .mutation(async ({ ctx, input }) => {
+      try {
+        if (!input.orderId)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "order Id is required",
+          });
 
-      if (!input.phone)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "phone is required",
-        });
+        if (!input.phone)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "phone is required",
+          });
 
-      if (!input.address)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Address is required",
-        });
+        if (!input.address)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Address is required",
+          });
 
-      return ctx.prisma.store
-        .findFirst({
+        const store = await ctx.prisma.store.findFirst({
           where: {
             id: input.storeId,
             userId: ctx.session.user.id,
           },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Order id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.order.update({
-            where: {
-              id: input.orderId,
-            },
-            data: {
-              isPaid: input.isPaid,
-              address: input.address,
-              phone: input.phone,
-              name: input.name,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
         });
+
+        if (!store) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Size id does not belong to current user",
+          });
+        }
+
+        const order = await ctx.prisma.order.update({
+          where: {
+            id: input.orderId,
+          },
+          data: {
+            isPaid: input.isPaid,
+            address: {
+              upsert: {
+                create: {
+                  street: input.address.street,
+                  additional: input.address.additional,
+                  city: input.address.city,
+                  state: input.address.state,
+                  postal_code: input.address.postalCode,
+                  country: input.address.country,
+                },
+                update: {
+                  street: input.address.street,
+                  additional: input.address.additional,
+                  city: input.address.city,
+                  state: input.address.state,
+                  postal_code: input.address.postalCode,
+                  country: input.address.country,
+                },
+              },
+            },
+            phone: input.phone,
+            name: input.name,
+          },
+        });
+
+        return order;
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong. Please try again later.",
+          cause: err,
+        });
+      }
     }),
 
   deleteOrder: protectedProcedure

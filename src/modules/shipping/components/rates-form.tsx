@@ -38,9 +38,10 @@ const selectionSchema = z.object({
 type TInitialData = {
   successCallback: (data?: unknown) => void;
   errorCallback: (data?: unknown) => void;
+  initialData: Shippo.Rate | null;
 };
 
-const RatesForm: FC<TInitialData> = ({ successCallback }) => {
+const RatesForm: FC<TInitialData> = ({ initialData, successCallback }) => {
   //   const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { rates, selectedRate, setSelectedRate } = useShippingLabel();
@@ -49,6 +50,7 @@ const RatesForm: FC<TInitialData> = ({ successCallback }) => {
     resolver: zodResolver(selectionSchema),
     defaultValues: {
       //   rate_selection_id: order?.address,
+      rate_selection_id: initialData?.object_id ?? "",
     },
   });
 
@@ -73,60 +75,61 @@ const RatesForm: FC<TInitialData> = ({ successCallback }) => {
 
                 <FormControl>
                   <>
-                    <Select
-                      onValueChange={(e) => {
-                        setSelectedRate(
-                          rates.find((rate) => rate.object_id === e)! ?? null
-                        );
-                        console.log(
-                          rates.find((rate) => rate.object_id === e)! ?? null
-                        );
+                    {rates && (
+                      <Select
+                        value={field.value}
+                        onValueChange={(e) => {
+                          setSelectedRate(
+                            rates.find((rate) => rate.object_id === e)! ?? null
+                          );
+                          console.log(initialData);
 
-                        field.onChange(e);
-                      }}
-                    >
-                      <SelectTrigger className="flex h-20 w-full text-left">
-                        <SelectValue placeholder="No variant selected" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-96 ">
-                        <SelectGroup>
-                          {rates?.map((rate, idx) => (
-                            <SelectItem
-                              className="flex"
-                              value={rate?.object_id}
-                              key={idx}
-                            >
-                              <div className="flex items-center gap-4">
-                                <Image
-                                  src={rate?.provider_image_75}
-                                  className={cn(
-                                    rate?.provider === "USPS" ? "h-3" : "h-6"
-                                  )}
-                                  alt=""
-                                  width={rate?.provider === "USPS" ? 56 : 24}
-                                  height={rate?.provider === "USPS" ? 24 : 24}
-                                />
-                                <div className="flex flex-col justify-start">
-                                  <span className="flex gap-2">
-                                    {rate?.servicelevel?.name} ${rate?.amount}
-                                    {rate?.attributes?.map(
-                                      (attr: unknown, idx: number) => (
-                                        <Badge key={idx} className="text-xs">
-                                          {attr as string}
-                                        </Badge>
-                                      )
+                          field.onChange(e);
+                        }}
+                      >
+                        <SelectTrigger className="flex h-20 w-full text-left">
+                          <SelectValue placeholder="No variant selected" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-96 ">
+                          <SelectGroup>
+                            {rates?.map((rate, idx) => (
+                              <SelectItem
+                                className="flex"
+                                value={rate?.object_id}
+                                key={idx}
+                              >
+                                <div className="flex items-center gap-4">
+                                  <Image
+                                    src={rate?.provider_image_75}
+                                    className={cn(
+                                      rate?.provider === "USPS" ? "h-3" : "h-6"
                                     )}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {rate?.duration_terms}
-                                  </span>
+                                    alt=""
+                                    width={rate?.provider === "USPS" ? 56 : 24}
+                                    height={rate?.provider === "USPS" ? 24 : 24}
+                                  />
+                                  <div className="flex flex-col justify-start">
+                                    <span className="flex gap-2">
+                                      {rate?.servicelevel?.name} ${rate?.amount}
+                                      {rate?.attributes?.map(
+                                        (attr: unknown, idx: number) => (
+                                          <Badge key={idx} className="text-xs">
+                                            {attr as string}
+                                          </Badge>
+                                        )
+                                      )}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {rate?.duration_terms}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
 
                     <FormDescription>
                       {selectedRate

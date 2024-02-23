@@ -33,7 +33,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           );
 
           if (verifiedDBDataResponse.status !== 200) {
-            throw new Error();
+            throw new Error("Error verifying cart items.");
           }
 
           const verifiedDBData = (await verifiedDBDataResponse.data
@@ -103,6 +103,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           return res.json(session);
         } catch (err) {
+          console.log(err);
           return res
             .status(500)
             .json({ error: "Error creating checkout session" });

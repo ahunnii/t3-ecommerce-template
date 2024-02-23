@@ -22,6 +22,7 @@ export type DetailedOrder = Prisma.OrderGetPayload<{
     };
     shippingLabel: true;
     timeline: true;
+    address: true;
   };
 }>;
 

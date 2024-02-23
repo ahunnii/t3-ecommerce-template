@@ -28,12 +28,14 @@ const handleCheckoutProcessing = async (
       isComplete,
     }: UpdateOrderProps) => {
       try {
+        const { address, ...rest } = orderData;
         const order = await prisma.order.update({
           where: {
             id: orderId,
           },
           data: {
-            ...orderData,
+            ...rest,
+
             timeline: {
               createMany: {
                 data: [
@@ -60,6 +62,21 @@ const handleCheckoutProcessing = async (
           },
         });
 
+        if (address) {
+          await prisma.order.update({
+            where: {
+              id: orderId,
+            },
+            data: {
+              address: {
+                upsert: {
+                  create: address,
+                  update: address,
+                },
+              },
+            },
+          });
+        }
         if (!isComplete) return order;
 
         order.orderItems.map(async (orderItem) => {

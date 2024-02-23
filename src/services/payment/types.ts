@@ -72,6 +72,15 @@ export type PaymentOrderData = {
   taxes?: number;
   referenceId?: string;
   paymentId?: string;
+
+  address?: {
+    street: string;
+    additional?: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string;
+  };
 };
 
 export type UpdateOrderProps = {

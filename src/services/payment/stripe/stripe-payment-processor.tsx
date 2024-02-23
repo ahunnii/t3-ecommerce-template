@@ -105,7 +105,17 @@ export const stripePaymentProcessor: PaymentProcessor<
         const eventSession = event.data.object as Stripe.Checkout.Session;
 
         const orderDataFromSession = getOrderInfo({
-          orderData: { isPaid: false },
+          orderData: {
+            address: {
+              street: eventSession?.shipping_details?.address?.line1 ?? "",
+              additional: eventSession?.shipping_details?.address?.line2 ?? "",
+              city: eventSession?.shipping_details?.address?.city ?? "",
+              state: eventSession?.shipping_details?.address?.state ?? "",
+              postal_code:
+                eventSession?.shipping_details?.address?.postal_code ?? "",
+              country: eventSession?.shipping_details?.address?.country ?? "",
+            },
+          },
           formattedData: formatSessionData(eventSession),
         });
 
@@ -287,7 +297,7 @@ export const stripePaymentProcessor: PaymentProcessor<
     const results: retrievePaymentResult = {
       items: order.orderItems,
       billingAddress: `${paymentMethod?.billing_details?.address?.line1},  ${paymentMethod?.billing_details?.address?.line2}, ${paymentMethod?.billing_details?.address?.city} ${paymentMethod?.billing_details?.address?.state} ${paymentMethod?.billing_details?.address?.postal_code},  `,
-      shippingAddress: order.address,
+      shippingAddress: `${order?.address?.street},  ${order?.address?.additional}, ${order?.address?.city} ${order?.address?.state} ${order?.address?.postal_code},  `,
       orderPlaced: `Placed: ${new Date(paymentMethod?.created).toDateString()}`,
       paymentDetails: `${paymentMethod?.card?.brand} ending in ${paymentMethod?.card?.last4}`,
     };

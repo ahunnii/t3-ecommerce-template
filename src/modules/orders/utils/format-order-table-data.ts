@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-import { formatter } from "~/utils/styles";
 import type { DetailedOrder } from "../types";
 
 export const formatOrderTableData = (item: DetailedOrder) => ({
@@ -13,9 +11,7 @@ export const formatOrderTableData = (item: DetailedOrder) => ({
   products: item.orderItems
     .map((orderItem) => orderItem.product.name)
     .join(", "),
-  total: item.orderItems.reduce((total, item) => {
-    return total + Number(item.product.price);
-  }, 0),
+  total: item.total,
 
   isPaid: item.isPaid,
   isShipped: item.isShipped,

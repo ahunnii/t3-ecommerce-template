@@ -3,7 +3,17 @@ import { Separator } from "~/components/ui/separator";
 type ViewOrderDetailsProps = {
   name?: string;
   phone?: string;
-  address?: string;
+  address: {
+    id: string;
+    street: string;
+    additional: string | null;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string | null;
+    storeId: string | null;
+    orderId: string | null;
+  } | null;
   email?: string;
 };
 export const ViewOrderDetails = ({
@@ -31,7 +41,11 @@ export const ViewOrderDetails = ({
         <Separator orientation="vertical" />
         <div className="text-left">
           <p className="text-muted-foreground">Address:</p>
-          <p>{address}</p>
+          <p>{address?.street}</p>
+          <p>{address?.additional}</p>
+          <p>
+            {address?.city}, {address?.state} {address?.postal_code}
+          </p>
         </div>{" "}
         <Separator orientation="vertical" />
         <div className="text-left">
