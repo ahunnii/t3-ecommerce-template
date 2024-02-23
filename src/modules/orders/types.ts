@@ -1,4 +1,6 @@
-import type { Prisma, Product } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import type * as z from "zod";
+import type { orderFormSchema } from "./schemas";
 
 export type OrderItem = Prisma.OrderItemGetPayload<{
   include: {
@@ -38,3 +40,5 @@ export type PaymentOrder = Prisma.OrderGetPayload<{
     timeline: true;
   };
 }>;
+
+export type OrderFormValues = z.infer<typeof orderFormSchema>;

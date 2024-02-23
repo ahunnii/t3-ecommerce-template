@@ -77,7 +77,11 @@ export const ordersRouter = createTRPCRouter({
         include: {
           shippingLabel: true,
           address: true,
-          timeline: true,
+          timeline: {
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
           orderItems: {
             include: {
               variant: true,
@@ -106,6 +110,13 @@ export const ordersRouter = createTRPCRouter({
           postalCode: z.string(),
           country: z.string(),
         }),
+        orderItems: z.array(
+          z.object({
+            variantId: z.string().nullish(),
+            productId: z.string(),
+            quantity: z.number(),
+          })
+        ),
         name: z.string(),
       })
     )
@@ -146,6 +157,20 @@ export const ordersRouter = createTRPCRouter({
 
             phone: input.phone,
             name: input.name,
+
+            orderItems: {
+              createMany: {
+                data: [
+                  ...input.orderItems.map((orderItem) => {
+                    return {
+                      variantId: orderItem.variantId,
+                      productId: orderItem.productId,
+                      quantity: orderItem.quantity,
+                    };
+                  }),
+                ],
+              },
+            },
           },
         });
 
@@ -192,6 +217,14 @@ export const ordersRouter = createTRPCRouter({
           postalCode: z.string(),
           country: z.string(),
         }),
+        orderItems: z.array(
+          z.object({
+            id: z.string(),
+            variantId: z.string().nullish(),
+            productId: z.string(),
+            quantity: z.number(),
+          })
+        ),
         name: z.string(),
       })
     )
@@ -254,6 +287,25 @@ export const ordersRouter = createTRPCRouter({
                   country: input.address.country,
                 },
               },
+            },
+            orderItems: {
+              upsert: input.orderItems.map((orderItem) => {
+                return {
+                  where: {
+                    id: orderItem.id,
+                  },
+                  create: {
+                    variantId: orderItem.variantId,
+                    productId: orderItem.productId,
+                    quantity: orderItem.quantity,
+                  },
+                  update: {
+                    variantId: orderItem.variantId,
+                    productId: orderItem.productId,
+                    quantity: orderItem.quantity,
+                  },
+                };
+              }),
             },
             phone: input.phone,
             name: input.name,
