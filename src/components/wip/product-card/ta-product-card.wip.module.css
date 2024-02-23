@@ -1,0 +1,114 @@
+.root {
+  @apply relative box-border inline-block max-h-full w-full
+    cursor-pointer overflow-hidden bg-accent bg-cover
+    bg-center bg-no-repeat transition-transform ease-linear;
+  height: 100% !important;
+}
+
+.root:hover {
+  & .productImage {
+    transform: scale(1.2625);
+  }
+
+  & .header .name span,
+  & .header .price,
+  & .wishlistButton {
+    @apply bg-secondary text-secondary;
+  }
+
+  &:nth-child(6n + 1) .header .name span,
+  &:nth-child(6n + 1) .header .price,
+  &:nth-child(6n + 1) .wishlistButton {
+    @apply bg-violet-500 text-white;
+  }
+
+  &:nth-child(6n + 5) .header .name span,
+  &:nth-child(6n + 5) .header .price,
+  &:nth-child(6n + 5) .wishlistButton {
+    @apply bg-blue-500 text-white;
+  }
+
+  &:nth-child(6n + 3) .header .name span,
+  &:nth-child(6n + 3) .header .price,
+  &:nth-child(6n + 3) .wishlistButton {
+    @apply bg-pink-500 text-white;
+  }
+
+  &:nth-child(6n + 6) .header .name span,
+  &:nth-child(6n + 6) .header .price,
+  &:nth-child(6n + 6) .wishlistButton {
+    @apply bg-cyan-500 text-white;
+  }
+}
+
+.header {
+  @apply absolute left-0 top-0
+    z-20 pr-16 transition-colors duration-500 ease-in-out;
+}
+
+.header .name {
+  @apply w-full max-w-full pt-0 leading-loose
+    transition-colors duration-500 ease-in-out;
+  font-size: 2rem;
+  letter-spacing: 0.4px;
+}
+
+.header .name span {
+  @apply bg-primary px-6 py-4 font-bold text-primary
+    transition-colors duration-500 ease-in-out;
+  font-size: inherit;
+  letter-spacing: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.header .price {
+  @apply inline-block bg-primary px-6 pb-4 pt-2 text-sm
+    font-semibold tracking-wide text-accent
+    transition-colors duration-500 ease-in-out;
+}
+
+.imageContainer {
+  @apply flex aspect-square items-center justify-center overflow-hidden;
+}
+
+.imageContainer > div {
+  min-width: 100%;
+}
+
+.imageContainer .productImage {
+  @apply scale-125 transform object-cover
+    transition-transform duration-500;
+}
+
+.root .wishlistButton {
+  @apply absolute right-0 top-0 z-30;
+}
+
+/* Variant Simple */
+.simple .header .name {
+  @apply -mt-1 pt-2 text-lg leading-10;
+}
+
+.simple .header .price {
+  @apply text-sm;
+}
+
+/* Variant Slim */
+.slim {
+  @apply relative box-border overflow-hidden
+    bg-transparent;
+}
+
+.slim .header {
+  @apply absolute inset-0 z-20 mr-8 flex items-center justify-end;
+}
+
+.slim span {
+  @apply inline-block break-words bg-accent p-3
+    text-xl font-bold text-accent;
+}
+
+.root:global(.secondary) .header span {
+  @apply bg-accent text-accent;
+}

@@ -14,9 +14,14 @@ import { cn } from "~/utils/styles";
 interface ProductCard {
   data: DetailedProductFull;
   className?: string;
+  imgClassName?: string;
 }
 
-const ProductCard: React.FC<ProductCard> = ({ data, className }) => {
+export const ProductCardMarquee: React.FC<ProductCard> = ({
+  data,
+  className,
+  imgClassName,
+}) => {
   const previewModal = usePreviewModal();
   const cart = useCart();
   const router = useRouter();
@@ -58,7 +63,7 @@ const ProductCard: React.FC<ProductCard> = ({ data, className }) => {
   return (
     <div
       className={cn(
-        "group cursor-pointer space-y-4 rounded-xl  border border-white/50 bg-black p-3",
+        "group mx-4 flex h-60 w-auto cursor-pointer items-center space-x-4 rounded-xl  border bg-black  p-3",
         className
       )}
       onMouseOver={() => setHovered(true)}
@@ -94,9 +99,9 @@ const ProductCardImage = ({ children, ...props }: TProductCardImage) => {
     "/placeholder-image.webp";
 
   const imageStyle =
-    "aspect-square rounded-md object-cover transition-all duration-500 ease-in-out";
+    "aspect-square rounded-md object-cover transition-all duration-500 ease-in-out h-60 w-60";
   return (
-    <div className="relative aspect-[1/1.6] rounded-xl bg-white/70">
+    <div className="relative aspect-square h-60 w-60  rounded-xl bg-white/70">
       <>
         <Image
           src={fallbackImage}
@@ -135,7 +140,10 @@ const ProductCardDescription = ({
   category,
 }: TProductCardDescription) => {
   return (
-    <div className="text-left" onClick={onClick}>
+    <div
+      className="flex h-full w-60 flex-col items-center justify-center text-center"
+      onClick={onClick}
+    >
       <p className="text-lg font-semibold text-white">{name}</p>
       <p className="text-sm text-gray-500">{category?.name}</p>
       <Currency value={price} className="mt-2  font-extrabold text-white" />
@@ -169,5 +177,3 @@ const ProductCardQuickActions = ({ actions }: { actions: QuickAction[] }) => {
     </div>
   );
 };
-
-export default ProductCard;

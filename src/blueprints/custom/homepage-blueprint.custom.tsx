@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Image from "next/image";
 import Container from "~/components/core/ui/container";
@@ -12,8 +12,30 @@ import { TaProductList } from "~/components/custom/ta-product-list.custom";
 
 import Link from "next/link";
 
+import { Prisma } from "@prisma/client";
+import {
+  IconArrowWaveRightUp,
+  IconBoxAlignRightFilled,
+  IconBoxAlignTopLeft,
+  IconClipboardCopy,
+  IconFileBroken,
+  IconSignature,
+  IconTableColumn,
+} from "@tabler/icons-react";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { FeaturedBanner } from "~/components/wip/featured-banner.wip";
+import Marquee from "~/components/wip/marquee/ta-marquee.wip";
+import {
+  BentoGrid,
+  BentoGridItem,
+} from "~/components/wip/product-bento-grid.wip";
+import ProductCard from "~/components/wip/product-card.wip";
+// import ProductCard from "~/components/wip/product-card/ta-product-card.wip";
+import { ProductCardMarquee } from "~/components/wip/product-card-marquee.wip";
+import Grid from "~/components/wip/product-grid/ta-product-grid.wip";
+import { LayoutGrid } from "~/components/wip/product-layout-grid.wip";
 import { storeTheme } from "~/data/config.custom";
+import { DetailedProductFull } from "~/types";
 
 const metadata = {
   title: "Trend Anomaly",
@@ -24,9 +46,66 @@ export const HomePage = () => {
   const [hover, setHover] = useState(false);
   const [bleach, setBleach] = useState(false);
   const [custom, setCustom] = useState(false);
-  const { data: products } = api.products.getAllProducts.useQuery({
-    // isFeatured: true,
-  });
+  const getAllProducts = api.products.getAllProducts.useQuery(
+    {
+      // isFeatured: true,
+    },
+    {
+      enabled: false,
+    }
+  );
+  useEffect(() => {
+    void getAllProducts.refetch();
+  }, []);
+  function randomNoRepeats(
+    array: Prisma.ProductGetPayload<{
+      include: { images: true; variants: true };
+    }>[]
+  ) {
+    let copy = array.slice(0);
+    return function () {
+      if (copy.length < 1) {
+        copy = array.slice(0);
+      }
+      const index = Math.floor(Math.random() * copy.length);
+      const item = copy[index];
+      copy.splice(index, 1);
+      return item;
+    };
+  }
+
+  const randomProducts = randomNoRepeats(getAllProducts.data ?? []);
+
+  const cards = [
+    {
+      id: 1,
+      content: <SkeletonOne />,
+      className: "md:col-span-2 max-md:aspect-square max-md:h-full",
+      thumbnail: "/product-img-placeholder.svg",
+      product: randomProducts() as DetailedProductFull,
+    },
+    {
+      id: 2,
+      content: <SkeletonTwo />,
+      className: "col-span-1 max-md:aspect-square max-md:h-full",
+      thumbnail: "/product-img-placeholder.svg",
+      product: randomProducts() as DetailedProductFull,
+    },
+    {
+      id: 3,
+      content: <SkeletonThree />,
+      className: "col-span-1 max-md:aspect-square max-md:h-full",
+      thumbnail: "/product-img-placeholder.svg",
+      product: randomProducts() as DetailedProductFull,
+    },
+    {
+      id: 4,
+      content: <SkeletonFour />,
+      className: "md:col-span-2 max-md:aspect-square max-md:h-full",
+      thumbnail: "/product-img-placeholder.svg",
+      product: randomProducts() as DetailedProductFull,
+    },
+  ];
 
   return (
     <>
@@ -40,8 +119,53 @@ export const HomePage = () => {
           <TaHero />
         </div>
 
-        <TaProductList items={products ?? []} />
+        <div className=" w-full md:h-screen">
+          <LayoutGrid cards={cards} />
+        </div>
 
+        {/* <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+          <LayoutGrid cards={cards} className="flex h-96 flex-row" />
+
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea> */}
+
+        {/* <TaProductList items={products ?? []} /> */}
+        {/* <Grid variant="filled">
+          {products?.slice(0, 3).map((product, i: number) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              variant="default"
+              imgProps={{
+                width: i === 0 ? 1080 : 540,
+                height: i === 0 ? 1080 : 540,
+                priority: true,
+                alt: `${product.name} - ${product.id}`,
+              }}
+            />
+          ))}
+        </Grid>{" "} */}
+        {/* <BentoGrid className="mx-auto max-w-4xl">
+          {items.map((item, i) => (
+            <BentoGridItem
+              key={i}
+              title={item.title}
+              description={item.description}
+              header={item.header}
+              icon={item.icon}
+              className={i === 3 || i === 6 ? "md:col-span-2" : ""}
+            />
+          ))}
+        </BentoGrid> */}
+        <Marquee variant="secondary" className="bg-purple-300/90">
+          {getAllProducts.data?.slice(0, 3).map((product, i: number) => (
+            <ProductCardMarquee
+              key={product.id}
+              data={product}
+              className="h-full"
+            />
+          ))}
+        </Marquee>
         <h2 className="text-7xl font-bold text-purple-600">Collections</h2>
         <Container>
           {" "}
@@ -115,3 +239,102 @@ export const HomePage = () => {
     </>
   );
 };
+const SkeletonOne = () => {
+  return (
+    <div>
+      <p className="text-4xl font-bold text-white">House in the woods</p>
+      <p className="text-base font-normal text-white"></p>
+      <p className="my-4 max-w-lg text-base font-normal text-neutral-200">
+        A serene and tranquil retreat, this house in the woods offers a peaceful
+        escape from the hustle and bustle of city life.
+      </p>
+    </div>
+  );
+};
+
+const SkeletonTwo = () => {
+  return (
+    <div>
+      <p className="text-4xl font-bold text-white">House above the clouds</p>
+      <p className="text-base font-normal text-white"></p>
+      <p className="my-4 max-w-lg text-base font-normal text-neutral-200">
+        Perched high above the world, this house offers breathtaking views and a
+        unique living experience. It&apos;s a place where the sky meets home,
+        and tranquility is a way of life.
+      </p>
+    </div>
+  );
+};
+const SkeletonThree = () => {
+  return (
+    <div>
+      <p className="text-4xl font-bold text-white">Greens all over</p>
+      <p className="text-base font-normal text-white"></p>
+      <p className="my-4 max-w-lg text-base font-normal text-neutral-200">
+        A house surrounded by greenery and nature&apos;s beauty. It&apos;s the
+        perfect place to relax, unwind, and enjoy life.
+      </p>
+    </div>
+  );
+};
+const SkeletonFour = () => {
+  return (
+    <div>
+      <p className="text-4xl font-bold text-white">Rivers are serene</p>
+      <p className="text-base font-normal text-white"></p>
+      <p className="my-4 max-w-lg text-base font-normal text-neutral-200">
+        A house by the river is a place of peace and tranquility. It&apos;s the
+        perfect place to relax, unwind, and enjoy life.
+      </p>
+    </div>
+  );
+};
+
+// const Skeleton = () => (
+//   <div className="flex h-full min-h-[6rem] w-full flex-1 rounded-xl bg-gradient-to-br from-neutral-200 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800"></div>
+// );
+// const items = [
+//   {
+//     title: "The Dawn of Innovation",
+//     description: "Explore the birth of groundbreaking ideas and inventions.",
+//     header: <Skeleton />,
+//     icon: <IconClipboardCopy className="h-4 w-4 text-neutral-500" />,
+//   },
+//   {
+//     title: "The Digital Revolution",
+//     description: "Dive into the transformative power of technology.",
+//     header: <Skeleton />,
+//     icon: <IconFileBroken className="h-4 w-4 text-neutral-500" />,
+//   },
+//   {
+//     title: "The Art of Design",
+//     description: "Discover the beauty of thoughtful and functional design.",
+//     header: <Skeleton />,
+//     icon: <IconSignature className="h-4 w-4 text-neutral-500" />,
+//   },
+//   {
+//     title: "The Power of Communication",
+//     description:
+//       "Understand the impact of effective communication in our lives.",
+//     header: <Skeleton />,
+//     icon: <IconTableColumn className="h-4 w-4 text-neutral-500" />,
+//   },
+//   {
+//     title: "The Pursuit of Knowledge",
+//     description: "Join the quest for understanding and enlightenment.",
+//     header: <Skeleton />,
+//     icon: <IconArrowWaveRightUp className="h-4 w-4 text-neutral-500" />,
+//   },
+//   {
+//     title: "The Joy of Creation",
+//     description: "Experience the thrill of bringing ideas to life.",
+//     header: <Skeleton />,
+//     icon: <IconBoxAlignTopLeft className="h-4 w-4 text-neutral-500" />,
+//   },
+//   {
+//     title: "The Spirit of Adventure",
+//     description: "Embark on exciting journeys and thrilling discoveries.",
+//     header: <Skeleton />,
+//     icon: <IconBoxAlignRightFilled className="h-4 w-4 text-neutral-500" />,
+//   },
+// ];

@@ -1,0 +1,31 @@
+.root {
+  @apply absolute left-0 top-0
+    z-20 pr-16 transition-colors duration-500 ease-in-out;
+}
+
+.root .name {
+  @apply w-full max-w-full pt-0 leading-loose;
+  font-size: 2rem;
+  letter-spacing: 0.4px;
+  line-height: 2.1em;
+}
+
+.root .name span {
+  @apply bg-primary px-6 py-4 font-bold text-primary;
+  min-height: 70px;
+  font-size: inherit;
+  letter-spacing: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.root .name span.fontsizing {
+  display: flex;
+  padding-top: 1.5rem;
+}
+
+.root .price {
+  @apply inline-block bg-primary px-6 pb-4 pt-2 text-sm
+    font-semibold tracking-wide text-accent;
+  margin-top: -1px;
+}
