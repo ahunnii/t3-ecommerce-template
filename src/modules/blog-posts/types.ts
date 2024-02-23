@@ -1,4 +1,4 @@
-import type { Prisma, Product } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export type BlogPost = Prisma.BlogPostGetPayload<{
   include: {

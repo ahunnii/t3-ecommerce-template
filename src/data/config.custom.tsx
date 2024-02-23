@@ -23,6 +23,7 @@ export const storeTheme = {
     h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
     h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
     h4: "scroll-m-20 text-xl font-semibold tracking-tight",
+    subheader: "text-muted-foreground",
 
     NavBar: Navbar,
     Footer: Footer,
@@ -41,6 +42,7 @@ export const storeTheme = {
     h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
     h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
     h4: "scroll-m-20 text-xl font-semibold tracking-tight",
+    subheader: "text-muted-foreground",
   },
   breadCrumbs: {
     primary: "hover:text-purple-500 text-neutral-500",

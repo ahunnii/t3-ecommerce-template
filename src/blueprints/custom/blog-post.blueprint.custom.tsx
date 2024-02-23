@@ -1,10 +1,11 @@
 import parse from "html-react-parser";
 import { ArrowLeft } from "lucide-react";
-import Head from "next/head";
+import Image from "next/image";
+
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
-import GalleryCard from "~/components/core/ui/gallery-card";
+
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { Button } from "~/components/ui/button";
 import { useConfig } from "~/providers/style-config-provider";
@@ -23,8 +24,6 @@ export const BlogPostPage = () => {
     slug: params?.blogPostSlug as string,
   });
   const config = useConfig();
-  console.log(params);
-  // const result = ;
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
@@ -45,12 +44,32 @@ export const BlogPostPage = () => {
                   Back to Blog
                 </Button>
               </Link>
-              <h3 className="text-3xl font-bold">{blog?.title} </h3>
 
+              <Image
+                src={blog?.featuredImg ?? ""}
+                width={800}
+                height={400}
+                alt=""
+              />
+              <h1 className={cn(config.typography.h1)}>{blog?.title} </h1>
+              <p className={cn(config.typography.subheader, "mt-0")}>
+                {blog?.createdAt.toDateString()}
+              </p>
               <div className={cn("", "")}>
                 {parse(blog.content ?? "No description provided.")}
               </div>
             </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 px-4 sm:px-6 lg:px-8">
+            {blog.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="rounded-md bg-gray-200 px-2 py-1 font-semibold text-gray-700"
+              >
+                {tag.name}
+              </span>
+            ))}
           </div>
         </div>
       )}
