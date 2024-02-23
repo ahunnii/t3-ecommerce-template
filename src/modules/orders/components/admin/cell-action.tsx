@@ -1,10 +1,19 @@
 "use client";
 
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  CheckSquareIcon,
+  Copy,
+  Download,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Package,
+  Trash,
+} from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
@@ -16,6 +25,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import type { OrderColumn } from "./columns";
 
@@ -27,32 +37,35 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useNavigationRouter();
   const shippingModal = useShippingModal();
   const params = useRouter();
+  const apiContext = api.useContext();
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const { mutate: deleteOrder } = api.orders.deleteOrder.useMutation({
+  const deleteOrder = api.orders.deleteOrder.useMutation({
     onSuccess: () => {
       router.refresh();
-      toast.success("Order deleted.");
+      toastService.success("Order successfully deleted");
     },
-    onError: (error) => {
-      toast.error(
-        "Make sure you removed all orderItems using this order first."
-      );
-      console.error(error);
-    },
-    onMutate: () => {
-      setLoading(true);
-    },
+    onError: (error) => toastService.error("Failed to delete order", error),
     onSettled: () => {
-      setLoading(false);
       setOpen(false);
+      void apiContext.orders.invalidate();
+    },
+  });
+
+  const updateShippingStatus = api.orders.updateOrderShipStatus.useMutation({
+    onSuccess: () => {
+      toastService.success("Order marked as shipped");
+    },
+    onError: (error) =>
+      toastService.error("Failed to update order shipping status", error),
+    onSettled: () => {
+      void apiContext.orders.invalidate();
     },
   });
 
   const onConfirm = () => {
-    deleteOrder({
+    deleteOrder.mutate({
       storeId: params?.query?.storeId as string,
       orderId: data.id,
     });
@@ -61,12 +74,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onCopy = (id: string) => {
     navigator.clipboard
       .writeText(id)
-      .then(() => {
-        toast.success("Order ID copied to clipboard.");
-      })
-      .catch(() => {
-        toast.error("Failed to copy order ID to clipboard.");
-      });
+      .then(() => toastService.success("Order ID copied to clipboard."))
+      .catch((error: unknown) =>
+        toastService.error("Failed to copy order ID to clipboard.", error)
+      );
   };
   useEffect(() => {
     if (openDropdown)
@@ -74,13 +85,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         document.body.style.pointerEvents = "";
       }, 500);
   }, [openDropdown]);
+
   return (
     <>
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onConfirm}
-        loading={loading}
+        loading={deleteOrder.isLoading}
       />
       <DropdownMenu open={openDropdown} onOpenChange={setOpenDropdown}>
         <DropdownMenuTrigger asChild>
@@ -118,8 +130,25 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           {data?.isPaid && (
             <DropdownMenuItem onClick={() => shippingModal.onOpen(data.id)}>
-              <Edit className="mr-2 h-4 w-4" />{" "}
+              {data?.labelCreated ? (
+                <Download className="mr-2 h-4 w-4" />
+              ) : (
+                <Package className="mr-2 h-4 w-4" />
+              )}{" "}
               {data?.labelCreated ? "Download" : "Create"} label
+            </DropdownMenuItem>
+          )}
+          {data?.isPaid && data?.labelCreated && (
+            <DropdownMenuItem
+              onClick={() =>
+                updateShippingStatus.mutate({
+                  orderId: data.id,
+                  isShipped: true,
+                })
+              }
+            >
+              <CheckSquareIcon className="mr-2 h-4 w-4" />
+              Mark as shipped
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onClick={() => setOpen(true)}>

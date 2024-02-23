@@ -335,7 +335,7 @@ model BlogPost {
 model TimeLineEntry {
   id              String      @id @default(cuid())
   title           String
-  description     String?
+  description     String? @db.Text
   type            TimeLineEntryType @default(ORDER_GENERIC)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt

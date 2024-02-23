@@ -1,3 +1,4 @@
+import { TimeLineEntryType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -56,6 +57,43 @@ export const ordersRouter = createTRPCRouter({
         },
         orderBy: {
           createdAt: "desc",
+        },
+      });
+    }),
+
+  createTimelineEntry: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        type: z.nativeEnum(TimeLineEntryType),
+        title: z.string(),
+        description: z.string(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      if (!input.orderId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "orderId is required",
+        });
+      }
+
+      return ctx.prisma.order.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          timeline: {
+            create: {
+              type: input.type,
+              title: input.title,
+              description: input.description,
+              createdAt: new Date(),
+            },
+          },
+        },
+        include: {
+          timeline: true,
         },
       });
     }),
@@ -322,6 +360,39 @@ export const ordersRouter = createTRPCRouter({
       }
     }),
 
+  updateOrderShipStatus: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        isShipped: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        if (!input.orderId)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "order Id is required",
+          });
+
+        const order = await ctx.prisma.order.update({
+          where: {
+            id: input.orderId,
+          },
+          data: {
+            isShipped: input.isShipped,
+          },
+        });
+
+        return order;
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong. Please try again later.",
+          cause: err,
+        });
+      }
+    }),
   deleteOrder: protectedProcedure
     .input(
       z.object({
