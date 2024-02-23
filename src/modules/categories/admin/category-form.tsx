@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Attribute, Billboard, Category } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+
 import * as z from "zod";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
@@ -81,7 +81,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: initialData?.name ?? undefined,
+      name: initialData?.name ?? "",
       billboardId: initialData?.billboardId ?? undefined,
       attributes: initialData?.attributes ?? [],
     },

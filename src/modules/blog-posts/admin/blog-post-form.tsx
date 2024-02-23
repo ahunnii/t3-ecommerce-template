@@ -74,11 +74,11 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
   const action = initialData ? "Save changes" : "Create";
 
   const defaultValues = {
-    title: initialData?.title ?? undefined,
+    title: initialData?.title ?? "",
     featuredImg: initialData?.featuredImg ?? undefined,
-    content: initialData?.content ?? undefined,
-    author: initialData?.author ?? undefined,
-    slug: initialData?.slug ?? undefined,
+    content: initialData?.content ?? "",
+    author: initialData?.author ?? "",
+    slug: initialData?.slug ?? "",
     published: initialData?.published ?? false,
     tags: initialData?.tags ?? [],
   };

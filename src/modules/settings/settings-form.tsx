@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Store } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 import { CheckIcon, ChevronsUpDown, LoaderIcon, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
@@ -49,7 +49,10 @@ const formSchema = z.object({
   additional: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  zip: z.coerce.number().positive().int().optional(),
+  zip: z
+    .string()
+    .regex(/^\d{5}-\d{3}$/)
+    .optional(),
   hasFreeShipping: z.boolean(),
   minFreeShipping: z.coerce.number().nonnegative(),
   hasPickup: z.boolean(),
@@ -61,7 +64,11 @@ const formSchema = z.object({
 type SettingsFormValues = z.infer<typeof formSchema>;
 
 interface SettingsFormProps {
-  initialData: Store;
+  initialData: Prisma.StoreGetPayload<{
+    include: {
+      gallery: true;
+    };
+  }>;
 }
 
 export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
@@ -74,30 +81,31 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const address = initialData.businessAddress?.split(", ") ?? [];
+  const address = initialData.businessAddress?.split(", ") ?? [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ];
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData.name,
 
-      street: address[0] ?? undefined,
-      additional: address.length > 5 ? address[1] ?? undefined : undefined,
-      city:
-        address.length > 5 ? address[2] ?? undefined : address[1] ?? undefined,
-      state:
-        address.length > 5 ? address[3] ?? undefined : address[2] ?? undefined,
-      zip:
-        address.length > 5
-          ? Number(address[4]) ?? undefined
-          : Number(address[3]) ?? undefined,
+      street: address[0] ?? "",
+      additional: address.length > 5 ? address[1] ?? "" : "",
+      city: address.length > 5 ? address[2] ?? "" : address[1] ?? "",
+      state: address.length > 5 ? address[3] ?? "" : address[2] ?? "",
+      zip: address.length > 5 ? address[4] ?? "" : address[3] ?? "",
 
       hasFreeShipping: initialData?.hasFreeShipping,
-      minFreeShipping: initialData?.minFreeShipping ?? undefined,
+      minFreeShipping: initialData?.minFreeShipping ?? 0,
       hasPickup: initialData?.hasPickup,
-      maxPickupDistance: initialData?.maxPickupDistance ?? undefined,
+      maxPickupDistance: initialData?.maxPickupDistance ?? 0,
       hasFlatRate: initialData?.hasFlatRate,
-      flatRateAmount: initialData?.flatRateAmount ?? undefined,
+      flatRateAmount: initialData?.flatRateAmount ?? 0,
     },
   });
 
@@ -187,13 +195,13 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           onChange={() => console.log(form.formState)}
           className="w-full space-y-8"
         >
-          <div className="grid grid-cols-3 gap-8">
+          <div className=" gap-8">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>{" "}
+                  <FormLabel>Store Name</FormLabel>{" "}
                   <FormDescription>
                     Give your store a unique name that will be displayed to your
                     customers.
@@ -203,22 +211,9 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                       disabled={loading}
                       placeholder="Store name"
                       {...field}
+                      className=""
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />{" "}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your name" {...field} />
-                  </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -352,11 +347,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                       <Input
                         placeholder="e.g. 44444"
                         {...field}
-                        type="number"
                         className="col-span-1"
-                        onChange={(e) => {
-                          field.onChange(Number(e.target.value));
-                        }}
                       />
                     </FormControl>
 

@@ -12,13 +12,6 @@ import Link from "next/link";
 
 import { columns, type BillboardColumn } from "./columns";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
-
 interface BillboardClientProps {
   data: BillboardColumn[];
 }
@@ -30,27 +23,13 @@ export const BillboardClient: React.FC<BillboardClientProps> = ({ data }) => {
   return (
     <>
       <div className="flex items-center justify-between">
-        <TooltipProvider delayDuration={250}>
-          <Tooltip>
-            <TooltipTrigger className="text-left">
-              <Heading
-                title={`Billboards (${data.length})`}
-                description="Manage billboards for your store. "
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-96">
-                A billboard is a image text combo that can be used to promote a
-                product or a category.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
+        <Heading
+          title={`Billboards (${data.length})`}
+          description="Manage billboards for your store. A billboard is a image text combo that can be used to promote a product or a category."
+        />
         <Link href={`/admin/${storeId}/billboards/new`}>
           <Button>
-            <Plus className="h-4 w-4 lg:mr-2" />
-            <span className="max-md:sr-only"> Add New</span>
+            <Plus className="mr-2 h-4 w-4" /> Add New
           </Button>
         </Link>
       </div>

@@ -52,32 +52,49 @@ export const redirectToSignIn = () => {
   };
 };
 
+export const redirectToUnauthorized = () => {
+  return {
+    redirect: {
+      destination: "/sign-in",
+      permanent: false,
+    },
+  };
+};
+
+export const redirectToAdmin = () => {
+  return {
+    redirect: {
+      destination: "/admin",
+      permanent: false,
+    },
+  };
+};
 export const authenticateAdminOrOwner = async (
-  ctx: GetServerSidePropsContext
+  ctx: GetServerSidePropsContext,
+  conditional?: (ctx: GetServerSidePropsContext) => unknown
 ) => {
   const session = await getServerAuthSession(ctx);
 
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
+  if (!session || !session.user) return redirectToSignIn();
+  const { id, role } = session.user;
 
-  const userId = session.user.id;
-  const userRole = session.user.role;
+  const storeId = ctx.query.storeId;
 
-  if (userRole !== "ADMIN") {
-    return {
-      store: null,
-      user: null,
-      redirect: {
-        destination: "/unauthorized",
-        permanent: false,
+  if (!storeId) {
+    const store = await prisma.store.findFirst({
+      where: {
+        userId: id,
       },
-    };
+    });
+
+    if (store) {
+      return {
+        redirect: {
+          destination: `/admin/${store.id.toString()}`,
+          permanent: false,
+        },
+      };
+    }
   }
 
   const store = await prisma.store.findFirst({
@@ -86,31 +103,17 @@ export const authenticateAdminOrOwner = async (
     },
   });
 
-  if (!store) {
-    return {
-      store: null,
-      user: null,
-      redirect: {
-        destination: "/admin",
-        permanent: false,
-      },
-    };
-  }
+  if (!store) redirectToAdmin();
 
-  if (store.userId !== userId) {
-    return {
-      store: null,
-      user: null,
-      redirect: {
-        destination: "/unauthorized",
-        permanent: false,
-      },
-    };
-  }
+  if (role !== "ADMIN" && store?.userId !== id) redirectToUnauthorized();
+
+  if (conditional) return conditional(ctx);
 
   return {
-    store,
-    user: session.user,
-    redirect: null,
+    props: {
+      // store,
+      user: session.user,
+      storeId: ctx.query.storeId,
+    },
   };
 };

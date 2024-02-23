@@ -8,6 +8,12 @@ import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 import { columns, type CollectionColumn } from "./columns";
 
@@ -24,10 +30,23 @@ export const CollectionsClient: React.FC<CollectionsClientProps> = ({
   return (
     <>
       <div className="flex items-center justify-between">
-        <Heading
-          title={`Collections (${data.length})`}
-          description="Manage collections for your store. Collections are used to group products together. From basics like Apparel and Jewelry to more specific collections like Holiday and Sale."
-        />
+        <TooltipProvider delayDuration={250}>
+          <Tooltip>
+            <TooltipTrigger className="text-left">
+              <Heading
+                title={`Collections (${data.length})`}
+                description="Manage collections for your store. "
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-96">
+                Collections are used to group products together. From basics
+                like Apparel and Jewelry to more specific collections like
+                Holiday and Sale.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <Button
           onClick={() =>
             navigate.push(

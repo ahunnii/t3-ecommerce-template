@@ -1,13 +1,11 @@
 "use client";
 
-import { CldUploadWidget } from "next-cloudinary";
 import { useEffect, useState } from "react";
 
-import { ImagePlus, Star, StarIcon, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 import { CloudinaryUpload } from "./cloudinary-upload";
-import { UploadThingUpload } from "./uploadthing-upload";
 
 interface ImageUploadProps {
   disabled?: boolean;
@@ -15,10 +13,6 @@ interface ImageUploadProps {
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
   value: string[];
-}
-
-interface Results {
-  secure_url: "https://res.cloudinary.com/dlpkok326/image/upload/v1691613998/i4rjxgj1cirznvtqzbwo.png";
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -33,10 +27,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // const onUpload = (result: { event: string; info: Partial<Results> }) => {
-  //   onChange(result.info.secure_url as string);
-  // };
 
   if (!isMounted) {
     return null;
@@ -61,7 +51,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               </Button>
             </div>
 
-            <Image fill className="object-cover" alt="Image" src={url} />
+            <Image
+              fill
+              className="object-cover"
+              alt="Image"
+              src={url}
+              sizes=" (max-width: 200px) 100vw, 200px"
+              priority
+              loading="eager"
+            />
           </div>
         ))}
       </div>

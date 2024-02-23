@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -8,10 +9,10 @@ import {
 
 export const billboardsRouter = createTRPCRouter({
   getAllBillboards: publicProcedure
-    .input(z.object({ storeId: z.string() }))
+    .input(z.object({ storeId: z.string().optional() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.billboard.findMany({
-        where: { storeId: input.storeId },
+        where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
         orderBy: { createdAt: "desc" },
       });
     }),

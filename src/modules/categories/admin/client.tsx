@@ -11,6 +11,13 @@ import { Separator } from "~/components/ui/separator";
 import Link from "next/link";
 import { columns, type CategoryColumn } from "./columns";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+
 interface CategoriesClientProps {
   data: CategoryColumn[];
 }
@@ -22,10 +29,22 @@ export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
   return (
     <>
       <div className="flex items-center justify-between">
-        <Heading
-          title={`Categories (${data.length})`}
-          description="Manage categories for your store. Products are assigned a category, which includes shared attributes that can used to generate product variants."
-        />
+        <TooltipProvider delayDuration={250}>
+          <Tooltip>
+            <TooltipTrigger className="text-left">
+              <Heading
+                title={`Categories (${data.length})`}
+                description="Manage categories for your store."
+              />{" "}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-96">
+                Products are assigned a category, which includes shared
+                attributes that can used to generate product variants.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <Link href={`/admin/${storeId}/categories/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Add New

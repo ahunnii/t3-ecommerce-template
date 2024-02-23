@@ -6,7 +6,7 @@ import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+
 import * as z from "zod";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
@@ -85,7 +85,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   const form = useForm<CollectionFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: initialData?.name ?? undefined,
+      name: initialData?.name ?? "",
       billboardId: initialData?.billboardId ?? undefined,
       products: initialData?.products ?? [],
     },

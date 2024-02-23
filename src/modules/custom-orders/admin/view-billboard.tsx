@@ -5,7 +5,7 @@ export const ViewBillboard = ({ billboard }: { billboard: Billboard }) => {
   return (
     <div className="w-full rounded-md border border-border bg-background/50 p-4">
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Collection Billboard Preview
+        Preview
       </h3>
       <p className="text-sm text-muted-foreground">
         This is what is shown at the top of each collections page.

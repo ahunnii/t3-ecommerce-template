@@ -1,17 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  Attribute,
-  Category,
-  GalleryImage,
-  Image,
-  Product,
-  ProductType,
-  ShippingType,
-  Tag,
-  Variation,
-} from "@prisma/client";
+import type { GalleryImage } from "@prisma/client";
 
 import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
@@ -162,8 +152,6 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
       id: params.query.galleryId as string,
     });
   };
-
-  const { setValue } = form;
 
   return (
     <>

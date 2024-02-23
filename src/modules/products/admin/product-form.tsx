@@ -14,7 +14,7 @@ import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+
 import * as z from "zod";
 import {
   Table,
@@ -40,7 +40,6 @@ import {
 import { Heading } from "~/components/ui/heading";
 // import ImageLoader from "~/components/ui/image-loader";
 
-import { StringOrTemplateHeader } from "@tanstack/react-table";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { Input } from "~/components/ui/input";
 import {
@@ -52,7 +51,7 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { TagInput } from "~/components/ui/tag-input";
-import { Textarea } from "~/components/ui/textarea";
+
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
@@ -134,7 +133,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     images: initialData?.images ?? [],
     price: initialData?.price ?? 0.0,
     categoryId: initialData?.categoryId ?? undefined,
-    description: initialData?.description ?? undefined,
+    description: initialData?.description ?? "",
     quantity: initialData?.quantity ?? 1,
     isFeatured: initialData?.isFeatured ?? false,
     isArchived: initialData?.isArchived ?? false,
@@ -832,75 +831,70 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     />
                   )}
 
-                  <div className="gap- flex">
-                    <FormField
-                      control={form.control}
-                      name="weight_lb"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Weight (g):</FormLabel>
-                          <FormControl>
-                            <>
-                              <div className="relative ">
-                                <Input
-                                  type="number"
-                                  disabled={loading}
-                                  className="block w-full rounded-md py-1.5 pr-7  text-gray-900     sm:text-sm sm:leading-6"
-                                  placeholder="0.00"
-                                  {...field}
-                                />
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                  <span className="text-gray-500 sm:text-sm">
-                                    lb
-                                  </span>
+                  <div className="flex flex-col justify-center">
+                    <FormLabel>Weight (g):</FormLabel>
+                    <div className="flex">
+                      <FormField
+                        control={form.control}
+                        name="weight_lb"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <>
+                                <div className="relative ">
+                                  <Input
+                                    type="number"
+                                    disabled={loading}
+                                    className="block w-full rounded-md py-1.5 pr-7  text-gray-900     sm:text-sm sm:leading-6"
+                                    placeholder="0.00"
+                                    {...field}
+                                  />
+                                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <span className="text-gray-500 sm:text-sm">
+                                      lb
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </>
-                          </FormControl>
-                          <FormDescription>
-                            Weight of item in grams (excluding packaging)
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                              </>
+                            </FormControl>
 
-                    <FormField
-                      control={form.control}
-                      name="weight_oz"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Weight:</FormLabel>
-                          <FormControl>
-                            <>
-                              <div className="relative ">
-                                {/* <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                              <span className="text-gray-500 sm:text-sm">
-                                $
-                              </span>
-                            </div> */}
-                                <Input
-                                  type="number"
-                                  disabled={loading}
-                                  className="block w-full rounded-md py-1.5 pr-7  text-gray-900     sm:text-sm sm:leading-6"
-                                  placeholder="0.00"
-                                  {...field}
-                                />
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                  <span className="text-gray-500 sm:text-sm">
-                                    oz
-                                  </span>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="weight_oz"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <>
+                                <div className="relative ">
+                                  <Input
+                                    type="number"
+                                    disabled={loading}
+                                    className="block w-full rounded-md py-1.5 pr-7  text-gray-900     sm:text-sm sm:leading-6"
+                                    placeholder="0.00"
+                                    {...field}
+                                  />
+                                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <span className="text-gray-500 sm:text-sm">
+                                      oz
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </>
-                          </FormControl>
-                          <FormDescription>
-                            Weight of item in grams (excluding packaging)
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                              </>
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormDescription>
+                      Weight of item in grams (excluding packaging)
+                    </FormDescription>
                   </div>
                   <div className="gap-8 md:grid md:grid-cols-3">
                     <FormField

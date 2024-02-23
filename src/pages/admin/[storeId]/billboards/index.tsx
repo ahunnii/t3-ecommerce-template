@@ -12,9 +12,13 @@ type TProps = { storeId: string };
 
 const BillboardsPage: FC<TProps> = ({ storeId }) => {
   const { data: billboards, isLoading } =
-    api.billboards.getAllBillboards.useQuery({
-      storeId,
-    });
+    api.billboards.getAllBillboards.useQuery(
+      { storeId },
+      {
+        refetchIntervalInBackground: false,
+        refetchOnWindowFocus: false,
+      }
+    );
 
   return (
     <AdminLayout>
