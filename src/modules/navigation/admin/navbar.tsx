@@ -14,6 +14,7 @@ import {
 import { MainNav } from "~/modules/navigation/admin/main-nav";
 import { api } from "~/utils/api";
 import { Button } from "../../../components/ui/button";
+import { AdminSearch } from "./admin-search";
 const Navbar = () => {
   const { data: stores } = api.store.getAllStores.useQuery();
 
@@ -53,17 +54,7 @@ const Navbar = () => {
               </SheetFooter> */}
           </SheetContent>
         </Sheet>
-        <Button
-          // onClick={() => setShowSearchModal(true)}
-          className="flex w-96 items-center justify-start gap-2"
-          variant="ghost"
-        >
-          <Search className="text-grey-50" />
-          {/* <div className="ml-5">
-          <Shortcu macModifiers="⌘" winModifiers="Ctrl" keys="K" />
-        </div> */}
-          <span className="ml-0 text-left">Search anything...</span>
-        </Button>
+        <AdminSearch />
         <div className="ml-auto flex items-center space-x-4">
           <ThemeToggle />
           {/* <UserButton afterSignOutUrl="/" /> */}

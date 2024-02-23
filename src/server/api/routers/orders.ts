@@ -29,7 +29,7 @@ export const ordersRouter = createTRPCRouter({
   getAllOrders: protectedProcedure
     .input(
       z.object({
-        storeId: z.string(),
+        storeId: z.string().optional(),
         searchParams: z
           .object({
             isShipped: z.boolean().optional(),
@@ -40,7 +40,7 @@ export const ordersRouter = createTRPCRouter({
     .query(({ ctx, input }) => {
       return ctx.prisma.order.findMany({
         where: {
-          storeId: input.storeId,
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           ...input.searchParams,
         },
         include: {

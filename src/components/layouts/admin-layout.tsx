@@ -1,3 +1,4 @@
+import Link from "next/link";
 import StoreSwitcher from "~/components/admin/store-switcher";
 import { SEO } from "~/components/core/seo-head";
 import { Button } from "~/components/ui/button";
@@ -48,7 +49,12 @@ const AdminLayout = ({ children, metadata }: IProps) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full">View Docs</Button>
+                  <Link
+                    prefetch={false}
+                    href="https://artisanal-futures-documentation.vercel.app/artisan-sites"
+                  >
+                    <Button className="w-full">View Docs</Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>
