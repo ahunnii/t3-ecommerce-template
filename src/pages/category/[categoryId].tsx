@@ -1,12 +1,4 @@
-import type { GetServerSidePropsContext } from "next";
-import type { ParsedUrlQuery } from "querystring";
-import type { FC } from "react";
-import type { Category, DetailedProductFull, Size, Variation } from "~/types";
-
-import getCategory from "~/actions/core/get-category";
-
-import getProducts from "~/actions/core/get-products";
-import getSizes from "~/actions/core/get-sizes";
+import type { DetailedProductFull } from "~/types";
 
 import AttributeFilter from "~/modules/categories/core/attribute-filter";
 
@@ -17,18 +9,6 @@ import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import MobileFilters from "~/modules/categories/core/mobile-filters";
 import { api } from "~/utils/api";
-
-interface IProps {
-  category: Category;
-  products: DetailedProductFull[];
-  sizes: Size[];
-}
-
-interface Params extends ParsedUrlQuery {
-  sizeId: string;
-  categoryId: string;
-  sizeVariant: string;
-}
 
 const CategoryPage = () => {
   const params = useParams();
@@ -72,58 +52,4 @@ const CategoryPage = () => {
   );
 };
 
-// export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-//   const { sizeId, categoryId } = ctx.query as Params;
-
-//   const products = await getProducts({
-//     categoryId,
-
-//     sizeId,
-//   });
-
-//   const sizes = await getSizes();
-
-//   const category = await getCategory(categoryId);
-
-//   const attributes = category.attributes.map((attribute) =>
-//     attribute.name.toLowerCase()
-//   );
-
-//   if (Object.keys(ctx.query).length === 1 && ctx.query?.categoryId) {
-//     return {
-//       props: {
-//         products,
-//         sizes,
-
-//         category,
-//       },
-//     };
-//   }
-
-//   const variants = products.flatMap((product) => product.variants);
-
-//   const filteredProductIds = variants
-//     .filter((variant) => {
-//       return attributes.every((attribute) => {
-//         if (ctx.query?.[`${attribute}Variant`] !== undefined)
-//           return variant.values.includes(
-//             ctx.query?.[`${attribute}Variant`] as string
-//           );
-//         return true;
-//       });
-//     })
-//     .map((variant: Variation) => variant?.productId);
-
-//   const variantProducts = products.filter((product) =>
-//     filteredProductIds.includes(product.id)
-//   );
-
-//   return {
-//     props: {
-//       products: variantProducts,
-//       sizes,
-//       category,
-//     },
-//   };
-// };
 export default CategoryPage;
