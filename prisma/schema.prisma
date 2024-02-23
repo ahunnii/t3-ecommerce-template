@@ -74,7 +74,6 @@ model User {
   sessions      Session[]
   role          Role      @default(USER)
   orders        Order[]   @relation("UserToOrder")
-
   cart Cart[] @relation("UserToCart")
 }
 
@@ -87,17 +86,18 @@ model VerificationToken {
 }
 
 model Store {
-  id                String       @id @default(uuid())
+  id                String          @id @default(cuid())
   name              String
-  slug              String?        @unique
+  slug              String?         @unique
   userId            String
-  businessAddress   String       @default("")
-  billboards        Billboard[]  @relation("StoreToBillboard")
-  categories        Category[]   @relation("StoreToCategory")
-  products          Product[]    @relation("StoreToProduct")
-  orders            Order[]      @relation("StoreToOrder")
-  gallery           GalleryImage[] @relation("StoreToGalleryImage")
-  blog              BlogPost[] @relation("StoreToBlogPost")
+  businessAddress   String          @default("")
+ 
+  billboards        Billboard[]     @relation("StoreToBillboard")
+  categories        Category[]      @relation("StoreToCategory")
+  products          Product[]       @relation("StoreToProduct")
+  orders            Order[]         @relation("StoreToOrder")
+  gallery           GalleryImage[]  @relation("StoreToGalleryImage")
+  blog              BlogPost[]      @relation("StoreToBlogPost")
 
   hasFreeShipping   Boolean        @default(false)  
   minFreeShipping   Float?         @default(0)
@@ -117,10 +117,8 @@ model Store {
 }
 
 
-
-
 model Billboard {
-  id         String     @id @default(uuid())
+  id         String     @id @default(cuid())
   storeId    String
   store      Store      @relation("StoreToBillboard", fields: [storeId], references: [id])
   label      String
@@ -134,8 +132,11 @@ model Billboard {
   @@index([storeId])
 }
 
+
+
+
 model Category {
-  id          String      @id @default(uuid())
+  id          String      @id @default(cuid())
   storeId     String // Foreign Key to Store
   store       Store       @relation("StoreToCategory", fields: [storeId], references: [id])
   billboardId String // Foreign Key to Billboard
@@ -153,7 +154,7 @@ model Category {
 }
 
 model Collection {
-  id      String @id @default(uuid())
+  id      String @id @default(cuid())
   storeId String // Foreign Key to Store
   store   Store  @relation("StoreToCollection", fields: [storeId], references: [id])
 
@@ -178,7 +179,7 @@ LOCAL_PICKUP
 VARIABLE 
 }
 model Product {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   storeId     String // Foreign Key to Store
   store       Store    @relation("StoreToProduct", fields: [storeId], references: [id])
   categoryId  String // Foreign Key to Category
@@ -187,7 +188,7 @@ model Product {
   price       Float    @default(0.00)
   description String?  @db.VarChar(1000)
   quantity    Int      @default(1)
-  // handle      String?  @unique @default(uuid())
+  // handle      String?  @unique @default(cuid())
 
   isFeatured  Boolean      @default(false)
   isArchived  Boolean      @default(false)
@@ -226,7 +227,7 @@ model Product {
 }
 
 model Tag {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   productId   String? // Foreign Key to Store
   product     Product?   @relation("ProductToTag", fields: [productId], references: [id], onDelete: Cascade)
 
@@ -241,7 +242,7 @@ model Tag {
 }
 
 model ProductMaterial {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   productId   String // Foreign Key to Store
   product     Product    @relation("ProductMaterialToTag", fields: [productId], references: [id], onDelete: Cascade)
   name        String
@@ -259,7 +260,7 @@ enum ProductType {
 
 
 model Order {
-  id              String      @id @default(uuid())
+  id              String      @id @default(cuid())
   storeId         String      // Foreign Key to Store
   store           Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems      OrderItem[] // Relation to OrderItem model
@@ -303,7 +304,7 @@ model Order {
 
 
 model BlogPost {
-  id          String    @id @default(uuid())
+  id          String    @id @default(cuid())
   storeId     String // Foreign Key to Product
   store       Store  @relation( "StoreToBlogPost", fields: [storeId], references: [id], onDelete: Cascade)
   title       String
@@ -322,7 +323,7 @@ model BlogPost {
 
 
 model TimeLineEntry {
-  id              String      @id @default(uuid())
+  id              String      @id @default(cuid())
   title           String
   description     String?
   type            TimeLineEntryType @default(ORDER_GENERIC)
@@ -354,7 +355,7 @@ enum TimeLineEntryType{
 
 
 model ShippingLabel {
-  id              String      @id @default(uuid())
+  id              String      @id @default(cuid())
   labelUrl        String?  @db.Text 
   trackingNumber  String?  @db.Text 
   cost            String?      
@@ -370,7 +371,7 @@ model ShippingLabel {
 }
 // Intermediary for a many-to-many relationship
 model OrderItem {
-  id        String     @id @default(uuid())
+  id        String     @id @default(cuid())
   orderId   String // Foreign Key to Order
   order     Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String // Foreign Key to Product
@@ -386,7 +387,7 @@ model OrderItem {
 
 
 model Image {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
 
   productId String? // Foreign Key to Product
   product   Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -399,7 +400,7 @@ model Image {
 }
 
 model GalleryImage {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   storeId   String // Foreign Key to Product
   store     Store  @relation( "StoreToGalleryImage", fields: [storeId], references: [id], onDelete: Cascade)
   title     String?
@@ -412,7 +413,7 @@ model GalleryImage {
 }
 
 model Attribute {
-  id         String   @id @default(uuid())
+  id         String   @id @default(cuid())
   categoryId String // Foreign Key to Product
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   name       String
@@ -425,7 +426,7 @@ model Attribute {
 }
 
 model Variation {
-  id         String      @id @default(uuid())
+  id         String      @id @default(cuid())
   productId  String // Foreign Key to Product
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   names      String
@@ -444,7 +445,7 @@ model Variation {
 
 
 model CartItem {
-  id        String     @id @default(uuid())
+  id        String     @id @default(cuid())
   cartId    String // Foreign Key to Order
   cart      Cart       @relation(fields: [cartId], references: [id])
   productId String // Foreign Key to Product
@@ -459,7 +460,7 @@ model CartItem {
 }
 
 model Cart {
-  id        String     @id @default(uuid())
+  id        String     @id @default(cuid())
   storeId   String // Foreign Key to Store
   store     Store      @relation("StoreToCart", fields: [storeId], references: [id])
   userId    String
