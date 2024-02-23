@@ -1,13 +1,12 @@
 import type { GetServerSidePropsContext } from "next";
-import { useCallback, useEffect, useMemo, useState, type FC } from "react";
+import { useMemo, type FC } from "react";
 
-import PageLoader from "~/components/ui/page-loader";
 import { OrderClient } from "~/modules/orders/components/admin/client";
 import type { OrderColumn } from "~/modules/orders/components/admin/columns";
 import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
@@ -45,22 +44,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
-
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
 
 export default OrdersPage;

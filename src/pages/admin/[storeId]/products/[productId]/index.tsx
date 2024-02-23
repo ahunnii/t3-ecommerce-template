@@ -60,16 +60,14 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-
-  return {
-    props: {
-      storeId: ctx.query.storeId,
-      productId: ctx.query.productId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
+    return {
+      props: {
+        productId: ctx.query.productId,
+        storeId: ctx.query.storeId,
+      },
+    };
+  });
 }
 
 export default ProductPage;

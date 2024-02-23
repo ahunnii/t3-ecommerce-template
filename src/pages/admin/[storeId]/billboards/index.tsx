@@ -4,11 +4,9 @@ import { type FC } from "react";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
+import { BillboardClient } from "~/modules/billboards/admin/client";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
-
-import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
-import { BillboardClient } from "~/modules/billboards/admin/client";
 
 type TProps = { storeId: string };
 
@@ -33,15 +31,7 @@ const BillboardsPage: FC<TProps> = ({ storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-
-  return {
-    props: {
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
 
 export default BillboardsPage;

@@ -2,13 +2,13 @@ import type { GetServerSidePropsContext } from "next";
 import { type FC } from "react";
 
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
 
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { ProductForm } from "~/modules/products/admin/product-form";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 interface IProps {
   storeId: string;
@@ -45,23 +45,13 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
-
-  if (!store) {
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
     return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
+      props: {
+        productId: ctx.query.productId,
+        storeId: ctx.query.storeId,
       },
     };
-  }
-
-  return {
-    props: {
-      storeId: ctx.query.storeId,
-      productId: ctx.query.productId,
-    },
-  };
+  });
 }
-
 export default ProductPage;

@@ -35,15 +35,6 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-
-  return {
-    props: {
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
-
 export default CategoriesPage;

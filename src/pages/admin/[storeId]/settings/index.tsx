@@ -1,24 +1,27 @@
-import type { Store } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
 import { SettingsForm } from "~/modules/settings/settings-form";
+import { api } from "~/utils/api";
 
 interface IProps {
-  store: Store & { gallery: { url: string }[] };
+  storeId: string;
 }
-const SettingsPage: FC<IProps> = ({ store }) => {
+const SettingsPage: FC<IProps> = ({ storeId }) => {
+  const { data: store, isLoading } = api.store.getStore.useQuery({
+    storeId,
+  });
   return (
     <AdminLayout>
       <div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          {!store && <PageLoader />}
+          {isLoading && <PageLoader />}
 
-          {store && <SettingsForm initialData={store} />}
+          {!isLoading && store && <SettingsForm initialData={store} />}
         </div>
       </div>
     </AdminLayout>
@@ -26,27 +29,7 @@ const SettingsPage: FC<IProps> = ({ store }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = (await authenticateSession(ctx)) as Store;
-
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      store: {
-        ...store,
-
-        createdAt: store.createdAt.toISOString(),
-        updatedAt: store.updatedAt.toISOString(),
-      },
-    },
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
 
 export default SettingsPage;

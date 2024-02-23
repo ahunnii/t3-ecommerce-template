@@ -1,11 +1,9 @@
 import parse from "html-react-parser";
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
-import PageLoader from "~/components/ui/page-loader";
-import { GalleryForm } from "~/modules/gallery/admin/gallery-form";
 
 import { api } from "~/utils/api";
-import { authenticateAdminOrOwner, authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { Pencil } from "lucide-react";
 import Image from "next/image";
@@ -88,16 +86,14 @@ const GalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-
-  return {
-    props: {
-      galleryId: ctx.query.galleryId,
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
+    return {
+      props: {
+        galleryId: ctx.query.galleryId,
+        storeId: ctx.query.storeId,
+      },
+    };
+  });
 }
 
 export default GalleryImagePage;

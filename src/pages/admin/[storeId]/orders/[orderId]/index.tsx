@@ -1,12 +1,10 @@
 import type { GetServerSidePropsContext } from "next";
-import Head from "next/head";
 import type { FC } from "react";
-
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { Heading } from "~/components/ui/heading";
-import PageLoader from "~/components/ui/page-loader";
+
 import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 
 import AdminLayout from "~/components/layouts/admin-layout";
@@ -90,23 +88,14 @@ const OrderPage: FC<IProps> = ({ orderId, storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
-
-  if (!store) {
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
     return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
+      props: {
+        orderId: ctx.query.orderId,
+        storeId: ctx.query.storeId,
       },
     };
-  }
-
-  return {
-    props: {
-      orderId: ctx.query.orderId,
-      storeId: ctx.query.storeId,
-    },
-  };
+  });
 }
 
 export default OrderPage;

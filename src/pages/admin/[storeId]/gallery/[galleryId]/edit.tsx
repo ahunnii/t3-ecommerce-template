@@ -35,15 +35,13 @@ const EditGalleryImagePage: FC<IProps> = ({ galleryId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-
-  return {
-    props: {
-      galleryId: ctx.query.galleryId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
+    return {
+      props: {
+        galleryId: ctx.query.galleryId,
+      },
+    };
+  });
 }
 
 export default EditGalleryImagePage;

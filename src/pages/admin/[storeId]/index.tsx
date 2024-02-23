@@ -9,7 +9,7 @@ import { getSalesCount } from "~/modules/admin-overview/actions/get-sales-count"
 import { getStockCount } from "~/modules/admin-overview/actions/get-stock-count";
 import { getTotalRevenue } from "~/modules/admin-overview/actions/get-total-revenue";
 
-import { authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
 import { Overview } from "~/components/admin/overview";
@@ -97,23 +97,13 @@ const DashboardPage: FC<DashboardPageProps> = ({
   );
 };
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
+const getStoreStats = async (ctx: GetServerSidePropsContext) => {
   const storeId = ctx.query.storeId as string;
 
   const totalRevenue = await getTotalRevenue(storeId);
   const graphRevenue = await getGraphRevenue(storeId);
   const salesCount = await getSalesCount(storeId);
   const stockCount = await getStockCount(storeId);
-
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
 
   return {
     props: {
@@ -123,6 +113,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       stockCount,
     },
   };
+};
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  return await authenticateAdminOrOwner(ctx, getStoreStats);
 }
 
 export default DashboardPage;

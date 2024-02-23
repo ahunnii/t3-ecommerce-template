@@ -24,12 +24,7 @@ const NewBlogPostPage: FC<IProps> = () => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-  return {
-    props: {},
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
 
 export default NewBlogPostPage;

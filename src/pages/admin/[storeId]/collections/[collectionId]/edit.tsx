@@ -60,16 +60,14 @@ const CollectionPage: FC<IProps> = ({ collectionId, storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-
-  return {
-    props: {
-      collectionId: ctx.query.collectionId,
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
+    return {
+      props: {
+        collectionId: ctx.query.collectionId,
+        storeId: ctx.query.storeId,
+      },
+    };
+  });
 }
 
 export default CollectionPage;

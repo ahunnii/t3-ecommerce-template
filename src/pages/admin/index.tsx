@@ -4,12 +4,10 @@ import { type GetServerSidePropsContext } from "next";
 
 import { useStoreModal } from "~/hooks/use-store-modal";
 
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
-const Admin = () => {
-  const onOpen = useStoreModal((state) => state.onOpen);
-  const isOpen = useStoreModal((state) => state.isOpen);
+const PreAdminPage = () => {
+  const { onOpen, isOpen } = useStoreModal((state) => state);
 
   useEffect(() => {
     if (!isOpen) {
@@ -21,45 +19,7 @@ const Admin = () => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(ctx);
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
-
-  const userId = session.user.id;
-  const userRole = session.user.role;
-
-  if (userRole !== "ADMIN")
-    return {
-      redirect: {
-        destination: "/unauthorized",
-        permanent: false,
-      },
-    };
-
-  const store = await prisma.store.findFirst({
-    where: {
-      userId,
-    },
-  });
-
-  if (store)
-    return {
-      redirect: {
-        destination: `/admin/${store.id.toString()}`,
-        permanent: false,
-      },
-    };
-
-  return {
-    props: {},
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
 
-export default Admin;
+export default PreAdminPage;

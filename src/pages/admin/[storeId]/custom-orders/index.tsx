@@ -1,21 +1,19 @@
 import type { GetServerSidePropsContext } from "next";
 import { type FC } from "react";
 
-import { CategoriesClient } from "~/modules/categories/admin/client";
-
+import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { BillboardClient } from "~/modules/billboards/admin/client";
 
-interface IProps {
-  storeId: string;
-}
-const CategoriesPage: FC<IProps> = ({ storeId }) => {
-  const { data: categories, isLoading } =
-    api.categories.getAllCategories.useQuery({
+type TProps = { storeId: string };
+
+const BillboardsPage: FC<TProps> = ({ storeId }) => {
+  const { data: billboards, isLoading } =
+    api.billboards.getAllBillboards.useQuery({
       storeId,
     });
 
@@ -25,7 +23,7 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
       {!isLoading && (
         <div className="flex h-full flex-col">
           <div className="flex-1 space-y-4 p-8 pt-6">
-            <CategoriesClient data={categories ?? []} />
+            <BillboardClient data={billboards ?? []} />
           </div>
         </div>
       )}
@@ -37,4 +35,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return await authenticateAdminOrOwner(ctx);
 }
 
-export default CategoriesPage;
+export default BillboardsPage;

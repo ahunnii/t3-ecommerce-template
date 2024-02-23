@@ -2,7 +2,7 @@ import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
 import { api } from "~/utils/api";
-import { authenticateAdminOrOwner, authenticateSession } from "~/utils/auth";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { Pencil } from "lucide-react";
 import Link from "next/link";
@@ -74,15 +74,14 @@ const CategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { store, user, redirect } = await authenticateAdminOrOwner(ctx);
-
-  if (!store || !user) return { redirect };
-  return {
-    props: {
-      categoryId: ctx.query.categoryId,
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
+    return {
+      props: {
+        categoryId: ctx.query.categoryId,
+        storeId: ctx.query.storeId,
+      },
+    };
+  });
 }
 
 export default CategoryPage;

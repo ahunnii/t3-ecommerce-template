@@ -1,27 +1,20 @@
 import { format } from "date-fns";
 import { useCallback, useEffect, useState, type FC } from "react";
 
-import type { Category, Product } from "@prisma/client";
 import type { GetServerSidePropsContext } from "next";
 import type { BlogPostColumn } from "~/modules/blog-posts/admin/columns";
 
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
-import { formatter } from "~/utils/styles";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
 import { ProductsClient } from "~/modules/blog-posts/admin/client";
-import { BlogPost } from "~/modules/blog-posts/types";
+import type { BlogPost } from "~/modules/blog-posts/types";
 
 interface IProps {
   storeId: string;
 }
-
-const metadata = {
-  title: "Blog Posts",
-  description: "Manage your blog posts here.",
-};
 
 const ProductsPage: FC<IProps> = ({ storeId }) => {
   const [formattedBlogPosts, setFormattedBlogPosts] = useState<
@@ -60,22 +53,7 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
-
-  if (!store) {
-    return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      storeId: ctx.query.storeId,
-    },
-  };
+  return await authenticateAdminOrOwner(ctx);
 }
 
 export default ProductsPage;

@@ -2,14 +2,13 @@ import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
 import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
 
-import Head from "next/head";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
-import PageLoader from "~/components/ui/page-loader";
+
 import { OrderForm } from "~/modules/orders/components/admin/order-form";
+import { authenticateAdminOrOwner } from "~/utils/auth";
 
 interface IProps {
   orderId: string;
@@ -35,22 +34,14 @@ const OrderPage: FC<IProps> = ({ orderId }) => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const store = await authenticateSession(ctx);
-
-  if (!store) {
+  return await authenticateAdminOrOwner(ctx, (ctx) => {
     return {
-      redirect: {
-        destination: `/admin`,
-        permanent: false,
+      props: {
+        orderId: ctx.query.orderId,
+        storeId: ctx.query.storeId,
       },
     };
-  }
-
-  return {
-    props: {
-      orderId: ctx.query.orderId,
-    },
-  };
+  });
 }
 
 export default OrderPage;
