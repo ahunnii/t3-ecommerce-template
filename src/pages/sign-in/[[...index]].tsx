@@ -18,7 +18,6 @@ export default function SignIn({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const config = useConfig();
 
-  console.log(providers);
   return (
     <StorefrontLayout
       {...config.layout}
@@ -99,7 +98,13 @@ export default function SignIn({
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  console.log(authOptions);
+  console.log(context.req);
+
+  console.log(context.res);
   const session = await getServerSession(context.req, context.res, authOptions);
+
+  console.log(session);
 
   // If the user is already logged in, redirect.
   // Note: Make sure not to redirect to the same page
@@ -108,9 +113,25 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return { redirect: { destination: "/" } };
   }
 
+  // const isLoggedIn = context.req.cookies.login;
+
+  // if (!isLoggedIn) {
+  //   return { redirect: { destination: "/password-protect" } };
+  // }
+  // const isPathPasswordProtect =
+  //   req.nextUrl.pathname.startsWith("/password-protect");
+  // if (isPasswordEnabled && !isLoggedIn && !isPathPasswordProtect) {
+  //   return NextResponse.redirect(new URL("/password-protect", req.url));
+  // }
+  // return NextResponse.next();
+
   const providers = await getProviders();
 
+  console.log(providers);
+
   const errorMessage: Record<string, string> = {
+    "account-not-found":
+      "Oops, that account doesn't exist. You can sign up for a new account below. ",
     OAuthCallback: "Oops, something went wrong there. Please try again later.",
     OAuthAccountNotLinked:
       "The email associated with your selected provider is already in use. Please try another provider or contact us.",
@@ -120,7 +141,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     ? errorMessage[(context.query.error as string) ?? "OAuthCallback"]
     : null;
 
+  console.log(error);
   return {
-    props: { providers: providers ?? [], error: error },
+    props: {
+      providers: providers ?? [],
+      error: typeof error === "string" ? error : "",
+    },
   };
 }
