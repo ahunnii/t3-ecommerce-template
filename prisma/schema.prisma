@@ -473,6 +473,62 @@ model Cart {
   @@index([userId])
 }
 
+// model Coupon {
+//   id        String     @id @default(cuid())
+//   storeId   String // Foreign Key to Store
+//   store     Store      @relation("StoreToDiscount", fields: [storeId], references: [id])
+//   code      String
+//   type      CouponType
+//   value     Float
+//   cartItems CartItem[]
+//   restriction CouponRestriction
+//   restrictionValue Float?
+//   restrictionTimeStart DateTime?
+//   restrictionTimeEnd DateTime?
+//   createdAt DateTime   @default(now())
+//   updatedAt DateTime   @updatedAt
+
+//   @@index([storeId])
+// }
+
+// model Sale{
+//   id          String     @id @default(cuid())
+//   storeId     String // Foreign Key to Store
+//   store       Store      @relation("StoreToSale", fields: [storeId], references: [id])
+//   name        String
+//   type        SaleType
+//   value       Float
+//   collections Collection[]
+//   products    Product[]
+//   saleStart   DateTime
+//   saleEnd     DateTime?
+//   createdAt   DateTime   @default(now())
+//   updatedAt   DateTime   @updatedAt
+
+//   @@index([storeId])
+
+// }
+
+// enum SaleType {
+//   BOGO
+//   PERCENTAGE
+// }
+
+
+// enum CouponType {
+//   PERCENTAGE_ORDER
+//   FIXED_ORDER
+//   PERCENTAGE_ITEM
+//   FIXED_ITEM
+//   FREE_SHIPPING
+//   FREE_ITEM
+// }
+
+// enum CouponRestriction {
+//   NONE
+//   MINIMUM_ORDER
+//   DATE
+// }
 
 
 
