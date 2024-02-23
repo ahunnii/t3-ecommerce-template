@@ -1,4 +1,5 @@
 import { Separator } from "~/components/ui/separator";
+import { phoneFormatStringToNumber } from "~/utils/format-utils.wip";
 
 type ViewOrderDetailsProps = {
   name?: string;
@@ -28,18 +29,23 @@ export const ViewOrderDetails = ({
         Details
       </h3>
 
-      <div className="flex h-5 items-center space-x-4 py-8 text-sm">
-        <div className="text-left">
+      <div className="grid  grid-cols-4 items-start divide-x py-2 text-sm">
+        <div className="col-span-1  text-center">
           <p className="text-muted-foreground">Name:</p>
           <p>{name}</p>
         </div>
-        <Separator orientation="vertical" />
-        <div className="text-left">
+        {/* <Separator orientation="vertical" /> */}
+        <div className="col-span-1  text-center">
           <p className="text-muted-foreground">Phone:</p>
-          <p>{phone}</p>
+          <p>{phoneFormatStringToNumber(phone ?? "")}</p>
         </div>{" "}
-        <Separator orientation="vertical" />
-        <div className="text-left">
+        {/* <Separator orientation="vertical" /> */}
+        {/* <Separator orientation="vertical" /> */}
+        <div className="col-span-1  text-center">
+          <p className="text-muted-foreground">Email:</p>
+          <p>{email}</p>
+        </div>
+        <div className="col-span-1  text-center">
           <p className="text-muted-foreground">Address:</p>
           <p>{address?.street}</p>
           <p>{address?.additional}</p>
@@ -47,11 +53,6 @@ export const ViewOrderDetails = ({
             {address?.city}, {address?.state} {address?.postal_code}
           </p>
         </div>{" "}
-        <Separator orientation="vertical" />
-        <div className="text-left">
-          <p className="text-muted-foreground">Email:</p>
-          <p>{email}</p>
-        </div>
       </div>
     </div>
   );
