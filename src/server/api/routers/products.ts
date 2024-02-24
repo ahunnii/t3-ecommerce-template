@@ -20,19 +20,24 @@ export const productsRouter = createTRPCRouter({
   getAllStoreProducts: publicProcedure
     .input(
       z.object({
+        storeId: z.string().optional(),
         isFeatured: z.boolean().optional(),
         queryString: z.string().optional(),
         categoryId: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const results = extractQueryString(input.queryString ?? "");
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
 
-      console.log(results);
+      const results = extractQueryString(input.queryString ?? "");
 
       const products = await ctx.prisma.product.findMany({
         where: {
-          storeId: env.NEXT_PUBLIC_STORE_ID,
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured,
           categoryId: input.categoryId,
         },
@@ -62,11 +67,17 @@ export const productsRouter = createTRPCRouter({
     }),
 
   getAllSuggestedProducts: publicProcedure
-    .input(z.object({ categoryId: z.string() }))
+    .input(z.object({ storeId: z.string().optional(), categoryId: z.string() }))
     .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
       return ctx.prisma.product.findMany({
         where: {
-          storeId: env.NEXT_PUBLIC_STORE_ID,
+          storeId: input?.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           categoryId: input.categoryId,
         },
         include: {
@@ -89,6 +100,12 @@ export const productsRouter = createTRPCRouter({
       })
     )
     .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
       return ctx.prisma.product.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
@@ -121,17 +138,8 @@ export const productsRouter = createTRPCRouter({
   getProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.productId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Product id is required",
-        });
-      }
-
       return ctx.prisma.product.findUnique({
-        where: {
-          id: input.productId,
-        },
+        where: { id: input.productId },
         include: {
           images: true,
           variants: true,
@@ -159,8 +167,6 @@ export const productsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      // const productIds = input.products.map((product) => product.productId);
-
       // Fetch all unique product IDs and variant IDs from the cart items
       const productIds = [
         ...new Set(input.products.map((item) => item.productId)),
@@ -206,13 +212,6 @@ export const productsRouter = createTRPCRouter({
   getDetailedProduct: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.productId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Product id is required",
-        });
-      }
-
       return ctx.prisma.product.findUnique({
         where: {
           id: input.productId,
@@ -269,146 +268,70 @@ export const productsRouter = createTRPCRouter({
       })
     )
     .mutation(({ ctx, input }) => {
-      if (!input.name) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
-      }
 
-      if (!input.price) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Price is required",
-        });
-      }
-
-      if (!input.categoryId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Category id is required",
-        });
-      }
-
-      if (!input.storeId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Store id is required",
-        });
-      }
-
-      if (!input.images ?? !input.images.length) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Images is required",
-        });
-      }
-
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Product id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.product.create({
-            // name: input.name,
-            // price: input.price,
-            // isFeatured: input.isFeatured,
-            // isArchived: input.isArchived,
-            // categoryId: input.categoryId,
-            // estimatedCompletion: input.estimatedCompletion ?? 0,
-            // description: input.description,
-            // quantity: input.quantity,
-            // images: {
-            //   deleteMany: {},
-            // },
-            // variants: {
-            //   deleteMany: {},
-            // },
-            // shippingCost: input.shippingCost,
-            // shippingType: input.shippingType,
-            // weight: input.weight,
-            // length: input.length,
-            // width: input.width,
-            // height: input.height,
-
-            data: {
-              name: input.name,
-              price: input.price,
-              isFeatured: input.isFeatured,
-              isArchived: input.isArchived,
-              categoryId: input.categoryId,
-              description: input.description,
-              estimatedCompletion: input.estimatedCompletion ?? 0,
-              storeId: input.storeId,
-              quantity: input.quantity,
-              featuredImage: input.featuredImage,
-              images: {
-                createMany: {
-                  data: [
-                    ...input.images.map((image: { url: string }) => image),
-                  ],
-                },
-              },
-              variants: {
-                createMany: {
-                  data: [
-                    ...input.variants.map(
-                      (variant: {
-                        names: string;
-                        values: string;
-                        price: number;
-                        quantity: number;
-                      }) => variant
-                    ),
-                  ],
-                },
-              },
-
-              tags: {
-                createMany: {
-                  data: [
-                    ...input.tags.map((tag: { name: string }) => ({
-                      name: tag.name,
-                    })),
-                  ],
-                },
-              },
-              materials: {
-                createMany: {
-                  data: [
-                    ...input.materials.map((tag: { name: string }) => ({
-                      name: tag.name,
-                    })),
-                  ],
-                },
-              },
-              shippingCost: input.shippingCost,
-              shippingType: input.shippingType,
-              weight: input.weight,
-              length: input.length,
-              width: input.width,
-              height: input.height,
+      return ctx.prisma.product.create({
+        data: {
+          name: input.name,
+          price: input.price,
+          isFeatured: input.isFeatured,
+          isArchived: input.isArchived,
+          categoryId: input.categoryId,
+          description: input.description,
+          estimatedCompletion: input.estimatedCompletion ?? 0,
+          storeId: input.storeId,
+          quantity: input.quantity,
+          featuredImage: input.featuredImage,
+          images: {
+            createMany: {
+              data: [...input.images.map((image: { url: string }) => image)],
             },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+          },
+          variants: {
+            createMany: {
+              data: [
+                ...input.variants.map(
+                  (variant: {
+                    names: string;
+                    values: string;
+                    price: number;
+                    quantity: number;
+                  }) => variant
+                ),
+              ],
+            },
+          },
+
+          tags: {
+            createMany: {
+              data: [
+                ...input.tags.map((tag: { name: string }) => ({
+                  name: tag.name,
+                })),
+              ],
+            },
+          },
+          materials: {
+            createMany: {
+              data: [
+                ...input.materials.map((tag: { name: string }) => ({
+                  name: tag.name,
+                })),
+              ],
+            },
+          },
+          shippingCost: input.shippingCost,
+          shippingType: input.shippingType,
+          weight: input.weight,
+          length: input.length,
+          width: input.width,
+          height: input.height,
+        },
+      });
     }),
 
   updateProduct: protectedProcedure
@@ -454,61 +377,11 @@ export const productsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (!input.name) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
-        });
-      }
-
-      if (!input.price) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Price is required",
-        });
-      }
-
-      if (!input.categoryId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Category id is required",
-        });
-      }
-
-      if (!input.storeId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Store id is required",
-        });
-      }
-
-      if (!input.images?.length) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Images is required",
-        });
-      }
-
-      // if (!input.variants || !input.variants.length) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Variants is required",
-      //   });
-      // }
-
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      if (!store) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Product id does not belong to current user",
+          message: "You are not authorized to perform this action.",
         });
-      }
 
       try {
         await ctx.prisma.product.update({
@@ -599,46 +472,16 @@ export const productsRouter = createTRPCRouter({
       }
     }),
   deleteProduct: protectedProcedure
-    .input(
-      z.object({
-        productId: z.string(),
-        storeId: z.string(),
-      })
-    )
+    .input(z.object({ productId: z.string() }))
     .mutation(({ ctx, input }) => {
-      if (!input.productId)
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Product id is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Product id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.product.delete({
-            where: {
-              id: input.productId,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.product.delete({
+        where: { id: input.productId },
+      });
     }),
 });

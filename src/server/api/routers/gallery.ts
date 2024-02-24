@@ -9,17 +9,16 @@ import {
 
 export const galleryRouter = createTRPCRouter({
   getAllGalleryImages: publicProcedure
-    .input(
-      z.object({
-        storeId: z.string().optional(),
-      })
-    )
+    .input(z.object({ storeId: z.string().optional() }))
     .query(({ ctx, input }) => {
-      return ctx.prisma.galleryImage.findMany({
-        where: {
-          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-        },
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
 
+      return ctx.prisma.galleryImage.findMany({
+        where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
         orderBy: { createdAt: "desc" },
       });
     }),
@@ -27,17 +26,8 @@ export const galleryRouter = createTRPCRouter({
   getGalleryImage: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.id) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Gallery image id is required",
-        });
-      }
-
       return ctx.prisma.galleryImage.findUnique({
-        where: {
-          id: input.id,
-        },
+        where: { id: input.id },
       });
     }),
 
@@ -50,88 +40,45 @@ export const galleryRouter = createTRPCRouter({
         storeId: z.string(),
       })
     )
-    .mutation(async ({ ctx, input }) => {
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      if (!store) {
+    .mutation(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Collection id does not belong to current user",
+          message: "You are not authorized to perform this action.",
         });
-      }
-
-      return ctx.prisma.galleryImage
-        .create({
-          data: {
-            title: input.title,
-            caption: input.caption,
-            url: input.url,
-            storeId: input.storeId,
-          },
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.galleryImage.create({
+        data: {
+          title: input.title,
+          caption: input.caption,
+          url: input.url,
+          storeId: input.storeId,
+        },
+      });
     }),
 
   updateGalleryImage: protectedProcedure
     .input(
       z.object({
         id: z.string(),
-        storeId: z.string(),
         title: z.string().optional(),
         caption: z.string().optional(),
         url: z.string(),
       })
     )
-    .mutation(async ({ ctx, input }) => {
-      if (!input.id)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Gallery image id is required",
-        });
-
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      if (!store) {
+    .mutation(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Collection id does not belong to current user",
+          message: "You are not authorized to perform this action.",
         });
-      }
-
-      return ctx.prisma.galleryImage
-        .update({
-          where: {
-            id: input.id,
-          },
-          data: {
-            title: input.title,
-            caption: input.caption,
-            url: input.url,
-          },
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.galleryImage.update({
+        where: { id: input.id },
+        data: {
+          title: input.title,
+          caption: input.caption,
+          url: input.url,
+        },
+      });
     }),
 
   deleteGalleryImage: protectedProcedure
@@ -142,38 +89,12 @@ export const galleryRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (!input.id)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Gallery image id is required",
-        });
-
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      if (!store) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Collection id does not belong to current user",
+          message: "You are not authorized to perform this action.",
         });
-      }
 
-      return ctx.prisma.galleryImage
-        .delete({
-          where: {
-            id: input.id,
-          },
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.galleryImage.delete({ where: { id: input.id } });
     }),
 });

@@ -21,9 +21,12 @@ interface IProps {
 }
 
 const BillboardPage: FC<IProps> = ({ billboardId }) => {
-  const { data: billboard, isLoading } = api.billboards.getBillboard.useQuery({
+  const getBillboard = api.billboards.getBillboard.useQuery({
     billboardId,
   });
+
+  const billboard = getBillboard.data;
+  const isLoading = getBillboard.isLoading;
 
   const editBillboardURL = `/admin/${billboard?.storeId}/billboards/${billboard?.id}/edit`;
   return (

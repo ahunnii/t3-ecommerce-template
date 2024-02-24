@@ -72,6 +72,10 @@ export const env = createEnv({
     NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
 
     //End Uploads
+
+    // Logging
+    NEXT_PUBLIC_AXIOM_TOKEN: z.string().optional(),
+    NEXT_PUBLIC_AXIOM_DATASET: z.string().optional(),
   },
 
   /**
@@ -106,6 +110,10 @@ export const env = createEnv({
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
     NEXT_PUBLIC_UPLOADTHING_APP_ID: z.string().optional(),
     NEXT_PUBLIC_CLOUDINARY_API_KEY: z.string().optional(),
+
+    // Logging
+    NEXT_PUBLIC_AXIOM_TOKEN: z.string().optional(),
+    NEXT_PUBLIC_AXIOM_DATASET: z.string().optional(),
   },
 
   /**
@@ -169,6 +177,10 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     NEXT_PUBLIC_UPLOADTHING_APP_ID: process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID,
     UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET,
+
+    // Logging
+    NEXT_PUBLIC_AXIOM_TOKEN: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
+    NEXT_PUBLIC_AXIOM_DATASET: process.env.NEXT_PUBLIC_AXIOM_DATASET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

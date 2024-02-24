@@ -20,6 +20,7 @@ export const CloudinaryUpload = ({ disabled, onChange }: ImageUploadProps) => {
     <>
       <CldUploadWidget
         onUpload={onUpload}
+        options={{ sources: ["local", "url", "unsplash"] }}
         // uploadPreset={env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
         signatureEndpoint="/api/cloudinary"
       >

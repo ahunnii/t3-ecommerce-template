@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge, type BadgeProps } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { toastService } from "~/services/toast";
 
 interface ApiAlertProps {
   title: string;
@@ -30,10 +31,10 @@ export const ApiAlert: React.FC<ApiAlertProps> = ({
     navigator.clipboard
       .writeText(description)
       .then(() => {
-        toast.success("API Route copied to clipboard.");
+        toastService.success("API Route copied to clipboard.");
       })
-      .catch(() => {
-        toast.error("Failed to copy API Route to clipboard.");
+      .catch((error: unknown) => {
+        toastService.error("Failed to copy API Route to clipboard.", error);
       });
   };
 

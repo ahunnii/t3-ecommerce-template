@@ -3,6 +3,27 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const shippingLabelRouter = createTRPCRouter({
+  getLabel: protectedProcedure
+    .input(z.object({ labelId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      const label = await ctx.prisma.shippingLabel.findUnique({
+        where: { id: input.labelId },
+      });
+
+      if (!label)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Shipping label not found.",
+        });
+
+      return label;
+    }),
   createLabel: protectedProcedure
     .input(
       z.object({
@@ -16,12 +37,11 @@ export const shippingLabelRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      if (!input.labelUrl) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "labelUrl is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
-      }
 
       const label = await ctx.prisma.shippingLabel.create({
         data: {
@@ -41,22 +61,4 @@ export const shippingLabelRouter = createTRPCRouter({
 
       return label;
     }),
-
-  // getLabel: protectedProcedure
-  //     .input(z.object({ labelId: z.string() }))
-  //     .query(async ({ ctx, input }) => {
-  //       if (!input.labelId)
-  //         throw new TRPCError({
-  //           code: "BAD_REQUEST",
-  //           message: "Label id is required",
-  //         });
-
-  //       return ctx.prisma.shippingLabel.findUnique({
-  //         where: { id: input.labelId },
-  //       });
-  //     }),
-
-  //   getSecretMessage: protectedProcedure.query(() => {
-  //     return "you can now see this secret message!";
-  //   }),
 });

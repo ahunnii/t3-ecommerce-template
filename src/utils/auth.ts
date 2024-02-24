@@ -94,7 +94,7 @@ export const authenticateAdminOrOwner = async (
     }
   }
 
-  const store = await prisma.store.findFirst({
+  const store = await prisma.store.findUnique({
     where: {
       id: ctx.query.storeId as string,
     },

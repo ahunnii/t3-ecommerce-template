@@ -16,6 +16,12 @@ export const collectionsRouter = createTRPCRouter({
       })
     )
     .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
       return ctx.prisma.collection.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
@@ -44,17 +50,8 @@ export const collectionsRouter = createTRPCRouter({
   getCollection: publicProcedure
     .input(z.object({ collectionId: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.collectionId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Collection id is required",
-        });
-      }
-
       return ctx.prisma.collection.findUnique({
-        where: {
-          id: input.collectionId,
-        },
+        where: { id: input.collectionId },
         include: {
           products: {
             include: {
@@ -89,60 +86,29 @@ export const collectionsRouter = createTRPCRouter({
       })
     )
     .mutation(({ ctx, input }) => {
-      if (!input.name) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
-        });
-      }
-      if (!input.billboardId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Billboard Id is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
+      return ctx.prisma.collection.create({
+        data: {
+          name: input.name,
+          billboardId: input.billboardId,
+          isFeatured: input.isFeatured,
+          storeId: input.storeId,
+          products: {
+            connect: input.products,
           },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Collection id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.collection.create({
-            data: {
-              name: input.name,
-              billboardId: input.billboardId,
-              isFeatured: input.isFeatured,
-              storeId: input.storeId,
-              products: {
-                connect: input.products,
-              },
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+        },
+      });
     }),
 
   updateCollection: protectedProcedure
     .input(
       z.object({
         collectionId: z.string(),
-        storeId: z.string(),
         name: z.string(),
         billboardId: z.string(),
         isFeatured: z.boolean(),
@@ -154,116 +120,50 @@ export const collectionsRouter = createTRPCRouter({
         ),
       })
     )
-    .mutation(({ ctx, input }) => {
-      if (!input.name)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
-        });
-      if (!input.billboardId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Billboard Id is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
 
-      if (!input.collectionId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Collection id is required",
-        });
-
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
+      const collection = await ctx.prisma.collection.update({
+        where: {
+          id: input.collectionId,
+        },
+        data: {
+          name: input.name,
+          billboardId: input.billboardId,
+          isFeatured: input.isFeatured,
+          products: {
+            set: [],
           },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Collection id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.collection
-            .update({
-              where: {
-                id: input.collectionId,
-              },
-              data: {
-                name: input.name,
-                billboardId: input.billboardId,
-                isFeatured: input.isFeatured,
-                products: {
-                  set: [],
-                },
-              },
-            })
-            .then(() => {
-              return ctx.prisma.collection.update({
-                where: {
-                  id: input.collectionId,
-                },
-                data: {
-                  products: {
-                    connect: input.products,
-                  },
-                },
-              });
-            });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+        },
+      });
+
+      return ctx.prisma.collection.update({
+        where: { id: collection.id },
+        data: {
+          products: {
+            connect: input.products,
+          },
+        },
+      });
     }),
 
   deleteCollection: protectedProcedure
-    .input(
-      z.object({
-        collectionId: z.string(),
-        storeId: z.string(),
-      })
-    )
+    .input(z.object({ collectionId: z.string() }))
     .mutation(({ ctx, input }) => {
-      if (!input.collectionId)
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Collection id is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Collection id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.collection.delete({
-            where: {
-              id: input.collectionId,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.collection.delete({
+        where: {
+          id: input.collectionId,
+        },
+      });
     }),
 });

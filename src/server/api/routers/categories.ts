@@ -9,12 +9,16 @@ import {
 
 export const categoriesRouter = createTRPCRouter({
   getAllCategories: publicProcedure
-    .input(z.object({ storeId: z.string() }))
+    .input(z.object({ storeId: z.string().optional() }))
     .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
       return ctx.prisma.category.findMany({
-        where: {
-          storeId: input.storeId,
-        },
+        where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
         include: {
           billboard: true,
           attributes: true,
@@ -25,37 +29,32 @@ export const categoriesRouter = createTRPCRouter({
       });
     }),
 
-  getAllStoreCategoryAttributes: publicProcedure.query(async ({ ctx }) => {
-    const categories = await ctx.prisma.category.findMany({
-      where: {
-        storeId: env.NEXT_PUBLIC_STORE_ID,
-      },
-      include: {
-        attributes: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  getAllStoreCategoryAttributes: publicProcedure
+    .input(z.object({ storeId: z.string().optional() }))
+    .query(async ({ input, ctx }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
 
-    const attributes = categories.map((category) => category.attributes).flat();
-    return attributes;
-  }),
+      const categories = await ctx.prisma.category.findMany({
+        where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
+        include: { attributes: true },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const attributes = categories
+        .map((category) => category.attributes)
+        .flat();
+      return attributes;
+    }),
 
   getCategory: publicProcedure
     .input(z.object({ categoryId: z.string() }))
     .query(({ ctx, input }) => {
-      if (!input.categoryId) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Category id is required",
-        });
-      }
-
       return ctx.prisma.category.findUnique({
-        where: {
-          id: input.categoryId,
-        },
+        where: { id: input.categoryId },
         include: {
           billboard: true,
           attributes: true,
@@ -79,64 +78,32 @@ export const categoriesRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (!input.name) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
-      }
 
-      // if (!input.billboardId) {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "Billboard Id is required",
-      //   });
-      // }
-
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Category id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.category.create({
-            data: {
-              name: input.name,
-              billboardId: input.billboardId,
-              storeId: input.storeId,
-              attributes: {
-                createMany: {
-                  data: [
-                    ...input.attributes.map(
-                      (attribute: {
-                        name: string;
-                        values: string;
-                        storeId: string;
-                      }) => attribute
-                    ),
-                  ],
-                },
-              },
+      return ctx.prisma.category.create({
+        data: {
+          name: input.name,
+          billboardId: input.billboardId,
+          storeId: input.storeId,
+          attributes: {
+            createMany: {
+              data: [
+                ...input.attributes.map(
+                  (attribute: {
+                    name: string;
+                    values: string;
+                    storeId: string;
+                  }) => attribute
+                ),
+              ],
             },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+          },
+        },
+      });
     }),
 
   updateCategory: protectedProcedure
@@ -154,124 +121,53 @@ export const categoriesRouter = createTRPCRouter({
         ),
       })
     )
-    .mutation(({ ctx, input }) => {
-      if (!input.name)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
 
-      if (!input.billboardId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Billboard Id is required",
-        });
-
-      if (!input.categoryId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Category id is required",
-        });
-
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
+      const category = await ctx.prisma.category.update({
+        where: { id: input.categoryId },
+        data: {
+          name: input.name,
+          billboardId: input.billboardId,
+          attributes: {
+            deleteMany: {},
           },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Category id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.category
-            .update({
-              where: {
-                id: input.categoryId,
-              },
-              data: {
-                name: input.name,
-                billboardId: input.billboardId,
-                attributes: {
-                  deleteMany: {},
-                },
-              },
-            })
-            .then(() => {
-              return ctx.prisma.category.update({
-                where: {
-                  id: input.categoryId,
-                },
-                data: {
-                  attributes: {
-                    createMany: {
-                      data: [
-                        ...input.attributes.map(
-                          (attribute: { name: string; values: string }) => {
-                            return { ...attribute, storeId: input.storeId };
-                          }
-                        ),
-                      ],
-                    },
-                  },
-                },
-              });
-            });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+        },
+      });
+
+      return ctx.prisma.category.update({
+        where: { id: category.id },
+        data: {
+          attributes: {
+            createMany: {
+              data: [
+                ...input.attributes.map(
+                  (attribute: { name: string; values: string }) => {
+                    return { ...attribute, storeId: input.storeId };
+                  }
+                ),
+              ],
+            },
+          },
+        },
+      });
     }),
 
   deleteCategory: protectedProcedure
-    .input(
-      z.object({
-        categoryId: z.string(),
-        storeId: z.string(),
-      })
-    )
+    .input(z.object({ categoryId: z.string() }))
     .mutation(({ ctx, input }) => {
-      if (!input.categoryId)
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Category id is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId)
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Category id does not belong to current user",
-            });
-        })
-        .then(() => {
-          return ctx.prisma.category.delete({
-            where: {
-              id: input.categoryId,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
-        });
+      return ctx.prisma.category.delete({
+        where: { id: input.categoryId },
+      });
     }),
 });

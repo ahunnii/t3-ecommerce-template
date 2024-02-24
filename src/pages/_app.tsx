@@ -12,9 +12,9 @@ import { ConfigProvider } from "~/providers/style-config-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/services/toast/toaster-provider";
 // import { ToastProvider } from "~/providers/toast-provider";
-import { storeTheme } from "~/data/config.custom";
-
+import { AxiomWebVitals } from "next-axiom";
 import { storeTheme as storeThemeCore } from "~/data/config.core";
+import { storeTheme } from "~/data/config.custom";
 import { env } from "~/env.mjs";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
@@ -33,6 +33,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
+      {/* <AxiomWebVitals /> */}
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <ToastProvider />
         <ModalProvider />

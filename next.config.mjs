@@ -6,19 +6,9 @@
 await import("./src/env.mjs");
 
 import NextMdx from "@next/mdx";
+import * as Axiom from "next-axiom";
 
-const withMDX = NextMdx({
-  // Optionally provide remark and rehype plugins
-  options: {
-    // If you use remark-gfm, you'll need to use next.config.mjs
-    // as the package is ESM only
-    // https://github.com/remarkjs/remark-gfm#install
-    remarkPlugins: [],
-    rehypePlugins: [],
-    // If you use `MDXProvider`, uncomment the following line.
-    // providerImportSource: "@mdx-js/react",
-  },
-});
+const { withAxiom } = Axiom;
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -74,4 +64,5 @@ const config = {
   },
 };
 
+// export default withAxiom(config);
 export default config;

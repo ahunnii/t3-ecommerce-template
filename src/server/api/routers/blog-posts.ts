@@ -1,5 +1,3 @@
-import { type ShippingType } from "@prisma/client";
-
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -18,17 +16,15 @@ export const blogPostRouter = createTRPCRouter({
         slug: z.string().optional(),
       })
     )
-    .query(async ({ ctx, input }) => {
+    .query(({ ctx, input }) => {
       if (!input.blogPostId && !input.slug) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "blogPostId or slug is required",
+          message: "Blog Post ID or slug is required",
         });
       }
 
-      // if (input.slug) {
-      // console.log()
-      const blogPost = await ctx.prisma.blogPost.findUnique({
+      return ctx.prisma.blogPost.findUnique({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           id: input?.blogPostId,
@@ -38,9 +34,6 @@ export const blogPostRouter = createTRPCRouter({
           tags: true,
         },
       });
-
-      return blogPost;
-      // }
     }),
   getAllBlogPosts: publicProcedure
     .input(
@@ -51,19 +44,15 @@ export const blogPostRouter = createTRPCRouter({
         querySearch: z.string().optional(),
       })
     )
-    .query(async ({ ctx, input }) => {
-      const blogPosts = await ctx.prisma.blogPost.findMany({
+    .query(({ ctx, input }) => {
+      return ctx.prisma.blogPost.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           published: input?.published,
         },
 
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
       });
-
-      return blogPosts;
     }),
 
   createBlogPost: protectedProcedure
@@ -78,24 +67,16 @@ export const blogPostRouter = createTRPCRouter({
         storeId: z.string().optional(),
       })
     )
-    .mutation(async ({ ctx, input }) => {
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      if (!store) {
+    .mutation(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Unable to create posts to unowned store.",
+          message: "You are not authorized to perform this action.",
         });
-      }
-      const blogPost = await ctx.prisma.blogPost.create({
+
+      return ctx.prisma.blogPost.create({
         data: {
           title: input.title,
-          // description: input.description,
           featuredImg: input.featuredImg,
           content: input.content,
           slug: input.slug ?? input.title.toLowerCase().replace(/ /g, "-"),
@@ -112,8 +93,6 @@ export const blogPostRouter = createTRPCRouter({
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
         },
       });
-
-      return blogPost;
     }),
 
   updateBlogPost: protectedProcedure
@@ -123,7 +102,6 @@ export const blogPostRouter = createTRPCRouter({
         featuredImg: z.string().optional(),
         title: z.string(),
         slug: z.string().optional(),
-        // description: z.string(),
         content: z.string(),
         tags: z.array(z.object({ name: z.string() })),
         published: z.boolean().optional(),
@@ -131,106 +109,50 @@ export const blogPostRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId,
-          userId: ctx.session.user.id,
-        },
-      });
-      if (!input.blogPostId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Blog post id is required",
-        });
-
-      if (!store) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Blog post id does not belong to current user",
-        });
-      }
-
-      try {
-        await ctx.prisma.blogPost.update({
-          where: {
-            id: input.blogPostId,
-          },
-          data: {
-            title: input.title,
-            slug: input?.slug,
-            // description: input.description,
-            content: input.content,
-            tags: {
-              deleteMany: {},
-            },
-            published: input.published,
-            featuredImg: input.featuredImg,
-          },
+          message: "You are not authorized to perform this action.",
         });
 
-        return ctx.prisma.blogPost.update({
-          where: {
-            id: input.blogPostId,
-          },
-          data: {
-            tags: {
-              createMany: {
-                data: [
-                  ...input.tags.map((tag: { name: string }) => ({
-                    name: tag.name,
-                  })),
-                ],
-              },
+      const blogPost = await ctx.prisma.blogPost.update({
+        where: { id: input.blogPostId },
+        data: {
+          title: input.title,
+          slug: input?.slug,
+          content: input.content,
+          tags: { deleteMany: {} },
+          published: input.published,
+          featuredImg: input.featuredImg,
+        },
+      });
+
+      return ctx.prisma.blogPost.update({
+        where: { id: blogPost.id },
+        data: {
+          tags: {
+            createMany: {
+              data: [
+                ...input.tags.map((tag: { name: string }) => ({
+                  name: tag.name,
+                })),
+              ],
             },
           },
-        });
-      } catch (err) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Something went wrong. Please try again later.",
-          cause: err,
-        });
-      }
+        },
+      });
     }),
   deleteBlogPost: protectedProcedure
-    .input(
-      z.object({
-        blogPostId: z.string(),
-        storeId: z.string().optional(),
-      })
-    )
+    .input(z.object({ blogPostId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const store = await ctx.prisma.store.findFirst({
-        where: {
-          id: input.storeId,
-          userId: ctx.session.user.id,
-        },
-      });
-      if (!input.blogPostId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Blog post id is required",
-        });
-
-      if (!store) {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Blog post id does not belong to current user",
-        });
-      }
-
-      if (!input.blogPostId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Blog post id is required",
+          message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.product
-        .delete({
-          where: {
-            id: input.blogPostId,
-          },
-        })
+      return ctx.prisma.blogPost
+        .delete({ where: { id: input.blogPostId } })
         .catch((err) => {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
