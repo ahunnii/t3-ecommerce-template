@@ -302,7 +302,6 @@ export const stripePaymentProcessor: PaymentProcessor<
       paymentDetails: `${paymentMethod?.card?.brand} ending in ${paymentMethod?.card?.last4}`,
     };
 
-    console.log(results);
     return results;
   },
 };

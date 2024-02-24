@@ -9,6 +9,9 @@ import {
 
 export const storeRouter = createTRPCRouter({
   getAllStores: protectedProcedure.query(({ ctx }) => {
+    if (ctx.session.user.role === "ADMIN") {
+      return ctx.prisma.store.findMany({});
+    }
     return ctx.prisma.store.findMany({
       where: {
         userId: ctx.session.user.id,
@@ -60,110 +63,79 @@ export const storeRouter = createTRPCRouter({
         flatRateAmount: z.coerce.number().nonnegative().optional(),
       })
     )
-    .mutation(({ ctx, input }) => {
-      if (!input.name)
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN") {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Name is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
+
+      try {
+        const store = await ctx.prisma.store.findUnique({
+          where: { id: input.storeId },
         });
 
-      if (!input.storeId)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Store id is required",
-        });
+        if (!store) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Store not found",
+          });
+        }
 
-      return ctx.prisma.store
-        .findFirst({
+        return ctx.prisma.store.update({
           where: {
             id: input.storeId,
-            userId: ctx.session.user.id,
           },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Store id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.store.update({
-            where: {
-              id: input.storeId,
-            },
-            data: {
-              name: input.name,
-              address: {
-                create: {
-                  street: input.address.street,
-                  additional: input.address.additional,
-                  city: input.address.city,
-                  state: input.address.state,
-                  postal_code: input.address.postalCode,
-                  country: input.address.country,
-                },
+          data: {
+            name: input.name,
+            address: {
+              create: {
+                street: input.address.street,
+                additional: input.address.additional,
+                city: input.address.city,
+                state: input.address.state,
+                postal_code: input.address.postalCode,
+                country: input.address.country,
               },
-              hasFreeShipping: input.hasFreeShipping,
-              minFreeShipping: input.minFreeShipping,
-              hasPickup: input.hasPickup,
-              maxPickupDistance: input.maxPickupDistance,
-              hasFlatRate: input.hasFlatRate,
-              flatRateAmount: input.flatRateAmount,
             },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
+            hasFreeShipping: input.hasFreeShipping,
+            minFreeShipping: input.minFreeShipping,
+            hasPickup: input.hasPickup,
+            maxPickupDistance: input.maxPickupDistance,
+            hasFlatRate: input.hasFlatRate,
+            flatRateAmount: input.flatRateAmount,
+          },
         });
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong. Please try again later.",
+          cause: error,
+        });
+      }
     }),
 
   deleteStore: protectedProcedure
-    .input(
-      z.object({
-        storeId: z.string(),
-      })
-    )
-    .mutation(({ ctx, input }) => {
-      if (!input.storeId)
+    .input(z.object({ storeId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN") {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Color id is required",
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
         });
+      }
 
-      return ctx.prisma.store
-        .findFirst({
-          where: {
-            id: input.storeId,
-            userId: ctx.session.user.id,
-          },
-        })
-        .then((storeByUserId) => {
-          if (!storeByUserId) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Store id does not belong to current user",
-            });
-          }
-        })
-        .then(() => {
-          return ctx.prisma.store.delete({
-            where: {
-              id: input.storeId,
-            },
-          });
-        })
-        .catch((err) => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Something went wrong. Please try again later.",
-            cause: err,
-          });
+      try {
+        return ctx.prisma.store.delete({
+          where: { id: input.storeId },
         });
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong. Please try again later.",
+          cause: error,
+        });
+      }
     }),
 });

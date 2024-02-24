@@ -76,18 +76,15 @@ export const authenticateAdminOrOwner = async (
   const session = await getServerAuthSession(ctx);
 
   if (!session || !session.user) return redirectToSignIn();
+
   const { id, role } = session.user;
 
   const storeId = ctx.query.storeId;
 
   if (!storeId) {
-    const store = await prisma.store.findFirst({
-      where: {
-        userId: id,
-      },
-    });
+    const store = await prisma.store.findFirst({});
 
-    if (store) {
+    if (store && (role === "ADMIN" || store.userId === id)) {
       return {
         redirect: {
           destination: `/admin/${store.id.toString()}`,
@@ -111,9 +108,8 @@ export const authenticateAdminOrOwner = async (
 
   return {
     props: {
-      // store,
       user: session.user,
-      storeId: ctx.query.storeId,
+      storeId: ctx.query.storeId ?? "",
     },
   };
 };

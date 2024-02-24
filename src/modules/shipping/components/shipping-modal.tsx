@@ -155,7 +155,6 @@ export const ShippingModal = ({ data }: { data: string }) => {
     if (tabValue === "rates")
       getRates()
         .then((res: RateResponse) => {
-          console.log(res);
           setRates(res?.rates ?? []);
         })
         .catch((err) => console.log(err));

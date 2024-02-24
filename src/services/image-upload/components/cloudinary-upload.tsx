@@ -9,18 +9,12 @@ interface ImageUploadProps {
   disabled?: boolean;
   onChange: (value: string) => void;
 }
-interface Results {
-  secure_url: "https://res.cloudinary.com/dlpkok326/image/upload/v1691613998/i4rjxgj1cirznvtqzbwo.png";
-}
+type Results = { secure_url: string };
 export const CloudinaryUpload = ({ disabled, onChange }: ImageUploadProps) => {
   const onUpload = (result: { event: string; info: Partial<Results> }) => {
-    onChange(result.info.secure_url as string);
+    onChange(result.info.secure_url!);
   };
-  if (
-    !env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-    // !env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-  )
-    return null;
+  if (!env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) return null;
 
   return (
     <>

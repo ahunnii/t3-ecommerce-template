@@ -7,34 +7,35 @@ import { env } from "~/env.mjs";
 
 export type SignApiOptions = Record<string, unknown>;
 
+cloudinary.config({
+  cloud_name: env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
+});
+
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    switch (req.method) {
-      case "POST":
-        if (!env.CLOUDINARY_API_SECRET) {
-          res.status(401).json({ message: "Cloudinary API secret not set" });
-        } else {
-          const { paramsToSign } = JSON.parse(req.body as string);
+    if (!env.CLOUDINARY_API_SECRET) {
+      res.status(401).json({ message: "Cloudinary API secret not set" });
+    } else {
+      const body = JSON.parse(req.body as string) || {};
+      const { paramsToSign } = body;
 
-          const signature = cloudinary.utils.api_sign_request(
-            paramsToSign as SignApiOptions,
-            env.CLOUDINARY_API_SECRET
-          );
+      const signature = cloudinary.utils.api_sign_request(
+        paramsToSign as SignApiOptions,
+        env.CLOUDINARY_API_SECRET
+      );
 
-          res.status(200).json({ signature });
-        }
-      default:
-        res.setHeader("Allow", "POST");
-        return res.status(405).end("Method Not Allowed");
+      res.status(200).json({ signature });
     }
-  } catch (cause) {
+  } catch (cause: unknown) {
     if (cause instanceof TRPCError) {
       // An error from tRPC occurred
       const httpCode = getHTTPStatusCodeFromError(cause);
       return res.status(httpCode).json(cause);
     }
     // Another error occurred
-    console.error(cause);
+    console.error(JSON.stringify(cause));
     res.status(500).json({ message: "Internal server error" });
   }
 };
