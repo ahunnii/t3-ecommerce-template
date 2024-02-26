@@ -34,7 +34,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       {/* <AxiomWebVitals /> */}
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        forcedTheme="light"
+      >
         <ToastProvider />
         <ModalProvider />
         <StorefrontModalProvider />

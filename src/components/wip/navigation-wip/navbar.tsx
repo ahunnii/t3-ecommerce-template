@@ -10,6 +10,7 @@ import { STORE_NAME } from "../../../data/config.custom";
 import MainNav from "./main-nav";
 import NavbarActions from "./navbar-actions";
 
+import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import { storeTheme } from "~/data/config.custom";
 import { MobileNav } from "./mobile-nav";

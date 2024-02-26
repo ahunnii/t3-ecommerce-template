@@ -95,10 +95,7 @@ model Store {
   slug              String?         @unique
   userId            String
   businessAddress   String          @default("")
-
-  address         Address ?
-
- 
+  address         Address ? 
   billboards        Billboard[]     @relation("StoreToBillboard")
   categories        Category[]      @relation("StoreToCategory")
   products          Product[]       @relation("StoreToProduct")
@@ -114,7 +111,7 @@ model Store {
 
   hasFlatRate      Boolean        @default(false)
   flatRateAmount    Float?        @default(0)
-  
+
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
@@ -232,6 +229,21 @@ model Product {
   @@index([categoryId])
 
 }
+
+model CustomOrderRequest {
+  id          String          @id @default(cuid())
+  type        String       // Type of product being requested
+  email       String
+  name        String
+  description String
+  images      Image[]     // Assuming you're storing image URLs or keys
+  status      String       // ["pending", "accepted", "rejected"]
+  price       Float?       // Price set by the admin upon acceptance
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+
 
 model Tag {
   id          String   @id @default(cuid())
@@ -397,15 +409,19 @@ model OrderItem {
 
 
 model Image {
-  id        String   @id @default(cuid())
-
-  productId String? // Foreign Key to Product
-  product   Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+    
+  productId     String? // Foreign Key to Product
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+    
+  customOrderId String?
+  customOrder   CustomOrderRequest?  @relation(fields: [customOrderId], references: [id], onDelete: Cascade)
   url       String // URL of the image
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([productId])
+  @@index([customOrderId])
   
 }
 

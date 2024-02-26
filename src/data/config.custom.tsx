@@ -10,14 +10,16 @@ export const storeTheme = {
   },
   logo: {
     default: "/custom/logo.png",
+    alt: "/custom/logo-alt.png",
   },
   buttons: {
     accent: "bg-purple-500 hover:bg-purple-400",
   },
   layout: {
     mainStyle: "bg-fuchsia-200",
+
     // bodyStyle: "max-w-full",
-    navStyles: "bg-black border-b-black",
+    // navStyles: "bg-black border-b-black",
     p: "leading-7 [&:not(:first-child)]:mt-6",
     h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
     h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
@@ -28,14 +30,24 @@ export const storeTheme = {
     NavBar: Navbar,
     Footer: Footer,
   },
+
+  body: {
+    primary: "bg-black",
+  },
+
+  navigation: {
+    body: "bg-black border-b-black",
+  },
+
   textColors: {
     primary: "text-black",
+    accent: "text-purple-500",
   },
   signIn: {
     title: "text-black",
     background: "bg-transparent",
   },
-  navigation: {},
+
   typography: {
     p: "leading-7 [&:not(:first-child)]:mt-6",
     h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-black",

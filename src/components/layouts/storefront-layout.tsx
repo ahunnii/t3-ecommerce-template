@@ -1,3 +1,4 @@
+import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
 import { Footer as DefaultFooter } from "~/components/core/footer";
@@ -5,6 +6,7 @@ import { Navbar as DefaultNavbar } from "~/components/core/navbar";
 import { SEO } from "~/components/core/seo-head";
 
 import useCart from "~/modules/cart/hooks/use-cart";
+import { useConfig } from "~/providers/style-config-provider";
 import { cn } from "~/utils/styles";
 
 const StorefrontLayout = ({
@@ -28,6 +30,7 @@ const StorefrontLayout = ({
   navStyles?: string;
 }) => {
   const updateStore = () => void useCart.persist.rehydrate();
+  const config = useConfig();
 
   useEffect(() => {
     document.addEventListener("visibilitychange", updateStore);
@@ -37,6 +40,7 @@ const StorefrontLayout = ({
       window.removeEventListener("focus", updateStore);
     };
   }, []);
+
   return (
     <>
       <SEO
@@ -44,7 +48,7 @@ const StorefrontLayout = ({
         description={metadata?.description ?? "Lorem Ipsum"}
       />
       <main className={cn("flex h-full  min-h-screen flex-col", mainStyle)}>
-        <NavBar navStyles={navStyles} />
+        <NavBar navStyles={cn(config.navigation.body, navStyles)} />
 
         <div
           className={cn(

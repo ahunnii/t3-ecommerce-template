@@ -9,6 +9,7 @@ import { CloudinaryUpload } from "./cloudinary-upload";
 
 interface ImageUploadProps {
   disabled?: boolean;
+  secure?: boolean;
 
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
@@ -19,8 +20,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   disabled,
   onChange,
   onRemove,
-
   value,
+  secure = true,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -63,7 +64,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </div>
         ))}
       </div>
-      <CloudinaryUpload disabled={disabled} onChange={onChange} />
+      <CloudinaryUpload
+        disabled={disabled}
+        onChange={onChange}
+        secure={secure}
+      />
       {/* <UploadThingUpload disabled={disabled} onChange={onChange} /> */}
     </div>
   );

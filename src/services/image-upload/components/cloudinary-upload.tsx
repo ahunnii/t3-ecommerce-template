@@ -5,24 +5,35 @@ import { ImagePlus } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
 
-interface ImageUploadProps {
-  disabled?: boolean;
-  onChange: (value: string) => void;
-}
 type Results = { secure_url: string };
-export const CloudinaryUpload = ({ disabled, onChange }: ImageUploadProps) => {
+
+type Props = {
+  disabled?: boolean;
+  secure?: boolean;
+  onChange: (value: string) => void;
+};
+
+export const CloudinaryUpload = ({
+  disabled,
+  onChange,
+  secure = true,
+}: Props) => {
   const onUpload = (result: { event: string; info: Partial<Results> }) => {
     onChange(result.info.secure_url!);
   };
+
   if (!env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) return null;
+
+  const props = secure
+    ? { signatureEndpoint: "/api/cloudinary" }
+    : { uploadPreset: env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET, maxFiles: 3 };
 
   return (
     <>
       <CldUploadWidget
         onUpload={onUpload}
         options={{ sources: ["local", "url", "unsplash"] }}
-        // uploadPreset={env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-        signatureEndpoint="/api/cloudinary"
+        {...props}
       >
         {({ open }) => {
           const onClick = () => open();
