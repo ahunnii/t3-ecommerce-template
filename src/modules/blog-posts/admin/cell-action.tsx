@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
+import { toastService } from "~/services/toast";
 import type { BlogPostColumn } from "./columns";
 
 interface CellActionProps {
@@ -35,10 +36,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       await axios.delete(
         `/api/${params.query.storeId as string}/blog-posts/${data.id}`
       );
-      toast.success("Blog post deleted.");
+      toastService.success("Blog post deleted.");
       router.refresh();
-    } catch (error) {
-      toast.error("Something went wrong");
+    } catch (error: unknown) {
+      toastService.error("Something went wrong", error);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -48,12 +49,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onCopy = (id: string) => {
     navigator.clipboard
       .writeText(id)
-      .then(() => {
-        toast.success("Blog post ID copied to clipboard.");
-      })
-      .catch(() => {
-        toast.error("Failed to copy Blog post ID to clipboard.");
-      });
+      .then(() => toastService.success("Blog post ID copied to clipboard."))
+      .catch((err: unknown) =>
+        toastService.error("Failed to copy Blog post ID to clipboard.", err)
+      );
   };
 
   return (

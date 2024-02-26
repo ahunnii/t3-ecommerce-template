@@ -18,6 +18,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 const emailSchema = z.object({
@@ -41,11 +42,10 @@ export const ContactUsPage = () => {
   });
 
   const { mutate: sendEmail } = api.email.sendEmailInquiry.useMutation({
-    onSuccess: () => {
-      toast.success("Email sent. We will get back to you shortly.");
-    },
-    onError: (error) => {
-      toast.error("Something went wrong");
+    onSuccess: () =>
+      toastService.success("Email sent. We will get back to you shortly."),
+    onError: (error: unknown) => {
+      toastService.error("Something went wrong", error);
       console.error(error);
     },
     onMutate: () => setLoading(true),

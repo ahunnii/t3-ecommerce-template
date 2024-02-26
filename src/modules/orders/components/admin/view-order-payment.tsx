@@ -5,6 +5,7 @@ import { InfoButton } from "~/components/common/buttons/info-button";
 import Currency from "~/components/core/ui/currency";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
+import { toastService } from "~/services/toast";
 
 type ViewOrderPaymentProps = {
   id: string;
@@ -31,9 +32,9 @@ export const ViewOrderPayment = ({
     });
 
     if (res.status === 200) {
-      toast.success("Order refunded");
+      toastService.success("Order refunded");
     } else {
-      toast.error("Failed to refund order");
+      toastService.error("Failed to refund order", res);
     }
   };
   return (

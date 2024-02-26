@@ -244,7 +244,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const onDelete = () => {
     deleteProduct({
-      storeId: params.query.storeId as string,
       productId: params.query.productId as string,
     });
   };

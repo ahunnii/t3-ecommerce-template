@@ -18,6 +18,7 @@ import { Input } from "~/components/ui/input";
 import { Modal } from "~/components/ui/modal";
 
 import { useStoreModal } from "~/hooks/use-store-modal";
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 const formSchema = z.object({
@@ -29,8 +30,8 @@ export const StoreModal = () => {
 
   const { mutate } = api.store.createStore.useMutation({
     onSuccess: ({ id }) => window.location.assign(`/admin/${id}`),
-    onError: (error) => {
-      toast.error("Something went wrong");
+    onError: (error: unknown) => {
+      toastService.error("Something went wrong", error);
       console.error(error);
     },
     onMutate: () => setLoading(true),

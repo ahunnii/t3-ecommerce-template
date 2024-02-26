@@ -20,7 +20,7 @@ export const AllProductsPage = () => {
   });
 
   const { data: attributes } =
-    api.categories.getAllStoreCategoryAttributes.useQuery();
+    api.categories.getAllStoreCategoryAttributes.useQuery({});
 
   const { data: billboard } = api.billboards.getBillboard.useQuery({
     billboardId: "3889d79c-f6ee-46c6-8259-d207a3279df7",

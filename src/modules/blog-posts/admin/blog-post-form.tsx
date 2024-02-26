@@ -157,8 +157,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
 
   const onDelete = () => {
     deleteBlogPost({
-      storeId: params.query.storeId as string,
-      blogPostId: params.query.productId as string,
+      blogPostId: params.query.blogPostId as string,
     });
   };
 

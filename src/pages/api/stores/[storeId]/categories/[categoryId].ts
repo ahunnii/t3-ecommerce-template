@@ -58,7 +58,6 @@ const colorByIdHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const deleteCategory = await caller.categories.deleteCategory({
           categoryId: categoryId as string,
-          storeId: storeId as string,
         });
         return res.status(200).json(deleteCategory);
       default:

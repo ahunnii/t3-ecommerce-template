@@ -66,7 +66,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const onConfirm = () => {
     deleteOrder.mutate({
-      storeId: params?.query?.storeId as string,
       orderId: data.id,
     });
   };

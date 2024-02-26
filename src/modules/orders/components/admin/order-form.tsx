@@ -168,7 +168,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
     }
   };
 
-  const onDelete = () => deleteOrder.mutate({ storeId, orderId });
+  const onDelete = () => deleteOrder.mutate({ orderId });
 
   const loading =
     updateOrder.isLoading || createOrder.isLoading || deleteOrder.isLoading;

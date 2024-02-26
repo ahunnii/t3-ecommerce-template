@@ -41,7 +41,6 @@ const productByIdHandler = async (
               },
             },
 
-     
             variants: true,
           },
         });
@@ -56,7 +55,6 @@ const productByIdHandler = async (
 
         const deleteProduct = await caller.products.deleteProduct({
           productId: productId as string,
-          storeId: storeId as string,
         });
         return res.status(200).json(deleteProduct);
       default:

@@ -63,7 +63,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       );
   };
 
-  const onConfirm = () => deleteGalleryImage({ storeId, id: galleryId });
+  const onConfirm = () => deleteGalleryImage({ id: galleryId });
   const onDeleteSelection = () => setOpen(true);
 
   return (

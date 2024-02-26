@@ -165,7 +165,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 
   const onDelete = () => {
     deleteCategory({
-      storeId: params?.query?.storeId as string,
       categoryId: params?.query?.categoryId as string,
     });
   };

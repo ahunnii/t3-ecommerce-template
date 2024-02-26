@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { toastService } from "~/services/toast";
 
 const useNotification = () => {
   const showError = (message: string) => {
@@ -6,7 +7,7 @@ const useNotification = () => {
   };
 
   const showInfo = (message: string) => {
-    toast.error(message, { icon: null });
+    toastService.inform(message);
   };
 
   const showSuccess = (message: string) => {

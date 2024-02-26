@@ -85,7 +85,6 @@ export const galleryRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        storeId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {

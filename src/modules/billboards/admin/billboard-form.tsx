@@ -46,7 +46,6 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   };
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const title = initialData ? "Edit billboard" : "Create billboard";
   const description = initialData ? "Edit a billboard." : "Add a new billboard";
@@ -65,75 +64,59 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
     },
   });
 
-  const { mutate: updateBillboard } =
-    api.billboards.updateBillboard.useMutation({
-      onSuccess: () => toastService.success(toastMessage),
-      onError: (error: unknown) =>
-        toastService.error(
-          "Something went wrong updating your billboard.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        setLoading(false);
-        router.push(`/admin/${storeId}/billboards`);
-        void apiContext.billboards.invalidate();
-      },
-    });
+  const updateBillboard = api.billboards.updateBillboard.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong updating your billboard.",
+        error
+      ),
+    onSettled: () => {
+      router.push(`/admin/${storeId}/billboards`);
+      void apiContext.billboards.invalidate();
+    },
+  });
 
-  const { mutate: createBillboard } =
-    api.billboards.createBillboard.useMutation({
-      onSuccess: () => toastService.success(toastMessage),
-      onError: (error: unknown) =>
-        toastService.error(
-          "Something went wrong creating your billboard.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        setLoading(false);
-        router.push(`/admin/${storeId}/billboards`);
-        void apiContext.billboards.invalidate();
-      },
-    });
+  const createBillboard = api.billboards.createBillboard.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong creating your billboard.",
+        error
+      ),
 
-  const { mutate: deleteBillboard } =
-    api.billboards.deleteBillboard.useMutation({
-      onSuccess: () =>
-        toastService.success("Billboard was successfully deleted."),
-      onError: (error: unknown) =>
-        toastService.error(
-          "Make sure to remove all items using this billboard first before deleting.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        setLoading(false);
-        setOpen(false);
-        router.push(`/admin/${storeId}/billboards`);
-        void apiContext.billboards.invalidate();
-      },
-    });
+    onSettled: () => {
+      router.push(`/admin/${storeId}/billboards`);
+      void apiContext.billboards.invalidate();
+    },
+  });
+
+  const deleteBillboard = api.billboards.deleteBillboard.useMutation({
+    onSuccess: () =>
+      toastService.success("Billboard was successfully deleted."),
+    onError: (error: unknown) =>
+      toastService.error(
+        "Make sure to remove all items using this billboard first before deleting.",
+        error
+      ),
+
+    onSettled: () => {
+      setOpen(false);
+      router.push(`/admin/${storeId}/billboards`);
+      void apiContext.billboards.invalidate();
+    },
+  });
 
   const onSubmit = (data: BillboardFormValues) => {
-    if (initialData) {
-      updateBillboard({
-        storeId,
-        billboardId,
-        label: data.label,
-        imageUrl: data.imageUrl,
-        description: data?.description ?? undefined,
-      });
-    } else {
-      createBillboard({
-        storeId,
-        label: data.label,
-        imageUrl: data.imageUrl,
-        description: data?.description,
-      });
-    }
+    if (initialData) updateBillboard.mutate({ billboardId, ...data });
+    else createBillboard.mutate({ storeId, ...data });
   };
-  const onDelete = () => deleteBillboard({ storeId, billboardId });
+  const onDelete = () => deleteBillboard.mutate({ billboardId });
+
+  const isLoading =
+    updateBillboard.isLoading ||
+    createBillboard.isLoading ||
+    deleteBillboard.isLoading;
 
   return (
     <>
@@ -141,7 +124,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
-        loading={loading}
+        loading={isLoading}
       />
       <BackToButton
         link={`/admin/${storeId}/billboards/${billboardId ?? ""}`}
@@ -151,7 +134,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         <Heading title={title} description={description} />
         {initialData && (
           <Button
-            disabled={loading}
+            disabled={isLoading}
             variant="destructive"
             size="sm"
             onClick={() => setOpen(true)}
@@ -175,7 +158,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
                 <Form.FormControl>
                   <ImageUpload
                     value={field.value ? [field.value] : []}
-                    disabled={loading}
+                    disabled={isLoading}
                     onChange={(url) => field.onChange(url)}
                     onRemove={() => field.onChange("")}
                   />
@@ -193,7 +176,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
                   <Form.FormLabel>Label</Form.FormLabel>
                   <Form.FormControl>
                     <Input
-                      disabled={loading}
+                      disabled={isLoading}
                       placeholder="Billboard label"
                       {...field}
                     />
@@ -212,7 +195,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
                   <Form.FormLabel>Description</Form.FormLabel>
                   <Form.FormControl>
                     <Input
-                      disabled={loading}
+                      disabled={isLoading}
                       placeholder="Billboard description"
                       {...field}
                     />
@@ -222,7 +205,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
               )}
             />
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
+          <Button disabled={isLoading} className="ml-auto" type="submit">
             {action}
           </Button>
         </form>

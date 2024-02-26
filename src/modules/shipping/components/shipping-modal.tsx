@@ -23,6 +23,7 @@ import { api } from "~/utils/api";
 
 import axios from "axios";
 
+import { toastService } from "~/services/toast";
 import AddressForm from "./address-form";
 import PackageForm from "./package-form";
 import RatesForm from "./rates-form";
@@ -164,12 +165,10 @@ export const ShippingModal = ({ data }: { data: string }) => {
   const onCopy = (id: string) => {
     navigator.clipboard
       .writeText(id)
-      .then(() => {
-        toast.success("Tracking link copied to clipboard.");
-      })
-      .catch(() => {
-        toast.error("Failed to copy tracking link to clipboard.");
-      });
+      .then(() => toastService.success("Tracking link copied to clipboard."))
+      .catch((err: unknown) =>
+        toastService.error("Failed to copy tracking link to clipboard.", err)
+      );
   };
 
   return (
@@ -229,12 +228,15 @@ export const ShippingModal = ({ data }: { data: string }) => {
                   {customerAddress && (
                     <AddressForm
                       successCallback={(data) => {
-                        toast.success("Customer address is valid.");
+                        toastService.success("Customer address is valid.");
                         setCustomerAddress(data as ShippingAddress);
                         setTabValue("business_address");
                       }}
-                      errorCallback={() =>
-                        toast.error("Customer address is invalid.")
+                      errorCallback={(error: unknown) =>
+                        toastService.error(
+                          "Customer address is invalid.",
+                          error
+                        )
                       }
                       initialData={customerAddress ?? null}
                     />
@@ -244,12 +246,15 @@ export const ShippingModal = ({ data }: { data: string }) => {
                   {businessAddress && (
                     <AddressForm
                       successCallback={(data) => {
-                        toast.success("Business address is valid.");
+                        toastService.success("Business address is valid.");
                         setBusinessAddress(data as ShippingAddress);
                         setTabValue("package");
                       }}
-                      errorCallback={() =>
-                        toast.error("Business address is invalid.")
+                      errorCallback={(error: unknown) =>
+                        toastService.error(
+                          "Business address is invalid.",
+                          error
+                        )
                       }
                       initialData={businessAddress ?? null}
                     />
@@ -259,11 +264,14 @@ export const ShippingModal = ({ data }: { data: string }) => {
                   {parcel && (
                     <PackageForm
                       successCallback={() => {
-                        toast.success("Package details saved to cache");
+                        toastService.success("Package details saved to cache");
                         setTabValue("rates");
                       }}
-                      errorCallback={() =>
-                        toast.error("Business address is invalid.")
+                      errorCallback={(error: unknown) =>
+                        toastService.error(
+                          "Business address is invalid.",
+                          error
+                        )
                       }
                       initialData={parcel ?? null}
                     />
@@ -274,11 +282,14 @@ export const ShippingModal = ({ data }: { data: string }) => {
                   {selectedRate && (
                     <RatesForm
                       successCallback={() => {
-                        toast.success("selected");
+                        toastService.success("selected");
                         setTabValue("review");
                       }}
-                      errorCallback={() => {
-                        toast.error("Rates could not be fetched.");
+                      errorCallback={(error: unknown) => {
+                        toastService.error(
+                          "Rates could not be fetched.",
+                          error
+                        );
                       }}
                       initialData={selectedRate ?? null}
                     />

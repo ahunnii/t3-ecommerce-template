@@ -42,7 +42,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       },
     });
 
-  const onConfirm = () => deleteBillboard({ storeId, billboardId });
+  const onConfirm = () => deleteBillboard({ billboardId });
   const onDeleteSelection = () => setOpen(true);
 
   const onCopySelection = () => {

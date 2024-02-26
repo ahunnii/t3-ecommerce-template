@@ -190,7 +190,6 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   const onSubmit = (data: CollectionFormValues) => {
     if (initialData) {
       updateCollection({
-        storeId: params?.query?.storeId as string,
         billboardId: data.billboardId,
         isFeatured: data.isFeatured,
         name: data.name,
@@ -210,7 +209,6 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
 
   const onDelete = () => {
     deleteCollection({
-      storeId: params?.query?.storeId as string,
       collectionId: params?.query?.collectionId as string,
     });
   };

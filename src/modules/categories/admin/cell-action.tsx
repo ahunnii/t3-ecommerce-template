@@ -51,7 +51,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       );
   };
 
-  const onConfirm = () => deleteCategory({ storeId, categoryId });
+  const onConfirm = () => deleteCategory({ categoryId });
   const onDeleteSelection = () => setOpen(true);
 
   return (

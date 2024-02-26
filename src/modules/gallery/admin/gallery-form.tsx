@@ -135,7 +135,7 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
     if (initialData) {
       updateBlogPost({
         ...data,
-        storeId: params.query.storeId as string,
+
         id: params.query.galleryId as string,
       });
     } else {
@@ -148,7 +148,6 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
 
   const onDelete = () => {
     deleteBlogPost({
-      storeId: params.query.storeId as string,
       id: params.query.galleryId as string,
     });
   };

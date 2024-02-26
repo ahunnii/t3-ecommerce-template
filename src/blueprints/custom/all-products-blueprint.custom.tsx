@@ -33,7 +33,7 @@ export const AllProductsPage = () => {
     });
 
   const { data: attributes } =
-    api.categories.getAllStoreCategoryAttributes.useQuery();
+    api.categories.getAllStoreCategoryAttributes.useQuery({});
 
   const config = useConfig();
   const router = useRouter();

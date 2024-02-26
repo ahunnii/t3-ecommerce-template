@@ -118,7 +118,6 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const onSubmit = (data: BillboardFormValues) => {
     if (initialData) {
       updateBillboard({
-        storeId,
         billboardId,
         label: data.label,
         imageUrl: data.imageUrl,
@@ -133,7 +132,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
       });
     }
   };
-  const onDelete = () => deleteBillboard({ storeId, billboardId });
+  const onDelete = () => deleteBillboard({ billboardId });
 
   return (
     <>
