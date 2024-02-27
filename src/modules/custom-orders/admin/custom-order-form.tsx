@@ -3,16 +3,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CustomOrderStatus,
-  CustomOrderType,
-  type Billboard,
-  type Prisma,
-} from "@prisma/client";
+import { CustomOrderStatus, CustomOrderType } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
-
-import * as z from "zod";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -31,32 +24,20 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
-import CategoryPage from "~/pages/admin/[storeId]/categories/[categoryId]";
+
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
+import {
+  customOrderAdminFormSchema,
+  type CustomOrder,
+  type CustomOrderAdminFormValues,
+} from "../types";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  name: z.string(),
-  description: z.string(),
-  notes: z.string().optional(),
-  images: z.object({ url: z.string() }).array(),
-  status: z.nativeEnum(CustomOrderStatus),
-  type: z.nativeEnum(CustomOrderType),
-  price: z.coerce.number().min(0),
-});
+type Props = {
+  initialData: CustomOrder;
+};
 
-type BillboardFormValues = z.infer<typeof formSchema>;
-
-interface BillboardFormProps {
-  initialData: Prisma.CustomOrderRequestGetPayload<{
-    include: { images: true };
-  }>;
-}
-
-export const CustomOrderForm: React.FC<BillboardFormProps> = ({
-  initialData,
-}) => {
+export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const apiContext = api.useContext();
@@ -78,8 +59,8 @@ export const CustomOrderForm: React.FC<BillboardFormProps> = ({
 
   const action = initialData ? "Save changes" : "Create";
 
-  const form = useForm<BillboardFormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<CustomOrderAdminFormValues>({
+    resolver: zodResolver(customOrderAdminFormSchema),
     defaultValues: {
       name: initialData?.name ?? "",
       email: initialData?.email ?? "",
@@ -144,7 +125,7 @@ export const CustomOrderForm: React.FC<BillboardFormProps> = ({
     },
   });
 
-  const onSubmit = (data: BillboardFormValues) => {
+  const onSubmit = (data: CustomOrderAdminFormValues) => {
     if (initialData) {
       updateCustomOrder.mutate({
         customOrderId,
@@ -173,7 +154,7 @@ export const CustomOrderForm: React.FC<BillboardFormProps> = ({
         loading={loading}
       />
       <BackToButton
-        link={`/admin/${storeId}/custom-order/${customOrderId ?? ""}`}
+        link={`/admin/${storeId}/custom-orders/${customOrderId ?? ""}`}
         title="Back to Custom Order"
       />
       <div className="flex items-center justify-between">

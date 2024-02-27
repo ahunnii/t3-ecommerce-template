@@ -2,7 +2,15 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { Copy, Download, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Edit,
+  Eye,
+  Mail,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -10,19 +18,12 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 
 import { api } from "~/utils/api";
 
-import { env } from "~/env.mjs";
-import { emailService } from "~/services/email_new";
 import { toastService } from "~/services/toast";
-import type { CustomOrderColumn } from "./columns";
+import type { CustomOrderColumn } from "../types";
+import { saveAsPDF } from "../utils/save-as-pdf";
 
 interface CellActionProps {
   data: CustomOrderColumn;
-}
-
-function addWeeks(weeks: number, date = new Date()): Date {
-  date.setDate(date.getDate() + weeks * 7);
-
-  return date;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -31,120 +32,71 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const params = useRouter();
   const apiContext = api.useContext();
   const { storeId } = params.query as { storeId: string };
-  const billboardId = data.id;
+  const customOrderId = data.id;
 
-  const baseUrl = `/admin/${storeId}/custom-orders/${billboardId}`;
+  const baseUrl = `/admin/${storeId}/custom-orders/${customOrderId}`;
 
-  const { mutate: deleteBillboard, isLoading } =
-    api.billboards.deleteBillboard.useMutation({
-      onSuccess: () => toastService.success("Billboard deleted."),
-      onError: (error: unknown) => {
-        toastService.error(
-          "Make sure you removed all items using this billboard first.",
-          error
-        );
-      },
-      onSettled: () => {
-        void apiContext.billboards.invalidate();
-        setOpen(false);
-      },
-    });
+  const deleteCustomOrder = api.customOrder.deleteCustomRequest.useMutation({
+    onSuccess: () =>
+      toastService.success("Custom request was successfully deleted"),
+    onError: (error: unknown) => {
+      toastService.error(
+        "There was an error deleting the custom request. Please try again later.",
+        error
+      );
+    },
+    onSettled: () => {
+      void apiContext.customOrder.invalidate();
+      setOpen(false);
+    },
+  });
 
-  const onConfirm = () => deleteBillboard({ billboardId });
+  const onConfirm = () => deleteCustomOrder.mutate({ customOrderId });
   const onDeleteSelection = () => setOpen(true);
 
   const onCopySelection = () => {
     navigator.clipboard
-      .writeText(billboardId)
-      .then(() => toastService.success("Billboard ID copied to clipboard."))
+      .writeText(customOrderId)
+      .then(() =>
+        toastService.success("Custom order request id copied to clipboard.")
+      )
       .catch((e) =>
-        toastService.error("Failed to copy billboard ID to clipboard.", e)
+        toastService.error(
+          "Failed to copy Custom order request ID to clipboard.",
+          e
+        )
       );
   };
 
-  // container function to generate the Invoice
-  const generateInvoice = (e: MouseEvent) => {
-    e.preventDefault();
-    // send a post request with the name to our API endpoint
-
-    if (data?.store?.address === null) {
-      toastService.error(
-        "Unable to generate invoice. Your store's address isn't set.",
-        "Store address is null"
-      );
-      return;
+  const emailCustomerInvoice = api.customOrder.emailCustomerInvoice.useMutation(
+    {
+      onSuccess: () =>
+        toastService.success("Customer invoice was successfully sent"),
+      onError: (error: unknown) => {
+        toastService.error(
+          "There was an error sending the customer invoice. Please try again later.",
+          error
+        );
+      },
     }
-    const fetchData = async () => {
-      const invoiceData = await fetch(
-        `${env.NEXT_PUBLIC_API_URL}/generate-invoice`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            customerName: data?.name,
-            customerEmail: data?.email,
-            invoiceNumber: data?.id,
-            createdAt: new Date().toDateString(),
-            dueAt: addWeeks(1, new Date()).toDateString(),
-            businessLogo: `${env.NEXT_PUBLIC_URL}/custom/logo.png`,
-            businessName: data?.store?.name,
-            businessStreet: data?.store?.address?.street ?? "",
-            businessCity: data?.store?.address?.city ?? "",
-            businessState: data?.store?.address?.state ?? "",
-            businessPostalCode: data?.store?.address?.postal_code ?? "",
-            product: data?.product?.name ?? "",
-            productCost: data?.product?.price ?? 0.0,
-            productTotal: data?.product?.price ?? 0.0,
-            productLink: `${env.NEXT_PUBLIC_URL}/product/${data?.product?.id}`,
-            productDescription: data?.product?.description ?? "",
-          }),
-        }
-      );
-      // convert the response into an array Buffer
-      return invoiceData.arrayBuffer();
-    };
+  );
 
-    // convert the buffer into an object URL
-    const saveAsPDF = async () => {
-      const buffer = await fetchData();
-      const blob = new Blob([buffer]);
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "invoice.pdf";
-      link.click();
-    };
-
-    void saveAsPDF();
-  };
-
-  const emailCustomer = async () => {
-    const fetchData = await fetch(`${env.NEXT_PUBLIC_API_URL}/email-customer`, {
-      method: "POST",
-      body: JSON.stringify({
-        customerName: data?.name,
-        customerEmail: data?.email,
-        invoiceNumber: data?.id,
-        createdAt: new Date().toDateString(),
-        dueAt: addWeeks(1, new Date()).toDateString(),
-        businessLogo: `${env.NEXT_PUBLIC_URL}/custom/logo.png`,
-        businessName: data?.store?.name,
-        businessStreet: data?.store?.address?.street ?? "",
-        businessCity: data?.store?.address?.city ?? "",
-        businessState: data?.store?.address?.state ?? "",
-        businessPostalCode: data?.store?.address?.postal_code ?? "",
-        product: data?.product?.name ?? "",
-        productCost: data?.product?.price ?? 0.0,
-        productTotal: data?.product?.price ?? 0.0,
-        productLink: `${env.NEXT_PUBLIC_URL}/product/${data?.product?.id}`,
-        productDescription: data?.product?.description ?? "",
-      }),
+  const generateCustomerInvoice =
+    api.customOrder.generateCustomOrderInvoice.useMutation({
+      onSuccess: (data) => {
+        // Convert the buffer into an object URL
+        saveAsPDF(data);
+        toastService.success("Customer invoice was successfully generated");
+      },
+      onError: (error: unknown) => {
+        toastService.error(
+          "There was an error generating the customer invoice. Please try again later.",
+          error
+        );
+      },
     });
 
-    if (fetchData?.status === 200) {
-      toastService.success("Email Sent");
-    } else {
-      toastService.error("Error", "");
-    }
-  };
+  const isLoading = deleteCustomOrder.isLoading;
   return (
     <>
       <AlertModal
@@ -182,7 +134,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           {data.status === "ACCEPTED" && (
             <Dropdown.DropdownMenuItem
               className="cursor-pointer"
-              onClick={generateInvoice}
+              onClick={() => generateCustomerInvoice.mutate({ customOrderId })}
             >
               <Download className="mr-2 h-4 w-4" /> Download Invoice
             </Dropdown.DropdownMenuItem>
@@ -191,9 +143,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           {data.status === "ACCEPTED" && (
             <Dropdown.DropdownMenuItem
               className="cursor-pointer"
-              onClick={emailCustomer}
+              onClick={() =>
+                emailCustomerInvoice.mutate({
+                  customOrderId,
+                })
+              }
             >
-              <Download className="mr-2 h-4 w-4" /> Email Customer
+              <Mail className="mr-2 h-4 w-4" /> Resend Customer Invoice
             </Dropdown.DropdownMenuItem>
           )}
           <Dropdown.DropdownMenuItem

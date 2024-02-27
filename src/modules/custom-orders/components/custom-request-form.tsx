@@ -22,7 +22,6 @@ import {
 } from "~/components/ui/select";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import {
-  customProductOptions,
   customRequestFormSchema,
   type CustomRequestFormValues,
 } from "../types";

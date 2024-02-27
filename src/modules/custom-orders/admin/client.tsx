@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 
 import { Plus } from "lucide-react";
 
-import { ApiList } from "~/components/ui/api-list";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
@@ -10,13 +9,12 @@ import { Separator } from "~/components/ui/separator";
 
 import Link from "next/link";
 
-import { columns, type CustomOrderColumn } from "./columns";
+import type { CustomOrderColumn } from "../types";
+import { columns } from "./columns";
 
-interface BillboardClientProps {
-  data: CustomOrderColumn[];
-}
+type Props = { data: CustomOrderColumn[] };
 
-export const CustomOrderClient: React.FC<BillboardClientProps> = ({ data }) => {
+export const CustomOrderClient: React.FC<Props> = ({ data }) => {
   const params = useRouter();
   const storeId = params.query.storeId as string;
 
@@ -35,9 +33,6 @@ export const CustomOrderClient: React.FC<BillboardClientProps> = ({ data }) => {
       </div>
       <Separator />
       <DataTable searchKey="email" columns={columns} data={data} />
-      {/* <Heading title="Public API" description="API Calls for Billboards" /> */}
-      {/* <Separator /> */}
-      {/* <ApiList entityName="billboards" entityIdName="billboardId" /> */}
     </>
   );
 };

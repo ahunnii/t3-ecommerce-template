@@ -12,7 +12,7 @@ import { emailRouter } from "./routers/core/emails";
 import { galleryRouter } from "./routers/gallery";
 import { productsRouter } from "./routers/products";
 
-import { customRouter } from "./routers/custom";
+import { customRouter } from "~/modules/custom-orders/api/custom-order-router.trpc";
 import { userRouter } from "./routers/users";
 
 /**
@@ -30,10 +30,12 @@ export const appRouter = createTRPCRouter({
   orders: ordersRouter,
   products: productsRouter,
   users: userRouter,
-  customOrder: customRouter,
 
   shippingLabels: shippingLabelRouter,
   email: emailRouter,
+
+  // Add your routers here
+  customOrder: customRouter,
 });
 
 // export type definition of API

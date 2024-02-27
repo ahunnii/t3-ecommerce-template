@@ -1,16 +1,10 @@
-import type { Billboard, Prisma } from "@prisma/client";
-import BillboardDisplay from "~/components/core/ui/billboard";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import type { CustomOrder } from "../types";
 
-export const ViewCustomOrder = ({
-  customOrder,
-}: {
-  customOrder: Prisma.CustomOrderRequestGetPayload<{
-    include: {
-      images: true;
-    };
-  }>;
-}) => {
+type Props = {
+  customOrder: CustomOrder;
+};
+export const ViewCustomOrder = ({ customOrder }: Props) => {
   return (
     <div className="flex w-3/4 flex-col space-y-2">
       <div className="w-full rounded-md border border-border bg-background/50 p-4">
