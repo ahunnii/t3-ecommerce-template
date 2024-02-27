@@ -95,7 +95,8 @@ model Store {
   slug              String?         @unique
   userId            String
   businessAddress   String          @default("")
-  address         Address ? 
+  customRequests   CustomOrderRequest[] @relation("StoreToCustomOrderRequest")
+  address           Address ? 
   billboards        Billboard[]     @relation("StoreToBillboard")
   categories        Category[]      @relation("StoreToCategory")
   products          Product[]       @relation("StoreToProduct")
@@ -230,17 +231,32 @@ model Product {
 
 }
 
+enum CustomOrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum CustomOrderType {
+  HAT
+  SHIRT
+  HOODIE
+}
 model CustomOrderRequest {
   id          String          @id @default(cuid())
-  type        String       // Type of product being requested
+  storeId     String    // Foreign Key to Store 
+  store       Store    @relation("StoreToCustomOrderRequest", fields: [storeId], references: [id]) 
+  type        CustomOrderType @default(SHIRT)       // Type of product being requested
   email       String
   name        String
-  description String
+  description String @db.Text
   images      Image[]     // Assuming you're storing image URLs or keys
-  status      String       // ["pending", "accepted", "rejected"]
+  status      CustomOrderStatus @default(PENDING)       // ["pending", "accepted", "rejected"]
   price       Float?       // Price set by the admin upon acceptance
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@index([storeId])
 }
 
 

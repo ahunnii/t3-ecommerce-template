@@ -7,6 +7,7 @@ export const storeTheme = {
   brand: {
     name: STORE_NAME,
     url: "https://trendanomaly.com",
+    email: "ahunn@umich.edu",
   },
   logo: {
     default: "/custom/logo.png",

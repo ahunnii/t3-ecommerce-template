@@ -1,3 +1,4 @@
+import { CustomOrderType } from "@prisma/client";
 import type { LucideIcon } from "lucide-react";
 import * as z from "zod";
 
@@ -12,8 +13,8 @@ export const customProductOptions = [
 export const customRequestFormSchema = z.object({
   email: z.string().email(),
   name: z.string(),
-  productType: z.enum(["hat", "shirt", "hoodie"]),
-  body: z.string(),
+  type: z.nativeEnum(CustomOrderType),
+  description: z.string(),
   images: z.object({ url: z.string() }).array(),
 });
 

@@ -14,45 +14,52 @@ import { Heading } from "~/components/ui/heading";
 import { Pencil } from "lucide-react";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
-import { ViewBillboard } from "~/modules/billboards/admin/view-billboard";
+import { ViewCustomOrder } from "~/modules/custom-orders/admin/view-custom-order";
+import { ViewCustomOrderImages } from "~/modules/custom-orders/admin/view-custom-order-images";
 
 interface IProps {
-  billboardId: string;
+  customOrderId: string;
 }
 
-const BillboardPage: FC<IProps> = ({ billboardId }) => {
-  const { data: billboard, isLoading } = api.billboards.getBillboard.useQuery({
-    billboardId,
-  });
+const CustomOrderPage: FC<IProps> = ({ customOrderId }) => {
+  const { data: customOrder, isLoading } =
+    api.customOrder.getCustomRequest.useQuery({
+      customOrderId,
+    });
 
-  const editBillboardURL = `/admin/${billboard?.storeId}/billboards/${billboard?.id}/edit`;
+  const editBillboardURL = `/admin/${customOrder?.storeId}/custom-orders/${customOrder?.id}/edit`;
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
       <div className="flex-1 space-y-4 p-8 pt-6">
-        {!isLoading && billboard && (
+        {!isLoading && customOrder && (
           <>
             <BackToButton
-              link={`/admin/${billboard.storeId}/billboards`}
-              title="Back to Billboards"
+              link={`/admin/${customOrder.storeId}/custom-orders`}
+              title="Back to Custom Orders"
             />
             <div className="flex w-full items-center justify-between">
               <Heading
-                title={billboard.label}
-                description={billboard.description ?? "No description added"}
+                title={customOrder.email}
+                description={customOrder.createdAt.toDateString()}
               />
               <Link href={editBillboardURL}>
                 <Button className="flex gap-2" size={"sm"}>
-                  <Pencil className="h-5 w-5" /> Edit Billboard
+                  <Pencil className="h-5 w-5" /> Edit Custom Order
                 </Button>
               </Link>
             </div>
-            {billboard && <ViewBillboard billboard={billboard} />}
+            {customOrder && (
+              <div className="flex gap-2 ">
+                <ViewCustomOrder customOrder={customOrder} />
+                <ViewCustomOrderImages images={customOrder.images} />
+              </div>
+            )}
           </>
         )}
-        {!billboard && !isLoading && (
-          <DataFetchErrorMessage message="There seems to be an issue with loading the billboard" />
+        {!customOrder && !isLoading && (
+          <DataFetchErrorMessage message="There seems to be an issue with loading the custom order" />
         )}
       </div>
     </AdminLayout>
@@ -63,10 +70,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return await authenticateAdminOrOwner(ctx, (ctx) => {
     return {
       props: {
-        billboardId: ctx.query.billboardId,
+        customOrderId: ctx.query.customOrderId,
       },
     };
   });
 }
 
-export default BillboardPage;
+export default CustomOrderPage;

@@ -76,6 +76,8 @@ export const env = createEnv({
     // Logging
     NEXT_PUBLIC_AXIOM_TOKEN: z.string().optional(),
     NEXT_PUBLIC_AXIOM_DATASET: z.string().optional(),
+    REDIS_URL: z.string().url().optional(),
+    REDIS_TOKEN: z.string().optional(),
   },
 
   /**
@@ -181,6 +183,8 @@ export const env = createEnv({
     // Logging
     NEXT_PUBLIC_AXIOM_TOKEN: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
     NEXT_PUBLIC_AXIOM_DATASET: process.env.NEXT_PUBLIC_AXIOM_DATASET,
+    REDIS_URL: process.env.REDIS_URL,
+    REDIS_TOKEN: process.env.REDIS_TOKEN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

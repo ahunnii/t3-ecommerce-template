@@ -6,23 +6,23 @@ import { CellAction } from "./cell-action";
 
 import { format } from "date-fns";
 
-export type BillboardColumn = {
+export type CustomOrderColumn = {
   id: string;
   storeId: string;
-  label: string;
+  email: string;
   createdAt: Date;
 };
 
-export const columns: ColumnDef<BillboardColumn>[] = [
+export const columns: ColumnDef<CustomOrderColumn>[] = [
   {
-    accessorKey: "label",
-    header: "Label",
+    accessorKey: "email",
+    header: "Email",
     cell: ({ row }) => (
       <Link
-        href={`/admin/${row.original.storeId}/billboards/${row.original.id}`}
+        href={`/admin/${row.original.storeId}/custom-orders/${row.original.id}`}
       >
         <Button variant={"link"} className="mx-0 px-0">
-          {row.original.label}
+          {row.original.email}
         </Button>
       </Link>
     ),

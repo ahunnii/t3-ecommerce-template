@@ -12,6 +12,7 @@ import { cn } from "~/utils/styles";
 
 import { Loader2 } from "lucide-react";
 
+import { CustomOrderType } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -48,8 +49,8 @@ export const CustomRequestForm = ({
     defaultValues: {
       email: "",
       name: "",
-      body: "",
-      productType: undefined,
+      description: "",
+      type: undefined,
       images: [],
     },
   });
@@ -103,27 +104,7 @@ export const CustomRequestForm = ({
         />{" "}
         <Form.FormField
           control={form.control}
-          name="name"
-          render={({ field }) => (
-            <Form.FormItem className=" sm:col-span-3">
-              {" "}
-              <Form.FormLabel className="label">
-                <span className="label-text text-error">Name</span>
-              </Form.FormLabel>
-              <Form.FormControl>
-                <Input
-                  disabled={loading}
-                  placeholder={formPlaceholders.name}
-                  {...field}
-                />
-              </Form.FormControl>
-              <Form.FormMessage />
-            </Form.FormItem>
-          )}
-        />
-        <Form.FormField
-          control={form.control}
-          name="productType"
+          name="type"
           render={({ field }) => (
             <Form.FormItem>
               <Form.FormLabel>Product Type</Form.FormLabel>
@@ -142,14 +123,9 @@ export const CustomRequestForm = ({
                   </SelectTrigger>
                 </Form.FormControl>
                 <SelectContent>
-                  {customProductOptions.map((category, idx) => (
-                    <SelectItem
-                      key={category.value + idx}
-                      value={category.value}
-                    >
-                      {category.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value={CustomOrderType.HAT}>Hat</SelectItem>
+                  <SelectItem value={CustomOrderType.HOODIE}>Hoodie</SelectItem>
+                  <SelectItem value={CustomOrderType.SHIRT}>Shirt</SelectItem>
                 </SelectContent>
               </Select>
               <Form.FormMessage />
@@ -162,7 +138,7 @@ export const CustomRequestForm = ({
         </div> */}
         <Form.FormField
           control={form.control}
-          name="body"
+          name="description"
           render={({ field }) => (
             <Form.FormItem className=" sm:col-span-3">
               {" "}

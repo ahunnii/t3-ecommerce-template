@@ -12,6 +12,7 @@ import { emailRouter } from "./routers/core/emails";
 import { galleryRouter } from "./routers/gallery";
 import { productsRouter } from "./routers/products";
 
+import { customRouter } from "./routers/custom";
 import { userRouter } from "./routers/users";
 
 /**
@@ -29,6 +30,7 @@ export const appRouter = createTRPCRouter({
   orders: ordersRouter,
   products: productsRouter,
   users: userRouter,
+  customOrder: customRouter,
 
   shippingLabels: shippingLabelRouter,
   email: emailRouter,

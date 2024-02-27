@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { BillboardForm } from "~/modules/billboards/admin/billboard-form";
+import { CustomOrderForm } from "~/modules/custom-orders/admin/custom-order-form";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
@@ -11,19 +11,20 @@ import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 interface IProps {
-  billboardId: string;
+  customOrderId: string;
 }
 
-const EditBillboardPage: FC<IProps> = ({ billboardId }) => {
-  const { data: billboard, isLoading } = api.billboards.getBillboard.useQuery({
-    billboardId: billboardId,
-  });
+const EditCustomOrderPage: FC<IProps> = ({ customOrderId }) => {
+  const { data: billboard, isLoading } =
+    api.customOrder.getCustomRequest.useQuery({
+      customOrderId,
+    });
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
       <div className="flex-1 space-y-4 p-8 pt-6">
-        {!isLoading && billboard && <BillboardForm initialData={billboard} />}
+        {!isLoading && billboard && <CustomOrderForm initialData={billboard} />}
         {!isLoading && !billboard && (
           <DataFetchErrorMessage message="There seems to be an issue with loading the billboard" />
         )}
@@ -36,10 +37,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return await authenticateAdminOrOwner(ctx, (ctx) => {
     return {
       props: {
-        billboardId: ctx.query.billboardId,
+        customOrderId: ctx.query.customOrderId,
       },
     };
   });
 }
 
-export default EditBillboardPage;
+export default EditCustomOrderPage;

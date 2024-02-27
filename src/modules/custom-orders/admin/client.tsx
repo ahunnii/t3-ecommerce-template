@@ -10,13 +10,13 @@ import { Separator } from "~/components/ui/separator";
 
 import Link from "next/link";
 
-import { columns, type BillboardColumn } from "./columns";
+import { columns, type CustomOrderColumn } from "./columns";
 
 interface BillboardClientProps {
-  data: BillboardColumn[];
+  data: CustomOrderColumn[];
 }
 
-export const BillboardClient: React.FC<BillboardClientProps> = ({ data }) => {
+export const CustomOrderClient: React.FC<BillboardClientProps> = ({ data }) => {
   const params = useRouter();
   const storeId = params.query.storeId as string;
 
@@ -24,20 +24,20 @@ export const BillboardClient: React.FC<BillboardClientProps> = ({ data }) => {
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Billboards (${data.length})`}
-          description="Manage billboards for your store. A billboard is a image text combo that can be used to promote a product or a category."
+          title={`Custom Order Requests (${data.length})`}
+          description="Manage custom requests for your store."
         />
-        <Link href={`/admin/${storeId}/billboards/new`}>
+        <Link href={`/admin/${storeId}/custom-orders/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Button>
         </Link>
       </div>
       <Separator />
-      <DataTable searchKey="label" columns={columns} data={data} />
-      <Heading title="Public API" description="API Calls for Billboards" />
-      <Separator />
-      <ApiList entityName="billboards" entityIdName="billboardId" />
+      <DataTable searchKey="email" columns={columns} data={data} />
+      {/* <Heading title="Public API" description="API Calls for Billboards" /> */}
+      {/* <Separator /> */}
+      {/* <ApiList entityName="billboards" entityIdName="billboardId" /> */}
     </>
   );
 };

@@ -11,10 +11,10 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
-import type { BillboardColumn } from "./columns";
+import type { CustomOrderColumn } from "./columns";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: CustomOrderColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
