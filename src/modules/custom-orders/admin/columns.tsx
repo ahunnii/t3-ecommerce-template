@@ -10,7 +10,27 @@ export type CustomOrderColumn = {
   id: string;
   storeId: string;
   email: string;
+  name: string;
+  type: string;
+  status: string;
+  store: {
+    name: string;
+    address: {
+      street: string;
+      additional: string | null;
+      city: string;
+      state: string;
+      postal_code: string;
+    };
+  };
+  description: string;
   createdAt: Date;
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    description: string;
+  };
 };
 
 export const columns: ColumnDef<CustomOrderColumn>[] = [
@@ -26,6 +46,11 @@ export const columns: ColumnDef<CustomOrderColumn>[] = [
         </Button>
       </Link>
     ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => row.original.status,
   },
   {
     accessorKey: "createdAt",

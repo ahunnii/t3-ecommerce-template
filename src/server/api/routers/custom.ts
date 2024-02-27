@@ -33,6 +33,15 @@ export const customRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
+        include: {
+          images: true,
+          store: {
+            include: {
+              address: true,
+            },
+          },
+          product: true,
+        },
       });
     }),
   getCustomRequest: protectedProcedure
@@ -111,6 +120,7 @@ export const customRouter = createTRPCRouter({
         email: z.string().email(),
         name: z.string(),
         description: z.string(),
+        notes: z.string().optional(),
         images: z.object({ url: z.string() }).array(),
         status: z.nativeEnum(CustomOrderStatus),
         type: z.nativeEnum(CustomOrderType),
@@ -131,7 +141,7 @@ export const customRouter = createTRPCRouter({
         });
       }
 
-      await ctx.prisma.customOrderRequest.update({
+      const orderRequest = await ctx.prisma.customOrderRequest.update({
         where: {
           id: input.customOrderId,
         },
@@ -139,6 +149,7 @@ export const customRouter = createTRPCRouter({
           name: input.name,
           email: input.email,
           description: input.description,
+          notes: input.notes,
           type: input.type,
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           status: input.status,
@@ -148,6 +159,58 @@ export const customRouter = createTRPCRouter({
           },
         },
       });
+
+      if (input.status === "ACCEPTED") {
+        const category = await ctx.prisma.category.findFirst({
+          where: {
+            storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          },
+        });
+
+        const product = await ctx.prisma.product.upsert({
+          where: {
+            id: orderRequest.productId! ?? "",
+            // storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+            // customOrder: {
+            // id: input.customOrderId,
+            // },
+          },
+          update: {
+            price: input.price,
+            description: input.notes,
+          },
+          create: {
+            price: input.price,
+            isArchived: true,
+            name: `Custom ${input.type}`,
+            categoryId: category?.id ?? "",
+            storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+            description: input.notes,
+          },
+        });
+
+        await ctx.prisma.customOrderRequest.update({
+          where: {
+            id: input.customOrderId,
+          },
+          data: {
+            productId: product.id,
+          },
+        });
+      }
+
+      if (input.status === "REJECTED") {
+        await ctx.prisma.customOrderRequest.update({
+          where: {
+            id: input.customOrderId,
+          },
+          data: {
+            product: {
+              delete: true,
+            },
+          },
+        });
+      }
 
       return ctx.prisma.customOrderRequest.update({
         where: {

@@ -1,4 +1,8 @@
-import type { CustomOrderEmailData, RouteEmailData } from "./types";
+import type {
+  CustomOrderEmailData,
+  CustomerCustomOrderProps,
+  RouteEmailData,
+} from "./types";
 
 type SendEmailProps<T> = {
   data: T;
@@ -8,6 +12,10 @@ export interface EmailProcessor<Client> {
   client: Client;
 
   sendCustomOrderToAdmin<T extends CustomOrderEmailData>({
+    data,
+  }: SendEmailProps<T>): Promise<unknown>;
+
+  sendCustomOrderToCustomer<T extends CustomerCustomOrderProps>({
     data,
   }: SendEmailProps<T>): Promise<unknown>;
 }
@@ -21,5 +29,11 @@ export class EmailService<Client> {
     props: SendEmailProps<T>
   ) => {
     return this.service.sendCustomOrderToAdmin(props);
+  };
+
+  sendCustomOrderToCustomer = async <T extends CustomerCustomOrderProps>(
+    props: SendEmailProps<T>
+  ) => {
+    return this.service.sendCustomOrderToCustomer(props);
   };
 }

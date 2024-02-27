@@ -22,6 +22,7 @@ export const productsRouter = createTRPCRouter({
       z.object({
         storeId: z.string().optional(),
         isFeatured: z.boolean().optional(),
+        isArchived: z.boolean().optional(),
         queryString: z.string().optional(),
         categoryId: z.string().optional(),
       })
@@ -40,6 +41,7 @@ export const productsRouter = createTRPCRouter({
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured,
           categoryId: input.categoryId,
+          isArchived: input.isArchived,
         },
         include: {
           category: {

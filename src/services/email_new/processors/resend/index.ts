@@ -1,9 +1,14 @@
 import type { CreateEmailOptions } from "resend/build/src/emails/interfaces";
 
 import NewCustomOrderEmail from "../../email-templates/new-custom-order";
-import NewRouteTemplate from "../../email-templates/new-route-template";
+import NewCustomOrderCustomer from "../../email-templates/new-custom-order-customer";
 import type { EmailProcessor } from "../../factory";
-import type { CustomOrderEmailData, Email, RouteEmailData } from "../../types";
+import type {
+  CustomOrderEmailData,
+  CustomerCustomOrderProps,
+  Email,
+  RouteEmailData,
+} from "../../types";
 import { resendClient } from "./client";
 
 type SendEmailProps<T> = {
@@ -26,6 +31,26 @@ export const ResendEmailService: EmailProcessor<typeof resendClient> = {
         react: NewCustomOrderEmail({
           firstName: name,
           orderLink: url,
+        }),
+      } as CreateEmailOptions);
+
+      return res;
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  sendCustomOrderToCustomer: async <T extends CustomerCustomOrderProps>({
+    data,
+  }: SendEmailProps<T>) => {
+    const { email } = data;
+    try {
+      const res = await resendClient.emails.send({
+        from: "Trend Anomaly <no-reply@trendanomaly.com>",
+        to: email,
+        subject: "New Invoice from Trend Anomaly",
+        react: NewCustomOrderCustomer({
+          ...data,
         }),
       } as CreateEmailOptions);
 

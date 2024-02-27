@@ -1,5 +1,6 @@
 import type { Billboard, Prisma } from "@prisma/client";
 import BillboardDisplay from "~/components/core/ui/billboard";
+import { ScrollArea } from "~/components/ui/scroll-area";
 
 export const ViewCustomOrder = ({
   customOrder,
@@ -36,11 +37,13 @@ export const ViewCustomOrder = ({
           Description
         </h3>
 
-        <p className="mt-4 text-base text-muted-foreground">
-          {customOrder.description
-            ? customOrder.description
-            : "No description added"}
-        </p>
+        <ScrollArea className="h-96 w-full">
+          <p className="mt-4 text-base text-muted-foreground">
+            {customOrder.description
+              ? customOrder.description
+              : "No description added"}
+          </p>
+        </ScrollArea>
       </div>
     </div>
   );

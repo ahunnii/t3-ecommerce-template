@@ -41,3 +41,16 @@ export type TEmailService<Client> = {
   }) => Promise<unknown>;
   client: Client;
 };
+
+export type CustomerCustomOrderProps = {
+  name?: string;
+  customerName?: string;
+  email?: string;
+  productLink?: string;
+  invoiceId?: string;
+  product?: string;
+  price?: string;
+  total?: string;
+  dueDate?: string;
+  notes?: string;
+};

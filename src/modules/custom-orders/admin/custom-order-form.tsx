@@ -39,6 +39,7 @@ const formSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   description: z.string(),
+  notes: z.string().optional(),
   images: z.object({ url: z.string() }).array(),
   status: z.nativeEnum(CustomOrderStatus),
   type: z.nativeEnum(CustomOrderType),
@@ -83,6 +84,7 @@ export const CustomOrderForm: React.FC<BillboardFormProps> = ({
       name: initialData?.name ?? "",
       email: initialData?.email ?? "",
       description: initialData?.description ?? "",
+      notes: initialData?.notes ?? "",
 
       images: initialData?.images ?? [],
       status: initialData?.status ?? "PENDING",
@@ -360,6 +362,28 @@ export const CustomOrderForm: React.FC<BillboardFormProps> = ({
               render={({ field }) => (
                 <Form.FormItem>
                   <Form.FormLabel>Description</Form.FormLabel>
+                  <Form.FormControl>
+                    <Textarea
+                      disabled={loading}
+                      placeholder="Order description"
+                      {...field}
+                    />
+                  </Form.FormControl>
+                  <Form.FormMessage />
+                </Form.FormItem>
+              )}
+            />
+
+            <Form.FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <Form.FormItem>
+                  <Form.FormLabel>Product Notes</Form.FormLabel>
+                  <Form.FormDescription>
+                    Details on the custom product. The customer is able to see
+                    this.
+                  </Form.FormDescription>
                   <Form.FormControl>
                     <Textarea
                       disabled={loading}

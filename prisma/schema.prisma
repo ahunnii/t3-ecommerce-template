@@ -193,6 +193,8 @@ model Product {
   price       Float    @default(0.00)
   description String?  @db.VarChar(1000)
   quantity    Int      @default(1)
+
+  customOrder   CustomOrderRequest?
   // handle      String?  @unique @default(cuid())
 
   isFeatured  Boolean      @default(false)
@@ -250,13 +252,21 @@ model CustomOrderRequest {
   email       String
   name        String
   description String @db.Text
+  notes       String? @db.Text
   images      Image[]     // Assuming you're storing image URLs or keys
   status      CustomOrderStatus @default(PENDING)       // ["pending", "accepted", "rejected"]
   price       Float?       // Price set by the admin upon acceptance
+  invoiceId   String?      // Invoice ID for the custom order
+
+  productId   String?   @unique
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   @@index([storeId])
+
 }
 
 
@@ -372,7 +382,7 @@ model TimeLineEntry {
   @@index([orderId])
 }
 
-enum TimeLineEntryType{
+enum TimeLineEntryType {
   ORDER_PLACED
   ORDER_PAID
   ORDER_SHIPPED
