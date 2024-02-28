@@ -1,23 +1,24 @@
 import axios from "axios";
+import { useState } from "react";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { storeTheme } from "~/data/config.custom";
 import { env } from "~/env.mjs";
 import { CustomRequestForm } from "~/modules/custom-orders/components/custom-request-form";
-import { CustomRequestFormValues } from "~/modules/custom-orders/types";
-import { useEmail } from "~/services/email/hooks/use-email";
+import type { CustomRequestFormValues } from "~/modules/custom-orders/types";
+
 import { toastService } from "~/services/toast";
-import { api } from "~/utils/api";
 
 const metadata = {
-  title: "Contact Us | Trend Anomaly",
-  description: "Contact Us for any questions, concerns, or custom orders.",
+  title: "Custom Orders | Trend Anomaly",
+  description: "Submit your requests for any custom orders.",
 };
 
 export const CustomRequestPage = () => {
-  const { sendEmail, isSending } = useEmail();
+  const [isLoading, setIsLoading] = useState(false);
 
   const createCustomRequest = (data: CustomRequestFormValues) => {
+    setIsLoading(true);
     axios
       .post(env.NEXT_PUBLIC_API_URL + "/custom", data)
       .then(() => {
@@ -28,6 +29,9 @@ export const CustomRequestPage = () => {
           "You can only submit a total of three requests per day. Please try again tomorrow.",
           error
         );
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -51,7 +55,7 @@ export const CustomRequestPage = () => {
               </p>
               <CustomRequestForm
                 onSubmit={createCustomRequest}
-                loading={isSending}
+                loading={isLoading}
               />
             </>
           </div>

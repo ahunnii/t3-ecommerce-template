@@ -5,8 +5,13 @@ import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { ContactFormBasic } from "~/modules/contact/components/contact-form-basic";
 import { ContactInfo } from "~/modules/contact/components/contact-info";
 
+import axios from "axios";
+import { useState } from "react";
 import { storeTheme } from "~/data/config.custom";
-import { useEmail } from "~/services/email/hooks/use-email";
+import { env } from "~/env.mjs";
+import type { ContactFormValues } from "~/modules/contact/types";
+
+import { toastService } from "~/services/toast";
 
 const metadata = {
   title: "Contact Us | Trend Anomaly",
@@ -36,7 +41,25 @@ const contactData = {
 };
 
 export const ContactUsPage = () => {
-  const { sendEmail, isSending } = useEmail();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const emailStore = (data: ContactFormValues) => {
+    setIsLoading(true);
+    axios
+      .post(env.NEXT_PUBLIC_API_URL + "/inquiry", data)
+      .then(() => {
+        toastService.success("Your request has been submitted!");
+      })
+      .catch((error: unknown) => {
+        toastService.error(
+          "You can only submit a total of three requests per day. Please try again tomorrow.",
+          error
+        );
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   return (
     <StorefrontLayout
@@ -58,10 +81,8 @@ export const ContactUsPage = () => {
                 using the contact form below, or just shoot an email to
                 store@trendanomaly.com.
               </p>
-              <ContactFormBasic onSubmit={sendEmail} loading={isSending} />
+              <ContactFormBasic onSubmit={emailStore} loading={isLoading} />
             </>
-
-            <p></p>
 
             <ContactInfo {...contactData} />
           </div>

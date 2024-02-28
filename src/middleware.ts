@@ -9,7 +9,7 @@ import { redis } from "~/server/redis/client";
 
 const ratelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.cachedFixedWindow(3, "1d"),
+  limiter: Ratelimit.cachedFixedWindow(4, "1d"),
   ephemeralCache: new Map(),
   analytics: true,
 });
@@ -20,8 +20,10 @@ export default async function middleware(
 ): Promise<Response | undefined> {
   const ip = request.ip ?? "127.0.0.1";
 
+  const route = request.headers.get("referer")?.split("/")[3];
+
   const { success, pending, limit, reset, remaining } = await ratelimit.limit(
-    `mw_${ip}`
+    `${route === "contact-us" ? "cu_" : "mw_"}${ip}`
   );
   event.waitUntil(pending);
 
@@ -36,5 +38,5 @@ export default async function middleware(
 }
 
 export const config = {
-  matcher: "/api/stores/:storeId*/custom",
+  matcher: ["/api/stores/:storeId*/custom", "/api/stores/:storeId*/inquiry"],
 };
