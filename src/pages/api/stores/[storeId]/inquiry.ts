@@ -7,8 +7,8 @@ import { ContactFormValues } from "~/modules/contact/types";
 import type { CustomRequestFormValues } from "~/modules/custom-orders/types";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
-import { emailService } from "~/services/email_new";
-import InquiryEmailTemplate from "~/services/email_new/email-templates/inquiry.core";
+import { emailService } from "~/services/email";
+import InquiryEmailTemplate from "~/services/email/email-templates/inquiry.core";
 
 const sendInquiryHandler = async (
   req: NextApiRequest,

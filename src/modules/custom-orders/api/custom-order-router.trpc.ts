@@ -12,9 +12,9 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { emailService } from "~/services/email_new";
-import NewCustomOrderEmail from "~/services/email_new/email-templates/admin.custom-order";
-import NewCustomOrderCustomer from "~/services/email_new/email-templates/customer.custom-order";
+import { emailService } from "~/services/email";
+import NewCustomOrderEmail from "~/services/email/email-templates/admin.custom-order";
+import NewCustomOrderCustomer from "~/services/email/email-templates/customer.custom-order";
 
 export const customRouter = createTRPCRouter({
   getCustomRequests: protectedProcedure

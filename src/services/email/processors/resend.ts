@@ -1,7 +1,7 @@
 import type { CreateEmailOptions } from "resend/build/src/emails/interfaces";
 
-import type { EmailProcessor } from "../../interface";
-import type { EmailProps } from "../../types";
+import type { EmailProcessor } from "../interface";
+import type { EmailProps } from "../types";
 
 import { Resend } from "resend";
 

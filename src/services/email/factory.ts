@@ -1,7 +1,7 @@
 import { EmailService } from "./email-service";
 
+import type { resendClient } from "./processors/resend";
 import { ResendEmailService } from "./processors/resend";
-import type { resendClient } from "./processors/resend/client";
 
 export class EmailProcessorFactory {
   static createEmailService(processorType: string) {

@@ -1,31 +1,7 @@
-import type { FC } from "react";
-
-export type EmailTemplate = {
+export type EmailProps<V> = {
   from: string;
   to: string;
-  subject: (name: string) => string;
-  Template: FC<Readonly<EmailData>>;
-};
-
-export type EmailTemplateMap = {
-  [key in Email]: EmailTemplate;
-};
-
-export type Email = "contactUs" | "default";
-
-export type EmailData = {
-  email: string;
-  name: string;
-  body: string;
-};
-
-export type TEmailService<Client> = {
-  sendEmail: <T extends EmailData>({
-    data,
-    type,
-  }: {
-    data: T;
-    type: Email;
-  }) => Promise<unknown>;
-  client: Client;
+  subject: string;
+  data: V;
+  template: React.FC<V>;
 };

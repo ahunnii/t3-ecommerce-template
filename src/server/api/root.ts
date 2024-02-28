@@ -8,7 +8,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
 import { shippingLabelRouter } from "./routers/admin/shipping-labels";
 
 import { blogPostRouter } from "./routers/blog-posts";
-import { emailRouter } from "./routers/core/emails";
+
 import { galleryRouter } from "./routers/gallery";
 import { productsRouter } from "./routers/products";
 
@@ -32,7 +32,6 @@ export const appRouter = createTRPCRouter({
   users: userRouter,
 
   shippingLabels: shippingLabelRouter,
-  email: emailRouter,
 
   // Add your routers here
   customOrder: customRouter,

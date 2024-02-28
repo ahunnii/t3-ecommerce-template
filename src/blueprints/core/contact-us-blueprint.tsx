@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import Head from "next/head";
 import Image from "next/image";
 
@@ -18,6 +19,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import { env } from "~/env.mjs";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
@@ -30,7 +32,7 @@ const emailSchema = z.object({
 type EmailFormValues = z.infer<typeof emailSchema>;
 
 export const ContactUsPage = () => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
@@ -41,21 +43,26 @@ export const ContactUsPage = () => {
     },
   });
 
-  const { mutate: sendEmail } = api.email.sendEmailInquiry.useMutation({
-    onSuccess: () =>
-      toastService.success("Email sent. We will get back to you shortly."),
-    onError: (error: unknown) => {
-      toastService.error("Something went wrong", error);
-      console.error(error);
-    },
-    onMutate: () => setLoading(true),
-    onSettled: () => {
-      setLoading(false);
-    },
-  });
+  const emailStore = (data: EmailFormValues) => {
+    setIsLoading(true);
+    axios
+      .post(env.NEXT_PUBLIC_API_URL + "/inquiry", data)
+      .then(() => {
+        toastService.success("Your request has been submitted!");
+      })
+      .catch((error: unknown) => {
+        toastService.error(
+          "You can only submit a total of three requests per day. Please try again tomorrow.",
+          error
+        );
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const onSubmit = (values: EmailFormValues) => {
-    sendEmail(values);
+    emailStore(values);
   };
   return (
     <>
@@ -87,7 +94,7 @@ export const ContactUsPage = () => {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              disabled={loading}
+                              disabled={isLoading}
                               placeholder="e.g. janedoe@example.com"
                               {...field}
                             />
@@ -107,7 +114,7 @@ export const ContactUsPage = () => {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              disabled={loading}
+                              disabled={isLoading}
                               placeholder="e.g. Jane Doe"
                               {...field}
                             />
@@ -127,7 +134,7 @@ export const ContactUsPage = () => {
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              disabled={loading}
+                              disabled={isLoading}
                               placeholder="e.g. Hey! I had a question about a product."
                               {...field}
                             />
@@ -136,7 +143,11 @@ export const ContactUsPage = () => {
                         </FormItem>
                       )}
                     />{" "}
-                    <Button className="ml-auto" type="submit">
+                    <Button
+                      className="ml-auto"
+                      type="submit"
+                      disabled={isLoading}
+                    >
                       Email Us
                     </Button>
                   </form>

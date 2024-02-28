@@ -1,5 +1,5 @@
-import NewCustomOrderCustomer from "~/services/email_new/email-templates/customer.custom-order";
-import InquiryEmailTemplate from "~/services/email_new/email-templates/inquiry.core";
+import NewCustomOrderCustomer from "~/services/email/email-templates/customer.custom-order";
+import InquiryEmailTemplate from "~/services/email/email-templates/inquiry.core";
 
 const Home = () => {
   return (
