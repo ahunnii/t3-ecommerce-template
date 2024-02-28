@@ -45,5 +45,5 @@ yarn-error.log*
 # Store Backups
 /src/shop/*
 /src/components/custom/*
-/src/blueprints/custom/*
+
 /src/data/config.custom.*

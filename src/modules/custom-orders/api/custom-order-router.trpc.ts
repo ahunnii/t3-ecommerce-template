@@ -5,6 +5,7 @@ import fs from "fs";
 import handlers from "handlebars";
 import puppeteer from "puppeteer";
 import { z } from "zod";
+import { storeTheme } from "~/data/config.custom";
 import { env } from "~/env.mjs";
 import {
   createTRPCRouter,
@@ -12,6 +13,8 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { emailService } from "~/services/email_new";
+import NewCustomOrderEmail from "~/services/email_new/email-templates/admin.custom-order";
+import NewCustomOrderCustomer from "~/services/email_new/email-templates/customer.custom-order";
 
 export const customRouter = createTRPCRouter({
   getCustomRequests: protectedProcedure
@@ -91,6 +94,19 @@ export const customRouter = createTRPCRouter({
               },
             },
           },
+        });
+
+        const emailData = {
+          firstName: input.name,
+          orderLink: `${env.NEXT_PUBLIC_URL}/admin/${env.NEXT_PUBLIC_STORE_ID}/custom-orders/${customOrder.id}`,
+        };
+
+        await emailService.sendEmail<typeof emailData>({
+          to: storeTheme.brand.email,
+          from: "Trend Anomaly <no-reply@trendanomaly.com>",
+          subject: "New Custom Order Request",
+          data: emailData,
+          template: NewCustomOrderEmail,
         });
 
         return customOrder;
@@ -253,26 +269,31 @@ export const customRouter = createTRPCRouter({
           },
         });
 
-        await emailService.sendCustomOrderToCustomer({
-          data: {
-            productLink: `${env.NEXT_PUBLIC_URL}/product/${customOrder?.product?.id}`,
-            product: customOrder?.product?.name ?? "",
-            price: new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(Number(customOrder?.product?.price ?? 0.0)),
-            customerName: customOrder?.name ?? "",
-            email: customOrder?.email ?? "",
-            name: customOrder?.store?.name ?? "",
+        const data = {
+          productLink: `${env.NEXT_PUBLIC_URL}/product/${customOrder?.product?.id}`,
+          product: customOrder?.product?.name ?? "",
+          price: new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(Number(customOrder?.product?.price ?? 0.0)),
+          customerName: customOrder?.name ?? "",
+          email: customOrder?.email ?? "",
+          name: customOrder?.store?.name ?? "",
 
-            total: new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(Number(customOrder?.product?.price ?? 0.0)),
-            dueDate: addWeeks(new Date(), 1).toDateString(),
-            notes: customOrder?.product?.description ?? "",
-            invoiceId: customOrder?.id,
-          },
+          total: new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(Number(customOrder?.product?.price ?? 0.0)),
+          dueDate: addWeeks(new Date(), 1).toDateString(),
+          notes: customOrder?.product?.description ?? "",
+          invoiceId: customOrder?.id,
+        };
+        await emailService.sendEmail<typeof data>({
+          to: customOrder?.email ?? "",
+          from: "Trend Anomaly <no-reply@trendanomaly.com>",
+          subject: "New Invoice from Trend Anomaly",
+          data: data,
+          template: NewCustomOrderCustomer,
         });
 
         return {

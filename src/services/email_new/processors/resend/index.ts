@@ -1,62 +1,32 @@
 import type { CreateEmailOptions } from "resend/build/src/emails/interfaces";
 
-import NewCustomOrderEmail from "../../email-templates/new-custom-order";
-import NewCustomOrderCustomer from "../../email-templates/new-custom-order-customer";
-import type { EmailProcessor } from "../../factory";
-import type {
-  CustomOrderEmailData,
-  CustomerCustomOrderProps,
-  Email,
-  RouteEmailData,
-} from "../../types";
-import { resendClient } from "./client";
+import type { EmailProcessor } from "../../interface";
+import type { EmailProps } from "../../types";
 
-type SendEmailProps<T> = {
-  data: T;
-  type: Email;
-};
+import { Resend } from "resend";
+
+import { env } from "~/env.mjs";
+
+export const resendClient = new Resend(env.RESEND_API_KEY);
 
 export const ResendEmailService: EmailProcessor<typeof resendClient> = {
   client: resendClient,
 
-  sendCustomOrderToAdmin: async <T extends CustomOrderEmailData>({
-    data,
-  }: SendEmailProps<T>) => {
-    const { email, name, url } = data;
+  sendEmail: async <V>(props: EmailProps<V>) => {
     try {
       const res = await resendClient.emails.send({
-        from: "Trend Anomaly <no-reply@trendanomaly.com>",
-        to: email,
-        subject: "New Custom Order Request",
-        react: NewCustomOrderEmail({
-          firstName: name,
-          orderLink: url,
-        }),
+        from: props.from,
+        to: props.to,
+        subject: props.subject,
+        react: props.template(props.data),
       } as CreateEmailOptions);
 
-      return res;
+      return {
+        status: res?.error ? "error" : "success",
+        message: res?.error ? res?.error?.message : "Email sent successfully",
+      };
     } catch (e) {
-      console.log(e);
-    }
-  },
-
-  sendCustomOrderToCustomer: async <T extends CustomerCustomOrderProps>({
-    data,
-  }: SendEmailProps<T>) => {
-    const { email } = data;
-    try {
-      const res = await resendClient.emails.send({
-        from: "Trend Anomaly <no-reply@trendanomaly.com>",
-        to: email,
-        subject: "New Invoice from Trend Anomaly",
-        react: NewCustomOrderCustomer({
-          ...data,
-        }),
-      } as CreateEmailOptions);
-
-      return res;
-    } catch (e) {
-      console.log(e);
+      console.error("sendEmail error: ", e);
     }
   },
 };

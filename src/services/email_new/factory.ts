@@ -1,39 +1,16 @@
-import type {
-  CustomOrderEmailData,
-  CustomerCustomOrderProps,
-  RouteEmailData,
-} from "./types";
+import { EmailService } from "./email-service";
 
-type SendEmailProps<T> = {
-  data: T;
-};
+import { ResendEmailService } from "./processors/resend";
+import type { resendClient } from "./processors/resend/client";
 
-export interface EmailProcessor<Client> {
-  client: Client;
+export class EmailProcessorFactory {
+  static createEmailService(processorType: string) {
+    switch (processorType) {
+      case "resend":
+        return new EmailService<typeof resendClient>(ResendEmailService);
 
-  sendCustomOrderToAdmin<T extends CustomOrderEmailData>({
-    data,
-  }: SendEmailProps<T>): Promise<unknown>;
-
-  sendCustomOrderToCustomer<T extends CustomerCustomOrderProps>({
-    data,
-  }: SendEmailProps<T>): Promise<unknown>;
-}
-
-export class EmailService<Client> {
-  constructor(private service: EmailProcessor<Client>) {}
-
-  client: Client = this.service.client;
-
-  sendCustomOrderToAdmin = async <T extends CustomOrderEmailData>(
-    props: SendEmailProps<T>
-  ) => {
-    return this.service.sendCustomOrderToAdmin(props);
-  };
-
-  sendCustomOrderToCustomer = async <T extends CustomerCustomOrderProps>(
-    props: SendEmailProps<T>
-  ) => {
-    return this.service.sendCustomOrderToCustomer(props);
-  };
+      default:
+        throw new Error("Unsupported email processor type");
+    }
+  }
 }
