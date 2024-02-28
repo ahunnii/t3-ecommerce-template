@@ -7,9 +7,10 @@ import IconButton from "~/components/core/ui/icon-button";
 
 import { Label } from "~/components/ui/label";
 import useCart from "~/modules/cart/hooks/use-cart";
-import useNotification from "~/modules/notifications/use-notification";
+
 import type { CartItem as TCartItem } from "~/types";
 
+import { toastService } from "~/services/toast";
 import CartItemQuantity from "./cart-item-quantity";
 import CartItemVariant from "./cart-item-variant";
 
@@ -19,8 +20,6 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
   const cart = useCart();
 
   const onCartRemove = () => cart.removeCartItem(data);
-
-  const { showInfo } = useNotification();
 
   const estDelivery = new Date(
     Date.now() +
@@ -63,7 +62,9 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
                 cartItem={data}
                 onQuantityChange={(val) => cart.updateQuantity(data, val)}
                 onQuantityEmpty={onCartRemove}
-                onQuantityMax={() => showInfo("Maximum quantity reached")}
+                onQuantityMax={() =>
+                  toastService.inform("Maximum quantity reached")
+                }
               />
 
               <div className="flex space-y-2 max-sm:items-center max-sm:gap-2 md:flex-col">

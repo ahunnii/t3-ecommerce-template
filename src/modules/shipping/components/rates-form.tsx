@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-import useShippingLabel from "~/hooks/admin/use-shipping-label";
+import useShippingLabel from "~/modules/shipping/hooks/use-shipping-label";
 
 import { cn } from "~/utils/styles";
 

@@ -2,11 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { storeTheme } from "~/data/config.custom";
-import { ContactFormValues } from "~/modules/contact/types";
+import type { ContactFormValues } from "~/modules/contact/types";
 
-import type { CustomRequestFormValues } from "~/modules/custom-orders/types";
-import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
 import { emailService } from "~/services/email";
 import InquiryEmailTemplate from "~/services/email/email-templates/inquiry.core";
 
@@ -14,10 +11,6 @@ const sendInquiryHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  // Create context and caller
-  const ctx = await createTRPCContext({ req, res });
-  const caller = appRouter.createCaller(ctx);
-
   try {
     switch (req.method) {
       case "POST":

@@ -17,8 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import useShippingLabel, {
   type RateResponse,
   type ShippingAddress,
-} from "~/hooks/admin/use-shipping-label";
-import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
+} from "~/modules/shipping/hooks/use-shipping-label";
+import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
 import { api } from "~/utils/api";
 
 import axios from "axios";

@@ -34,7 +34,7 @@ import {
 import USA_STATES from "~/data/states";
 import useShippingLabel, {
   type ShippingResponse,
-} from "~/hooks/admin/use-shipping-label";
+} from "~/modules/shipping/hooks/use-shipping-label";
 
 import { cn } from "~/utils/styles";
 

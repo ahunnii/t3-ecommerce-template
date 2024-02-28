@@ -23,19 +23,17 @@ model Example {
 
 
 model Address {
-  id        String   @id @default(cuid())
+  id            String   @id @default(cuid())
   street        String
   additional    String?
   city          String
   state         String
   postal_code   String
   country       String?
-
- storeId  String?                  @unique  
-  store    Store?                 @relation( fields: [storeId], references: [id], onDelete: Cascade) 
-
-    orderId  String?               @unique  //Main Address of the order
-  order    Order?               @relation( fields: [orderId], references: [id], onDelete: Cascade) 
+  storeId       String?  @unique
+  store         Store?   @relation( fields: [storeId], references: [id], onDelete: Cascade) 
+  orderId       String?  @unique
+  order         Order?   @relation( fields: [orderId], references: [id], onDelete: Cascade) 
 
 }
 // Necessary for Next auth
@@ -95,7 +93,7 @@ model Store {
   slug              String?         @unique
   userId            String
   businessAddress   String          @default("")
-  customRequests   CustomOrderRequest[] @relation("StoreToCustomOrderRequest")
+  customRequests    CustomOrderRequest[] @relation("StoreToCustomOrderRequest")
   address           Address ? 
   billboards        Billboard[]     @relation("StoreToBillboard")
   categories        Category[]      @relation("StoreToCategory")
@@ -103,6 +101,8 @@ model Store {
   orders            Order[]         @relation("StoreToOrder")
   gallery           GalleryImage[]  @relation("StoreToGalleryImage")
   blog              BlogPost[]      @relation("StoreToBlogPost")
+  discounts             Discount[]          @relation("StoreToDiscount")
+  // discounts         Discount[]      @relation("StoreToDiscount")
 
   hasFreeShipping   Boolean        @default(false)  
   minFreeShipping   Float?         @default(0)
@@ -121,35 +121,40 @@ model Store {
   collections Collection[] @relation("StoreToCollection")
 }
 
-
+model StoreContent {
+  id            String    @id @default(cuid())
+  aboutPage     String    @db.Text
+  heroImg       String?
+  facebook      String?
+  instagram     String?
+  twitter       String?
+}
 model Billboard {
-  id         String     @id @default(cuid())
-  storeId    String
-  store      Store      @relation("StoreToBillboard", fields: [storeId], references: [id])
-  label      String
-  description String?
-  imageUrl   String
-  categories Category[]
-  collections Collection[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id            String     @id @default(cuid())
+  storeId       String
+  store         Store      @relation("StoreToBillboard", fields: [storeId], references: [id])
+  label         String
+  description   String?
+  imageUrl      String
+  categories    Category[]
+  collections   Collection[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   @@index([storeId])
 }
 
 
-
-
 model Category {
   id          String      @id @default(cuid())
-  storeId     String // Foreign Key to Store
+  storeId     String      // Foreign Key to Store
   store       Store       @relation("StoreToCategory", fields: [storeId], references: [id])
-  billboardId String // Foreign Key to Billboard
+  billboardId String       // Foreign Key to Billboard
   billboard   Billboard   @relation(fields: [billboardId], references: [id])
   name        String
   attributes  Attribute[]
   products    Product[]   @relation("CategoryToProduct")
-  // collections Collection[] @relation("CategoryToCollection")
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -174,6 +179,8 @@ model Collection {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  discounts Discount[] @relation("DiscountToCollection")
+
   @@index([storeId])
   @@index([billboardId])
 }
@@ -183,6 +190,9 @@ FREE
 LOCAL_PICKUP
 VARIABLE 
 }
+
+
+
 model Product {
   id          String   @id @default(cuid())
   storeId     String // Foreign Key to Store
@@ -225,6 +235,8 @@ model Product {
 
   materials ProductMaterial[] @relation("ProductMaterialToTag")
   tags Tag[] @relation("ProductToTag")
+
+  discounts Discount[] @relation("DiscountToProduct")
 
 
 
@@ -525,62 +537,78 @@ model Cart {
   @@index([userId])
 }
 
-// model Coupon {
-//   id        String     @id @default(cuid())
-//   storeId   String // Foreign Key to Store
-//   store     Store      @relation("StoreToDiscount", fields: [storeId], references: [id])
-//   code      String
-//   type      CouponType
-//   value     Float
-//   cartItems CartItem[]
-//   restriction CouponRestriction
-//   restrictionValue Float?
-//   restrictionTimeStart DateTime?
-//   restrictionTimeEnd DateTime?
-//   createdAt DateTime   @default(now())
-//   updatedAt DateTime   @updatedAt
-
-//   @@index([storeId])
-// }
-
-// model Sale{
-//   id          String     @id @default(cuid())
-//   storeId     String // Foreign Key to Store
-//   store       Store      @relation("StoreToSale", fields: [storeId], references: [id])
-//   name        String
-//   type        SaleType
-//   value       Float
-//   collections Collection[]
-//   products    Product[]
-//   saleStart   DateTime
-//   saleEnd     DateTime?
-//   createdAt   DateTime   @default(now())
-//   updatedAt   DateTime   @updatedAt
-
-//   @@index([storeId])
-
-// }
-
-// enum SaleType {
-//   BOGO
-//   PERCENTAGE
-// }
 
 
-// enum CouponType {
-//   PERCENTAGE_ORDER
-//   FIXED_ORDER
-//   PERCENTAGE_ITEM
-//   FIXED_ITEM
-//   FREE_SHIPPING
-//   FREE_ITEM
-// }
 
-// enum CouponRestriction {
-//   NONE
-//   MINIMUM_ORDER
-//   DATE
-// }
+model Discount {
+  id        String     @id @default(cuid())
+  storeId   String // Foreign Key to Store
+  store     Store      @relation("StoreToDiscount", fields: [storeId], references: [id])
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+
+  startDate DateTime
+  endDate   DateTime?
+  code            String @unique
+  description     String?
+  active          Boolean @default(true)
+  isCodeRequired  Boolean @default(false)
+
+  type                  DiscountType // Percentage, Fixed, Free Shipping
+  allocation            DiscountAllocation // Total, Item
+  condition             DiscountCondition // Products, Collections
+  conditionExclusion    DiscountConditionOperator // Include, Exclude
+  conditionThreshold    Float @default(0)
+
+  value       Float @default(0)
+  // valueType   DiscountValueType
+
+  rule     DiscountRule 
+
+  products Product[] @relation("DiscountToProduct")
+  collections Collection[] @relation("DiscountToCollection")
+
+  @@index([storeId])
+
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+  FREE_SHIPPING
+}
+
+enum DiscountAllocation {
+  TOTAL
+  ITEM
+}
+
+enum DiscountCondition {
+  PRODUCTS
+  COLLECTIONS
+  SITEWIDE
+}
+
+enum DiscountConditionOperator {
+  INCLUDE
+  EXCLUDE
+  ALL
+}
+
+
+enum DiscountValueType {
+  PERCENTAGE
+  FIXED
+  FREE_SHIPPING
+}
+
+enum DiscountRule {
+  SALE //Applies automatically to site or products
+  COUPON //Promo only applies once a coupon is entered
+}
+
 
 
 

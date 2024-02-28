@@ -3,7 +3,7 @@ import { Download, Pencil } from "lucide-react";
 import Link from "next/link";
 import { InfoButton } from "~/components/common/buttons/info-button";
 import { Button } from "~/components/ui/button";
-import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
+import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
 
 type ViewOrderFulfillmentProps = {
   shippingLabel: ShippingLabel | null;

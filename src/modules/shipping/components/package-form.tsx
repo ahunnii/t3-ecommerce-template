@@ -17,7 +17,9 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
-import useShippingLabel, { Package } from "~/hooks/admin/use-shipping-label";
+import useShippingLabel, {
+  Package,
+} from "~/modules/shipping/hooks/use-shipping-label";
 
 const shippingFormSchema = z.object({
   package_length: z.coerce.number().min(1),

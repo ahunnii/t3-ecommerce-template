@@ -6,8 +6,8 @@ import { useState, type MouseEventHandler } from "react";
 
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
-import usePreviewModal from "~/hooks/core/use-preview-modal";
 import useCart from "~/modules/cart/hooks/use-cart";
+import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
 

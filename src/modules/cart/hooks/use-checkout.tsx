@@ -3,7 +3,8 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 import useCart from "~/modules/cart/hooks/use-cart";
-import useNotification from "~/modules/notifications/use-notification";
+
+import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 const CHECKOUT_URL = `${process.env.NEXT_PUBLIC_API_URL}/checkout`;
@@ -11,7 +12,7 @@ const CHECKOUT_URL = `${process.env.NEXT_PUBLIC_API_URL}/checkout`;
 const useCheckout = () => {
   const searchParams = useSearchParams();
   const { removeAll, cartItems } = useCart((state) => state);
-  const { showSuccess, showInfo } = useNotification();
+
   const totalPrice = cartItems.reduce((total, item) => {
     return total + Number(item.product.price) * Number(item.quantity);
   }, 0);
@@ -22,12 +23,12 @@ const useCheckout = () => {
     if (searchParams.size === 0) return;
 
     const onSuccessfulCheckout = () => {
-      showSuccess("Payment completed.");
+      toastService.success("Payment completed.");
       removeAll();
     };
 
     const onCanceledCheckout = () => {
-      showInfo("Payment canceled.");
+      toastService.inform("Payment canceled.");
     };
 
     if (searchParams.get("success")) onSuccessfulCheckout();

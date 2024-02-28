@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
+import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import type { OrderColumn } from "./columns";

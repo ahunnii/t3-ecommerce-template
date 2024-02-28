@@ -10,8 +10,8 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
-import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
 import { formatOrderTableData } from "~/modules/orders/utils/format-order-table-data";
+import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
 import type { DetailedOrder } from "~/types";
 
 interface IProps {
