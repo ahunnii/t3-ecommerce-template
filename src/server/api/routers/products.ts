@@ -44,10 +44,26 @@ export const productsRouter = createTRPCRouter({
           isArchived: input.isArchived,
         },
         include: {
+          collections: {
+            include: {
+              discounts: {
+                where: {
+                  active: true,
+                },
+                take: 1,
+              },
+            },
+          },
           category: {
             include: {
               attributes: true,
             },
+          },
+          discounts: {
+            where: {
+              active: true,
+            },
+            take: 1,
           },
           variants: true,
           images: true,
@@ -85,6 +101,7 @@ export const productsRouter = createTRPCRouter({
         include: {
           category: true,
           images: true,
+          discounts: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -121,8 +138,14 @@ export const productsRouter = createTRPCRouter({
             : {},
         },
         include: {
+          collections: {
+            include: {
+              discounts: true,
+            },
+          },
           images: true,
           variants: true,
+          discounts: true,
           materials: true,
           tags: true,
           category: {
@@ -144,6 +167,7 @@ export const productsRouter = createTRPCRouter({
         where: { id: input.productId },
         include: {
           images: true,
+          discounts: true,
           variants: true,
           materials: true,
           tags: true,

@@ -549,23 +549,24 @@ model Discount {
   updatedAt DateTime   @updatedAt
   deletedAt DateTime?
 
-  startDate DateTime
-  endDate   DateTime?
+  startDate       DateTime
+  endDate          DateTime?
+
   code            String @unique
   description     String?
+
+
   active          Boolean @default(true)
-  isCodeRequired  Boolean @default(false)
 
-  type                  DiscountType // Percentage, Fixed, Free Shipping
-  allocation            DiscountAllocation // Total, Item
-  condition             DiscountCondition // Products, Collections
-  conditionExclusion    DiscountConditionOperator // Include, Exclude
-  conditionThreshold    Float @default(0)
+  value           Float @default(0)
+  stackable       Boolean @default(false)
 
-  value       Float @default(0)
-  // valueType   DiscountValueType
+  valueType            DiscountValueType
+  type                 DiscountType
+  methodType           DiscountMethodType
 
-  rule     DiscountRule 
+  minValue             Float?
+  maxValue             Float?
 
   products Product[] @relation("DiscountToProduct")
   collections Collection[] @relation("DiscountToCollection")
@@ -574,40 +575,43 @@ model Discount {
 
 }
 
-enum DiscountType {
-  PERCENTAGE
-  FIXED
-  FREE_SHIPPING
-}
+// Store has three sales going on:  new sale -- 10% off all products,  clearance sale -- 20% off pokemon, extra $5 off all orders over $50
 
-enum DiscountAllocation {
-  TOTAL
-  ITEM
-}
+// 25% off any item with code DOOKIE
 
-enum DiscountCondition {
-  PRODUCTS
-  COLLECTIONS
-  SITEWIDE
-}
+//Gengar is apart of the 10% off site wide, and the 20% off pokemon sale.
 
-enum DiscountConditionOperator {
-  INCLUDE
-  EXCLUDE
-  ALL
-}
+//Page loads products and checks for any active sales, applies them to the products.
 
+
+
+
+
+
+// Percentage, Fixed off total order / per item (limited to entire site / specific products/ collections)
 
 enum DiscountValueType {
   PERCENTAGE
   FIXED
-  FREE_SHIPPING
 }
 
-enum DiscountRule {
-  SALE //Applies automatically to site or products
-  COUPON //Promo only applies once a coupon is entered
+enum DiscountMethodType { 
+  SALE
+  COUPON
 }
+
+enum DiscountType {
+  GLOBAL
+  PER_PRODUCT
+  PER_COLLECTION
+  SHIPPING
+  ORDER
+}
+
+
+
+
+
 
 
 

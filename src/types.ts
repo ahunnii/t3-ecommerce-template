@@ -93,6 +93,7 @@ export type DetailedProductFull = Prisma.ProductGetPayload<{
         attributes: true;
       };
     };
+    discounts: true;
   };
 }>;
 

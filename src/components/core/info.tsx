@@ -1,18 +1,21 @@
 import { ShoppingCart } from "lucide-react";
 
+import { Discount } from "@prisma/client";
 import { cva, type VariantProps } from "class-variance-authority";
 import parse from "html-react-parser";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Button from "~/components/core/ui/button";
 import Currency from "~/components/core/ui/currency";
 import useCart from "~/modules/cart/hooks/use-cart";
+import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 import type { DetailedProductFull, Variation } from "~/types";
 import { cn } from "~/utils/styles";
 import VariantSelector from "../../modules/products/core/variant-selector";
 
 interface InfoProps extends VariantProps<typeof infoVariants> {
   data: DetailedProductFull;
+  discounts: Discount[];
   descriptionStyle?: string;
 }
 
@@ -47,6 +50,13 @@ const Info: React.FC<InfoProps> = (props) => {
   const btnStyles = infoVariants({ button: props?.button ?? "default" });
 
   // console.log({ product: data, variant: variant!, quantity });
+
+  const discount = useMemo(() => {
+    return props.discounts?.length > 0
+      ? getBestDiscount(variant?.price ?? props?.data?.price, props.discounts)
+      : null;
+  }, [props.discounts, props?.data?.price, variant?.price]);
+
   return (
     <div>
       <h1 className={cn("text-3xl font-bold", textStyles)}>
@@ -54,7 +64,21 @@ const Info: React.FC<InfoProps> = (props) => {
       </h1>
       <div className="mt-3 flex items-end justify-between">
         <p className={cn("text-2xl ", textStyles)}>
-          <Currency value={props?.data?.price} />
+          <div className="flex gap-2">
+            {discount && (
+              <Currency
+                value={discount.price}
+                className="font-extrabold text-slate-800"
+              />
+            )}
+
+            <Currency
+              value={variant ? variant.price : props?.data?.price}
+              className={cn(
+                discount && "font-medium text-muted-foreground line-through"
+              )}
+            />
+          </div>
         </p>
       </div>
       <hr className="my-4" />

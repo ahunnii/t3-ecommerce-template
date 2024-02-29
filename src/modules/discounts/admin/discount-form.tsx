@@ -2,14 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  DiscountAllocation,
-  DiscountCondition,
-  DiscountConditionOperator,
-  DiscountRule,
+  DiscountMethodType,
   DiscountType,
+  DiscountValueType,
   type Collection,
   type Product,
-  type Tag,
 } from "@prisma/client";
 import { Command as CommandPrimitive } from "cmdk";
 import { CalendarIcon, Trash, X } from "lucide-react";
@@ -17,8 +14,6 @@ import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
-import * as z from "zod";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -85,23 +80,19 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
   const action = initialData ? "Save changes" : "Create";
 
   const defaultValues = {
-    startDate: initialData?.startDate ?? undefined,
+    startDate: initialData?.startDate ?? new Date(),
     endDate: initialData?.endDate ?? undefined,
     code: initialData?.code ?? "",
     active: initialData?.active ?? false,
-    isCodeRequired: initialData?.isCodeRequired ?? false,
-
-    type: initialData?.type ?? "PERCENTAGE",
-    allocation: initialData?.allocation ?? "TOTAL",
-    condition: initialData?.condition ?? "SITEWIDE",
-    conditionExclusion: initialData?.conditionExclusion ?? "ALL",
-    conditionThreshold: initialData?.conditionThreshold ?? 0,
+    stackable: initialData?.stackable ?? false,
     value: initialData?.value ?? 0,
-    rule: initialData?.rule ?? "SALE",
+    type: initialData?.type ?? "GLOBAL",
+    valueType: initialData?.valueType ?? "PERCENTAGE",
+    methodType: initialData?.methodType ?? "SALE",
+    minValue: initialData?.minValue ?? undefined,
+    mavValue: initialData?.maxValue ?? undefined,
     products: initialData?.products ?? [],
     collections: initialData?.collections ?? [],
-
-    // valueType: initialData?.valueType ?? "PERCENTAGE",
   };
 
   const form = useForm<DiscountFormValues>({
@@ -150,7 +141,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
 
     onSettled: async () => {
       setOpen(false);
-      router.push(`/admin/${params.query.storeId as string}/blog-posts`);
+      router.push(`/admin/${params.query.storeId as string}/discounts`);
       await apiContext.discounts.invalidate();
     },
   });
@@ -270,7 +261,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
         loading={loading}
       />{" "}
       <BackToButton
-        link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
+        link={`/admin/${storeId}/discounts/${blogPostId ?? ""}`}
         title="Back to Blog Post"
       />
       <div className="flex items-center justify-between">
@@ -294,22 +285,20 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
           className="w-full space-y-8"
         >
           <section className="flex w-full gap-4 max-lg:flex-col">
-            <div className="flex w-full flex-col space-y-4 lg:w-8/12">
+            <div className="flex w-full flex-col space-y-4 ">
               <div className="w-full  rounded-md border border-border bg-background/50 p-4 ">
                 <FormLabel>Details</FormLabel>{" "}
                 <FormDescription>
                   What is the discount and how is it being used?
                 </FormDescription>
-                <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
+                <div className="my-5 gap-8 md:grid md:grid-cols-6 ">
                   <FormField
                     control={form.control}
                     name="code"
                     render={({ field }) => (
                       <FormItem className="col-span-full">
                         <FormLabel>Code</FormLabel>
-                        <FormDescription>
-                          Site wide sales get this code automatically applied
-                        </FormDescription>
+
                         <FormControl>
                           <Input
                             disabled={loading}
@@ -317,40 +306,8 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="rule"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Rule</FormLabel>
-                        <Select
-                          disabled={loading}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                defaultValue={field.value}
-                                placeholder="Select what type your discount is"
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.values(DiscountRule).map((role) => (
-                              <SelectItem key={role} value={role}>
-                                {role}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
                         <FormDescription>
-                          Is it a sale or a coupon?
+                          Sales get this code applied automatically.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -379,10 +336,10 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                   />
                   <FormField
                     control={form.control}
-                    name="type"
+                    name="valueType"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Type</FormLabel>
+                      <FormItem className="col-span-2">
+                        <FormLabel>Value Type</FormLabel>
                         <Select
                           disabled={loading}
                           onValueChange={field.onChange}
@@ -398,26 +355,30 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Object.values(DiscountType).map((role) => (
+                            {Object.values(DiscountValueType).map((role) => (
                               <SelectItem key={role} value={role}>
                                 {role}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
+                        <FormDescription>
+                          Decide whether the discount is a percentage or a fixed
+                          dollar amount
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />{" "}
                   <FormField
                     control={form.control}
                     name="value"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="col-span-2">
                         <FormLabel>Discount Value</FormLabel>
                         <FormControl>
                           <div className="relative ">
-                            {form.watch("type") === "FIXED" && (
+                            {form.watch("valueType") === "FIXED" && (
                               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                 <span className="text-gray-500 sm:text-sm">
                                   $
@@ -427,20 +388,18 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
 
                             <Input
                               type="number"
-                              disabled={
-                                loading ||
-                                form.watch("type") === "FREE_SHIPPING"
-                              }
+                              disabled={loading}
                               className={cn(
-                                "block w-full rounded-md py-1.5    text-gray-900     sm:text-sm sm:leading-6",
-                                form.watch("type") === "FIXED" && "pl-7",
-                                form.watch("type") === "PERCENTAGE" && "pr-14"
+                                "block w-full rounded-md py-1.5  text-gray-900     sm:text-sm sm:leading-6",
+                                form.watch("valueType") === "FIXED" && "pl-7",
+                                form.watch("valueType") === "PERCENTAGE" &&
+                                  "pr-14"
                               )}
                               placeholder="0.00"
                               {...field}
                             />
 
-                            {form.watch("type") === "PERCENTAGE" && (
+                            {form.watch("valueType") === "PERCENTAGE" && (
                               <div className="absolute inset-y-0 right-0 flex items-center">
                                 <span className="py-0 pl-2 pr-7 text-gray-500 sm:text-sm">
                                   %
@@ -449,16 +408,54 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                             )}
                           </div>
                         </FormControl>
-
+                        <FormDescription>
+                          How much is the discount for?
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />{" "}
                   <FormField
                     control={form.control}
+                    name="methodType"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2">
+                        <FormLabel>Method Type</FormLabel>
+                        <Select
+                          disabled={loading}
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                defaultValue={field.value}
+                                placeholder="Select what type your discount is"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.values(DiscountMethodType).map((role) => (
+                              <SelectItem key={role} value={role}>
+                                {role}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Decide whether the discount is automatic or requires
+                          the code.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="active"
                     render={({ field }) => (
-                      <FormItem className="col-span- flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormItem className="col-span-3 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
@@ -476,9 +473,9 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                   />
                   <FormField
                     control={form.control}
-                    name="isCodeRequired"
+                    name="stackable"
                     render={({ field }) => (
-                      <FormItem className="col-span- flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormItem className="col-span-3 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
@@ -486,10 +483,10 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>Is the code required?</FormLabel>
+                          <FormLabel>Is the discount stackable?</FormLabel>
                           <FormDescription>
-                            If active, the code will be automatically applied,
-                            otherwise they would need the code.
+                            If active, the code will stack with other discounts
+                            also stackable.
                           </FormDescription>
                         </div>
                       </FormItem>
@@ -503,12 +500,12 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                 <FormDescription>
                   How can this discount be used?
                 </FormDescription>
-                <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
+                <div className="my-5 gap-8 md:grid md:grid-cols-6 ">
                   <FormField
                     control={form.control}
                     name="startDate"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem className="col-span-3 flex flex-col">
                         <FormLabel>Start Date</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -553,7 +550,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                     control={form.control}
                     name="endDate"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem className="col-span-3 flex flex-col">
                         <FormLabel>End Date</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -596,311 +593,309 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
                   />
                   <FormField
                     control={form.control}
-                    name="allocation"
+                    name="minValue"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Allocation</FormLabel>
-                        <Select
-                          disabled={loading}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                defaultValue={field.value}
-                                placeholder="Select what type your discount is"
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.values(DiscountAllocation).map((role) => (
-                              <SelectItem key={role} value={role}>
-                                {role}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Should the discount be applied to order total? Or just
-                          to the item?
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="condition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Conditions</FormLabel>
-                        <Select
-                          disabled={loading}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                defaultValue={field.value}
-                                placeholder="Select what type your discount is"
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.values(DiscountCondition).map((role) => (
-                              <SelectItem key={role} value={role}>
-                                {role}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Should the discount be applied site-wide? Just
-                          specific products? Specific collections?
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="conditionExclusion"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Condition Inclusion / Exclusion</FormLabel>
-                        <Select
-                          disabled={loading}
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                defaultValue={field.value}
-                                placeholder="Select what type your discount is"
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.values(DiscountConditionOperator).map(
-                              (role) => (
-                                <SelectItem key={role} value={role}>
-                                  {role}
-                                </SelectItem>
-                              )
-                            )}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Should the discount be applied to all? The items
-                          selected? Items not selected?
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="products"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Products</FormLabel>
+                      <FormItem className="col-span-3">
+                        <FormLabel>Minimum Value (optional)</FormLabel>
                         <FormControl>
-                          <Command
-                            onKeyDown={handleKeyDown}
-                            className="overflow-visible bg-transparent"
-                          >
-                            <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                              <div className="flex flex-wrap gap-1">
-                                {field.value.map((product) => {
-                                  return (
-                                    <Badge
-                                      key={(product as Product).name}
-                                      variant="secondary"
-                                    >
-                                      {(product as Product).name}
-                                      <button
-                                        className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                        aria-label={(product as Product).name}
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            handleUnselect(product as Product);
-                                          }
-                                        }}
-                                        onMouseDown={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }}
-                                        onClick={() =>
-                                          handleUnselect(product as Product)
-                                        }
-                                      >
-                                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                                      </button>
-                                    </Badge>
-                                  );
-                                })}
-                                {/* Avoid having the "Search" Icon */}
-                                <CommandPrimitive.Input
-                                  ref={inputRef}
-                                  value={inputValue}
-                                  onValueChange={setInputValue}
-                                  onBlur={() => setProductsOpen(false)}
-                                  onFocus={() => setProductsOpen(true)}
-                                  placeholder={
-                                    products?.data?.length === 0
-                                      ? "Add some products first."
-                                      : "Select products..."
-                                  }
-                                  disabled={products?.data?.length === 0}
-                                  className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-                                />
-                              </div>
+                          <div className="relative ">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                              <span className="text-gray-500 sm:text-sm">
+                                $
+                              </span>
                             </div>
-                            <div className="relative mt-2">
-                              {productsOpen &&
-                              selectables &&
-                              selectables?.length > 0 ? (
-                                <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-                                  <CommandGroup className="h-full overflow-auto">
-                                    {selectables?.map((product) => {
-                                      return (
-                                        <CommandItem
-                                          key={product.name}
+
+                            <Input
+                              type="number"
+                              disabled={loading}
+                              className={cn(
+                                "block w-full rounded-md py-1.5  text-gray-900     sm:text-sm sm:leading-6",
+                                "pl-7"
+                              )}
+                              placeholder="0.00"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Is there a minimum value for the discount to apply?
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />{" "}
+                  <FormField
+                    control={form.control}
+                    name="maxValue"
+                    render={({ field }) => (
+                      <FormItem className="col-span-3">
+                        <FormLabel>Maximum Value(optional)</FormLabel>
+                        <FormControl>
+                          <div className="relative ">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                              <span className="text-gray-500 sm:text-sm">
+                                $
+                              </span>
+                            </div>
+
+                            <Input
+                              type="number"
+                              disabled={loading}
+                              className={cn(
+                                "block w-full rounded-md py-1.5  text-gray-900     sm:text-sm sm:leading-6",
+                                "pl-7"
+                              )}
+                              placeholder="0.00"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Is there a maximum value for the discount to apply?
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />{" "}
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem className="col-span-3">
+                        <FormLabel>Discount applies to:</FormLabel>
+                        <Select
+                          disabled={loading}
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                defaultValue={field.value}
+                                placeholder="Select what type your discount is"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.values(DiscountType).map((role) => (
+                              <SelectItem key={role} value={role}>
+                                {role}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        <FormDescription>
+                          Where does this discount apply?
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                  {form.watch("type") === "PER_PRODUCT" && (
+                    <FormField
+                      control={form.control}
+                      name="products"
+                      render={({ field }) => (
+                        <FormItem className="col-span-full">
+                          <FormLabel>Products</FormLabel>
+                          <FormControl>
+                            <Command
+                              onKeyDown={handleKeyDown}
+                              className="overflow-visible bg-transparent"
+                            >
+                              <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                                <div className="flex flex-wrap gap-1">
+                                  {field.value.map((product) => {
+                                    return (
+                                      <Badge
+                                        key={(product as Product).name}
+                                        variant="secondary"
+                                      >
+                                        {(product as Product).name}
+                                        <button
+                                          className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                          aria-label={(product as Product).name}
+                                          onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                              handleUnselect(
+                                                product as Product
+                                              );
+                                            }
+                                          }}
                                           onMouseDown={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                           }}
-                                          onSelect={() => {
-                                            setInputValue("");
-                                            form.setValue("products", [
-                                              ...field.value,
-                                              product,
-                                            ]);
-                                          }}
-                                          className={"cursor-pointer"}
+                                          onClick={() =>
+                                            handleUnselect(product as Product)
+                                          }
                                         >
-                                          {product.name}
-                                        </CommandItem>
-                                      );
-                                    })}
-                                  </CommandGroup>
+                                          <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                        </button>
+                                      </Badge>
+                                    );
+                                  })}
+                                  {/* Avoid having the "Search" Icon */}
+                                  <CommandPrimitive.Input
+                                    ref={inputRef}
+                                    value={inputValue}
+                                    onValueChange={setInputValue}
+                                    onBlur={() => setProductsOpen(false)}
+                                    onFocus={() => setProductsOpen(true)}
+                                    placeholder={
+                                      products?.data?.length === 0
+                                        ? "Add some products first."
+                                        : "Select products..."
+                                    }
+                                    disabled={products?.data?.length === 0}
+                                    className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+                                  />
                                 </div>
-                              ) : null}
-                            </div>
-                          </Command>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="collections"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Collections</FormLabel>
-                        <FormControl>
-                          <Command
-                            onKeyDown={handleCollectionsKeyDown}
-                            className="overflow-visible bg-transparent"
-                          >
-                            <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                              <div className="flex flex-wrap gap-1">
-                                {field.value.map((product) => {
-                                  return (
-                                    <Badge
-                                      key={(product as Collection).name}
-                                      variant="secondary"
-                                    >
-                                      {(product as Collection).name}
-                                      <button
-                                        className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                        aria-label={
-                                          (product as Collection).name
-                                        }
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
+                              </div>
+                              <div className="relative mt-2">
+                                {productsOpen &&
+                                selectables &&
+                                selectables?.length > 0 ? (
+                                  <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+                                    <CommandGroup className="h-full overflow-auto">
+                                      {selectables?.map((product) => {
+                                        return (
+                                          <CommandItem
+                                            key={product.name}
+                                            onMouseDown={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                            }}
+                                            onSelect={() => {
+                                              setInputValue("");
+                                              form.setValue("products", [
+                                                ...field.value,
+                                                product,
+                                              ]);
+                                            }}
+                                            className={"cursor-pointer"}
+                                          >
+                                            {product.name}
+                                          </CommandItem>
+                                        );
+                                      })}
+                                    </CommandGroup>
+                                  </div>
+                                ) : null}
+                              </div>
+                            </Command>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {form.watch("type") === "PER_COLLECTION" && (
+                    <FormField
+                      control={form.control}
+                      name="collections"
+                      render={({ field }) => (
+                        <FormItem className="col-span-full">
+                          <FormLabel>Collections</FormLabel>
+                          <FormControl>
+                            <Command
+                              onKeyDown={handleCollectionsKeyDown}
+                              className="overflow-visible bg-transparent"
+                            >
+                              <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                                <div className="flex flex-wrap gap-1">
+                                  {field.value.map((product) => {
+                                    return (
+                                      <Badge
+                                        key={(product as Collection).name}
+                                        variant="secondary"
+                                      >
+                                        {(product as Collection).name}
+                                        <button
+                                          className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                          aria-label={
+                                            (product as Collection).name
+                                          }
+                                          onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                              handleCollectionsUnselect(
+                                                product as Collection
+                                              );
+                                            }
+                                          }}
+                                          onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                          }}
+                                          onClick={() =>
                                             handleCollectionsUnselect(
                                               product as Collection
-                                            );
+                                            )
                                           }
-                                        }}
-                                        onMouseDown={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }}
-                                        onClick={() =>
-                                          handleCollectionsUnselect(
-                                            product as Collection
-                                          )
-                                        }
-                                      >
-                                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                                      </button>
-                                    </Badge>
-                                  );
-                                })}
-                                {/* Avoid having the "Search" Icon */}
-                                <CommandPrimitive.Input
-                                  ref={inputCollectionsRef}
-                                  value={inputCollectionsValue}
-                                  onValueChange={setInputCollectionsValue}
-                                  onBlur={() => setCollectionsOpen(false)}
-                                  onFocus={() => setCollectionsOpen(true)}
-                                  placeholder={
-                                    collections?.data?.length === 0
-                                      ? "Add some collections first."
-                                      : "Select collections..."
-                                  }
-                                  disabled={collections?.data?.length === 0}
-                                  className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-                                />
-                              </div>
-                            </div>
-                            <div className="relative mt-2">
-                              {collectionsOpen &&
-                              selectablesCollections &&
-                              selectablesCollections?.length > 0 ? (
-                                <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-                                  <CommandGroup className="h-full overflow-auto">
-                                    {selectablesCollections?.map((product) => {
-                                      return (
-                                        <CommandItem
-                                          key={product.name}
-                                          onMouseDown={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                          }}
-                                          onSelect={() => {
-                                            setInputValue("");
-                                            form.setValue("collections", [
-                                              ...field.value,
-                                              product,
-                                            ]);
-                                          }}
-                                          className={"cursor-pointer"}
                                         >
-                                          {product.name}
-                                        </CommandItem>
-                                      );
-                                    })}
-                                  </CommandGroup>
+                                          <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                        </button>
+                                      </Badge>
+                                    );
+                                  })}
+                                  {/* Avoid having the "Search" Icon */}
+                                  <CommandPrimitive.Input
+                                    ref={inputCollectionsRef}
+                                    value={inputCollectionsValue}
+                                    onValueChange={setInputCollectionsValue}
+                                    onBlur={() => setCollectionsOpen(false)}
+                                    onFocus={() => setCollectionsOpen(true)}
+                                    placeholder={
+                                      collections?.data?.length === 0
+                                        ? "Add some collections first."
+                                        : "Select collections..."
+                                    }
+                                    disabled={collections?.data?.length === 0}
+                                    className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+                                  />
                                 </div>
-                              ) : null}
-                            </div>
-                          </Command>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                              </div>
+                              <div className="relative mt-2">
+                                {collectionsOpen &&
+                                selectablesCollections &&
+                                selectablesCollections?.length > 0 ? (
+                                  <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+                                    <CommandGroup className="h-full overflow-auto">
+                                      {selectablesCollections?.map(
+                                        (product) => {
+                                          return (
+                                            <CommandItem
+                                              key={product.name}
+                                              onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                              }}
+                                              onSelect={() => {
+                                                setInputValue("");
+                                                form.setValue("collections", [
+                                                  ...field.value,
+                                                  product,
+                                                ]);
+                                              }}
+                                              className={"cursor-pointer"}
+                                            >
+                                              {product.name}
+                                            </CommandItem>
+                                          );
+                                        }
+                                      )}
+                                    </CommandGroup>
+                                  </div>
+                                ) : null}
+                              </div>
+                            </Command>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
               </div>
               {/* <div className="w-full rounded-md border border-border bg-background/50 p-4 ">

@@ -18,10 +18,10 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import { toastService } from "~/services/toast";
-import type { BlogPostColumn } from "./columns";
+import { DiscountColumn } from "../types";
 
 interface CellActionProps {
-  data: BlogPostColumn;
+  data: DiscountColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -34,7 +34,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `/api/${params.query.storeId as string}/blog-posts/${data.id}`
+        `/api/${params.query.storeId as string}/discounts/${data.id}`
       );
       toastService.success("Blog post deleted.");
       router.refresh();
@@ -78,7 +78,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem
             onClick={() =>
               router.push(
-                `/admin/${params.query.storeId as string}/blog-posts/${data.id}`
+                `/admin/${params.query.storeId as string}/discounts/${data.id}`
               )
             }
           >
@@ -87,7 +87,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem
             onClick={() =>
               router.push(
-                `/admin/${params.query.storeId as string}/blog-posts/${
+                `/admin/${params.query.storeId as string}/discounts/${
                   data.id
                 }/edit`
               )

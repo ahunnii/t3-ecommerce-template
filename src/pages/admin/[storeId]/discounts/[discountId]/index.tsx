@@ -26,6 +26,10 @@ const DiscountPage: FC<IProps> = ({ storeId, discountId }) => {
     discountId,
   });
   const editDiscountUrl = `/admin/${storeId}/discounts/${discount?.id}/edit`;
+
+  const isPercentage = discount?.type === "PERCENTAGE";
+  const isFixed = discount?.type === "FIXED";
+  const isFreeShipping = discount?.type === "FREE_SHIPPING";
   return (
     <>
       <AdminLayout>
@@ -60,8 +64,34 @@ const DiscountPage: FC<IProps> = ({ storeId, discountId }) => {
                       Basic details of the discount
                     </p>
 
-                    <ul>
-                      <li></li>
+                    <p>
+                      {isFixed && "$"} {discount.value}{" "}
+                      {isPercentage
+                        ? "% off"
+                        : isFixed
+                        ? "off"
+                        : "Free Shipping"}
+                      {discount.allocation === "ITEM"
+                        ? " on select items"
+                        : " on total order"}
+                    </p>
+                    <ul className="mt-5">
+                      <li>Start Date: {discount.startDate.toDateString()}</li>
+                      <li>
+                        End Date:{" "}
+                        {discount.endDate?.toDateString() ??
+                          "No end date provided"}
+                      </li>
+                      <li>Discount Type: {discount.type}</li>
+                      <li>Discount Amount: {discount.value}</li>
+                      <li>Discount Code: {discount.code}</li>
+                      <li>
+                        Discount Active: {discount.active ? "True" : "False"}
+                      </li>
+                      <li>
+                        Discount Code Required:{" "}
+                        {discount.isCodeRequired ? "True" : "False"}
+                      </li>
                     </ul>
                   </div>
                 </div>

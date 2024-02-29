@@ -1,3 +1,4 @@
+import { Discount, Prisma } from "@prisma/client";
 import { Expand, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 
@@ -7,16 +8,18 @@ import { useState, type MouseEventHandler } from "react";
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
 import useCart from "~/modules/cart/hooks/use-cart";
+import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
 
 interface ProductCard {
   data: DetailedProductFull;
+  discounts: Discount[];
   className?: string;
 }
 
-const ProductCard: React.FC<ProductCard> = ({ data, className }) => {
+const ProductCard: React.FC<ProductCard> = ({ data, className, discounts }) => {
   const previewModal = usePreviewModal();
   const cart = useCart();
   const router = useRouter();
@@ -55,6 +58,9 @@ const ProductCard: React.FC<ProductCard> = ({ data, className }) => {
     },
   };
 
+  const bestDiscount =
+    discounts?.length > 0 ? getBestDiscount(data.price, discounts) : null;
+
   return (
     <div
       className={cn(
@@ -65,12 +71,24 @@ const ProductCard: React.FC<ProductCard> = ({ data, className }) => {
       onMouseLeave={() => setHovered(false)}
     >
       <ProductCardImage {...data} goToProduct={goToProduct} hovered={hovered}>
+        {(data?.discounts?.length > 0 || discounts?.length > 0) && (
+          <div className="absolute right-3 top-3 z-50">
+            <span className="rounded-md border border-white bg-purple-500 px-2 py-1 text-xs font-semibold text-white shadow">
+              SALE
+            </span>
+          </div>
+        )}
+
         {/* Quick Actions */}
         <ProductCardQuickActions
           actions={[quickActions.preview, quickActions.addToCart]}
         />
       </ProductCardImage>
-      <ProductCardDescription {...data} onClick={goToProduct} />
+      <ProductCardDescription
+        {...data}
+        onClick={goToProduct}
+        discountBundle={bestDiscount ?? null}
+      />
     </div>
   );
 };
@@ -127,18 +145,36 @@ type TProductCardDescription = {
   name: string;
   price: number;
   category?: { name: string };
+  discountBundle?: { price: number; discount: Discount | null } | null;
 };
 const ProductCardDescription = ({
   onClick,
   name,
   price,
   category,
+  discountBundle,
 }: TProductCardDescription) => {
   return (
     <div className="text-left" onClick={onClick}>
       <p className="text-lg font-semibold text-white">{name}</p>
       <p className="text-sm text-gray-500">{category?.name}</p>
-      <Currency value={price} className="mt-2  font-extrabold text-white" />
+
+      <div className="flex gap-2">
+        {discountBundle && (
+          <Currency
+            value={discountBundle.price}
+            className="mt-2  font-extrabold text-white"
+          />
+        )}
+
+        <Currency
+          value={price}
+          className={cn(
+            "mt-2  font-extrabold text-white",
+            discountBundle && "font-medium text-muted-foreground line-through"
+          )}
+        />
+      </div>
     </div>
   );
 };

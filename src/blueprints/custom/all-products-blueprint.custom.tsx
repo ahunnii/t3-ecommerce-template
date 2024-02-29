@@ -36,6 +36,8 @@ export const AllProductsPage = () => {
   const { data: attributes } =
     api.categories.getAllStoreCategoryAttributes.useQuery({});
 
+  const { data: sales } = api.discounts.getActiveSiteSales.useQuery({});
+
   const config = useConfig();
   const router = useRouter();
   return (
@@ -73,7 +75,11 @@ export const AllProductsPage = () => {
             {products?.length === 0 && <NoResults />}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4">
               {products?.map((item: DetailedProductFull) => (
-                <ProductCard key={item.id} data={item} />
+                <ProductCard
+                  key={item.id}
+                  data={item}
+                  discounts={[...(sales ?? []), ...item?.discounts] ?? []}
+                />
               ))}
             </div>
           </div>

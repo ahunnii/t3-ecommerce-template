@@ -1,9 +1,7 @@
 import {
-  DiscountAllocation,
-  DiscountCondition,
-  DiscountConditionOperator,
-  DiscountRule,
+  DiscountMethodType,
   DiscountType,
+  DiscountValueType,
 } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -30,11 +28,41 @@ export const discountRouter = createTRPCRouter({
       });
     }),
 
+  getActiveSiteSales: publicProcedure
+    .input(z.object({ storeId: z.string().optional() }))
+    .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
+      return ctx.prisma.discount.findMany({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          active: true,
+          methodType: "SALE",
+          type: "GLOBAL",
+          // startDate: {
+          //   lte: new Date(),
+          // },
+          // endDate: {
+          //   gte: new Date(),
+          // },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }),
+
   getDiscount: publicProcedure
     .input(z.object({ discountId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.discount.findUnique({
         where: { id: input.discountId },
+        include: {
+          products: true,
+          collections: true,
+        },
       });
     }),
 
@@ -42,26 +70,33 @@ export const discountRouter = createTRPCRouter({
     .input(
       z.object({
         storeId: z.string(),
+
         startDate: z.date(),
         endDate: z.date().optional(),
+
         code: z.string(),
         description: z.string().optional(),
+        value: z.number().min(0),
         active: z.boolean(),
-        isCodeRequired: z.boolean(),
+        stackable: z.boolean(),
 
         type: z.nativeEnum(DiscountType),
-        allocation: z.nativeEnum(DiscountAllocation),
-        condition: z.nativeEnum(DiscountCondition),
-        conditionExclusion: z.nativeEnum(DiscountConditionOperator),
-        conditionThreshold: z.number().optional().default(0),
+        valueType: z.nativeEnum(DiscountValueType),
+        methodType: z.nativeEnum(DiscountMethodType),
 
-        value: z.number().min(0),
-        // valueType: z.nativeEnum(DiscountValueType),
+        minValue: z.number().optional(),
+        maxValue: z.number().optional(),
 
-        rule: z.nativeEnum(DiscountRule),
-
-        productIds: z.array(z.string()).optional(),
-        collectionIds: z.array(z.string()).optional(),
+        products: z.array(
+          z.object({
+            id: z.string(),
+          })
+        ),
+        collections: z.array(
+          z.object({
+            id: z.string(),
+          })
+        ),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -74,10 +109,10 @@ export const discountRouter = createTRPCRouter({
         data: {
           ...input,
           products: {
-            connect: input.productIds?.map((id) => ({ id })),
+            connect: input.products,
           },
           collections: {
-            connect: input.collectionIds?.map((id) => ({ id })),
+            connect: input.collections,
           },
         },
       });
@@ -89,24 +124,30 @@ export const discountRouter = createTRPCRouter({
         id: z.string(),
         startDate: z.date(),
         endDate: z.date().optional(),
+
         code: z.string(),
         description: z.string().optional(),
+        value: z.number().min(0),
         active: z.boolean(),
-        isCodeRequired: z.boolean(),
+        stackable: z.boolean(),
 
         type: z.nativeEnum(DiscountType),
-        allocation: z.nativeEnum(DiscountAllocation),
-        condition: z.nativeEnum(DiscountCondition),
-        conditionExclusion: z.nativeEnum(DiscountConditionOperator),
-        conditionThreshold: z.number().optional().default(0),
+        valueType: z.nativeEnum(DiscountValueType),
+        methodType: z.nativeEnum(DiscountMethodType),
 
-        value: z.number().min(0),
-        // valueType: z.nativeEnum(DiscountValueType),
+        minValue: z.number().optional(),
+        maxValue: z.number().optional(),
 
-        rule: z.nativeEnum(DiscountRule),
-
-        productIds: z.array(z.string()).optional(),
-        collectionIds: z.array(z.string()).optional(),
+        products: z.array(
+          z.object({
+            id: z.string(),
+          })
+        ),
+        collections: z.array(
+          z.object({
+            id: z.string(),
+          })
+        ),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -132,6 +173,12 @@ export const discountRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           ...input,
+          products: {
+            connect: input.products,
+          },
+          collections: {
+            connect: input.collections,
+          },
         },
       });
     }),

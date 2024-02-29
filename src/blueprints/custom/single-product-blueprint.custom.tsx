@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import type { FC } from "react";
+import { useMemo, type FC } from "react";
 
 import Info from "~/components/core/info";
 
@@ -15,10 +15,13 @@ import type { DetailedProductFull } from "~/types";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
+import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 
 type ProductPageProps = { prevUrl: string; name: string };
 export const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
   const params = useParams();
+
+  const { data: sales } = api.discounts.getActiveSiteSales.useQuery({});
 
   const { data: product, isLoading } = api.products.getProduct.useQuery({
     productId: params?.productId as string,
@@ -80,7 +83,14 @@ export const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
               <Gallery images={product?.images} />
 
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-                <Info data={product} variant="default" button={"dark"} />
+                <Info
+                  data={product}
+                  variant="default"
+                  button={"dark"}
+                  discounts={
+                    [...(sales ?? []), ...(product?.discounts ?? [])] ?? []
+                  }
+                />
               </div>
             </div>
             <hr className="my-10" />
