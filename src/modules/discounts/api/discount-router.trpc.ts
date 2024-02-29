@@ -54,6 +54,107 @@ export const discountRouter = createTRPCRouter({
       });
     }),
 
+  getActiveCheckoutSales: publicProcedure
+    .input(z.object({ storeId: z.string().optional() }))
+    .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
+      return ctx.prisma.discount.findMany({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          active: true,
+          methodType: "COUPON",
+
+          // startDate: {
+          //   lte: new Date(),
+          // },
+          // endDate: {
+          //   gte: new Date(),
+          // },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }),
+
+  getCoupon: publicProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        code: z.string(),
+        orderTotal: z.number().optional(),
+        shippingTotal: z.number().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
+      return ctx.prisma.discount.findUnique({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          active: true,
+          methodType: "COUPON",
+          code: input.code,
+
+          AND: [
+            { OR: [{ endDate: { gte: new Date() } }, { endDate: null }] },
+            {
+              OR: [
+                {
+                  AND: [
+                    {
+                      OR: [
+                        { minValue: { lte: input?.orderTotal } },
+                        { minValue: null },
+                      ],
+                    },
+                    {
+                      OR: [
+                        { maxValue: null },
+                        { maxValue: { gte: input?.orderTotal } },
+                      ],
+                    },
+                    {
+                      type: "ORDER",
+                    },
+                  ],
+                },
+                {
+                  AND: [
+                    {
+                      OR: [
+                        { minValue: { lte: input?.shippingTotal } },
+                        { minValue: null },
+                      ],
+                    },
+                    {
+                      OR: [
+                        { maxValue: null },
+                        { maxValue: { gte: input?.shippingTotal } },
+                      ],
+                    },
+                    {
+                      type: "SHIPPING",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+
+          startDate: {
+            lte: new Date(),
+          },
+        },
+      });
+    }),
   getDiscount: publicProcedure
     .input(z.object({ discountId: z.string() }))
     .query(({ ctx, input }) => {
@@ -114,6 +215,10 @@ export const discountRouter = createTRPCRouter({
           collections: {
             connect: input.collections,
           },
+          maxValue:
+            input.maxValue === 0 || input.maxValue === undefined
+              ? null
+              : input.maxValue,
         },
       });
     }),
@@ -179,6 +284,10 @@ export const discountRouter = createTRPCRouter({
           collections: {
             connect: input.collections,
           },
+          maxValue:
+            input.maxValue === 0 || input.maxValue === undefined
+              ? null
+              : input.maxValue,
         },
       });
     }),

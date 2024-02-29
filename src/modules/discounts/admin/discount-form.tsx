@@ -90,7 +90,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
     valueType: initialData?.valueType ?? "PERCENTAGE",
     methodType: initialData?.methodType ?? "SALE",
     minValue: initialData?.minValue ?? undefined,
-    mavValue: initialData?.maxValue ?? undefined,
+    maxValue: initialData?.maxValue ?? undefined,
     products: initialData?.products ?? [],
     collections: initialData?.collections ?? [],
   };
@@ -156,11 +156,19 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
       updateDiscount.mutate({
         ...data,
         id: params.query.discountId as string,
+        maxValue:
+          data.maxValue === 0 || data.maxValue === undefined
+            ? undefined
+            : data.maxValue,
       });
     } else {
       createDiscount.mutate({
         ...data,
         storeId: params.query.storeId as string,
+        maxValue:
+          data.maxValue === 0 || data.maxValue === undefined
+            ? undefined
+            : data.maxValue,
       });
     }
   };
@@ -282,6 +290,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
       <Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          onChange={() => console.log(form.watch("minValue"))}
           className="w-full space-y-8"
         >
           <section className="flex w-full gap-4 max-lg:flex-col">

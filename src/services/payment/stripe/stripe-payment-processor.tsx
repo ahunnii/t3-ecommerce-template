@@ -18,6 +18,7 @@ export const stripePaymentProcessor: PaymentProcessor<
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
     cartItems.forEach((product, idx) => {
+      console.log(product);
       line_items.push({
         quantity: Number(quantities[idx]) ?? 1,
         price_data: {
@@ -27,7 +28,12 @@ export const stripePaymentProcessor: PaymentProcessor<
             description: product.variant?.values,
             images: product.product.images.map((image) => image.url),
           },
-          unit_amount: Math.floor(product.product.price * 100),
+
+          unit_amount: product?.discountBundle
+            ? product.discountBundle?.price * 100
+            : Math.floor(
+                (product?.variant?.price ?? product.product.price) * 100
+              ),
         },
       });
     });

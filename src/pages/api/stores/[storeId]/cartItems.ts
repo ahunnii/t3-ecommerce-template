@@ -59,6 +59,7 @@ const cartItemsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                 ? variants.find((v) => v.id === cartItem.variant?.id)
                 : null,
               quantity: cartItem.quantity,
+              discountBundle: cartItem.discountBundle,
             })
           ) as CartItem[];
 

@@ -2,15 +2,15 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useState, type FC } from "react";
 
 import type { GetServerSidePropsContext } from "next";
-import type { BlogPostColumn } from "~/modules/blog-posts/admin/columns";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
-import { ProductsClient } from "~/modules/blog-posts/admin/client";
-import type { BlogPost } from "~/modules/blog-posts/types";
+
+import { BlogPostClient } from "~/modules/blog-posts/admin/client";
+import type { BlogPost, BlogPostColumn } from "~/modules/blog-posts/types";
 
 interface IProps {
   storeId: string;
@@ -45,7 +45,7 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
           {!blogPosts && <PageLoader />}
-          {blogPosts && <ProductsClient data={formattedBlogPosts} />}
+          {blogPosts && <BlogPostClient data={formattedBlogPosts} />}
         </div>
       </div>
     </AdminLayout>
