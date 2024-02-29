@@ -1,5 +1,5 @@
 import type { DetailedCollection } from "~/types";
-import { CollectionCard } from "../categories/core/collection-card";
+import { CollectionCard } from "../../categories/core/collection-card";
 
 export const ViewCollectionPreview = ({
   collection,

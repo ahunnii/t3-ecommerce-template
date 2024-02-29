@@ -15,15 +15,12 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 
-import { columns, type CollectionColumn } from "./columns";
+import type { CollectionColumn } from "../types";
+import { columns } from "./columns";
 
-interface CollectionsClientProps {
-  data: CollectionColumn[];
-}
+type Props = { data: CollectionColumn[] };
 
-export const CollectionsClient: React.FC<CollectionsClientProps> = ({
-  data,
-}) => {
+export const CollectionsClient: React.FC<Props> = ({ data }) => {
   const params = useRouter();
   const navigate = useNavigationRouter();
 

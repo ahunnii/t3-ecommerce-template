@@ -3,18 +3,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import type { CollectionColumn } from "../types";
 import { CellAction } from "./cell-action";
-
-export type CollectionColumn = {
-  id: string;
-  storeId: string;
-  name: string;
-  products: {
-    id: string;
-    name: string;
-  }[];
-  createdAt: Date;
-};
 
 export const columns: ColumnDef<CollectionColumn>[] = [
   {

@@ -15,8 +15,8 @@ import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";
 
-import { ViewCollectionPreview } from "~/modules/collections/view-collection-preview";
-import { ViewCollectionProducts } from "~/modules/collections/view-collection-products";
+import { ViewCollectionPreview } from "~/modules/collections/admin/view-collection-preview";
+import { ViewCollectionProducts } from "~/modules/collections/admin/view-collection-products";
 
 interface IProps {
   collectionId: string;

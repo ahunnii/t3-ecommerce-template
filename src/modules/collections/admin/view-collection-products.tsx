@@ -2,7 +2,7 @@ import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
 import PageLoader from "~/components/ui/page-loader";
-import { CollectionForm } from "~/modules/collections/collection-form";
+import { CollectionForm } from "~/modules/collections/admin/collection-form";
 
 import { api } from "~/utils/api";
 import { authenticateSession } from "~/utils/auth";
@@ -18,7 +18,7 @@ import { Heading } from "~/components/ui/heading";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { CollectionCard } from "~/modules/categories/core/collection-card";
 import type { DetailedProductFull } from "~/types";
-import { CategoryProduct } from "../products/types";
+import { CategoryProduct } from "../../products/types";
 
 export const ViewCollectionProducts = ({
   products,

@@ -7,8 +7,6 @@ import type { Billboard } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-import * as z from "zod";
-
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import * as Form from "~/components/ui/form";
@@ -20,22 +18,12 @@ import ImageUpload from "~/services/image-upload/components/image-upload";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
+import { billboardFormSchema } from "../schema";
+import type { BillboardFormValues } from "../types";
 
-const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
-  description: z.string().optional(),
-});
+type Props = { initialData: Billboard | null };
 
-type BillboardFormValues = z.infer<typeof formSchema>;
-
-interface BillboardFormProps {
-  initialData: Billboard | null;
-}
-
-export const BillboardForm: React.FC<BillboardFormProps> = ({
-  initialData,
-}) => {
+export const BillboardForm: React.FC<Props> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const apiContext = api.useContext();
@@ -56,7 +44,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const action = initialData ? "Save changes" : "Create";
 
   const form = useForm<BillboardFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(billboardFormSchema),
     defaultValues: {
       label: initialData?.label ?? "",
       imageUrl: initialData?.imageUrl ?? "",
@@ -99,7 +87,6 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         "Make sure to remove all items using this billboard first before deleting.",
         error
       ),
-
     onSettled: () => {
       setOpen(false);
       router.push(`/admin/${storeId}/billboards`);

@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useRouter as useNavigationRouter } from "next/navigation";
+
 import { useRouter } from "next/router";
 
 import { ApiList } from "~/components/ui/api-list";
@@ -9,33 +9,47 @@ import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
-import { columns, type BlogPostColumn } from "./columns";
+import Link from "next/link";
+import type { BlogPostColumn } from "../types";
+import { columns } from "./columns";
 
-interface ProductsClientProps {
-  data: BlogPostColumn[];
-}
+type Props = { data: BlogPostColumn[] };
 
-export const ProductsClient: React.FC<ProductsClientProps> = ({ data }) => {
+export const BlogPostClient: React.FC<Props> = ({ data }) => {
   const params = useRouter();
-  const router = useNavigationRouter();
+  const storeId = params.query.storeId as string;
 
   return (
     <>
       <div className="flex items-center justify-between">
-        <Heading
-          title={`Blog Posts (${data.length})`}
-          description="Manage your site's blog"
-        />
-        <Button
-          onClick={() =>
-            router.push(
-              `/admin/${params.query.storeId as string}/blog-posts/new`
-            )
-          }
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add New
-        </Button>
+        <TooltipProvider delayDuration={250}>
+          <Tooltip>
+            <TooltipTrigger className="text-left">
+              <Heading
+                title={`Blog Posts (${data.length})`}
+                description="Manage your site's blog"
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-96">
+                Blog posts are a great way to keep your customers informed about
+                new products, sales, and other news.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <Link href={`/admin/${storeId}/blog-posts/new`}>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Add New
+          </Button>
+        </Link>
       </div>
       <Separator />
       <DataTable searchKey="name" columns={columns} data={data} />

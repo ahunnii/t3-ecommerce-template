@@ -1,11 +1,9 @@
 "use client";
 
-import axios from "axios";
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
-import { useRouter as useNavigationRouter } from "next/navigation";
+
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -17,41 +15,46 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
+import Link from "next/link";
 import { toastService } from "~/services/toast";
-import type { BlogPostColumn } from "./columns";
+import { api } from "~/utils/api";
+import type { BlogPostColumn } from "../types";
 
-interface CellActionProps {
-  data: BlogPostColumn;
-}
+type Props = { data: BlogPostColumn };
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const [loading, setLoading] = useState(false);
+export const CellAction: React.FC<Props> = ({ data }) => {
   const [open, setOpen] = useState(false);
-  const router = useNavigationRouter();
+
   const params = useRouter();
+  const apiContext = api.useContext();
+  const { storeId } = params.query as { storeId: string };
+  const blogPostId = data.id;
 
-  const onConfirm = async () => {
-    try {
-      setLoading(true);
-      await axios.delete(
-        `/api/${params.query.storeId as string}/blog-posts/${data.id}`
+  const baseUrl = `/admin/${storeId}/blog-posts/${blogPostId}`;
+
+  const deleteBlogPost = api.blogPosts.deleteBlogPost.useMutation({
+    onSuccess: () => toastService.success("Blog post deleted."),
+    onError: (error: unknown) => {
+      toastService.error(
+        "There was an issue deleting the blog post. Please try again.",
+        error
       );
-      toastService.success("Blog post deleted.");
-      router.refresh();
-    } catch (error: unknown) {
-      toastService.error("Something went wrong", error);
-    } finally {
-      setLoading(false);
+    },
+    onSettled: () => {
+      void apiContext.blogPosts.invalidate();
       setOpen(false);
-    }
-  };
+    },
+  });
 
-  const onCopy = (id: string) => {
+  const onConfirm = () => deleteBlogPost.mutate({ blogPostId });
+  const onDeleteSelection = () => setOpen(true);
+
+  const onCopySelection = () => {
     navigator.clipboard
-      .writeText(id)
+      .writeText(blogPostId)
       .then(() => toastService.success("Blog post ID copied to clipboard."))
       .catch((err: unknown) =>
-        toastService.error("Failed to copy Blog post ID to clipboard.", err)
+        toastService.error("Failed to copy blog post ID to clipboard.", err)
       );
   };
 
@@ -60,8 +63,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={() => void onConfirm()}
-        loading={loading}
+        onConfirm={onConfirm}
+        loading={deleteBlogPost.isLoading}
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -72,30 +75,24 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(data.id)}>
+          <DropdownMenuItem
+            onClick={onCopySelection}
+            className="cursor-pointer"
+          >
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              router.push(
-                `/admin/${params.query.storeId as string}/blog-posts/${data.id}`
-              )
-            }
-          >
-            <Eye className="mr-2 h-4 w-4" /> View
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              router.push(
-                `/admin/${params.query.storeId as string}/blog-posts/${
-                  data.id
-                }/edit`
-              )
-            }
-          >
-            <Edit className="mr-2 h-4 w-4" /> Update
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+          <Link href={baseUrl}>
+            <DropdownMenuItem className="cursor-pointer">
+              <Eye className="mr-2 h-4 w-4" /> View
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`${baseUrl}/edit`}>
+            <DropdownMenuItem className="cursor-pointer">
+              <Edit className="mr-2 h-4 w-4" /> Update
+            </DropdownMenuItem>
+          </Link>
+
+          <DropdownMenuItem onClick={onDeleteSelection}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

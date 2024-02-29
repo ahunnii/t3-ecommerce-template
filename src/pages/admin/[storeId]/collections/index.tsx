@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import { type FC } from "react";
 
-import { CollectionsClient } from "~/modules/collections/client";
+import { CollectionsClient } from "~/modules/collections/admin/client";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 

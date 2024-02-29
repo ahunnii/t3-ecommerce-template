@@ -7,7 +7,6 @@ import { useRouter } from "next/router";
 import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import * as z from "zod";
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { Badge } from "~/components/ui/badge";
@@ -36,27 +35,16 @@ import { Separator } from "~/components/ui/separator";
 import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
+import { collectionFormSchema } from "../schema";
+import type { CollectionFormValues } from "../types";
 
-const formSchema = z.object({
-  name: z.string().min(2),
-  billboardId: z.string().min(1),
-  isFeatured: z.boolean().default(false),
-  products: z.array(
-    z.object({
-      id: z.string(),
-    })
-  ),
-});
-
-type CollectionFormValues = z.infer<typeof formSchema>;
-
-interface CollectionFormProps {
+type Props = {
   initialData: DetailedCollection | null;
   products: Product[];
   billboards: Billboard[];
-}
+};
 
-export const CollectionForm: React.FC<CollectionFormProps> = ({
+export const CollectionForm: React.FC<Props> = ({
   initialData,
   products,
   billboards,
@@ -71,7 +59,6 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   };
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const title = initialData ? "Edit collection" : "Create collection";
   const description = initialData
@@ -83,7 +70,7 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
   const action = initialData ? "Save changes" : "Create";
 
   const form = useForm<CollectionFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(collectionFormSchema),
     defaultValues: {
       name: initialData?.name ?? "",
       billboardId: initialData?.billboardId ?? undefined,
@@ -130,89 +117,71 @@ export const CollectionForm: React.FC<CollectionFormProps> = ({
     (product) => !form.getValues("products").includes(product)
   );
 
-  const { mutate: updateCollection } =
-    api.collections.updateCollection.useMutation({
-      onSuccess: () => {
-        toastService.success(toastMessage),
-          router.push(`/admin/${params.query.storeId as string}/collections`);
-      },
+  const updateCollection = api.collections.updateCollection.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong with updating your collection.",
+        error
+      ),
 
-      onError: (error: unknown) =>
-        toastService.error(
-          "Something went wrong with updating your collection.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        setLoading(false);
-        void apiContext.collections.invalidate();
-      },
-    });
+    onSettled: () => {
+      router.push(`/admin/${storeId}/collections`);
+      void apiContext.collections.invalidate();
+    },
+  });
 
-  const { mutate: createCollection } =
-    api.collections.createCollection.useMutation({
-      onSuccess: () => {
-        toastService.success(toastMessage),
-          router.push(`/admin/${params.query.storeId as string}/collections`);
-      },
-      onError: (error: unknown) =>
-        toastService.error(
-          "Something went wrong with creating your collection.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        setLoading(false);
-        void apiContext.collections.invalidate();
-      },
-    });
+  const createCollection = api.collections.createCollection.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong with creating your collection.",
+        error
+      ),
+    onSettled: () => {
+      router.push(`/admin/${storeId}/collections`);
+      void apiContext.collections.invalidate();
+    },
+  });
 
-  const { mutate: deleteCollection } =
-    api.collections.deleteCollection.useMutation({
-      onSuccess: () => {
-        toastService.success("Collection was successfully deleted"),
-          router.push(`/admin/${params.query.storeId as string}/collections`);
-      },
+  const deleteCollection = api.collections.deleteCollection.useMutation({
+    onSuccess: () =>
+      toastService.success("Collection was successfully deleted"),
+    onError: (error: unknown) =>
+      toastService.error(
+        "Something went wrong with creating your collection.",
+        error
+      ),
 
-      onError: (error: unknown) =>
-        toastService.error(
-          "Something went wrong with creating your collection.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        setLoading(false);
-        setOpen(false);
-        void apiContext.collections.invalidate();
-      },
-    });
+    onSettled: () => {
+      router.push(`/admin/${storeId}/collections`);
+      setOpen(false);
+      void apiContext.collections.invalidate();
+    },
+  });
 
   const onSubmit = (data: CollectionFormValues) => {
     if (initialData) {
-      updateCollection({
-        billboardId: data.billboardId,
-        isFeatured: data.isFeatured,
-        name: data.name,
-        collectionId: params?.query?.collectionId as string,
-        products: data.products,
+      updateCollection.mutate({
+        collectionId,
+        ...data,
       });
     } else {
-      createCollection({
-        storeId: params?.query?.storeId as string,
-        isFeatured: data.isFeatured,
-        name: data.name,
-        billboardId: data.billboardId,
-        products: data.products,
+      createCollection.mutate({
+        storeId,
+        ...data,
       });
     }
   };
 
   const onDelete = () => {
-    deleteCollection({
-      collectionId: params?.query?.collectionId as string,
-    });
+    deleteCollection.mutate({ collectionId });
   };
 
+  const loading =
+    updateCollection.isLoading ||
+    createCollection.isLoading ||
+    deleteCollection.isLoading;
   return (
     <>
       <AlertModal

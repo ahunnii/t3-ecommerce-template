@@ -9,7 +9,7 @@ import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
 import Link from "next/link";
-import { columns, type CategoryColumn } from "./columns";
+import { columns } from "./columns";
 
 import {
   Tooltip,
@@ -17,12 +17,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import type { CategoryColumn } from "../types";
 
-interface CategoriesClientProps {
-  data: CategoryColumn[];
-}
+type Props = { data: CategoryColumn[] };
 
-export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
+export const CategoriesClient: React.FC<Props> = ({ data }) => {
   const params = useRouter();
   const storeId = params.query.storeId as string;
 

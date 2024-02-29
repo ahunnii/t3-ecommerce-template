@@ -4,17 +4,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import type { BlogPostColumn } from "../types";
 import { CellAction } from "./cell-action";
-
-export type BlogPostColumn = {
-  id: string;
-  storeId: string;
-  title: string;
-
-  createdAt: string;
-  updatedAt: string;
-  published: boolean;
-};
 
 export const columns: ColumnDef<BlogPostColumn>[] = [
   {

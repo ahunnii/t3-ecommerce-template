@@ -9,8 +9,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import * as z from "zod";
-
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -24,7 +22,6 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
-// import ImageLoader from "~/components/ui/image-loader";
 
 import { Input } from "~/components/ui/input";
 
@@ -36,25 +33,12 @@ import MarkdownEditor from "~/components/common/inputs/markdown-editor";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import type { BlogPost } from "../types";
+import { blogPostFormSchema } from "../schema";
+import type { BlogPost, BlogPostFormValues } from "../types";
 
-const formSchema = z.object({
-  title: z.string().min(1),
-  featuredImg: z.string().optional(),
-  tags: z.array(z.object({ name: z.string(), id: z.string() })),
-  content: z.string(),
-  author: z.string().optional(),
-  slug: z.string().optional(),
-  published: z.boolean(),
-});
+type Props = { initialData: BlogPost | null };
 
-type BlogPostFormValues = z.infer<typeof formSchema>;
-
-interface BlogPostFormProps {
-  initialData: BlogPost | null;
-}
-
-export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
+export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
 
@@ -64,7 +48,6 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
   };
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const title = initialData ? "Edit blog post" : "Create blog post";
   const description = initialData ? "Edit a blog post." : "Add a new blog post";
@@ -84,82 +67,81 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
   };
 
   const form = useForm<BlogPostFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(blogPostFormSchema),
     defaultValues,
   });
 
   const apiContext = api.useContext();
 
-  const { mutate: updateBlogPost } = api.blogPosts.updateBlogPost.useMutation({
+  const updateBlogPost = api.blogPosts.updateBlogPost.useMutation({
     onSuccess: () => toastService.success(toastMessage),
     onError: (error) =>
       toastService.error(
-        "Something went wrong with updating. Please try again later.",
+        "Something went wrong with updating your post. Please try again.",
         error
       ),
-    onMutate: () => setLoading(true),
-    onSettled: async () => {
-      setLoading(false);
-      router.push(`/admin/${params.query.storeId as string}/blog-posts`);
-      await apiContext.blogPosts.invalidate();
-    },
-  });
-
-  const { mutate: createBlogPost } = api.blogPosts.createBlogPost.useMutation({
-    onSuccess: () => toastService.success(toastMessage),
-    onError: (error) =>
-      toastService.error(
-        "Something went wrong with creating. Please try again later.",
-        error
-      ),
-    onMutate: () => setLoading(true),
     onSettled: () => {
-      setLoading(false);
-      router.push(`/admin/${params.query.storeId as string}/blog-posts`);
+      router.push(`/admin/${storeId}/blog-posts`);
+      void apiContext.blogPosts.invalidate();
     },
   });
 
-  const { mutate: deleteBlogPost } = api.blogPosts.deleteBlogPost.useMutation({
+  const createBlogPost = api.blogPosts.createBlogPost.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
+    onError: (error) =>
+      toastService.error(
+        "Something went wrong with creating your post. Please try again.",
+        error
+      ),
+
+    onSettled: () => {
+      router.push(`/admin/${storeId}/blog-posts`);
+      void apiContext.blogPosts.invalidate();
+    },
+  });
+
+  const deleteBlogPost = api.blogPosts.deleteBlogPost.useMutation({
     onSuccess: () => toastService.success("Product deleted."),
     onError: (error) =>
       toastService.error(
         "Something went wrong with deleting. Please try again later.",
         error
       ),
-    onMutate: () => setLoading(true),
+
     onSettled: () => {
-      setLoading(false);
       setOpen(false);
-      router.push(`/admin/${params.query.storeId as string}/blog-posts`);
+      router.push(`/admin/${storeId}/blog-posts`);
+      void apiContext.blogPosts.invalidate();
     },
   });
 
+  const loading =
+    updateBlogPost.isLoading ||
+    createBlogPost.isLoading ||
+    deleteBlogPost.isLoading;
+
   const onSubmit = (data: BlogPostFormValues) => {
     if (initialData) {
-      updateBlogPost({
+      updateBlogPost.mutate({
         ...data,
         slug: data?.slug
           ? data?.slug.toLowerCase().replace(/ /g, "-")
           : undefined,
-        storeId: params.query.storeId as string,
-        blogPostId: params.query.blogPostId as string,
+        storeId,
+        blogPostId,
       });
     } else {
-      createBlogPost({
+      createBlogPost.mutate({
         ...data,
         slug: data?.slug
           ? data?.slug.toLowerCase().replace(/ /g, "-")
           : undefined,
-        storeId: params.query.storeId as string,
+        storeId,
       });
     }
   };
 
-  const onDelete = () => {
-    deleteBlogPost({
-      blogPostId: params.query.blogPostId as string,
-    });
-  };
+  const onDelete = () => deleteBlogPost.mutate({ blogPostId });
 
   const [tags, setTags] = useState<{ name: string; id: string }[]>(
     initialData?.tags ?? []
@@ -332,8 +314,6 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
                       sharing
                     </FormDescription>
                     <FormControl>
-                      {/* <>
-                    {!initialData?.images && <ImageLoader />} */}
                       <ImageUpload
                         value={field.value ? [field.value] : []}
                         disabled={loading}
@@ -342,7 +322,6 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({ initialData }) => {
                         }}
                         onRemove={() => form.setValue("featuredImg", "")}
                       />
-                      {/* </> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

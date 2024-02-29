@@ -11,13 +11,11 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
-import type { BillboardColumn } from "./columns";
+import type { BillboardColumn } from "../types";
 
-interface CellActionProps {
-  data: BillboardColumn;
-}
+type Props = { data: BillboardColumn };
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<Props> = ({ data }) => {
   const [open, setOpen] = useState(false);
 
   const params = useRouter();
@@ -27,22 +25,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const baseUrl = `/admin/${storeId}/billboards/${billboardId}`;
 
-  const { mutate: deleteBillboard, isLoading } =
-    api.billboards.deleteBillboard.useMutation({
-      onSuccess: () => toastService.success("Billboard deleted."),
-      onError: (error: unknown) => {
-        toastService.error(
-          "Make sure you removed all items using this billboard first.",
-          error
-        );
-      },
-      onSettled: () => {
-        void apiContext.billboards.invalidate();
-        setOpen(false);
-      },
-    });
+  const deleteBillboard = api.billboards.deleteBillboard.useMutation({
+    onSuccess: () => toastService.success("Billboard deleted."),
+    onError: (error: unknown) => {
+      toastService.error(
+        "Make sure you removed all items using this billboard first.",
+        error
+      );
+    },
+    onSettled: () => {
+      void apiContext.billboards.invalidate();
+      setOpen(false);
+    },
+  });
 
-  const onConfirm = () => deleteBillboard({ billboardId });
+  const onConfirm = () => deleteBillboard.mutate({ billboardId });
   const onDeleteSelection = () => setOpen(true);
 
   const onCopySelection = () => {
@@ -60,7 +57,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onConfirm}
-        loading={isLoading}
+        loading={deleteBillboard.isLoading}
       />
       <Dropdown.DropdownMenu>
         <Dropdown.DropdownMenuTrigger asChild>

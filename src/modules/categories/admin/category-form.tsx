@@ -3,11 +3,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Attribute, Billboard, Category } from "@prisma/client";
+import type { Billboard } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-
-import * as z from "zod";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -34,33 +32,15 @@ import { Separator } from "~/components/ui/separator";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
+import { categoryFormSchema } from "../schema";
+import type { CategoryFormValues, SingleCategory } from "../types";
 
-const formSchema = z.object({
-  name: z.string().min(2),
-  billboardId: z.string(),
-  attributes: z.array(
-    z.object({
-      name: z.string().min(2),
-      values: z.string().min(2),
-    })
-  ),
-});
-
-type CategoryFormValues = z.infer<typeof formSchema>;
-
-interface CategoryFormProps {
-  initialData:
-    | (Category & {
-        attributes: Attribute[];
-      })
-    | null;
+type Props = {
+  initialData: SingleCategory | null;
   billboards: Billboard[];
-}
+};
 
-export const CategoryForm: React.FC<CategoryFormProps> = ({
-  initialData,
-  billboards,
-}) => {
+export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const apiContext = api.useContext();
@@ -71,7 +51,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   };
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const title = initialData ? "Edit category" : "Create category";
   const description = initialData ? "Edit a category." : "Add a new category";
@@ -79,7 +58,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const action = initialData ? "Save changes" : "Create";
 
   const form = useForm<CategoryFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(categoryFormSchema),
     defaultValues: {
       name: initialData?.name ?? "",
       billboardId: initialData?.billboardId ?? undefined,
@@ -92,46 +71,42 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     name: "attributes",
   });
 
-  const { mutate: updateCategory } = api.categories.updateCategory.useMutation({
+  const updateCategory = api.categories.updateCategory.useMutation({
     onSuccess: () => toastService.success(toastMessage),
     onError: (error) =>
       toastService.error(
         "Something went wrong with updating the category.",
         error
       ),
-    onMutate: () => setLoading(true),
+
     onSettled: () => {
-      setLoading(false);
       router.push(`/admin/${storeId}/categories`);
       void apiContext.categories.invalidate();
     },
   });
 
-  const { mutate: createCategory } = api.categories.createCategory.useMutation({
+  const createCategory = api.categories.createCategory.useMutation({
     onSuccess: () => toastService.success(toastMessage),
-    onError: (error) =>
+    onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with creating the category.",
         error
       ),
-    onMutate: () => setLoading(true),
+
     onSettled: () => {
-      setLoading(false);
       router.push(`/admin/${storeId}/categories`);
       void apiContext.categories.invalidate();
     },
   });
 
-  const { mutate: deleteCategory } = api.categories.deleteCategory.useMutation({
+  const deleteCategory = api.categories.deleteCategory.useMutation({
     onSuccess: () => toastService.success("Category was successfully deleted."),
-    onError: (error) =>
+    onError: (error: unknown) =>
       toastService.error(
         "Make sure you remove all products using this category first before deleting.",
         error
       ),
-    onMutate: () => setLoading(true),
     onSettled: () => {
-      setLoading(false);
       setOpen(false);
       router.push(`/admin/${storeId}/categories`);
       void apiContext.categories.invalidate();
@@ -140,34 +115,34 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 
   const onSubmit = (data: CategoryFormValues) => {
     if (initialData) {
-      updateCategory({
+      updateCategory.mutate({
         storeId,
         categoryId,
-        billboardId: data?.billboardId ?? "",
-        name: data.name,
+        ...data,
+
         attributes: data.attributes.map((attribute) => ({
           ...attribute,
-          storeId: params?.query?.storeId as string,
+          storeId,
         })),
       });
     } else {
-      createCategory({
+      createCategory.mutate({
         storeId,
-        name: data.name,
-        billboardId: data?.billboardId ?? "",
+        ...data,
         attributes: data.attributes.map((attribute) => ({
           ...attribute,
-          storeId: params?.query?.storeId as string,
+          storeId,
         })),
       });
     }
   };
 
-  const onDelete = () => {
-    deleteCategory({
-      categoryId: params?.query?.categoryId as string,
-    });
-  };
+  const onDelete = () => deleteCategory.mutate({ categoryId });
+
+  const loading =
+    updateCategory.isLoading ||
+    createCategory.isLoading ||
+    deleteCategory.isLoading;
 
   return (
     <>

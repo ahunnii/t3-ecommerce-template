@@ -11,13 +11,11 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
-import type { CategoryColumn } from "./columns";
+import type { CategoryColumn } from "../types";
 
-interface CellActionProps {
-  data: CategoryColumn;
-}
+type Props = { data: CategoryColumn };
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<Props> = ({ data }) => {
   const [open, setOpen] = useState(false);
 
   const params = useRouter();
@@ -27,20 +25,19 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const baseUrl = `/admin/${storeId}/categories/${categoryId}`;
 
-  const { mutate: deleteCategory, isLoading } =
-    api.categories.deleteCategory.useMutation({
-      onSuccess: () => toastService.success("Category deleted."),
-      onError: (error: unknown) => {
-        toastService.error(
-          "Make sure you removed all products using this category first.",
-          error
-        );
-      },
-      onSettled: () => {
-        setOpen(false);
-        void apiContext.categories.invalidate();
-      },
-    });
+  const deleteCategory = api.categories.deleteCategory.useMutation({
+    onSuccess: () => toastService.success("Category deleted."),
+    onError: (error: unknown) => {
+      toastService.error(
+        "Make sure you removed all products using this category first.",
+        error
+      );
+    },
+    onSettled: () => {
+      setOpen(false);
+      void apiContext.categories.invalidate();
+    },
+  });
 
   const onCopySelection = () => {
     navigator.clipboard
@@ -51,7 +48,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       );
   };
 
-  const onConfirm = () => deleteCategory({ categoryId });
+  const onConfirm = () => deleteCategory.mutate({ categoryId });
   const onDeleteSelection = () => setOpen(true);
 
   return (
@@ -60,7 +57,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onConfirm}
-        loading={isLoading}
+        loading={deleteCategory.isLoading}
       />
       <Dropdown.DropdownMenu>
         <Dropdown.DropdownMenuTrigger asChild>

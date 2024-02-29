@@ -17,39 +17,37 @@ import { api } from "~/utils/api";
 
 import Link from "next/link";
 import { toastService } from "~/services/toast";
-import type { CollectionColumn } from "./columns";
+import type { CollectionColumn } from "../types";
 
-interface CellActionProps {
+type Props = {
   data: CollectionColumn;
-}
+};
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<Props> = ({ data }) => {
   const params = useRouter();
   const apiContext = api.useContext();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const { storeId } = params.query as { storeId: string };
   const collectionId = data.id;
 
   const baseUrl = `/admin/${storeId}/collections/${collectionId}`;
 
-  const { mutate: deleteCollection } =
-    api.collections.deleteCollection.useMutation({
-      onSuccess: () =>
-        toastService.success("Collection was successfully deleted"),
-      onError: (error) =>
-        toastService.error(
-          "Make sure you removed all products using this collection first.",
-          error
-        ),
-      onMutate: () => setLoading(true),
-      onSettled: () => {
-        void apiContext.collections.invalidate();
-        setLoading(false);
-        setOpen(false);
-      },
-    });
+  const deleteCollection = api.collections.deleteCollection.useMutation({
+    onSuccess: () =>
+      toastService.success("Collection was successfully deleted"),
+    onError: (error) =>
+      toastService.error(
+        "Make sure you removed all products using this collection first.",
+        error
+      ),
+
+    onSettled: () => {
+      void apiContext.collections.invalidate();
+
+      setOpen(false);
+    },
+  });
 
   const onCopySelection = () => {
     navigator.clipboard
@@ -60,7 +58,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       );
   };
 
-  const onConfirm = () => deleteCollection({ collectionId });
+  const onConfirm = () => deleteCollection.mutate({ collectionId });
   const onDeleteSelection = () => setOpen(true);
 
   return (
@@ -69,7 +67,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={onConfirm}
-        loading={loading}
+        loading={deleteCollection.isLoading}
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
