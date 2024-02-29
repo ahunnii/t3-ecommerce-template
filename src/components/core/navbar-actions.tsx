@@ -23,10 +23,11 @@ const NavbarActions = () => {
 
   const { data: session } = useSession();
 
-  const { data: store } = api.store.getStore.useQuery({});
+  const getStore = api.store.getStore.useQuery({}, { enabled: false });
 
   useEffect(() => {
     setIsMounted(true);
+    void getStore.refetch();
   }, []);
 
   const router = useRouter();
@@ -76,7 +77,7 @@ const NavbarActions = () => {
             <DropdownMenuItem onClick={() => router.push("/account")}>
               Profile
             </DropdownMenuItem>
-            {session?.user?.id === store?.userId ? (
+            {session?.user?.id === getStore?.data?.userId ? (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/admin")}>

@@ -25,7 +25,9 @@ export const InsideTrendAnomaly = () => {
             src="/custom/ta_nanako.png"
             fill
             alt="logo"
+            priority
             className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
       </div>

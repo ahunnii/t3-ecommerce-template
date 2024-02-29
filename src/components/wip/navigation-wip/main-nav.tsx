@@ -33,7 +33,7 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
           {links.map((navlink, idx) => {
             if (navlink.href)
               return (
-                <NavigationMenuItem key={idx}>
+                <NavigationMenuItem key={idx + "_main"}>
                   <NavigationMenuLink
                     href={navlink.href}
                     active={pathname === navlink.href}

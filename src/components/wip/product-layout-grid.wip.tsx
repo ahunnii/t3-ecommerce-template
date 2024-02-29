@@ -1,9 +1,9 @@
 "use client";
-import { Prisma } from "@prisma/client";
 import { motion } from "framer-motion";
+import _uniqueId from "lodash/uniqueId";
 import { Expand, ShoppingCart } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 
 import { DirectionAwareHover } from "./direction-aware-card.wip";
 
@@ -48,7 +48,7 @@ export const LayoutGrid = ({
       )}
     >
       {cards.map((card, i) => (
-        <div key={i} className={cn(card.className, "")}>
+        <div key={_uniqueId("card-")} className={cn(card.className, "")}>
           <motion.div
             onClick={() => handleClick(card)}
             className={cn(
@@ -62,9 +62,6 @@ export const LayoutGrid = ({
             )}
             layout
           >
-            {/* {selected?.id === card.id && (
-              <SelectedProduct selected={selected} />
-            )} */}
             <SelectedProduct selected={card} />
           </motion.div>
         </div>
@@ -173,6 +170,7 @@ const SelectedProduct = ({ selected }: { selected: Card }) => {
   const Actions = (
     <ProductCardQuickActions
       actions={[quickActions.preview, quickActions.addToCart]}
+      productId={selected?.product?.id}
     />
   );
 
@@ -202,20 +200,25 @@ type QuickAction = {
   renderIf: boolean;
 };
 
-const ProductCardQuickActions = ({ actions }: { actions: QuickAction[] }) => {
+const ProductCardQuickActions = ({
+  actions,
+  productId,
+}: {
+  actions: QuickAction[];
+  productId: string;
+}) => {
   return (
     <div className="flex w-full justify-center gap-x-6 ">
       {actions.map((action, index) => (
-        <>
+        <Fragment key={_uniqueId("action-")}>
           {action?.renderIf && (
             <IconButton
-              key={index}
               onClick={action.onClick}
               icon={action.icon}
               className="size-14 "
             />
           )}
-        </>
+        </Fragment>
       ))}
     </div>
   );

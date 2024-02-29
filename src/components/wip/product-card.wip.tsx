@@ -3,7 +3,7 @@ import { Expand, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 
 import { useRouter } from "next/navigation";
-import { useState, type MouseEventHandler } from "react";
+import { Fragment, useState, type MouseEventHandler } from "react";
 
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
@@ -123,6 +123,7 @@ const ProductCardImage = ({ children, ...props }: TProductCardImage) => {
           fill
           className={cn(imageStyle, "")}
           onClick={props.goToProduct}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <Image
           src={featuredImage ?? "/placeholder-image.webp"}
@@ -133,6 +134,7 @@ const ProductCardImage = ({ children, ...props }: TProductCardImage) => {
             props.hovered ? "opacity-0" : "opacity-100"
           )}
           onClick={props.goToProduct}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </>
 
@@ -192,15 +194,11 @@ const ProductCardQuickActions = ({ actions }: { actions: QuickAction[] }) => {
     <div className="absolute bottom-5 z-50 w-full px-6 opacity-0 transition group-hover:opacity-100">
       <div className="flex justify-center gap-x-6">
         {actions.map((action, index) => (
-          <>
+          <Fragment key={index}>
             {action?.renderIf && (
-              <IconButton
-                key={index}
-                onClick={action.onClick}
-                icon={action.icon}
-              />
+              <IconButton onClick={action.onClick} icon={action.icon} />
             )}
-          </>
+          </Fragment>
         ))}
       </div>
     </div>

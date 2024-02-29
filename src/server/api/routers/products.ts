@@ -116,6 +116,7 @@ export const productsRouter = createTRPCRouter({
         storeId: z.string().optional(),
         isFeatured: z.boolean().optional(),
         collectionId: z.string().optional(),
+        isArchived: z.boolean().optional(),
       })
     )
     .query(({ ctx, input }) => {
@@ -129,6 +130,7 @@ export const productsRouter = createTRPCRouter({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured ?? undefined,
+          isArchived: input.isArchived ?? false,
           collections: input.collectionId
             ? {
                 some: {

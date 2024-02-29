@@ -11,7 +11,7 @@ import MainNav from "./main-nav";
 import NavbarActions from "./navbar-actions";
 
 import { useTheme } from "next-themes";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { storeTheme } from "~/data/config.custom";
 import { MobileNav } from "./mobile-nav";
 
@@ -36,9 +36,16 @@ const Navbar = ({
   navStyles?: string;
   linkStyles?: string;
 }) => {
-  const { data: collections } = api.collections.getAllCollections.useQuery({
-    storeId: env.NEXT_PUBLIC_STORE_ID,
-  });
+  const getAllCollections = api.collections.getAllCollections.useQuery(
+    {
+      storeId: env.NEXT_PUBLIC_STORE_ID,
+    },
+    {
+      enabled: false,
+    }
+  );
+
+  useEffect(() => void getAllCollections.refetch(), []);
 
   const navigationLinks = useMemo(() => {
     return [
@@ -77,11 +84,11 @@ const Navbar = ({
         ],
       },
 
-      collections && {
+      getAllCollections?.data && {
         title: "Collections",
         pathname: "/collections",
         links: [
-          ...collections?.map((collection) => ({
+          ...getAllCollections?.data?.map((collection) => ({
             title: collection?.name,
             href: `/collections/${collection?.id}`,
             description: "",
@@ -102,7 +109,7 @@ const Navbar = ({
         href: "/contact-us",
       },
     ] as SiteLinks[];
-  }, [collections]);
+  }, [getAllCollections?.data]);
 
   return (
     <div
@@ -115,7 +122,7 @@ const Navbar = ({
         <div className="h-18 relative flex w-full items-center justify-between px-4 sm:px-6 lg:px-8 ">
           <div className="flex items-center justify-start max-md:w-2/3  md:flex-row-reverse">
             <div className="max-md:w-1/2">
-              {navigationLinks && collections && (
+              {navigationLinks && getAllCollections?.data && (
                 <>
                   <MobileNav links={navigationLinks} />
                   <MainNav links={navigationLinks} />

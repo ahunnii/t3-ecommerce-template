@@ -24,9 +24,11 @@ const NavbarActions = ({ className }: { className?: string }) => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();
 
-  const { data: store } = api.store.getStore.useQuery({});
+  const getStore = api.store.getStore.useQuery({}, { enabled: false });
+
   useEffect(() => {
     setIsMounted(true);
+    void getStore.refetch();
   }, []);
 
   const router = useRouter();
@@ -80,7 +82,7 @@ const NavbarActions = ({ className }: { className?: string }) => {
             <DropdownMenuItem onClick={() => router.push("/account")}>
               Profile
             </DropdownMenuItem>
-            {sessionData?.user?.id === store?.userId ||
+            {sessionData?.user?.id === getStore?.data?.userId ||
             sessionData?.user?.role === "ADMIN" ? (
               <>
                 <DropdownMenuItem asChild>
