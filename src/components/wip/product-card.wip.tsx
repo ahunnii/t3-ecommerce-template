@@ -109,6 +109,7 @@ const ProductCardImage = ({ children, ...props }: TProductCardImage) => {
   const fallbackImage =
     props.images?.[1]?.url ??
     props.images?.[0]?.url ??
+    props?.featuredImage ??
     "/placeholder-image.webp";
 
   const imageStyle =
@@ -117,14 +118,14 @@ const ProductCardImage = ({ children, ...props }: TProductCardImage) => {
     <div className="relative aspect-[1/1.6] rounded-xl bg-white/70">
       <>
         <Image
-          src={fallbackImage}
+          src={fallbackImage ?? featuredImage ?? "/placeholder-image.webp"}
           alt={props.name}
           fill
           className={cn(imageStyle, "")}
           onClick={props.goToProduct}
         />
         <Image
-          src={featuredImage}
+          src={featuredImage ?? "/placeholder-image.webp"}
           alt={props.name}
           fill
           className={cn(

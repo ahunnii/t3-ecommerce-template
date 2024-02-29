@@ -11,6 +11,7 @@ import useCart from "~/modules/cart/hooks/use-cart";
 import type { CartItem as TCartItem } from "~/types";
 
 import { toastService } from "~/services/toast";
+import { cn } from "~/utils/styles";
 import CartItemQuantity from "./cart-item-quantity";
 import CartItemVariant from "./cart-item-variant";
 
@@ -37,7 +38,11 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
         <div className="relative h-24 w-24 overflow-hidden rounded-md sm:h-48 sm:w-48">
           <Image
             fill
-            src={data?.product.images[0]?.url ?? ""}
+            src={
+              data?.product?.featuredImage ??
+              data?.product.images[0]?.url ??
+              "/placeholder-image.webp"
+            }
             alt=""
             className="object-cover object-center"
           />
@@ -51,10 +56,29 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
               <p className="col-span-2 text-lg font-semibold text-black max-sm:line-clamp-1 md:col-span-3">
                 {data.product.name}
               </p>
-              <Currency
-                value={data.product.price}
+
+              <div className="flex flex-col">
+                {data?.discountBundle && (
+                  <Currency
+                    value={data?.discountBundle.price}
+                    className="font-extrabold text-slate-800"
+                  />
+                )}
+
+                <Currency
+                  value={data?.variant?.price ?? data.product.price}
+                  className={cn(
+                    // "col-span-2 w-full items-center  py-1 text-right md:col-span-1",
+                    data?.discountBundle &&
+                      "font-medium text-muted-foreground line-through"
+                  )}
+                />
+              </div>
+
+              {/* <Currency
+                value={data?.variant?.price ?? data.product.price}
                 className="col-span-2 w-full items-center  py-1 text-right md:col-span-1"
-              />
+              /> */}
               <CartItemVariant variant={data?.variant ?? null} />
             </div>
             <div className="relative items-center justify-between pr-9 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">

@@ -15,7 +15,11 @@ const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
       <div className="col-span-3">
         <div className="relative aspect-square w-20">
           <Image
-            src={cartItem.product?.images[0]?.url ?? ""}
+            src={
+              cartItem?.product?.featuredImage ??
+              cartItem.product?.images[0]?.url ??
+              "/placeholder-image.webp"
+            }
             layout="fill"
             objectFit="cover"
             alt="product"
@@ -43,7 +47,27 @@ const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
         </div>
         {/* Price of the item */}
         <div className="mt-3 flex items-end justify-between">
-          <Currency value={cartItem.product?.price} />
+          <div className="flex gap-2">
+            {cartItem?.discountBundle && (
+              <Currency
+                value={cartItem?.discountBundle.price}
+                // className="font-extrabold text-slate-800"
+              />
+            )}
+
+            <Currency
+              value={cartItem?.variant?.price ?? cartItem.product.price}
+              className={cn(
+                // "col-span-2 w-full items-center  py-1 text-right md:col-span-1",
+                cartItem?.discountBundle &&
+                  "font-medium text-muted-foreground line-through"
+              )}
+            />
+          </div>
+
+          {/* <Currency
+            value={cartItem?.variant?.price ?? cartItem.product?.price}
+          /> */}
         </div>
       </div>
     </div>

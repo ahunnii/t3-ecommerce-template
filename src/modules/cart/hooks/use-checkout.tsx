@@ -14,7 +14,34 @@ const useCheckout = () => {
   const { removeAll, cartItems } = useCart((state) => state);
 
   const totalPrice = cartItems.reduce((total, item) => {
-    return total + Number(item.product.price) * Number(item.quantity);
+    return (
+      total +
+      Number(item?.variant?.price ?? item.product.price) * Number(item.quantity)
+    );
+  }, 0);
+
+  const totalDiscount = cartItems.reduce((total, item) => {
+    return (
+      total +
+      Number(
+        item?.discountBundle
+          ? item?.discountBundle?.price
+          : item?.variant?.price ?? item.product.price
+      ) *
+        Number(item.quantity)
+    );
+  }, 0);
+
+  const totalDiscountDifference = cartItems.reduce((total, item) => {
+    return (
+      total +
+      (item?.discountBundle
+        ? Number(
+            (item?.variant?.price ?? item.product.price) -
+              item?.discountBundle?.price ?? 0
+          ) * Number(item.quantity)
+        : 0)
+    );
   }, 0);
 
   const { data: store } = api.store.getStore.useQuery({});
@@ -86,6 +113,8 @@ const useCheckout = () => {
 
   return {
     totalPrice,
+    totalDiscount,
+    totalDiscountDifference,
     calculateShippingCost,
     onCheckout,
     checkIfCheckoutWasSuccessful,

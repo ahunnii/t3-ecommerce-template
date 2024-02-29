@@ -1,4 +1,4 @@
-import type { Prisma, Product, ShippingType } from "@prisma/client";
+import type { Discount, Prisma, Product, ShippingType } from "@prisma/client";
 
 // export interface Product {
 //   id: string;
@@ -60,6 +60,7 @@ export interface Attribute {
 
 export interface CartItem {
   product: DetailedProductFull;
+  discountBundle?: { price: number; discount: Discount | null } | null;
   variant: Variation | null;
   quantity: number;
 }

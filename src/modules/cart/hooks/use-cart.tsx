@@ -40,7 +40,9 @@ const useCart = create(
       getTotal: () => {
         let cost = 0;
         get().cartItems.forEach((item) => {
-          cost += Number(item.quantity * item.product?.price);
+          cost += Number(
+            item.quantity * (item.variant?.price ?? item.product.price)
+          );
         });
         return cost;
       },

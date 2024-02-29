@@ -8,7 +8,13 @@ import { cn } from "~/utils/styles";
 import useCheckout from "../hooks/use-checkout";
 
 const Summary = ({ cartSize }: { cartSize: number }) => {
-  const { onCheckout, totalPrice, calculateShippingCost } = useCheckout();
+  const {
+    onCheckout,
+    totalPrice,
+    calculateShippingCost,
+    totalDiscount,
+    totalDiscountDifference,
+  } = useCheckout();
   const config = useConfig();
 
   return (
@@ -35,6 +41,27 @@ const Summary = ({ cartSize }: { cartSize: number }) => {
           </div>
           <Currency value={totalPrice} className={cn("", config.cart.price)} />
         </div>
+
+        {totalDiscountDifference !== 0 && (
+          <div className="flex items-center justify-between">
+            <div
+              className={cn(
+                "text-base font-medium text-gray-500",
+                config.cart.subheader
+              )}
+            >
+              Discounts
+            </div>
+            <div className="flex">
+              <span className="font-bold text-white"> - </span>
+              <Currency
+                value={totalDiscountDifference}
+                className={cn("", config.cart.price)}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           {cartSize > 0 && (
             <>
@@ -69,7 +96,7 @@ const Summary = ({ cartSize }: { cartSize: number }) => {
             *Order total
           </div>
           <Currency
-            value={totalPrice + calculateShippingCost}
+            value={(totalDiscount ?? totalPrice) + calculateShippingCost}
             className={cn("", config.cart.price)}
           />
         </div>

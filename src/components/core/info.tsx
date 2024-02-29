@@ -40,22 +40,28 @@ const Info: React.FC<InfoProps> = (props) => {
   const [variant, setVariant] = useState<Variation | null>(null);
 
   const [quantity, setQuantity] = useState<number>(0);
-  const cart = useCart();
-
-  const onAddToCart = () => {
-    cart.addCartItem({ product: props?.data, variant: variant!, quantity });
-  };
-
-  const textStyles = infoVariants({ variant: props?.variant ?? "default" });
-  const btnStyles = infoVariants({ button: props?.button ?? "default" });
-
-  // console.log({ product: data, variant: variant!, quantity });
 
   const discount = useMemo(() => {
     return props.discounts?.length > 0
       ? getBestDiscount(variant?.price ?? props?.data?.price, props.discounts)
       : null;
   }, [props.discounts, props?.data?.price, variant?.price]);
+
+  const cart = useCart();
+
+  const onAddToCart = () => {
+    cart.addCartItem({
+      product: props?.data,
+      variant: variant!,
+      quantity,
+      discountBundle: discount,
+    });
+  };
+
+  const textStyles = infoVariants({ variant: props?.variant ?? "default" });
+  const btnStyles = infoVariants({ button: props?.button ?? "default" });
+
+  // console.log({ product: data, variant: variant!, quantity });
 
   return (
     <div>
