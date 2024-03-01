@@ -1,4 +1,6 @@
-import type { Prisma, Product } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import type * as z from "zod";
+import { type productFormSchema } from "./schema";
 
 export type SingleProduct = Prisma.ProductGetPayload<{
   include: {
@@ -25,3 +27,5 @@ export type CategoryProduct = Prisma.ProductGetPayload<{
     };
   };
 }>;
+
+export type ProductFormValues = z.infer<typeof productFormSchema>;

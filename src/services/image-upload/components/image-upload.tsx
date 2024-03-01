@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Trash } from "lucide-react";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
+import { cn } from "~/utils/styles";
 import { CloudinaryUpload } from "./cloudinary-upload";
 
 interface ImageUploadProps {
@@ -35,11 +36,44 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-4">
+      {/* <div className="mb-4 flex items-center gap-4">
         {value.map((url) => (
           <div
             key={url}
             className="relative h-[200px] w-[200px] overflow-hidden rounded-md"
+          >
+            <div className="absolute right-2 top-2 z-10">
+              <Button
+                type="button"
+                onClick={() => onRemove(url)}
+                variant="destructive"
+                size="sm"
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <Image
+              fill
+              className="object-cover"
+              alt="Image"
+              src={url}
+              sizes=" (max-width: 200px) 100vw, 200px"
+              priority
+              loading="eager"
+            />
+          </div>
+        ))}
+      </div> */}
+
+      <div className="mb-4 flex flex-wrap items-center gap-4">
+        {value.map((url) => (
+          <div
+            key={url}
+            className={cn(
+              " relative h-48 w-48 overflow-hidden rounded-md",
+              value?.length > 1 && "h-32 w-32"
+            )}
           >
             <div className="absolute right-2 top-2 z-10">
               <Button

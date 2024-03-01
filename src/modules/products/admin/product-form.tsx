@@ -15,7 +15,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
-import * as z from "zod";
 import {
   Table,
   TableBody,
@@ -56,62 +55,16 @@ import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import MarkdownEditor from "../../../components/common/inputs/markdown-editor";
-import type { SingleProduct } from "../types";
+import { productFormSchema } from "../schema";
+import type { ProductFormValues, SingleProduct } from "../types";
 
-const formSchema = z.object({
-  name: z.string().min(1),
-  images: z.object({ url: z.string() }).array(),
-  price: z.coerce.number().min(1),
-  categoryId: z.string().min(1),
-
-  isFeatured: z.boolean().default(false).optional(),
-  isArchived: z.boolean().default(false).optional(),
-  description: z.string().optional(),
-  quantity: z.coerce.number().min(1).default(1),
-
-  variants: z.array(
-    z.object({
-      names: z.string().min(1),
-      values: z.string().min(1),
-      price: z.coerce.number().min(0),
-      quantity: z.coerce.number().min(0),
-    })
-  ),
-  tags: z.array(z.object({ name: z.string(), id: z.string() })),
-  materials: z.array(z.object({ name: z.string(), id: z.string() })),
-
-  featuredImage: z.string().min(1),
-  shippingCost: z.coerce.number().min(0).optional(),
-  shippingType: z.enum([
-    "FLAT_RATE" as ShippingType,
-    "FREE" as ShippingType,
-    "VARIABLE" as ShippingType,
-  ]),
-  weight: z.coerce.number().min(0).optional(),
-  length: z.coerce.number().min(0).optional(),
-  width: z.coerce.number().min(0).optional(),
-  height: z.coerce.number().min(0).optional(),
-  estimatedCompletion: z.coerce.number().min(0).int(),
-  productType: z.enum([
-    "PHYSICAL" as ProductType,
-    "DIGITAL" as ShippingType,
-    "SERVICE" as ShippingType,
-  ]),
-  weight_oz: z.coerce.number().min(0).optional(),
-  weight_lb: z.coerce.number().min(0).optional(),
-});
-
-type ProductFormValues = z.infer<typeof formSchema>;
 type ExtendedCategory = Category & { attributes: Attribute[] };
-interface ProductFormProps {
+type Props = {
   initialData: SingleProduct | null;
   categories: ExtendedCategory[];
-}
+};
 
-export const ProductForm: React.FC<ProductFormProps> = ({
-  initialData,
-  categories,
-}) => {
+export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
   const params = useRouter();
   const router = useNavigationRouter();
 
@@ -121,7 +74,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const title = initialData ? "Edit product" : "Create product";
   const description = initialData ? "Edit a product." : "Add a new product";
@@ -161,7 +113,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(productFormSchema),
     defaultValues,
   });
   const { categoryId: category, shippingType } = form.watch();
@@ -173,80 +125,69 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       ? categories.filter((cat) => cat.id === category)[0]!.attributes
       : [];
 
-  const { mutate: updateProduct } = api.products.updateProduct.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/products`);
-      toastService.success(toastMessage);
-    },
+  const updateProduct = api.products.updateProduct.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with updating the product",
         error
       ),
-    onMutate: () => setLoading(true),
-    onSettled: async () => {
-      setLoading(false);
-      await apiContext.products.getProduct.invalidate();
+    onSettled: () => {
+      router.push(`/admin/${storeId}/products`);
+      void apiContext.products.getProduct.invalidate();
     },
   });
 
-  const { mutate: createProduct } = api.products.createProduct.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/products`);
-      toastService.success(toastMessage);
-    },
+  const createProduct = api.products.createProduct.useMutation({
+    onSuccess: () => toastService.success(toastMessage),
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with creating the product",
         error
       ),
-    onMutate: () => setLoading(true),
     onSettled: () => {
-      setLoading(false);
+      router.push(`/admin/${storeId}/products`);
       void apiContext.products.invalidate();
     },
   });
 
-  const { mutate: deleteProduct } = api.products.deleteProduct.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${params.query.storeId as string}/products`);
-      toastService.success("Product was successfully deleted");
-    },
+  const deleteProduct = api.products.deleteProduct.useMutation({
+    onSuccess: () => toastService.success("Product was successfully deleted"),
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with deleting the product",
         error
       ),
-    onMutate: () => setLoading(true),
     onSettled: () => {
-      setLoading(false);
       setOpen(false);
+      router.push(`/admin/${storeId}/products`);
       void apiContext.products.invalidate();
     },
   });
 
   const onSubmit = (data: ProductFormValues) => {
     if (initialData) {
-      updateProduct({
+      updateProduct.mutate({
         ...data,
         weight: Number(data.weight_oz) + Number(data.weight_lb) * 16,
-        storeId: params.query.storeId as string,
-        productId: params.query.productId as string,
+        storeId,
+        productId,
       });
     } else {
-      createProduct({
+      createProduct.mutate({
         ...data,
         weight: Number(data.weight_oz) + Number(data.weight_lb) * 16,
-        storeId: params.query.storeId as string,
+        storeId,
       });
     }
   };
 
-  const onDelete = () => {
-    deleteProduct({
-      productId: params.query.productId as string,
-    });
-  };
+  const onDelete = () => deleteProduct.mutate({ productId });
+
+  const loading =
+    updateProduct.isLoading ||
+    createProduct.isLoading ||
+    deleteProduct.isLoading;
 
   const handleGenerateVariations = () => {
     function splitValues(attribute: Attribute): string[] {
@@ -499,12 +440,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       <FormItem className="col-span-full">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          {/* <Textarea
-                      disabled={loading}
-                      placeholder="e.g. This product is a ...."
-                      {...field}
-                    /> */}
-
                           <MarkdownEditor
                             description={field.value}
                             onChange={field.onChange}
@@ -569,7 +504,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     name="tags"
                     render={({ field }) => (
                       <FormItem className="col-span-full flex flex-col items-start">
-                        <FormLabel className="text-left">Tags</FormLabel>
+                        <FormLabel className="text-left">
+                          Tags (optional)
+                        </FormLabel>
                         <FormControl>
                           <TagInput
                             {...field}
@@ -595,7 +532,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     name="materials"
                     render={({ field }) => (
                       <FormItem className="col-span-full flex flex-col items-start">
-                        <FormLabel className="text-left">Materials</FormLabel>
+                        <FormLabel className="text-left">
+                          Materials (optional)
+                        </FormLabel>
                         <FormControl>
                           <TagInput
                             {...field}
@@ -993,7 +932,37 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex w-full flex-col lg:w-4/12">
+            <div className="flex w-full flex-col space-y-8 lg:w-4/12">
+              <FormField
+                control={form.control}
+                name="featuredImage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Featured Image</FormLabel>{" "}
+                    <FormDescription>
+                      Used to represent your product during checkout, social
+                      sharing and more.
+                    </FormDescription>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value ? [field.value] : []}
+                        disabled={loading}
+                        onChange={(url) => {
+                          form.setValue("images", [
+                            ...form.watch("images"),
+                            { url },
+                          ]);
+
+                          field.onChange(url);
+                          return field.onChange(url);
+                        }}
+                        onRemove={() => form.setValue("featuredImage", "")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="images"
@@ -1025,34 +994,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <FormMessage />
                   </FormItem>
                 )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="featuredImage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Featured Image</FormLabel>{" "}
-                    <FormDescription>
-                      Used to represent your product during checkout, social
-                      sharing and more.
-                    </FormDescription>
-                    <FormControl>
-                      {/* <>
-                    {!initialData?.images && <ImageLoader />} */}
-                      <ImageUpload
-                        value={field.value ? [field.value] : []}
-                        disabled={loading}
-                        onChange={(url) => {
-                          return field.onChange(url);
-                        }}
-                        onRemove={() => form.setValue("featuredImage", "")}
-                      />
-                      {/* </> */}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
+              />
             </div>
           </section>
 

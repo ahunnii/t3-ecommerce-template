@@ -1,8 +1,8 @@
 import { useParams } from "next/navigation";
 
-import Info from "~/components/core/info";
 import PageLoader from "~/components/ui/page-loader";
 import Gallery from "~/modules/gallery/core";
+import Info from "~/modules/products/core/info";
 import ProductList from "~/modules/products/core/product-list";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
@@ -12,6 +12,7 @@ import { api } from "~/utils/api";
 import Head from "next/head";
 import Breadcrumbs from "~/components/core/breadcrumbs";
 
+import { ProductGallery } from "~/modules/products/core/product-gallery";
 import type { DetailedProductFull } from "~/types";
 
 export const SingleProductPage = ({
@@ -80,7 +81,7 @@ export const SingleProductPage = ({
         {!isLoading && product && (
           <div className="px-4 pb-5 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
-              <Gallery images={product?.images} />
+              <ProductGallery images={product?.images} />
 
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
                 <Info data={product} />

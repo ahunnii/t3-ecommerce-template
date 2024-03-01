@@ -168,6 +168,11 @@ export const productsRouter = createTRPCRouter({
       return ctx.prisma.product.findUnique({
         where: { id: input.productId },
         include: {
+          collections: {
+            include: {
+              discounts: true,
+            },
+          },
           images: true,
           discounts: true,
           variants: true,
@@ -285,6 +290,7 @@ export const productsRouter = createTRPCRouter({
             url: z.string(),
           })
         ),
+
         variants: z.array(
           z.object({
             names: z.string(),

@@ -9,8 +9,8 @@ import { shippingLabelRouter } from "./routers/admin/shipping-labels";
 
 import { blogPostRouter } from "./routers/blog-posts";
 
+import { productsRouter } from "~/modules/products/api/product-router.trpc";
 import { galleryRouter } from "./routers/gallery";
-import { productsRouter } from "./routers/products";
 
 import { customRouter } from "~/modules/custom-orders/api/custom-order-router.trpc";
 import { discountRouter } from "~/modules/discounts/api/discount-router.trpc";

@@ -39,9 +39,9 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
               />
               <section className="flex w-full gap-4 max-lg:flex-col">
                 <div className="flex w-full flex-col space-y-4 lg:w-8/12">
-                  <ViewProductDetails {...product} />
-                  <ViewProductVariants {...product} />
+                  <ViewProductDetails {...product} />{" "}
                   <ViewProductAttributes {...product} />
+                  <ViewProductVariants {...product} />
                   <ViewProductsShipping {...product} />
                 </div>
                 <div className="flex w-full flex-col lg:w-4/12">

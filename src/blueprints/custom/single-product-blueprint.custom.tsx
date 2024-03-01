@@ -1,7 +1,7 @@
 import { useParams } from "next/navigation";
-import { useMemo, type FC } from "react";
+import { type FC } from "react";
 
-import Info from "~/components/core/info";
+import Info from "~/modules/products/core/info";
 
 import Breadcrumbs from "~/components/core/breadcrumbs";
 import Gallery from "~/modules/gallery/core";
@@ -15,9 +15,9 @@ import type { DetailedProductFull } from "~/types";
 import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
-import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 
 type ProductPageProps = { prevUrl: string; name: string };
+
 export const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
   const params = useParams();
 

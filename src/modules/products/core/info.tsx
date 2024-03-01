@@ -11,7 +11,7 @@ import useCart from "~/modules/cart/hooks/use-cart";
 import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 import type { DetailedProductFull, Variation } from "~/types";
 import { cn } from "~/utils/styles";
-import VariantSelector from "../../modules/products/core/variant-selector";
+import VariantSelector from "./variant-selector";
 
 interface InfoProps extends VariantProps<typeof infoVariants> {
   data: DetailedProductFull;

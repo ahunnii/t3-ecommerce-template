@@ -1,6 +1,6 @@
-import Info from "~/components/core/info";
 import Modal from "~/components/core/ui/modal";
 import Gallery from "~/modules/gallery/core";
+import Info from "~/modules/products/core/info";
 
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 

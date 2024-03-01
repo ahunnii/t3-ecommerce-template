@@ -1,7 +1,3 @@
-import parse from "html-react-parser";
-import Currency from "~/components/core/ui/currency";
-import { cn } from "~/utils/styles";
-
 import {
   flexRender,
   getCoreRowModel,
@@ -14,19 +10,16 @@ import {
   type SortingState,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import * as React from "react";
 
-import { Variation } from "@prisma/client";
+import type { Variation } from "@prisma/client";
 import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
@@ -39,22 +32,10 @@ import {
   TableRow,
 } from "~/components/ui/table";
 
-type ViewProductVariantsProps = {
+type Props = {
   variants: Variation[];
-  // category: {
-  //   name: string;
-  // };
-  // price: number;
-  // estimatedCompletion: number;
-  // description: string;
 };
-export const ViewProductVariants = ({
-  variants,
-}: // category,
-// price,
-// estimatedCompletion,
-// description,
-ViewProductVariantsProps) => {
+export const ViewProductVariants = ({ variants }: Props) => {
   return (
     <div className="w-full rounded-md border border-border bg-background/50 p-4">
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -69,77 +50,39 @@ ViewProductVariantsProps) => {
           </p>
         </div>
       )}
-      {/* <p>
-        Priced at: <Currency value={price} />
-      </p>
-      <p>Category: {category?.name}</p>
-      <p>Estimated Completion: {estimatedCompletion} days</p>
-      <p>Collection: TODO</p>
-      <p>Description: </p>{" "}
-      <div className={cn("", "")}>
-        {parse(description ?? "No description provided")}
-      </div> */}
     </div>
   );
 };
 
-// export type Payment = {
-//   id: string;
-//   amount: number;
-//   status: "pending" | "processing" | "success" | "failed";
-//   email: string;
-// };
-
 export const columns: ColumnDef<Variation>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     accessorKey: "values",
-    header: "Values",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("values")}</div>
-    ),
-  },
-  {
-    accessorKey: "quantity",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
+          className="mx-0 px-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Values
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("quantity")}</div>
+      <div className="capitalize">{row.getValue("values")} </div>
+    ),
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: ({ row }) => (
+      <div className=" lowercase">{row.getValue("quantity")}</div>
     ),
   },
   {
     accessorKey: "price",
-    header: () => <div className="text-right">Price</div>,
+    header: () => <div className="text-left">Price</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("price"));
 
@@ -149,36 +92,7 @@ export const columns: ColumnDef<Variation>[] = [
         currency: "USD",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => void navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <div className="text-left font-medium">{formatted}</div>;
     },
   },
 ];
@@ -215,10 +129,10 @@ export function VariantsTable({ data }: { data: Variation[] }) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter by values..."
+          value={(table.getColumn("values")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("values")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
