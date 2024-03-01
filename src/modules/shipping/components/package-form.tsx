@@ -1,9 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useState, type FC } from "react";
+import { type FC } from "react";
 import { useForm } from "react-hook-form";
-
-import * as z from "zod";
 
 import { Button } from "~/components/ui/button";
 
@@ -17,67 +15,36 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
-import useShippingLabel, {
-  Package,
-} from "~/modules/shipping/hooks/use-shipping-label";
+import { useShippingModal } from "../hooks/use-shipping-modal";
+import { packageFormSchema } from "../schema";
+import type { PackageFormValues } from "../types";
 
-const shippingFormSchema = z.object({
-  package_length: z.coerce.number().min(1),
-  package_width: z.coerce.number().min(1),
-  package_height: z.coerce.number().min(1),
-  package_weight_lbs: z.coerce.number(),
-  package_weight_oz: z.coerce.number(),
-});
-
-export type PackageFormValues = z.infer<typeof shippingFormSchema>;
-
-type PackageFormProps = {
-  initialData: Package | null;
-  successCallback: (data?: unknown) => void;
+type Props = {
+  initialData: PackageFormValues | null;
+  successCallback: (data: PackageFormValues) => void;
   errorCallback: (data?: unknown) => void;
 };
-const PackageForm: FC<PackageFormProps> = ({
-  initialData,
-  successCallback,
-}) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const { setParcelMeasurements } = useShippingLabel();
-
-  const defaultValues: Partial<PackageFormValues> = {
-    package_length: initialData?.length ?? 0,
-    package_width: initialData?.width ?? 0,
-    package_height: initialData?.height ?? 0,
-    package_weight_lbs: Math.floor((initialData?.weight ?? 0) % 16) ?? 0,
-    package_weight_oz: (initialData?.weight ?? 0) * 16 ?? 0,
-  };
-
+const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
   const form = useForm<PackageFormValues>({
-    resolver: zodResolver(shippingFormSchema),
-    defaultValues,
+    resolver: zodResolver(packageFormSchema),
+    defaultValues: {
+      package_length: initialData?.package_length ?? 0,
+      package_width: initialData?.package_width ?? 0,
+      package_height: initialData?.package_height ?? 0,
+      package_weight_lbs: initialData?.package_weight_lbs ?? 0,
+      package_weight_oz: initialData?.package_weight_oz ?? 0,
+    },
   });
 
   const onSubmit = (data: PackageFormValues) => {
-    setLoading(true);
-    setParcelMeasurements(data);
-    setLoading(true);
-    successCallback();
-
-    // getRates()
-    //   .then((res: RateResponse) => {
-    //     if (res.isValid) successCallback(res.rates);
-    //     else errorCallback();
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     errorCallback(err);
-    //   })
-    //   .finally(() => setLoading(false));
+    successCallback(data);
   };
+  const shippingModal = useShippingModal();
 
   return (
     <Form {...form}>
       <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
-        <div className="flex flex-col gap-y-5">
+        <div className="flex flex-col space-y-5 pt-4">
           <div className="flex gap-3">
             <FormField
               control={form.control}
@@ -87,12 +54,7 @@ const PackageForm: FC<PackageFormProps> = ({
                   <FormLabel>Length (in)</FormLabel>
 
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      {...field}
-                      type="number"
-                      min={0}
-                    />
+                    <Input {...field} type="number" min={0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,12 +68,7 @@ const PackageForm: FC<PackageFormProps> = ({
                   <FormLabel>Width (in)</FormLabel>
 
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      {...field}
-                      type="number"
-                      min={0}
-                    />
+                    <Input {...field} type="number" min={0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,12 +82,7 @@ const PackageForm: FC<PackageFormProps> = ({
                   <FormLabel>Height (in)</FormLabel>
 
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      {...field}
-                      type="number"
-                      min={0}
-                    />
+                    <Input {...field} type="number" min={0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -146,12 +98,7 @@ const PackageForm: FC<PackageFormProps> = ({
                   <FormLabel>Lbs</FormLabel>
 
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      {...field}
-                      type="number"
-                      min={0}
-                    />
+                    <Input {...field} type="number" min={0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,12 +112,7 @@ const PackageForm: FC<PackageFormProps> = ({
                   <FormLabel>Ozs</FormLabel>
 
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      {...field}
-                      type="number"
-                      min={0}
-                    />
+                    <Input {...field} type="number" min={0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -178,17 +120,12 @@ const PackageForm: FC<PackageFormProps> = ({
             />
           </div>
         </div>
+
         <div className="flex w-full items-center justify-end space-x-2 pt-6">
-          {/* <Button
-            disabled={loading}
-            variant="outline"
-            // onClick={shippingModal.onClose}
-          >
+          <Button variant={"outline"} onClick={() => shippingModal.onClose()}>
             Cancel
-          </Button>{" "} */}
-          <Button disabled={loading} type="submit">
-            Continue
           </Button>
+          <Button type="submit">Continue</Button>
         </div>
       </form>
     </Form>

@@ -3,9 +3,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { toast } from "react-hot-toast";
 import type Shippo from "shippo";
 
 import { Button } from "~/components/ui/button";
@@ -13,32 +12,30 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { Modal } from "~/components/ui/modal";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import useShippingLabel, {
-  type RateResponse,
-  type ShippingAddress,
-} from "~/modules/shipping/hooks/use-shipping-label";
 import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
+
 import { api } from "~/utils/api";
 
-import axios from "axios";
-
 import { toastService } from "~/services/toast";
+
+import { create } from "domain";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { useShippingLabelStore } from "../store/use-shipping-label-store";
 import AddressForm from "./address-form";
 import PackageForm from "./package-form";
 import RatesForm from "./rates-form";
 
 export const ShippingModal = ({ data }: { data: string }) => {
   const {
-    setRates,
-    getRates,
+    setParcel,
     selectedRate,
     setCustomerAddress,
     setBusinessAddress,
     businessAddress: fromAddress,
     customerAddress: toAddress,
     parcel,
-  } = useShippingLabel();
+    clearAll,
+  } = useShippingLabelStore((state) => state);
 
   const [tabValue, setTabValue] = useState<string>("customer_address");
   const params = useRouter();
@@ -48,22 +45,40 @@ export const ShippingModal = ({ data }: { data: string }) => {
 
   const shippingModal = useShippingModal();
 
-  // const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [label, setLabel] = useState<Shippo.Transaction | null>(null);
 
-  const { data: currentOrder } = api.orders.getOrder.useQuery(
+  const getStoreInfo = api.store.getStore.useQuery(
+    { storeId },
+    { enabled: shippingModal.isOpen }
+  );
+
+  const getCurrentOrder = api.orders.getOrder.useQuery(
     { orderId: data ?? "" },
     { enabled: shippingModal.isOpen }
   );
 
-  const { mutate: createLabel } = api.shippingLabels.createLabel.useMutation({
+  const getAvailableRates = api.shippingLabels.getAvailableRates.useQuery(
+    {
+      customerAddress: toAddress!,
+      businessAddress: fromAddress!,
+      parcel: parcel!,
+    },
+    {
+      enabled:
+        shippingModal.isOpen &&
+        toAddress !== null &&
+        fromAddress !== null &&
+        parcel !== null &&
+        tabValue === "rates",
+    }
+  );
+
+  const createLabel = api.shippingLabels.createLabel.useMutation({
     onSuccess: (data) => {
-      console.log(data);
+      setLabel(data?.shippingLabel);
+      toastService.success("Label created successfully");
     },
-    onError: (err) => {
-      console.log(err);
-    },
+    onError: (err) => toastService.error("Failed to create label", err),
   });
 
   const handleOnClose = () => {
@@ -75,92 +90,53 @@ export const ShippingModal = ({ data }: { data: string }) => {
     setTimeout(() => {
       document.body.style.pointerEvents = "";
     }, 500);
+
+    if (!shippingModal.isOpen) {
+      void getStoreInfo.refetch();
+      void getCurrentOrder.refetch();
+    }
   }, []);
 
-  const purchaseAndGenerateLabel = () => {
-    setLoading(true);
+  useEffect(() => {
+    if (!shippingModal.isOpen) {
+      clearAll();
+      setLabel(null);
+    }
+  }, [shippingModal.isOpen]);
 
-    axios
-      .post(`${process.env.NEXT_PUBLIC_API_URL}/shipping/label`, {
-        rate: selectedRate?.object_id,
-      })
-      .then((res) => {
-        if (res.status === 200 && res.data.label_url) {
-          if (data === undefined) return toast.error("Something went wrong.");
-          else
-            createLabel({
-              orderId: data,
-              labelUrl: res.data.label_url,
-              trackingNumber: res.data.tracking_number,
-              cost: selectedRate!.amount,
-              carrier: selectedRate!.provider,
-              timeEstimate: selectedRate!.duration_terms,
-            });
-          setLabel(res.data as Shippo.Transaction);
-          console.log(res.data);
-        } else {
-          toast.error("Something went wrong.");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => setLoading(false));
+  const purchaseAndGenerateLabel = () => {
+    createLabel.mutate({
+      rateId: selectedRate!.object_id,
+      orderId: data,
+      cost: selectedRate!.amount,
+      carrier: selectedRate!.provider,
+      timeEstimate: selectedRate!.duration_terms,
+    });
   };
 
-  const customerAddress = currentOrder?.address
-    ? {
-        name: toAddress?.name ?? currentOrder?.name ?? undefined,
-        street: toAddress?.street ?? currentOrder?.address?.street ?? "",
-        additional:
-          toAddress?.additional ?? currentOrder?.address?.additional ?? "",
-        city: toAddress?.city ?? currentOrder?.address?.city ?? "",
-        state: toAddress?.state ?? currentOrder?.address?.state ?? "",
-        zip: toAddress?.zip ?? currentOrder?.address?.postal_code ?? "",
-      }
-    : {
-        name: currentOrder?.name ?? undefined,
-        street: "",
-        additional: "",
-        city: "",
-        state: "",
-        zip: "",
-      };
+  const customerAddress = useMemo(() => {
+    return {
+      name: toAddress?.name ?? getCurrentOrder?.data?.name ?? undefined,
+      street: toAddress?.street ?? getCurrentOrder?.data?.address?.street ?? "",
+      additional:
+        toAddress?.additional ??
+        getCurrentOrder?.data?.address?.additional ??
+        "",
+      city: toAddress?.city ?? getCurrentOrder?.data?.address?.city ?? "",
+      state: toAddress?.state ?? getCurrentOrder?.data?.address?.state ?? "",
+      zip: toAddress?.zip ?? getCurrentOrder?.data?.address?.postal_code ?? "",
+    };
+  }, [toAddress, getCurrentOrder?.data]);
 
-  const { data: storeInfo } = api.store.getStore.useQuery(
-    { storeId },
-    { enabled: shippingModal.isOpen }
-  );
-
-  const businessAddress = storeInfo?.address
-    ? {
-        name: fromAddress?.name ?? storeInfo?.name ?? undefined,
-        street: fromAddress?.street ?? storeInfo?.address?.street ?? "",
-        additional:
-          fromAddress?.additional ?? storeInfo?.address?.additional ?? "",
-        city: fromAddress?.city ?? storeInfo?.address?.city ?? "",
-        state: fromAddress?.state ?? storeInfo?.address?.state ?? "",
-        zip: fromAddress?.zip ?? storeInfo?.address?.postal_code ?? "",
-      }
-    : {
-        name: storeInfo?.name ?? undefined,
-        street: "",
-        additional: "",
-        city: "",
-        state: "",
-        zip: "",
-      };
-
-  console.log(selectedRate);
-  useEffect(() => {
-    if (tabValue === "rates")
-      getRates()
-        .then((res: RateResponse) => {
-          setRates(res?.rates ?? []);
-        })
-        .catch((err) => console.log(err));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue]);
+  const businessAddress = {
+    name: fromAddress?.name ?? getStoreInfo?.data?.name ?? undefined,
+    street: fromAddress?.street ?? getStoreInfo?.data?.address?.street ?? "",
+    additional:
+      fromAddress?.additional ?? getStoreInfo?.data?.address?.additional ?? "",
+    city: fromAddress?.city ?? getStoreInfo?.data?.address?.city ?? "",
+    state: fromAddress?.state ?? getStoreInfo?.data?.address?.state ?? "",
+    zip: fromAddress?.zip ?? getStoreInfo?.data?.address?.postal_code ?? "",
+  };
 
   const onCopy = (id: string) => {
     navigator.clipboard
@@ -173,205 +149,206 @@ export const ShippingModal = ({ data }: { data: string }) => {
 
   return (
     <Modal
-      title="Create shipping label"
+      title={
+        getCurrentOrder?.data?.shippingLabel?.labelUrl
+          ? "Download Shipping Label"
+          : "Create Shipping Label"
+      }
       description="Add a new store to manage products and categories."
       isOpen={shippingModal.isOpen}
       onClose={handleOnClose}
     >
-      <div>
-        <div className="space-y-4 py-2 pb-4">
-          <div className="space-y-2">
-            {(label ?? currentOrder?.shippingLabel?.labelUrl) && (
-              <div>
-                <Label>
-                  Successful! Your account has been charged{" "}
-                  <strong>${selectedRate?.amount}</strong>
-                </Label>
-
-                <Link
-                  href={
-                    label?.label_url ??
-                    (currentOrder?.shippingLabel?.labelUrl as string)
-                  }
-                  target="_blank"
-                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
-                >
-                  Click to download the label
-                </Link>
-
-                <Button
-                  onClick={() =>
-                    onCopy(
-                      label?.tracking_url_provider ??
-                        (currentOrder?.shippingLabel?.trackingNumber as string)
-                    )
-                  }
-                >
-                  Click here to copy the tracking number url
-                </Button>
-              </div>
+      <div className="space-y-4 py-2 pb-4">
+        {(label ?? getCurrentOrder?.data?.shippingLabel?.labelUrl) && (
+          <div>
+            {label && (
+              <Label>
+                Successful! Your account has been charged{" "}
+                <strong>${selectedRate?.amount}</strong>
+              </Label>
             )}
-            {!label && !currentOrder?.shippingLabel?.labelUrl && (
-              <Tabs
-                value={tabValue}
-                onValueChange={setTabValue}
-                className="w-full"
-              >
-                <TabsList>
-                  <TabsTrigger value="customer_address">Customer</TabsTrigger>{" "}
-                  <TabsTrigger value="business_address">Business</TabsTrigger>
-                  <TabsTrigger value="package">Package</TabsTrigger>
-                  <TabsTrigger value="rates">Get Rates</TabsTrigger>
-                  <TabsTrigger value="review">Review</TabsTrigger>
-                </TabsList>
-                <TabsContent value="customer_address">
-                  {customerAddress && (
-                    <AddressForm
-                      successCallback={(data) => {
-                        toastService.success("Customer address is valid.");
-                        setCustomerAddress(data as ShippingAddress);
-                        setTabValue("business_address");
-                      }}
-                      errorCallback={(error: unknown) =>
-                        toastService.error(
-                          "Customer address is invalid.",
-                          error
-                        )
-                      }
-                      initialData={customerAddress ?? null}
-                    />
-                  )}
-                </TabsContent>
-                <TabsContent value="business_address">
-                  {businessAddress && (
-                    <AddressForm
-                      successCallback={(data) => {
-                        toastService.success("Business address is valid.");
-                        setBusinessAddress(data as ShippingAddress);
-                        setTabValue("package");
-                      }}
-                      errorCallback={(error: unknown) =>
-                        toastService.error(
-                          "Business address is invalid.",
-                          error
-                        )
-                      }
-                      initialData={businessAddress ?? null}
-                    />
-                  )}
-                </TabsContent>
-                <TabsContent value="package">
-                  {parcel && (
-                    <PackageForm
-                      successCallback={() => {
-                        toastService.success("Package details saved to cache");
-                        setTabValue("rates");
-                      }}
-                      errorCallback={(error: unknown) =>
-                        toastService.error(
-                          "Business address is invalid.",
-                          error
-                        )
-                      }
-                      initialData={parcel ?? null}
-                    />
-                  )}
-                </TabsContent>
 
-                <TabsContent value="rates">
-                  {selectedRate && (
-                    <RatesForm
-                      successCallback={() => {
-                        toastService.success("selected");
-                        setTabValue("review");
-                      }}
-                      errorCallback={(error: unknown) => {
-                        toastService.error(
-                          "Rates could not be fetched.",
-                          error
-                        );
-                      }}
-                      initialData={selectedRate ?? null}
-                    />
-                  )}
-                </TabsContent>
-                <TabsContent value="review">
-                  <div className="flex flex-col gap-4 text-left">
-                    {fromAddress && (
-                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                        <h3>From: </h3>
-                        <p>{fromAddress.name}</p>
-                        <p>{fromAddress.street}</p>
-                        <p>{fromAddress.additional}</p>
-                        <p>
-                          {fromAddress.city}, {fromAddress.state}{" "}
-                          {fromAddress.zip}
-                        </p>
-                      </div>
-                    )}
+            <Link
+              href={
+                label?.label_url ??
+                (getCurrentOrder?.data?.shippingLabel?.labelUrl as string)
+              }
+              target="_blank"
+              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
+            >
+              Click to download the label
+            </Link>
 
-                    {toAddress && (
-                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                        <h3>To: </h3>
-                        <p>{toAddress.name}</p>
-                        <p>{toAddress.street}</p>
-                        <p>{toAddress.additional}</p>
-                        <p>
-                          {toAddress.city}, {toAddress.state} {toAddress.zip}
-                        </p>
-                      </div>
-                    )}
-
-                    {parcel && (
-                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                        <h3 className="font-bold">Package: </h3>
-                        <p>
-                          {parcel.length} x {parcel.width} x {parcel.height} in
-                        </p>
-                        {/* Convert weight to lbs and ozs */}
-
-                        <p>
-                          {Math.floor(parcel.weight % 16)} lbs{" "}
-                          {parcel.weight * 16} oz
-                        </p>
-                      </div>
-                    )}
-
-                    {selectedRate && (
-                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                        <h3 className="font-bold">Rate: </h3>
-                        <p>{selectedRate.provider}</p>
-                        <p>${selectedRate.amount}</p>
-
-                        {/* <p>
-                          {selectedRate.estimated_days}{" "}
-                          {selectedRate.estimated_days > 1 ? "days" : "day"}
-                        </p>
-
-                        <p>
-                          {selectedRate.extra?.amount}{" "}
-                          {selectedRate.extra?.currency}
-                        </p> */}
-                      </div>
-                    )}
-
-                    <div>
-                      <Button
-                        onClick={purchaseAndGenerateLabel}
-                        disabled={loading}
-                        variant={"default"}
-                        className="bg-green-500 hover:bg-green-500/90"
-                      >
-                        Purchase
-                      </Button>
-                      <Button>Cancel</Button>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            )}
+            <Button
+              onClick={() =>
+                onCopy(
+                  label?.tracking_url_provider ??
+                    (getCurrentOrder?.data?.shippingLabel
+                      ?.trackingNumber as string)
+                )
+              }
+            >
+              Click here to copy the tracking number url
+            </Button>
           </div>
-        </div>
+        )}
+        {!label && !getCurrentOrder?.data?.shippingLabel?.labelUrl && (
+          <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="customer_address">Customer</TabsTrigger>{" "}
+              <TabsTrigger value="business_address" disabled={!toAddress}>
+                Business
+              </TabsTrigger>
+              <TabsTrigger
+                value="package"
+                disabled={!toAddress || !fromAddress}
+              >
+                Package
+              </TabsTrigger>
+              <TabsTrigger
+                value="rates"
+                disabled={!toAddress || !fromAddress || !parcel}
+              >
+                Get Rates
+              </TabsTrigger>
+              <TabsTrigger
+                value="review"
+                disabled={
+                  !toAddress || !fromAddress || !parcel || !selectedRate
+                }
+              >
+                Review
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="customer_address">
+              {customerAddress && getCurrentOrder?.isFetched && (
+                <AddressForm
+                  successCallback={(data) => {
+                    setCustomerAddress(data);
+                    setTabValue("business_address");
+                  }}
+                  initialData={customerAddress}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="business_address">
+              {businessAddress && getStoreInfo?.isFetched && (
+                <AddressForm
+                  successCallback={(data) => {
+                    setBusinessAddress(data);
+                    setTabValue("package");
+                  }}
+                  initialData={businessAddress ?? null}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="package">
+              <PackageForm
+                successCallback={(data) => {
+                  toastService.success("Package details saved to cache");
+                  setParcel(data);
+                  setTabValue("rates");
+                }}
+                errorCallback={(error: unknown) =>
+                  toastService.error("Business address is invalid.", error)
+                }
+                initialData={parcel ?? null}
+              />
+            </TabsContent>
+
+            <TabsContent value="rates">
+              {getAvailableRates?.isLoading && <p>Getting rates ...</p>}
+              {getAvailableRates?.isFetched && (
+                <RatesForm
+                  successCallback={() => {
+                    toastService.success("Rate selected");
+                    setTabValue("review");
+                  }}
+                  errorCallback={(error: unknown) => {
+                    toastService.error(
+                      "There was an issue selecting the rate. Please try again.",
+                      error
+                    );
+                  }}
+                  initialData={selectedRate ?? null}
+                  availableRates={getAvailableRates?.data ?? []}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="review">
+              <div className="flex flex-col gap-4 text-left">
+                {fromAddress && (
+                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                    <h3 className={"font-semibold "}>From: </h3>
+                    <p>{fromAddress.name}</p>
+                    <p>{fromAddress.street}</p>
+                    <p>{fromAddress.additional}</p>
+                    <p>
+                      {fromAddress.city}, {fromAddress.state} {fromAddress.zip}
+                    </p>
+                  </div>
+                )}
+
+                {toAddress && (
+                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                    <h3 className={"font-semibold "}>To: </h3>
+                    <p>{toAddress.name}</p>
+                    <p>{toAddress.street}</p>
+                    <p>{toAddress.additional}</p>
+                    <p>
+                      {toAddress.city}, {toAddress.state} {toAddress.zip}
+                    </p>
+                  </div>
+                )}
+
+                {parcel && (
+                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                    <h3 className={"font-semibold "}>Package: </h3>
+                    <p>
+                      {parcel.package_length} x {parcel.package_width} x{" "}
+                      {parcel.package_height} in
+                    </p>
+
+                    <p>
+                      {parcel.package_weight_lbs} lbs {parcel.package_weight_oz}{" "}
+                      oz
+                    </p>
+                  </div>
+                )}
+
+                {selectedRate && (
+                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                    <h3 className="font-bold">Rate: </h3>
+                    <p>Cost: ${selectedRate.amount}</p>
+
+                    <p>
+                      {selectedRate.provider} --{" "}
+                      {selectedRate.servicelevel?.name}
+                    </p>
+                    <p>{selectedRate.duration_terms}</p>
+                  </div>
+                )}
+
+                <div className="flex w-full items-center justify-end space-x-2 pt-6">
+                  <Button
+                    variant={"outline"}
+                    onClick={() => shippingModal.onClose()}
+                  >
+                    Cancel
+                  </Button>{" "}
+                  <Button
+                    onClick={purchaseAndGenerateLabel}
+                    disabled={createLabel.isLoading}
+                    variant={"default"}
+                  >
+                    Purchase
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </Modal>
   );

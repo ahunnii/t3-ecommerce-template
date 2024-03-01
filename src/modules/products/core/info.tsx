@@ -27,7 +27,7 @@ const infoVariants = cva("", {
     },
     button: {
       default: "",
-      dark: "bg-purple-500 text-white",
+      dark: "bg-black text-white",
     },
   },
   defaultVariants: {
@@ -119,27 +119,30 @@ const Info: React.FC<InfoProps> = (props) => {
             {parse(props?.data.description ?? "No description provided.")}
           </div>
         </div>
-        <div>
-          <h3 className="text-lg font-bold">Materials</h3>
-          <div className={cn("", "")}>
-            {props?.data?.materials?.map((material, idx) => {
-              return (
-                <>
-                  <span key={idx} className="text-black">
-                    {material.name}
-                  </span>
-                </>
-              );
-            })}
+        {props?.data?.materials?.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold">Materials</h3>
+            <div className={cn("", "")}>
+              {props?.data?.materials?.map((material, idx) => {
+                return (
+                  <>
+                    <span key={idx} className="text-black">
+                      {material.name}
+                    </span>
+                  </>
+                );
+              })}
+            </div>
           </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-bold">Tags</h3>
-          <div className={cn("", "")}>
-            {props?.data?.tags?.map((tag) => tag.name).join(", ")}
+        )}
+        {props?.data?.tags?.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold">Tags</h3>
+            <div className={cn("", "")}>
+              {props?.data?.tags?.map((tag) => tag.name).join(", ")}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

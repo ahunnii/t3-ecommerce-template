@@ -2,10 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { CheckIcon, ChevronsUpDown, Loader2 } from "lucide-react";
 
-import { useState, type FC } from "react";
+import { type FC } from "react";
 import { useForm } from "react-hook-form";
-
-import * as z from "zod";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -32,22 +30,13 @@ import {
 } from "~/components/ui/popover";
 
 import USA_STATES from "~/data/states";
-import useShippingLabel, {
-  type ShippingResponse,
-} from "~/modules/shipping/hooks/use-shipping-label";
 
+import { toastService } from "~/services/toast";
+import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
-
-const shippingFormSchema = z.object({
-  name: z.string().min(2),
-  street: z.string(),
-  additional: z.string().optional(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.string().regex(/^\d{5}(?:[-\s]\d{4})?$/),
-});
-
-type ShippingFormValues = z.infer<typeof shippingFormSchema>;
+import { useShippingModal } from "../hooks/use-shipping-modal";
+import { addressFormSchema } from "../schema";
+import type { AddressFormValues } from "../types";
 
 type TInitialData = {
   name: string | undefined;
@@ -58,55 +47,57 @@ type TInitialData = {
   zip: string | undefined;
 };
 
-type AddressFormProps = {
+type Props = {
   initialData?: TInitialData | null;
-  successCallback: (data?: unknown) => void;
-  errorCallback: (data?: unknown) => void;
+  successCallback: (data: AddressFormValues) => void;
+  errorCallback?: (data?: unknown) => void;
 };
-const AddressForm: FC<AddressFormProps> = ({
+const AddressForm: FC<Props> = ({
   successCallback,
   errorCallback,
   initialData,
 }) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const { validateAddress } = useShippingLabel();
-
-  const defaultValues: Partial<ShippingFormValues> = {
-    name: initialData?.name ?? undefined,
-    street: initialData?.street ?? undefined,
-    additional: initialData?.additional ?? undefined,
-    city: initialData?.city ?? undefined,
-    state: initialData?.state ?? undefined,
-    zip: initialData?.zip ?? undefined,
-  };
-
-  const shippingForm = useForm<ShippingFormValues>({
-    resolver: zodResolver(shippingFormSchema),
-    defaultValues,
+  const validateAddress = api.shippingLabels.verifyAddress.useMutation({
+    onSuccess: (data) => {
+      if (data?.validation_results?.is_valid === false) {
+        toastService.error(
+          "Address is invalid.",
+          "Shippo returned an invalid address."
+        );
+        if (errorCallback) errorCallback();
+        return;
+      }
+      toastService.success("Address is valid!");
+      successCallback({
+        name: data.name,
+        street: data.street1,
+        additional: data.street2,
+        city: data.city,
+        state: data.state,
+        zip: data.zip,
+      } as AddressFormValues);
+    },
+    onError: (err: unknown) => {
+      toastService.error("Address is invalid.", err);
+      if (errorCallback) errorCallback();
+    },
   });
 
-  const onAddressSubmit = (data: ShippingFormValues) => {
-    setLoading(true);
+  const shippingForm = useForm<AddressFormValues>({
+    resolver: zodResolver(addressFormSchema),
+    defaultValues: {
+      name: initialData?.name ?? undefined,
+      street: initialData?.street ?? undefined,
+      additional: initialData?.additional ?? undefined,
+      city: initialData?.city ?? undefined,
+      state: initialData?.state ?? undefined,
+      zip: initialData?.zip ?? undefined,
+    },
+  });
 
-    validateAddress({
-      name: data.name,
-      street: data.street,
-      additional: data.additional,
-      city: data.city,
-      state: data.state,
-      zip: data.zip,
-    })
-      .then((res: ShippingResponse) => {
-        if (res.isValid) successCallback(data);
-        else errorCallback();
-      })
-      .catch((err) => {
-        console.error(err);
-        errorCallback(err);
-      })
-      .finally(() => setLoading(false));
-  };
-
+  const onAddressSubmit = (data: AddressFormValues) =>
+    validateAddress.mutate(data);
+  const shippingModal = useShippingModal();
   return (
     <Form {...shippingForm}>
       <form
@@ -157,7 +148,7 @@ const AddressForm: FC<AddressFormProps> = ({
               <FormMessage />
             </FormItem>
           )}
-        />{" "}
+        />
         <FormField
           control={shippingForm.control}
           name="city"
@@ -246,7 +237,7 @@ const AddressForm: FC<AddressFormProps> = ({
                   <Input
                     placeholder="e.g. 44444"
                     {...field}
-                    type="number"
+                    // type="number"
                     className="col-span-1"
                     onChange={(e) => {
                       field.onChange(Number(e.target.value));
@@ -259,11 +250,17 @@ const AddressForm: FC<AddressFormProps> = ({
             )}
           />{" "}
         </div>
-        <Button type="submit" disabled={loading}>
-          {" "}
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Verify
-          Address
-        </Button>
+        <div className="flex w-full items-center justify-end space-x-2 pt-6">
+          <Button variant={"outline"} onClick={() => shippingModal.onClose()}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={validateAddress.isLoading}>
+            {validateAddress.isLoading && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}{" "}
+            Verify Address
+          </Button>
+        </div>
       </form>
     </Form>
   );

@@ -1,11 +1,9 @@
-import axios from "axios";
-
 import type Shippo from "shippo";
 import { create } from "zustand";
 
 import type { AddressFormValues, PackageFormValues } from "../types";
 
-interface useShippingLabelStore {
+interface ShippingLabelValueStore {
   rates: Shippo.Rate[];
   setRates: (rates: Shippo.Rate[]) => void;
   selectedRate: Shippo.Rate | null;
@@ -19,7 +17,7 @@ interface useShippingLabelStore {
   clearAll: () => void;
 }
 
-const useShippingLabelValues = create<useShippingLabelStore>((set) => ({
+export const useShippingLabelStore = create<ShippingLabelValueStore>((set) => ({
   rates: [],
   setRates: (rates: Shippo.Rate[]) => set({ rates }),
   selectedRate: null,
@@ -41,35 +39,3 @@ const useShippingLabelValues = create<useShippingLabelStore>((set) => ({
       parcel: null,
     }),
 }));
-
-const useShippingLabel = () => {
-  const {
-    rates,
-    setRates,
-    customerAddress,
-    setCustomerAddress,
-    businessAddress,
-    setBusinessAddress,
-    parcel,
-    setParcel,
-    selectedRate,
-    setSelectedRate,
-    clearAll,
-  } = useShippingLabelValues();
-
-  return {
-    setRates,
-    rates,
-    setCustomerAddress,
-    customerAddress,
-    businessAddress,
-    parcel,
-    setBusinessAddress,
-    setParcel,
-    selectedRate,
-    setSelectedRate,
-    clearAll,
-  };
-};
-
-export default useShippingLabel;

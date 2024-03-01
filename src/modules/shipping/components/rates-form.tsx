@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SelectGroup } from "@radix-ui/react-select";
 import { useForm } from "react-hook-form";
 
-import * as z from "zod";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 
@@ -27,30 +26,33 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
-import useShippingLabel from "~/modules/shipping/hooks/use-shipping-label";
-
 import { cn } from "~/utils/styles";
+import { useShippingModal } from "../hooks/use-shipping-modal";
+import { rateFormSchema } from "../schema";
+import { useShippingLabelStore } from "../store/use-shipping-label-store";
+import type { RateFormValues } from "../types";
 
-const selectionSchema = z.object({
-  rate_selection_id: z.string(),
-});
-
-type TInitialData = {
+type Props = {
   successCallback: (data?: unknown) => void;
   errorCallback: (data?: unknown) => void;
   initialData: Shippo.Rate | null;
+  availableRates: Shippo.Rate[];
 };
 
-const RatesForm: FC<TInitialData> = ({ initialData, successCallback }) => {
-  //   const [selectedRate, setSelectedRate] = useState<Shippo.Rate | null>(null);
+const RatesForm: FC<Props> = ({
+  initialData,
+  successCallback,
+  availableRates,
+}) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const { rates, selectedRate, setSelectedRate } = useShippingLabel();
+  const { selectedRate, setSelectedRate } = useShippingLabelStore(
+    (state) => state
+  );
 
-  const rateForm = useForm<z.infer<typeof selectionSchema>>({
-    resolver: zodResolver(selectionSchema),
+  const rateForm = useForm<RateFormValues>({
+    resolver: zodResolver(rateFormSchema),
     defaultValues: {
-      //   rate_selection_id: order?.address,
-      rate_selection_id: initialData?.object_id ?? "",
+      rate_selection_id: initialData?.object_id ?? undefined,
     },
   });
 
@@ -62,6 +64,7 @@ const RatesForm: FC<TInitialData> = ({ initialData, successCallback }) => {
     setLoading(false);
   };
 
+  const shippingModal = useShippingModal();
   return (
     <Form {...rateForm}>
       <form onSubmit={(e) => void rateForm.handleSubmit(onSubmit)(e)}>
@@ -75,24 +78,25 @@ const RatesForm: FC<TInitialData> = ({ initialData, successCallback }) => {
 
                 <FormControl>
                   <>
-                    {rates && (
+                    {availableRates && (
                       <Select
                         value={field.value}
                         onValueChange={(e) => {
                           setSelectedRate(
-                            rates.find((rate) => rate.object_id === e)! ?? null
+                            availableRates.find(
+                              (rate) => rate.object_id === e
+                            )! ?? null
                           );
-                          console.log(initialData);
 
                           field.onChange(e);
                         }}
                       >
                         <SelectTrigger className="flex h-20 w-full text-left">
-                          <SelectValue placeholder="No variant selected" />
+                          <SelectValue placeholder="Select a shipping rate..." />
                         </SelectTrigger>
                         <SelectContent className="max-h-96 ">
                           <SelectGroup>
-                            {rates?.map((rate, idx) => (
+                            {availableRates?.map((rate, idx) => (
                               <SelectItem
                                 className="flex"
                                 value={rate?.object_id}
@@ -144,13 +148,9 @@ const RatesForm: FC<TInitialData> = ({ initialData, successCallback }) => {
           />{" "}
         </div>
         <div className="flex w-full items-center justify-end space-x-2 pt-6">
-          {/* <Button
-            disabled={loading}
-            variant="outline"
-            onClick={shippingModal.onClose}
-          >
+          <Button variant={"outline"} onClick={() => shippingModal.onClose()}>
             Cancel
-          </Button>{" "} */}
+          </Button>{" "}
           <Button disabled={loading} type="submit">
             Review
           </Button>
