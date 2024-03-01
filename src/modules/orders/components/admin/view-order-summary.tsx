@@ -37,7 +37,9 @@ export const ViewOrderSummary = ({
             alt=""
           />
           <p>
-            {item.product.name} x <strong>{item.quantity}</strong> :{" "}
+            {item.product.name}
+            {item.variant ? `(${item.variant.values})` : ""} x{" "}
+            <strong>{item.quantity}</strong> :{" "}
             <Currency value={item.product.price} />
           </p>
         </div>

@@ -105,6 +105,10 @@ const Navbar = ({
         href: "/blog",
       },
       {
+        title: "Custom Requests",
+        href: "/custom-request",
+      },
+      {
         title: "Contact Us",
         href: "/contact-us",
       },
