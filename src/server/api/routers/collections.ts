@@ -55,6 +55,7 @@ export const collectionsRouter = createTRPCRouter({
         include: {
           products: {
             include: {
+              discounts: true,
               images: true,
               variants: true,
               materials: true,

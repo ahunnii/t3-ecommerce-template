@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import _uniqueId from "lodash/uniqueId";
+
 import { Expand, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
@@ -48,7 +48,7 @@ export const LayoutGrid = ({
       )}
     >
       {cards.map((card, i) => (
-        <div key={_uniqueId("card-")} className={cn(card.className, "")}>
+        <div key={i} className={cn(card.className, "")}>
           <motion.div
             onClick={() => handleClick(card)}
             className={cn(
@@ -210,7 +210,7 @@ const ProductCardQuickActions = ({
   return (
     <div className="flex w-full justify-center gap-x-6 ">
       {actions.map((action, index) => (
-        <Fragment key={_uniqueId("action-")}>
+        <Fragment key={index}>
           {action?.renderIf && (
             <IconButton
               onClick={action.onClick}

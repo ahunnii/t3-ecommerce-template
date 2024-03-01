@@ -20,7 +20,7 @@ export const storeTheme = {
     mainStyle: "bg-fuchsia-200",
 
     // bodyStyle: "max-w-full",
-    // navStyles: "bg-black border-b-black",
+    navStyles: "bg-black border-b-black",
     p: "leading-7 [&:not(:first-child)]:mt-6",
     h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
     h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",

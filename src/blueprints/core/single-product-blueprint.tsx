@@ -70,11 +70,6 @@ export const SingleProductPage = ({
 
   return (
     <>
-      <Head>
-        <title>{name} | Store Co.</title>
-        <meta name="description" content="Admin" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <StorefrontLayout>
         {isLoading && <PageLoader />}
         <Breadcrumbs pathway={pathway} />
@@ -84,7 +79,7 @@ export const SingleProductPage = ({
               <ProductGallery images={product?.images} />
 
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-                <Info data={product} />
+                <Info data={product} discounts={[]} />
               </div>
             </div>
             <hr className="my-10" />

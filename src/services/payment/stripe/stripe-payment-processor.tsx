@@ -206,7 +206,7 @@ export const stripePaymentProcessor: PaymentProcessor<
 
         await updateOrder({
           orderId: eventCharge?.metadata?.orderId ?? "",
-          orderData: { isPaid: true },
+          orderData: { isPaid: true, status: "PAID" },
           orderStatus: {
             type: "PAYMENT_SUCCESSFUL",
             title: "Order payment was successful",
@@ -254,7 +254,7 @@ export const stripePaymentProcessor: PaymentProcessor<
 
         await updateOrder({
           orderId: eventFailed?.metadata?.orderId ?? "",
-          orderData: { isPaid: false },
+          orderData: { isPaid: false, status: "PAYMENT_FAILED" },
           orderStatus: {
             type: "PAYMENT_FAILED",
             title: "Payment failed",

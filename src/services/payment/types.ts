@@ -1,4 +1,9 @@
-import type { Order, OrderItem, TimeLineEntryType } from "@prisma/client";
+import type {
+  Order,
+  OrderItem,
+  OrderStatus,
+  TimeLineEntryType,
+} from "@prisma/client";
 import type { NextApiRequest } from "next";
 export type retrievePaymentResult = {
   items: OrderItem[];
@@ -63,6 +68,7 @@ export type CheckoutOrderDetails = {
 
 export type PaymentOrderData = {
   isPaid?: boolean;
+  status?: OrderStatus;
   name?: string;
   phone?: string;
   email?: string;

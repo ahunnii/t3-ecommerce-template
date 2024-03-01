@@ -4,13 +4,14 @@ import { format } from "date-fns";
 import Link from "next/link";
 import Currency from "~/components/core/ui/currency";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { cn } from "~/utils/styles";
 import { CellAction } from "./cell-action";
 
 export type OrderColumn = {
   id: string;
   storeId: string;
-
+  status: string;
   isPaid: boolean;
   total: number;
 
@@ -21,6 +22,30 @@ export type OrderColumn = {
 };
 
 export const columns: ColumnDef<OrderColumn>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="translate-y-[2px]"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="translate-y-[2px]"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "id",
     header: "Order Id",
@@ -47,6 +72,16 @@ export const columns: ColumnDef<OrderColumn>[] = [
   {
     accessorKey: "name",
     header: "Customer Name",
+  },
+  {
+    accessorKey: "status",
+    header: "Order Status",
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+    cell: ({ row }) => {
+      return <p className="">{`${row.original.status.toString()}`}</p>;
+    },
   },
   {
     accessorKey: "isShipped",

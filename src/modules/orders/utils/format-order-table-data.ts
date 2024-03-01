@@ -12,6 +12,7 @@ export const formatOrderTableData = (item: DetailedOrder) => ({
     .map((orderItem) => orderItem.product.name)
     .join(", "),
   total: item.total,
+  status: `${item.status}`,
 
   isPaid: item.isPaid,
   isShipped: item.isShipped,

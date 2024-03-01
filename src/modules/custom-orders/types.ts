@@ -53,13 +53,16 @@ export type CustomOrderColumn = {
   status: string;
   store: {
     name: string;
-    address: {
-      street: string;
-      additional: string | null;
-      city: string;
-      state: string;
-      postal_code: string;
-    };
+    address:
+      | {
+          street: string;
+          additional: string | null;
+          city: string;
+          state: string;
+          postal_code: string;
+        }
+      | null
+      | undefined;
   };
   description: string;
   createdAt: Date;
@@ -68,7 +71,7 @@ export type CustomOrderColumn = {
     name: string;
     price: number;
     description: string;
-  };
+  } | null;
 };
 
 export type CustomOrder = Prisma.CustomOrderRequestGetPayload<{

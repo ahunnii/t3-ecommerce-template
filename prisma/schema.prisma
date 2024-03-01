@@ -201,7 +201,7 @@ model Product {
   category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
   name        String
   price       Float    @default(0.00)
-  description String?  @db.VarChar(1000)
+  description String    @db.Text
   quantity    Int      @default(1)
 
   customOrder   CustomOrderRequest?
@@ -323,6 +323,8 @@ model Order {
   orderItems      OrderItem[] // Relation to OrderItem model
   timeline        TimeLineEntry[]
 
+  status          OrderStatus @default(PENDING)
+
   isPaid          Boolean     @default(false)
   isRefunded      Boolean     @default(false)
   isShipped       Boolean     @default(false)
@@ -360,6 +362,15 @@ model Order {
   @@index([userId])
 }
 
+enum OrderStatus {
+  NEW
+  ABANDONED
+  PENDING
+  PAID
+  SHIPPED
+  REFUNDED
+  PAYMENT_FAILED
+}
 
 
 

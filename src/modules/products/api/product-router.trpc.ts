@@ -265,7 +265,7 @@ export const productsRouter = createTRPCRouter({
         categoryId: z.string(),
         featuredImage: z.string(),
 
-        description: z.string().optional(),
+        description: z.string(),
         quantity: z.number(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),

@@ -19,7 +19,7 @@ const PreviewModal = () => {
           <Gallery images={product.images} />
         </div>
         <div className="sm:col-span-8 lg:col-span-7">
-          <Info data={product} button={"dark"} />
+          <Info data={product} discounts={[]} />
         </div>
       </div>
     </Modal>
@@ -27,3 +27,4 @@ const PreviewModal = () => {
 };
 
 export default PreviewModal;
+// TODO: Call api to query discounts for related items
