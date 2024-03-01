@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Instagram } from "lucide-react";
 import Link from "next/link";
 import Container from "~/components/core/ui/container";
 import { Button } from "~/components/ui/button";
@@ -29,7 +29,7 @@ const Footer = () => {
                   <Instagram className="h-6 w-6 text-white transition-all duration-150 ease-linear group-hover:text-black" />
                 </Button>
               </Link>{" "}
-              <Link href="/">
+              {/* <Link href="/">
                 <Button
                   variant="ghost"
                   className="group  aspect-square rounded-full p-0"
@@ -46,7 +46,7 @@ const Footer = () => {
                   {" "}
                   <Twitter className="h-6 w-6 text-white transition-all duration-150 ease-linear group-hover:text-black" />
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </footer>
