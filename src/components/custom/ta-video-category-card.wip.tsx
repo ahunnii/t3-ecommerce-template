@@ -36,7 +36,7 @@ export const TaVideoCategoryCard = (props: Props) => {
           {props?.videoURL && (
             <video
               src={props.videoURL ?? ""}
-              className=" z-20 aspect-square object-cover object-center transition-all duration-500 ease-in-out"
+              className=" z-20  aspect-auto h-full w-full object-cover object-center transition-all duration-500 ease-in-out"
               autoPlay
               loop
               muted
