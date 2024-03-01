@@ -1,9 +1,10 @@
-import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
+
+import { storeTheme } from "~/data/config.custom";
 
 export const UnauthorizedPage = () => {
   const router = useRouter();
@@ -14,13 +15,11 @@ export const UnauthorizedPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Homepage | Store Co.</title>
-        <meta name="description" content="Admin" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <StorefrontLayout bodyStyle="items-center justify-center flex">
+      <StorefrontLayout
+        {...storeTheme.layout}
+        // mainStyle={storeTheme.body.primary}
+        bodyStyle="items-center justify-center flex"
+      >
         <div className="flex flex-col items-center">
           <Image
             src="/img/lost.svg"

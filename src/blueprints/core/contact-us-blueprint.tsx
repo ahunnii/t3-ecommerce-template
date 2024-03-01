@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+
 import * as z from "zod";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { Button } from "~/components/ui/button";
@@ -21,7 +21,6 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { env } from "~/env.mjs";
 import { toastService } from "~/services/toast";
-import { api } from "~/utils/api";
 
 const emailSchema = z.object({
   email: z.string().email(),

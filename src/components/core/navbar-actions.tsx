@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 

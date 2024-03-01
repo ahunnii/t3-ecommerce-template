@@ -1,5 +1,3 @@
-import Head from "next/head";
-
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 export const ShippingPolicyPage = () => {

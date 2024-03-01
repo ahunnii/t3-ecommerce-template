@@ -6,7 +6,7 @@ import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import PageLoader from "~/components/ui/page-loader";
-import { DetailedProductFull } from "~/types";
+import type { DetailedProductFull } from "~/types";
 
 import { api } from "~/utils/api";
 

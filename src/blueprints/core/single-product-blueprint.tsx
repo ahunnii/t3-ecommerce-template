@@ -1,7 +1,7 @@
 import { useParams } from "next/navigation";
 
 import PageLoader from "~/components/ui/page-loader";
-import Gallery from "~/modules/gallery/core";
+
 import Info from "~/modules/products/core/info";
 import ProductList from "~/modules/products/core/product-list";
 
@@ -9,19 +9,12 @@ import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
-import Head from "next/head";
 import Breadcrumbs from "~/components/core/breadcrumbs";
 
 import { ProductGallery } from "~/modules/products/core/product-gallery";
 import type { DetailedProductFull } from "~/types";
 
-export const SingleProductPage = ({
-  prevUrl,
-  name,
-}: {
-  name: string;
-  prevUrl: string;
-}) => {
+export const SingleProductPage = ({ prevUrl }: { prevUrl: string }) => {
   const params = useParams();
 
   const { data: product, isLoading } = api.products.getProduct.useQuery({

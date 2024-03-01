@@ -2,15 +2,14 @@
 import { motion } from "framer-motion";
 
 import { Expand, ShoppingCart } from "lucide-react";
-import Image from "next/image";
+// import Image from "next/image";
 import React, { Fragment, useState } from "react";
 
 import { DirectionAwareHover } from "./direction-aware-card.wip";
 
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { type MouseEventHandler } from "react";
 
-import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
 import useCart from "~/modules/cart/hooks/use-cart";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
@@ -78,62 +77,62 @@ export const LayoutGrid = ({
   );
 };
 
-const BlurImage = ({ card }: { card: Card }) => {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <Image
-      src={card?.product?.featuredImage ?? card.thumbnail}
-      height="500"
-      width="500"
-      onLoad={() => setLoaded(true)}
-      className={cn(
-        "absolute inset-0 h-full w-full object-cover object-top transition duration-200",
-        loaded ? "blur-none" : "blur-md"
-      )}
-      alt="thumbnail"
-    />
-  );
-};
+// const BlurImage = ({ card }: { card: Card }) => {
+//   const [loaded, setLoaded] = useState(false);
+//   return (
+//     <Image
+//       src={card?.product?.featuredImage ?? card.thumbnail}
+//       height="500"
+//       width="500"
+//       onLoad={() => setLoaded(true)}
+//       className={cn(
+//         "absolute inset-0 h-full w-full object-cover object-top transition duration-200",
+//         loaded ? "blur-none" : "blur-md"
+//       )}
+//       alt="thumbnail"
+//     />
+//   );
+// };
 
-const SelectedCard = ({ selected }: { selected: Card | null }) => {
-  return (
-    <div className="relative z-[60] flex h-full w-full flex-col justify-end rounded-lg bg-transparent shadow-2xl">
-      <motion.div
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 0.6,
-        }}
-        className="absolute inset-0 z-10 h-full w-full bg-black opacity-60"
-      />
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 100,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          duration: 0.3,
-          ease: "easeInOut",
-        }}
-        className="relative z-[70] px-8 pb-4"
-      >
-        {selected?.content}
-      </motion.div>
-    </div>
-  );
-};
+// const SelectedCard = ({ selected }: { selected: Card | null }) => {
+//   return (
+//     <div className="relative z-[60] flex h-full w-full flex-col justify-end rounded-lg bg-transparent shadow-2xl">
+//       <motion.div
+//         initial={{
+//           opacity: 0,
+//         }}
+//         animate={{
+//           opacity: 0.6,
+//         }}
+//         className="absolute inset-0 z-10 h-full w-full bg-black opacity-60"
+//       />
+//       <motion.div
+//         initial={{
+//           opacity: 0,
+//           y: 100,
+//         }}
+//         animate={{
+//           opacity: 1,
+//           y: 0,
+//         }}
+//         transition={{
+//           duration: 0.3,
+//           ease: "easeInOut",
+//         }}
+//         className="relative z-[70] px-8 pb-4"
+//       >
+//         {selected?.content}
+//       </motion.div>
+//     </div>
+//   );
+// };
 
 const SelectedProduct = ({ selected }: { selected: Card }) => {
   const imageUrl = selected?.product?.featuredImage ?? selected.thumbnail;
   const [loaded, setLoaded] = useState(false);
   const previewModal = usePreviewModal();
   const cart = useCart();
-  const router = useRouter();
+  // const router = useRouter();
 
   const onPreview: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.stopPropagation();
@@ -152,7 +151,7 @@ const SelectedProduct = ({ selected }: { selected: Card }) => {
     cart.setIsShoppingBagOpen(true);
   };
 
-  const goToProduct = () => router.push(`/product/${selected?.product?.id}`);
+  // const goToProduct = () => router.push(`/product/${selected?.product?.id}`);
 
   const quickActions = {
     preview: {
@@ -202,8 +201,8 @@ type QuickAction = {
 
 const ProductCardQuickActions = ({
   actions,
-  productId,
-}: {
+}: // productId,
+{
   actions: QuickAction[];
   productId: string;
 }) => {

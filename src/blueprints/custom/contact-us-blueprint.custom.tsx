@@ -22,21 +22,21 @@ const contactData = {
   location: "Southfield, MI 48034",
   hours: ["Sunday CLOSED", "Mon - Sat 10am - 6pm"],
   socials: [
-    {
-      Icon: Facebook,
-      href: "/",
-      name: "Facebook",
-    },
+    // {
+    //   Icon: Facebook,
+    //   href: "/",
+    //   name: "Facebook",
+    // },
     {
       Icon: Instagram,
       href: "https://www.instagram.com/trendanomaly/?hl=en",
       name: "Instagram",
     },
-    {
-      Icon: Twitter,
-      href: "/",
-      name: "Twitter",
-    },
+    // {
+    //   Icon: Twitter,
+    //   href: "/",
+    //   name: "Twitter",
+    // },
   ],
 };
 

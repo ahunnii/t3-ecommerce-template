@@ -8,7 +8,7 @@ import {
   Strikethrough,
 } from "lucide-react";
 
-import { FC } from "react";
+import type { FC } from "react";
 import { Toggle } from "../../ui/toggle";
 
 type Props = {

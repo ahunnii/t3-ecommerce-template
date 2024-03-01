@@ -1,11 +1,12 @@
-import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
+import { useConfig } from "~/providers/style-config-provider";
 
 const ErrorPage = () => {
   const router = useRouter();
+  const config = useConfig();
 
   const navigateToShop = () => {
     router.replace("/collections/all-products");
@@ -16,13 +17,10 @@ const ErrorPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Homepage | Store Co.</title>
-        <meta name="description" content="Admin" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <StorefrontLayout bodyStyle="items-center justify-center flex">
+      <StorefrontLayout
+        {...config.layout}
+        bodyStyle="items-center justify-center flex"
+      >
         <div className="flex flex-col items-center">
           <h1 className="text-9xl font-bold">404</h1>
           <h2 className="text-xl text-muted-foreground">
