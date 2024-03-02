@@ -15,6 +15,7 @@ import {
 import { emailService } from "~/services/email";
 import NewCustomOrderEmail from "~/services/email/email-templates/admin.custom-order";
 import NewCustomOrderCustomer from "~/services/email/email-templates/customer.custom-order";
+import { customOrderAdminFormSchema } from "../types";
 
 export const customRouter = createTRPCRouter({
   getCustomRequests: protectedProcedure
@@ -66,6 +67,7 @@ export const customRouter = createTRPCRouter({
   createCustomRequest: publicProcedure
     .input(
       z.object({
+        emailClient: z.boolean().optional(),
         storeId: z.string().optional(),
         email: z.string().email(),
         name: z.string(),
@@ -108,6 +110,88 @@ export const customRouter = createTRPCRouter({
           data: emailData,
           template: NewCustomOrderEmail,
         });
+
+        return customOrder;
+      } catch (e) {
+        console.log(e);
+      }
+    }),
+
+  createAdminCustomRequest: protectedProcedure
+    .input(
+      customOrderAdminFormSchema.extend({
+        storeId: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const customOrder = await ctx.prisma.customOrderRequest.create({
+          data: {
+            name: input.name,
+            email: input.email,
+            description: input.description,
+            type: input.type,
+            storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+            status: input.status,
+            price: null,
+
+            images: {
+              createMany: {
+                data: [...input.images.map((image: { url: string }) => image)],
+              },
+            },
+          },
+        });
+
+        // if (input.status !== "ACCEPTED") {
+        //   const emailData = {
+        //     firstName: input.name,
+        //     orderLink: `${env.NEXT_PUBLIC_URL}/admin/${env.NEXT_PUBLIC_STORE_ID}/custom-orders/${customOrder.id}`,
+        //   };
+
+        //   await emailService.sendEmail<typeof emailData>({
+        //     to: storeTheme.brand.email,
+        //     from: "Trend Anomaly <no-reply@trendanomaly.com>",
+        //     subject: "New Custom Order Request",
+        //     data: emailData,
+        //     template: NewCustomOrderEmail,
+        //   });
+        // }
+
+        if (input.status === "ACCEPTED") {
+          const category = await ctx.prisma.category.findFirst({
+            where: {
+              storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+            },
+          });
+
+          const product = await ctx.prisma.product.upsert({
+            where: {
+              id: customOrder.productId! ?? "",
+            },
+            update: {
+              price: input.price ?? 0.0,
+              description: input.productDescription,
+            },
+            create: {
+              price: input.price ?? 0.0,
+              isArchived: true,
+              name: `Custom ${input.type}`,
+              categoryId: category?.id ?? "",
+              storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+              description: input.notes ?? input.description,
+            },
+          });
+
+          await ctx.prisma.customOrderRequest.update({
+            where: {
+              id: customOrder?.id,
+            },
+            data: {
+              productId: product.id,
+            },
+          });
+        }
 
         return customOrder;
       } catch (e) {
@@ -289,7 +373,7 @@ export const customRouter = createTRPCRouter({
           invoiceId: customOrder?.id,
         };
         await emailService.sendEmail<typeof data>({
-          to: customOrder?.email ?? "",
+          to: customOrder!.email,
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
           subject: "New Invoice from Trend Anomaly",
           data: data,

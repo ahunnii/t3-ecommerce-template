@@ -26,6 +26,7 @@ export const customOrderAdminFormSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   description: z.string(),
+  productDescription: z.string(),
   notes: z.string().optional(),
   images: z.object({ url: z.string() }).array(),
   status: z.nativeEnum(CustomOrderStatus),
@@ -75,7 +76,7 @@ export type CustomOrderColumn = {
 };
 
 export type CustomOrder = Prisma.CustomOrderRequestGetPayload<{
-  include: { images: true };
+  include: { images: true; product: true };
 }>;
 
 export const invoiceSchema = z.object({

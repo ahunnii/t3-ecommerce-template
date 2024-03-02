@@ -25,6 +25,7 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 
+import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import {
@@ -34,7 +35,7 @@ import {
 } from "../types";
 
 type Props = {
-  initialData: CustomOrder;
+  initialData: CustomOrder | null;
 };
 
 export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
@@ -48,6 +49,7 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
   };
 
   const [open, setOpen] = useState(false);
+  const [sendToClient, setSendToClient] = useState(false);
 
   const title = initialData ? "Edit Custom Order" : "Create Custom Order";
   const description = initialData
@@ -64,11 +66,12 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
     defaultValues: {
       name: initialData?.name ?? "",
       email: initialData?.email ?? "",
-      description: initialData?.description ?? "",
+      description: initialData?.description ?? "N/A",
       notes: initialData?.notes ?? "",
+      productDescription: initialData?.product?.description ?? "",
 
       images: initialData?.images ?? [],
-      status: initialData?.status ?? "PENDING",
+      status: initialData?.status ?? "ACCEPTED",
       type: initialData?.type ?? undefined,
       price: initialData?.price ?? 0,
     },
@@ -90,21 +93,44 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
     },
   });
 
-  const createCustomOrder = api.customOrder.createCustomRequest.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${storeId}/custom-orders`);
-      toastService.success(toastMessage);
-    },
-    onError: (error: unknown) =>
-      toastService.error(
-        "Something went wrong creating your custom order.",
-        error
-      ),
+  const emailCustomerInvoice = api.customOrder.emailCustomerInvoice.useMutation(
+    {
+      onSuccess: () => {
+        toastService.success("Customer invoice was successfully sent");
+        setSendToClient(false);
+      },
+      onError: (error: unknown) => {
+        toastService.error(
+          "There was an error sending the customer invoice. Please try again later.",
+          error
+        );
+      },
+    }
+  );
 
-    onSettled: () => {
-      void apiContext.customOrder.invalidate();
-    },
-  });
+  const createCustomOrder =
+    api.customOrder.createAdminCustomRequest.useMutation({
+      onSuccess: (data) => {
+        router.push(`/admin/${storeId}/custom-orders`);
+        toastService.success(toastMessage);
+
+        if (sendToClient && data?.id && data?.status === "ACCEPTED") {
+          emailCustomerInvoice.mutate({
+            customOrderId: data.id,
+          });
+        }
+      },
+      onError: (error: unknown) =>
+        toastService.error(
+          "Something went wrong creating your custom order.",
+          error
+        ),
+
+      onSettled: () => {
+        void apiContext.customOrder.invalidate();
+        void apiContext.products.invalidate();
+      },
+    });
 
   const deleteCustomOrder = api.customOrder.deleteCustomRequest.useMutation({
     onSuccess: () => {
@@ -248,10 +274,11 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
                 <Form.FormItem>
                   <Form.FormLabel>Price</Form.FormLabel>
                   <Form.FormControl>
-                    <Input
-                      disabled={loading}
+                    <AdvancedNumericInput
+                      field={field}
+                      loading={loading}
                       placeholder="Price of order"
-                      {...field}
+                      prependSpan="$"
                     />
                   </Form.FormControl>
                   <Form.FormMessage />
@@ -318,9 +345,7 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
                       </SelectTrigger>
                     </Form.FormControl>
                     <SelectContent>
-                      <SelectItem value={CustomOrderType.HAT}>
-                        Pending
-                      </SelectItem>
+                      <SelectItem value={CustomOrderType.HAT}>Hat</SelectItem>
 
                       <SelectItem value={CustomOrderType.HOODIE}>
                         Hoodie
@@ -342,14 +367,40 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
               name="description"
               render={({ field }) => (
                 <Form.FormItem>
-                  <Form.FormLabel>Description</Form.FormLabel>
+                  <Form.FormLabel>User Description</Form.FormLabel>
+                  <Form.FormControl>
+                    <Textarea
+                      placeholder={
+                        "e.g. I want a custom hoodie with a custom design. I want it to be orange."
+                      }
+                      disabled={loading}
+                      {...field}
+                    />
+                  </Form.FormControl>{" "}
+                  <Form.FormDescription>
+                    What did the customer ask for?
+                  </Form.FormDescription>
+                  <Form.FormMessage />
+                </Form.FormItem>
+              )}
+            />
+
+            <Form.FormField
+              control={form.control}
+              name="productDescription"
+              render={({ field }) => (
+                <Form.FormItem>
+                  <Form.FormLabel>Product Description</Form.FormLabel>
                   <Form.FormControl>
                     <Textarea
                       disabled={loading}
-                      placeholder="Order description"
+                      placeholder="e.g. One custom orange hoodie with a custom design, medium size."
                       {...field}
                     />
-                  </Form.FormControl>
+                  </Form.FormControl>{" "}
+                  <Form.FormDescription>
+                    Details on the custom product. What are you making?
+                  </Form.FormDescription>
                   <Form.FormMessage />
                 </Form.FormItem>
               )}
@@ -360,26 +411,40 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
               name="notes"
               render={({ field }) => (
                 <Form.FormItem>
-                  <Form.FormLabel>Product Notes</Form.FormLabel>
-                  <Form.FormDescription>
-                    Details on the custom product. The customer is able to see
-                    this.
-                  </Form.FormDescription>
+                  <Form.FormLabel> Notes</Form.FormLabel>
                   <Form.FormControl>
                     <Textarea
                       disabled={loading}
-                      placeholder="Order description"
+                      placeholder="e.g. Need to contact customer on size."
                       {...field}
                     />
-                  </Form.FormControl>
+                  </Form.FormControl>{" "}
+                  <Form.FormDescription>
+                    Any notes you want to make for this order.
+                  </Form.FormDescription>
                   <Form.FormMessage />
                 </Form.FormItem>
               )}
             />
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
+          <Button
+            disabled={loading}
+            className="ml-auto"
+            type="submit"
+            variant="secondary"
+          >
             {action}
           </Button>
+          {action === "Create" && (
+            <Button
+              disabled={loading}
+              className="ml-4"
+              type="submit"
+              onClick={() => setSendToClient(true)}
+            >
+              Create and email invoice to customer
+            </Button>
+          )}
         </form>
       </Form.Form>
     </>
