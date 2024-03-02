@@ -5,6 +5,7 @@ import {
 } from "@prisma/client";
 import type { LucideIcon } from "lucide-react";
 import * as z from "zod";
+import { customOrderAdminFormSchema, customRequestFormSchema } from "./schema";
 
 export type CustomProduct = "hat" | "shirt" | "hoodie";
 
@@ -13,26 +14,6 @@ export const customProductOptions = [
   { label: "Shirt", value: "shirt" },
   { label: "Hoodie", value: "hoodie" },
 ] as const;
-
-export const customRequestFormSchema = z.object({
-  email: z.string().email(),
-  name: z.string(),
-  type: z.nativeEnum(CustomOrderType),
-  description: z.string(),
-  images: z.object({ url: z.string() }).array(),
-});
-
-export const customOrderAdminFormSchema = z.object({
-  email: z.string().email(),
-  name: z.string(),
-  description: z.string(),
-  productDescription: z.string(),
-  notes: z.string().optional(),
-  images: z.object({ url: z.string() }).array(),
-  status: z.nativeEnum(CustomOrderStatus),
-  type: z.nativeEnum(CustomOrderType),
-  price: z.coerce.number().min(0),
-});
 
 export type CustomOrderAdminFormValues = z.infer<
   typeof customOrderAdminFormSchema

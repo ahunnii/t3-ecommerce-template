@@ -3,14 +3,16 @@ import { useRouter } from "next/router";
 import { Plus } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
-import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
 import Link from "next/link";
 
+import { AdvancedDataTable } from "~/components/ui/advanced-data-table";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import type { CustomOrderColumn } from "../types";
 import { columns } from "./columns";
+import { filterOptions } from "./filter-options";
 
 type Props = { data: CustomOrderColumn[] };
 
@@ -32,7 +34,13 @@ export const CustomOrderClient: React.FC<Props> = ({ data }) => {
         </Link>
       </div>
       <Separator />
-      <DataTable searchKey="email" columns={columns} data={data} />
+
+      <AdvancedDataTable
+        searchKey="email"
+        columns={columns}
+        data={data}
+        filters={filterOptions}
+      />
     </>
   );
 };

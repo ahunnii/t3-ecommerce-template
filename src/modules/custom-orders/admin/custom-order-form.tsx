@@ -28,11 +28,8 @@ import { Textarea } from "~/components/ui/textarea";
 import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import {
-  customOrderAdminFormSchema,
-  type CustomOrder,
-  type CustomOrderAdminFormValues,
-} from "../types";
+import { type CustomOrder, type CustomOrderAdminFormValues } from "../types";
+import { customOrderAdminFormSchema } from "../schema";
 
 type Props = {
   initialData: CustomOrder | null;

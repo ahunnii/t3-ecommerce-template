@@ -1,13 +1,9 @@
 import type { Image } from "@prisma/client";
 import NextImage from "next/image";
 
-type ViewCustomOrderImagesProps = {
-  images: Image[];
-};
+type Props = { images: Image[] };
 
-export const ViewCustomOrderImages = ({
-  images,
-}: ViewCustomOrderImagesProps) => {
+export const ViewCustomOrderImages = ({ images }: Props) => {
   return (
     <div className="w-1/4  rounded-md border border-border bg-background/50 p-4">
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">

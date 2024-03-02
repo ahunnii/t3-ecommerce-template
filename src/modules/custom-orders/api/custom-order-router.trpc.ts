@@ -15,7 +15,7 @@ import {
 import { emailService } from "~/services/email";
 import NewCustomOrderEmail from "~/services/email/email-templates/admin.custom-order";
 import NewCustomOrderCustomer from "~/services/email/email-templates/customer.custom-order";
-import { customOrderAdminFormSchema } from "../types";
+import { customOrderAdminFormSchema } from "../schema";
 
 export const customRouter = createTRPCRouter({
   getCustomRequests: protectedProcedure
