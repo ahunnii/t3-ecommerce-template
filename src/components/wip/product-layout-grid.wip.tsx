@@ -42,7 +42,7 @@ export const LayoutGrid = ({
   return (
     <div
       className={cn(
-        "mx-auto grid h-full w-full max-w-7xl grid-cols-1  gap-4 py-10 md:grid-cols-3 ",
+        "mx-auto grid h-full w-full max-w-7xl grid-cols-2  gap-4 py-10 md:grid-cols-3 ",
         className
       )}
     >

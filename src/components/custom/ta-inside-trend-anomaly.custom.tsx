@@ -4,8 +4,8 @@ import Container from "~/components/core/ui/container";
 export const InsideTrendAnomaly = () => {
   return (
     <Container>
-      <div className="flex w-full items-center justify-around bg-purple-300/90 p-4 pl-8">
-        <div className="w-2/3 border border-purple-500 bg-zinc-800 p-8 shadow">
+      <div className="flex w-full flex-col items-center justify-around bg-purple-300/90 p-4 pl-8 md:flex-row">
+        <div className="w-full border border-purple-500 bg-zinc-800 p-8 shadow md:w-2/3">
           <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight text-purple-500 first:mt-0">
             Inside Trend Anomaly
           </h2>

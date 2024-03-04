@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "~/utils/styles";
+import { Button } from "../ui/button";
 
 type Props = {
   link: string;
@@ -22,15 +23,23 @@ export const TaVideoCategoryCard = (props: Props) => {
     <Link
       href={props.link}
       className={cn(
-        "relative aspect-square h-96 w-1/3 overflow-hidden bg-purple-500  bg-cover bg-center transition-all duration-500 ease-in-out",
+        "relative mx-auto aspect-square h-96 overflow-hidden bg-purple-500  bg-cover bg-center transition-all duration-500 ease-in-out max-md:w-11/12 md:w-1/3",
         bgVideo
       )}
       onMouseOver={() => setToggleVideo(true)}
       onMouseLeave={() => setToggleVideo(false)}
     >
-      <p className="absolute bottom-0 z-10  text-2xl font-bold text-white">
+      <p className="absolute bottom-32 left-5 z-10  text-lg font-semibold text-white lg:text-xl ">
+        Featured Collection
+      </p>
+      <p className="absolute bottom-20  left-5  z-10  text-2xl font-semibold text-white lg:text-3xl">
         {props?.title}
       </p>
+      <Button className="absolute bottom-5 left-5" variant={"outline"}>
+        Shop {props.title}
+      </Button>
+
+      <div className="h-full w-full bg-black/20 md:hidden"></div>
       {toggleVideo ? (
         <>
           {props?.videoURL && (
