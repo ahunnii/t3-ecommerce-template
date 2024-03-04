@@ -45,9 +45,10 @@ const NavbarActions = ({ className }: { className?: string }) => {
           <Button
             variant={"outline"}
             onClick={() => void signIn()}
-            className="bg-black text-white"
+            className="bg-black text-white  max-lg:rounded-full max-lg:px-2"
           >
-            Sign in
+            <span className="max-lg:hidden"> Sign in</span>{" "}
+            <User className="hidden max-lg:flex" />
           </Button>
         </>
       )}

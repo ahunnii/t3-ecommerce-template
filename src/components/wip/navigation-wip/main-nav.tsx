@@ -29,9 +29,9 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
   return (
     <nav className="mx-6 flex items-center space-x-4 max-md:hidden lg:space-x-6">
       <NavigationMenu>
-        <NavigationMenuList>
+        <NavigationMenuList className="flex flex-wrap">
           {links.map((navlink, idx) => {
-            if (navlink.href)
+            if (navlink?.href)
               return (
                 <NavigationMenuItem key={idx + "_main"}>
                   <NavigationMenuLink
@@ -50,7 +50,7 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               );
-            if (navlink.links) {
+            if (navlink?.links) {
               return (
                 <NavigationMenuItem key={idx}>
                   <NavigationMenuTrigger

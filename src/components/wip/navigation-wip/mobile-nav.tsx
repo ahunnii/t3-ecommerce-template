@@ -76,7 +76,7 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
           <div className="flex flex-col space-y-8 pt-6 ">
             {links?.map((item, idx) => {
-              if (item.href) {
+              if (item?.href) {
                 return (
                   <Link
                     key={item.href}
@@ -94,7 +94,7 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                 );
               }
 
-              if (item.links) {
+              if (item?.links) {
                 return (
                   <div className="flex flex-col space-y-2" key={idx}>
                     <div className="flex flex-col space-y-3 ">

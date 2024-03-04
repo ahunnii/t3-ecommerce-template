@@ -37,12 +37,8 @@ const Navbar = ({
   linkStyles?: string;
 }) => {
   const getAllCollections = api.collections.getAllCollections.useQuery(
-    {
-      storeId: env.NEXT_PUBLIC_STORE_ID,
-    },
-    {
-      enabled: false,
-    }
+    {},
+    { enabled: false }
   );
 
   useEffect(() => void getAllCollections.refetch(), []);
@@ -70,6 +66,11 @@ const Navbar = ({
               "Check out our gallery to see some of our previous work.",
           },
           {
+            title: "Blog",
+            href: "/blog",
+            description: "Read our blog to stay up to date with our brand.",
+          },
+          {
             title: "Shipping Policy",
             href: "/policies/shipping-policy",
             description:
@@ -84,28 +85,37 @@ const Navbar = ({
         ],
       },
 
-      getAllCollections?.data && {
-        title: "Collections",
-        pathname: "/collections",
-        links: [
-          ...getAllCollections?.data?.map((collection) => ({
-            title: collection?.name,
-            href: `/collections/${collection?.id}`,
-            description: "",
-          })),
-          {
-            title: "View All",
-            href: "/collections",
-            description: "",
+      getAllCollections?.data
+        ? {
+            title: "Collections",
+            pathname: "/collections",
+            links: [
+              ...getAllCollections?.data?.map((collection) => ({
+                title: collection?.name,
+                href: `/collections/${collection?.id}`,
+                description: "",
+              })),
+              {
+                title: "View All",
+                href: "/collections",
+                description: "",
+              },
+            ],
+          }
+        : {
+            title: "Collections",
+            pathname: "/collections",
+            links: [
+              {
+                title: "View All",
+                href: "/collections",
+                description: "",
+              },
+            ],
           },
-        ],
-      },
+
       {
-        title: "Blog",
-        href: "/blog",
-      },
-      {
-        title: "Custom Requests",
+        title: "Custom",
         href: "/custom-request",
       },
       {
@@ -124,9 +134,9 @@ const Navbar = ({
     >
       <Container>
         <div className="h-18 relative flex w-full items-center justify-between px-4 sm:px-6 lg:px-8 ">
-          <div className="flex items-center justify-start max-md:w-2/3  md:flex-row-reverse">
-            <div className="max-md:w-1/2">
-              {navigationLinks && getAllCollections?.data && (
+          <div className="flex items-center max-md:w-2/3 md:flex-row-reverse  md:justify-center lg:justify-start">
+            <div className="mx-auto max-md:w-1/2">
+              {navigationLinks && (
                 <>
                   <MobileNav links={navigationLinks} />
                   <MainNav links={navigationLinks} />
@@ -146,14 +156,15 @@ const Navbar = ({
 
 const NavBarLogo = () => {
   return (
-    <div className="ml-4  flex justify-start gap-x-2 overflow-hidden max-md:w-1/2 max-md:justify-center lg:ml-0">
-      <Link href="/" className="mx-auto flex">
+    <div className="ml-4  flex justify-start gap-x-2 overflow-hidden max-md:w-1/2 max-md:justify-center lg:ml-0  ">
+      <Link href="/" className="mx-auto flex  flex-shrink-0">
         <p className="sr-only text-xl font-bold">{STORE_NAME}</p>
 
         <Image
           src={storeTheme.logo.default}
           width={80}
           height={80}
+          className=" h-20 w-20"
           alt="logo"
         />
       </Link>

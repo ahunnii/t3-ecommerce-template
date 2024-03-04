@@ -54,7 +54,7 @@ const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
           </div>
 
           <Link href="/cart">
-            <Button className="mt-4 w-full rounded-full">
+            <Button className="mt-4 w-full rounded-full" type="button">
               View cart & check out
             </Button>
           </Link>
