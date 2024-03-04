@@ -90,6 +90,39 @@ const VariantSelector: FC<IProps> = ({
     form.setValue("quantity", watchedValues.quantity - 1);
   };
 
+  const getVariantByAttributes = (
+    attributeValues: string[],
+    variants: Variation[]
+  ) => {
+    // Loop through the variants to find a match
+    return variants.find((variant) => {
+      // Split the variant values by comma and trim spaces for comparison
+      const variantValues = variant.values
+        .split(", ")
+        .map((value) => value.trim());
+      // Check if all selected attribute values are in the variant's values
+      return attributeValues.every((attrValue) =>
+        variantValues.includes(attrValue)
+      );
+    });
+  };
+
+  const getVariantPrice = (optionValue: string, attributeName: string) => {
+    // Assuming each variant has a unique combination of values
+    const variant = product.variants?.find((v) => {
+      const values = v.values.split(", ").map((v) => v.trim());
+      return values.includes(optionValue);
+    });
+
+    // If variant is found and has a price, return it
+    return variant ? variant.price : null;
+  };
+
+  const formatPrice = (price: number | null) => {
+    // Format the price as a currency string, or return an empty string if null
+    return price ? `$${price.toFixed(2)}` : "";
+  };
+
   useEffect(() => {
     const getVariant = () => {
       return product.variants?.find(
@@ -213,45 +246,82 @@ const VariantSelector: FC<IProps> = ({
                             />
                             <CommandEmpty>No {field.name} found.</CommandEmpty>
                             <CommandGroup>
-                              {field.values.map((language, index) => {
-                                const available = isOptionAvailable(language);
-                                const combo = doesMatch(
-                                  language,
-                                  idx,
-                                  field.name
+                              {field.values.map((givenOption, index) => {
+                                // Prepare the array of currently selected attribute values, including the current 'field.name'
+                                const attributeValues = Object.entries(
+                                  watchedValues.selection
+                                )
+                                  .map(([key, value]) => {
+                                    return key === field.name
+                                      ? givenOption
+                                      : value; // Replace the current field's value with the option
+                                  })
+                                  .filter(Boolean); // Filter out any undefined or empty strings
+
+                                // Find the matching variant based on current and new selection
+                                const matchingVariant = getVariantByAttributes(
+                                  attributeValues,
+                                  product.variants || []
                                 );
+
+                                const variantAvailable = matchingVariant
+                                  ? matchingVariant.quantity > 0
+                                  : false;
+                                const variantPrice = matchingVariant
+                                  ? matchingVariant.price
+                                  : null;
+                                const isSelected =
+                                  watchedValues.selection[field.name] ===
+                                  givenOption;
+                                const isSelectable =
+                                  variantAvailable && variantPrice !== null;
+
+                                const optionLabel = `${givenOption} ${
+                                  variantPrice !== null
+                                    ? `- $${variantPrice.toFixed(2)}`
+                                    : ""
+                                }`;
+                                const optionDetail = !variantAvailable
+                                  ? " - Out of stock"
+                                  : isSelected
+                                  ? ``
+                                  : "";
 
                                 return (
                                   <CommandItem
-                                    value={language}
+                                    value={givenOption}
                                     key={index}
                                     className={cn(
-                                      available && combo
+                                      isSelectable
                                         ? ""
                                         : "text-gray-400 line-through"
                                     )}
-                                    disabled={!available || !combo}
+                                    disabled={!isSelectable}
                                     onSelect={() => {
                                       form.setValue(
                                         `selection.${field.name}`,
-                                        formField.value === language
-                                          ? ""
-                                          : language
+                                        isSelected ? "" : givenOption
                                       );
                                     }}
                                   >
                                     <Check
                                       className={cn(
                                         "mr-2 h-4 w-4",
-                                        language === formField.value
+                                        givenOption === formField.value
                                           ? "opacity-100"
                                           : "opacity-0"
                                       )}
                                     />
-                                    {language}{" "}
+                                    {/* {givenOption} -{" "}
+                                    {formatPrice(
+                                      getVariantPrice(givenOption, field.name)
+                                    )}
                                     {!available || !combo
                                       ? " - Out of stock"
-                                      : ""}
+                                      : ""} */}
+
+                                    {optionLabel}
+                                    {optionDetail}
                                   </CommandItem>
                                 );
                               })}

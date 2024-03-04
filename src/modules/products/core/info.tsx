@@ -49,6 +49,19 @@ const Info: React.FC<InfoProps> = (props) => {
 
   const cart = useCart();
 
+  const getPriceRange = useMemo(() => {
+    if (props?.data?.variants?.length === 0) {
+      return { min: props?.data?.price, max: null };
+    }
+
+    const prices = props?.data?.variants?.map((variant) => variant.price);
+
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    return { min, max };
+  }, [props?.data?.variants, props?.data?.price]);
+
   const onAddToCart = () => {
     cart.addCartItem({
       product: props?.data,
@@ -72,18 +85,31 @@ const Info: React.FC<InfoProps> = (props) => {
         <p className={cn("text-2xl ", textStyles)}>
           <div className="flex gap-2">
             {discount && (
-              <Currency
-                value={discount.price}
-                className="font-extrabold text-slate-800"
-              />
+              <div className="flex items-center">
+                <Currency
+                  value={discount.price}
+                  className="font-extrabold text-slate-800"
+                />
+                <span>{getPriceRange.max && !variant && "+"}</span>
+              </div>
             )}
 
-            <Currency
-              value={variant ? variant.price : props?.data?.price}
-              className={cn(
-                discount && "font-medium text-muted-foreground line-through"
-              )}
-            />
+            <div className="flex">
+              <Currency
+                value={variant ? variant.price : props?.data?.price}
+                className={cn(
+                  discount && "font-medium text-muted-foreground line-through"
+                )}
+              />
+
+              <span
+                className={cn(
+                  discount && "font-medium text-muted-foreground line-through"
+                )}
+              >
+                {getPriceRange.max && !variant && "+"}
+              </span>
+            </div>
           </div>
 
           {discount && (
