@@ -97,11 +97,16 @@ export const productsRouter = createTRPCRouter({
         where: {
           storeId: input?.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           categoryId: input.categoryId,
+          isArchived: false,
         },
         include: {
           category: true,
           images: true,
-          discounts: true,
+          discounts: {
+            where: {
+              active: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -170,11 +175,19 @@ export const productsRouter = createTRPCRouter({
         include: {
           collections: {
             include: {
-              discounts: true,
+              discounts: {
+                where: {
+                  active: true,
+                },
+              },
             },
           },
           images: true,
-          discounts: true,
+          discounts: {
+            where: {
+              active: true,
+            },
+          },
           variants: true,
           materials: true,
           tags: true,

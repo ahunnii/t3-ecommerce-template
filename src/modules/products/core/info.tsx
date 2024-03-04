@@ -58,6 +58,8 @@ const Info: React.FC<InfoProps> = (props) => {
     });
   };
 
+  console.log(props?.data?.description?.length);
+
   const textStyles = infoVariants({ variant: props?.variant ?? "default" });
   const btnStyles = infoVariants({ button: props?.button ?? "default" });
 
@@ -115,9 +117,16 @@ const Info: React.FC<InfoProps> = (props) => {
       <div className={cn("mt-10 gap-x-3 space-y-4", textStyles)}>
         <div>
           <h3 className="text-lg font-bold">Description</h3>
-          <div className={cn("", "")}>
-            {parse(props?.data.description ?? "No description provided.")}
-          </div>
+
+          {props?.data?.description === "" ||
+          props?.data.description === null ||
+          props?.data?.description?.length === 0 ? (
+            <div className={cn("", "")}>
+              <p>No description provided.</p>
+            </div>
+          ) : (
+            <div className={cn("", "")}>{parse(props?.data.description)}</div>
+          )}
         </div>
         {props?.data?.materials?.length > 0 && (
           <div>
