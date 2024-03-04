@@ -135,7 +135,7 @@ const useCart = create(
         if (existingItem) {
           existingItem.quantity = quantity;
           set({ cartItems: [...get().cartItems] });
-          toastService.success("Item quantity updated.");
+          // toastService.success("Item quantity updated.");
         }
       },
       getQuantity: () => {
