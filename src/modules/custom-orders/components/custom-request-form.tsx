@@ -21,10 +21,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import ImageUpload from "~/services/image-upload/components/image-upload";
-import {
-  customRequestFormSchema,
-  type CustomRequestFormValues,
-} from "../types";
+import { customRequestFormSchema } from "../schema";
+import { type CustomRequestFormValues } from "../types";
 
 type TContactFormBasicProps = {
   onSubmit: (values: CustomRequestFormValues) => void;
