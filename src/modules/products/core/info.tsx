@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Tag } from "lucide-react";
 
 import { Discount } from "@prisma/client";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -58,8 +58,6 @@ const Info: React.FC<InfoProps> = (props) => {
     });
   };
 
-  console.log(props?.data?.description?.length);
-
   const textStyles = infoVariants({ variant: props?.variant ?? "default" });
   const btnStyles = infoVariants({ button: props?.button ?? "default" });
 
@@ -87,6 +85,12 @@ const Info: React.FC<InfoProps> = (props) => {
               )}
             />
           </div>
+
+          {discount && (
+            <p className="flex items-center gap-2 py-2 text-sm">
+              <Tag size={16} /> Discount: {discount?.discount?.description}
+            </p>
+          )}
         </p>
       </div>
       <hr className="my-4" />
