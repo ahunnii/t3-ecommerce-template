@@ -26,10 +26,11 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 
 import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import { type CustomOrder, type CustomOrderAdminFormValues } from "../types";
 import { customOrderAdminFormSchema } from "../schema";
+import { type CustomOrder, type CustomOrderAdminFormValues } from "../types";
 
 type Props = {
   initialData: CustomOrder | null;
@@ -74,20 +75,23 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
     },
   });
 
+  const defaultSuccess = () => {
+    router.push(`/admin/${storeId}/custom-orders`);
+    toastService.success(toastMessage);
+  };
+
+  const defaultSettled = () => {
+    void apiContext.customOrder.invalidate();
+    void apiContext.products.invalidate();
+  };
   const updateCustomOrder = api.customOrder.updateCustomRequest.useMutation({
-    onSuccess: () => {
-      router.push(`/admin/${storeId}/custom-orders`);
-      toastService.success(toastMessage);
-    },
+    onSuccess: defaultSuccess,
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong updating your custom order.",
         error
       ),
-
-    onSettled: () => {
-      void apiContext.customOrder.invalidate();
-    },
+    onSettled: defaultSettled,
   });
 
   const emailCustomerInvoice = api.customOrder.emailCustomerInvoice.useMutation(
@@ -108,25 +112,16 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
   const createCustomOrder =
     api.customOrder.createAdminCustomRequest.useMutation({
       onSuccess: (data) => {
-        router.push(`/admin/${storeId}/custom-orders`);
-        toastService.success(toastMessage);
-
-        if (sendToClient && data?.id && data?.status === "ACCEPTED") {
-          emailCustomerInvoice.mutate({
-            customOrderId: data.id,
-          });
-        }
+        defaultSuccess();
+        if (sendToClient && data?.id && data?.status === "ACCEPTED")
+          emailCustomerInvoice.mutate({ customOrderId: data.id });
       },
       onError: (error: unknown) =>
         toastService.error(
           "Something went wrong creating your custom order.",
           error
         ),
-
-      onSettled: () => {
-        void apiContext.customOrder.invalidate();
-        void apiContext.products.invalidate();
-      },
+      onSettled: defaultSettled,
     });
 
   const deleteCustomOrder = api.customOrder.deleteCustomRequest.useMutation({
@@ -143,8 +138,7 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
 
     onSettled: () => {
       setOpen(false);
-
-      void apiContext.customOrder.invalidate();
+      defaultSettled();
     },
   });
 
@@ -182,266 +176,301 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
       />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
+
         {initialData && (
           <Button
             disabled={loading}
             variant="destructive"
             size="sm"
+            type="button"
             onClick={() => setOpen(true)}
           >
             <Trash className="h-4 w-4" />
           </Button>
         )}
       </div>
+
       <Separator />
       <Form.Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="w-full space-y-8"
+          className=" w-full  space-y-8"
         >
-          <Form.FormField
-            control={form.control}
-            name="images"
-            render={({ field }) => (
-              <Form.FormItem>
-                <Form.FormLabel>Media</Form.FormLabel>
-                <Form.FormDescription>
-                  Upload images for your product.{" "}
-                </Form.FormDescription>
-                <Form.FormControl>
-                  {/* <>
+          <div className="flex space-x-4">
+            <section className="w-3/4 space-y-4">
+              <EditSection
+                title="Customer Details"
+                description="Details of the customer who made the custom order."
+                bodyClassName="grid grid-cols-2 gap-2"
+              >
+                <Form.FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel>Full Name</Form.FormLabel>
+                      <Form.FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Name of customer"
+                          {...field}
+                        />
+                      </Form.FormControl>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+                <Form.FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel>Email</Form.FormLabel>
+                      <Form.FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Email of customer"
+                          {...field}
+                        />
+                      </Form.FormControl>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+              </EditSection>
+              <EditSection
+                title="Customer Request"
+                description="Description of the item the customer is requesting"
+                bodyClassName="grid grid-cols-2 gap-2"
+              >
+                <Form.FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel>Product Type</Form.FormLabel>
+                      <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <Form.FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Set the order's product type"
+                            />
+                          </SelectTrigger>
+                        </Form.FormControl>
+                        <SelectContent>
+                          <SelectItem value={CustomOrderType.HAT}>
+                            Hat
+                          </SelectItem>
+
+                          <SelectItem value={CustomOrderType.HOODIE}>
+                            Hoodie
+                          </SelectItem>
+
+                          <SelectItem value={CustomOrderType.SHIRT}>
+                            Shirt
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+                <Form.FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <Form.FormItem className="col-span-full">
+                      <Form.FormLabel>User Description</Form.FormLabel>
+                      <Form.FormControl>
+                        <Textarea
+                          placeholder={
+                            "e.g. I want a custom hoodie with a custom design. I want it to be orange."
+                          }
+                          disabled={loading}
+                          {...field}
+                        />
+                      </Form.FormControl>{" "}
+                      <Form.FormDescription>
+                        What did the customer ask for?
+                      </Form.FormDescription>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+                <Form.FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <Form.FormItem className="mt-5">
+                      <Form.FormLabel>Media</Form.FormLabel>
+                      <Form.FormDescription>
+                        Upload images for your product.{" "}
+                      </Form.FormDescription>
+                      <Form.FormControl>
+                        {/* <>
                     {!initialData?.images && <ImageLoader />} */}
-                  <ImageUpload
-                    value={field.value.map((image) => image.url)}
-                    disabled={loading}
-                    onChange={(url) => {
-                      return field.onChange([...field.value, { url }]);
-                    }}
-                    onRemove={(url) =>
-                      field.onChange([
-                        ...field.value.filter((current) => current.url !== url),
-                      ])
-                    }
-                  />
-                  {/* </> */}
-                </Form.FormControl>
-                <Form.FormMessage />
-              </Form.FormItem>
-            )}
-          />{" "}
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <Form.FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>Name</Form.FormLabel>
-                  <Form.FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Name of customer"
-                      {...field}
-                    />
-                  </Form.FormControl>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
-            <Form.FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>Email</Form.FormLabel>
-                  <Form.FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Email of customer"
-                      {...field}
-                    />
-                  </Form.FormControl>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
-            <Form.FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>Price</Form.FormLabel>
-                  <Form.FormControl>
-                    <AdvancedNumericInput
-                      field={field}
-                      loading={loading}
-                      placeholder="Price of order"
-                      prependSpan="$"
-                    />
-                  </Form.FormControl>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
-            <Form.FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>Status</Form.FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <Form.FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Set the order's status"
+                        <ImageUpload
+                          value={field.value.map((image) => image.url)}
+                          disabled={loading}
+                          onChange={(url) => {
+                            return field.onChange([...field.value, { url }]);
+                          }}
+                          onRemove={(url) =>
+                            field.onChange([
+                              ...field.value.filter(
+                                (current) => current.url !== url
+                              ),
+                            ])
+                          }
                         />
-                      </SelectTrigger>
-                    </Form.FormControl>
-                    <SelectContent>
-                      <SelectItem value={CustomOrderStatus.PENDING}>
-                        Pending
-                      </SelectItem>
-
-                      <SelectItem value={CustomOrderStatus.ACCEPTED}>
-                        Accepted
-                      </SelectItem>
-
-                      <SelectItem value={CustomOrderStatus.REJECTED}>
-                        Rejected
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
-
-            <Form.FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>Product Type</Form.FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <Form.FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Set the order's product type"
+                        {/* </> */}
+                      </Form.FormControl>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />{" "}
+              </EditSection>
+              <EditSection
+                className=" gap-2"
+                title="Product Details"
+                description="Details on the product the customer will be sent"
+              >
+                <Form.FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel>Price</Form.FormLabel>
+                      <Form.FormControl>
+                        <AdvancedNumericInput
+                          field={field}
+                          loading={loading}
+                          placeholder="Price of order"
+                          prependSpan="$"
                         />
-                      </SelectTrigger>
-                    </Form.FormControl>
-                    <SelectContent>
-                      <SelectItem value={CustomOrderType.HAT}>Hat</SelectItem>
+                      </Form.FormControl>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
 
-                      <SelectItem value={CustomOrderType.HOODIE}>
-                        Hoodie
-                      </SelectItem>
+                <Form.FormField
+                  control={form.control}
+                  name="productDescription"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel>Product Description</Form.FormLabel>
+                      <Form.FormControl>
+                        <Textarea
+                          disabled={loading}
+                          placeholder="e.g. A large orange hoodie with your custom design, $14.99, est. 5 days"
+                          {...field}
+                        />
+                      </Form.FormControl>{" "}
+                      <Form.FormDescription>
+                        Description of the product the customer is interested in
+                        purchasing.
+                      </Form.FormDescription>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+              </EditSection>
+            </section>
+            <section className="w-1/4">
+              <EditSection
+                className=" gap-2"
+                title="Request Admin"
+                description="Details on the status of this request and the product details"
+              >
+                <Form.FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel>Status</Form.FormLabel>
+                      <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <Form.FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Set the order's status"
+                            />
+                          </SelectTrigger>
+                        </Form.FormControl>
+                        <SelectContent>
+                          <SelectItem value={CustomOrderStatus.PENDING}>
+                            Pending
+                          </SelectItem>
 
-                      <SelectItem value={CustomOrderType.SHIRT}>
-                        Shirt
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
+                          <SelectItem value={CustomOrderStatus.ACCEPTED}>
+                            Accepted
+                          </SelectItem>
+
+                          <SelectItem value={CustomOrderStatus.REJECTED}>
+                            Rejected
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+                <Form.FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <Form.FormItem>
+                      <Form.FormLabel> Notes</Form.FormLabel>
+                      <Form.FormControl>
+                        <Textarea
+                          disabled={loading}
+                          placeholder="e.g. Need to contact customer on size."
+                          {...field}
+                        />
+                      </Form.FormControl>{" "}
+                      <Form.FormDescription>
+                        Any notes you want to make for this order.
+                      </Form.FormDescription>
+                      <Form.FormMessage />
+                    </Form.FormItem>
+                  )}
+                />
+              </EditSection>
+            </section>
           </div>
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <Form.FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>User Description</Form.FormLabel>
-                  <Form.FormControl>
-                    <Textarea
-                      placeholder={
-                        "e.g. I want a custom hoodie with a custom design. I want it to be orange."
-                      }
-                      disabled={loading}
-                      {...field}
-                    />
-                  </Form.FormControl>{" "}
-                  <Form.FormDescription>
-                    What did the customer ask for?
-                  </Form.FormDescription>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
 
-            <Form.FormField
-              control={form.control}
-              name="productDescription"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel>Product Description</Form.FormLabel>
-                  <Form.FormControl>
-                    <Textarea
-                      disabled={loading}
-                      placeholder="e.g. One custom orange hoodie with a custom design, medium size."
-                      {...field}
-                    />
-                  </Form.FormControl>{" "}
-                  <Form.FormDescription>
-                    Details on the custom product. What are you making?
-                  </Form.FormDescription>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
-
-            <Form.FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <Form.FormItem>
-                  <Form.FormLabel> Notes</Form.FormLabel>
-                  <Form.FormControl>
-                    <Textarea
-                      disabled={loading}
-                      placeholder="e.g. Need to contact customer on size."
-                      {...field}
-                    />
-                  </Form.FormControl>{" "}
-                  <Form.FormDescription>
-                    Any notes you want to make for this order.
-                  </Form.FormDescription>
-                  <Form.FormMessage />
-                </Form.FormItem>
-              )}
-            />
-          </div>
-          <Button
-            disabled={loading}
-            className="ml-auto"
-            type="submit"
-            variant="secondary"
-          >
-            {action}
-          </Button>
-          {action === "Create" && (
+          <div className="w-full">
             <Button
               disabled={loading}
-              className="ml-4"
+              className="ml-auto"
               type="submit"
-              onClick={() => setSendToClient(true)}
+              variant={action === "Create" ? "secondary" : "default"}
             >
-              Create and email invoice to customer
+              {action}
             </Button>
-          )}
+            {action === "Create" && (
+              <Button
+                disabled={loading}
+                className="ml-4"
+                type="submit"
+                onClick={() => setSendToClient(true)}
+              >
+                Create and email invoice to customer
+              </Button>
+            )}
+          </div>
         </form>
       </Form.Form>
     </>

@@ -14,8 +14,8 @@ import { Heading } from "~/components/ui/heading";
 import { Pencil } from "lucide-react";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
-import { ViewCustomOrder } from "~/modules/custom-orders/admin/view-custom-order";
-import { ViewCustomOrderImages } from "~/modules/custom-orders/admin/view-custom-order-images";
+import { ViewCustomOrderImages } from "~/modules/custom-orders/admin/view-custom-order-images.admin";
+import { ViewCustomOrder } from "~/modules/custom-orders/admin/view-custom-order.admin";
 
 interface IProps {
   customOrderId: string;

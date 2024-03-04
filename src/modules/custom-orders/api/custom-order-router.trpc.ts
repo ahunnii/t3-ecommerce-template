@@ -60,6 +60,7 @@ export const customRouter = createTRPCRouter({
         },
         include: {
           images: true,
+          product: true,
         },
       });
     }),

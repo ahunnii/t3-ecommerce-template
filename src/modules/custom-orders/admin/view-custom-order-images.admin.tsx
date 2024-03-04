@@ -1,15 +1,17 @@
 import type { Image } from "@prisma/client";
 import NextImage from "next/image";
+import { ViewSection } from "~/components/common/sections/view-section.admin";
 
 type Props = { images: Image[] };
 
 export const ViewCustomOrderImages = ({ images }: Props) => {
   return (
-    <div className="w-1/4  rounded-md border border-border bg-background/50 p-4">
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Images
-      </h3>
-
+    <ViewSection title="Images" className="w-1/4">
+      {images?.length === 0 && (
+        <p className="text-sm">
+          There are no images associated with this custom order
+        </p>
+      )}
       {images?.length > 0 &&
         images.map((image) => (
           <NextImage
@@ -21,6 +23,6 @@ export const ViewCustomOrderImages = ({ images }: Props) => {
             height={128}
           />
         ))}
-    </div>
+    </ViewSection>
   );
 };
