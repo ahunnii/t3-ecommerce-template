@@ -217,6 +217,7 @@ const Summary = ({ cartSize }: { cartSize: number }) => {
       <Button
         onClick={() => void onCheckout()}
         disabled={cartSize === 0}
+        variant={"outline"}
         className={cn("mt-6 w-full", config.cart.button)}
       >
         Checkout

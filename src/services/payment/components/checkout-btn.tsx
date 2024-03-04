@@ -19,6 +19,7 @@ export const CheckoutBtn = (props: TCheckoutBtnProps) => {
   return (
     <Button
       onClick={props.onCheckout}
+      variant={"outline"}
       disabled={props.isDisabled}
       className={cn("mt-6 w-full", config.cart.button)}
     >
