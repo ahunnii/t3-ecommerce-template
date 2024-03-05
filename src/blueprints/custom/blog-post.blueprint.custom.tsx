@@ -20,9 +20,14 @@ const metadata = {
 
 export const BlogPostPage = () => {
   const params = useParams();
-  const { data: blog, isLoading } = api.blogPosts.getBlogPost.useQuery({
-    slug: params?.blogPostSlug as string,
-  });
+  const { data: blog, isLoading } = api.blogPosts.getBlogPost.useQuery(
+    {
+      slug: params?.blogPostSlug as string,
+    },
+    {
+      enabled: !!params?.blogPostSlug,
+    }
+  );
   const config = useConfig();
 
   return (

@@ -18,7 +18,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.headers["x-forwarded-for"]);
   const identifier = "api";
   const result = await ratelimit.limit(identifier);
   res.setHeader("X-RateLimit-Limit", result.limit);

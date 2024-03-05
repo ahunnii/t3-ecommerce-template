@@ -121,8 +121,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const providers = await getProviders();
 
-  console.log(providers);
-
   const errorMessage: Record<string, string> = {
     "account-not-found":
       "Oops, that account doesn't exist. You can sign up for a new account below. ",

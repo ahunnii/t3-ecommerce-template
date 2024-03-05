@@ -42,7 +42,7 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                       primaryLinkStyle,
 
                       (pathname === navlink.href ||
-                        pathname.startsWith(`${navlink.href}`)) &&
+                        pathname?.startsWith(`${navlink.href}`)) &&
                         highlightStyle
                     )}
                   >
