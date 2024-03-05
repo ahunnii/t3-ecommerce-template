@@ -22,7 +22,10 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ data }) => {
 
   return (
     <>
-      <Button onClick={onOpen} className="flex items-center gap-x-2 lg:hidden">
+      <Button
+        onClick={onOpen}
+        className="my-4 flex items-center gap-x-2 lg:hidden"
+      >
         Filters
         <Plus size={20} />
       </Button>

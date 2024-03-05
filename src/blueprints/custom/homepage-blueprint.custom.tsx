@@ -15,6 +15,7 @@ import { ProductCardMarquee } from "~/components/wip/product-card-marquee.wip";
 
 import { TaProductGrid } from "~/components/custom/ta-product-grid.custom";
 
+import Link from "next/link";
 import { TaVideoCategoryCard } from "~/components/custom/ta-video-category-card.wip";
 import { Button } from "~/components/ui/button";
 import { storeTheme } from "~/data/config.custom";
@@ -66,10 +67,11 @@ export const HomePage = () => {
 
         <TaProductGrid products={getAllProducts.data ?? []} />
 
-        <Button className="w-full md:hidden" variant={"outline"} size={"lg"}>
-          Shop Products
-        </Button>
-
+        <Link href="/collections/all-products">
+          <Button className="w-full md:hidden" variant={"outline"} size={"lg"}>
+            Shop Products
+          </Button>
+        </Link>
         <section className="max-md:py-8">
           <Marquee variant="secondary" className="bg-purple-300/90">
             {getAllProducts.data?.slice(0, 3).map((product, idx) => (

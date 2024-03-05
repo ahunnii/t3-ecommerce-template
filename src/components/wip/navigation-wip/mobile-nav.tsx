@@ -65,7 +65,7 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
 
           <>
             <Image
-              src={`/${env.NEXT_PUBLIC_STORE_TYPE}/logo.png`}
+              src={`/${env.NEXT_PUBLIC_STORE_TYPE}/logo-alt.png`}
               width={80}
               height={80}
               alt="logo"
@@ -98,7 +98,9 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                 return (
                   <div className="flex flex-col space-y-2" key={idx}>
                     <div className="flex flex-col space-y-3 ">
-                      <h4 className="text-xl font-medium ">{item.title}</h4>
+                      <h4 className="text-xl font-medium text-purple-800">
+                        {item.title}
+                      </h4>
                       {item.links.map((link, index) => (
                         <Link
                           key={link.href + index}

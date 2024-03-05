@@ -69,7 +69,7 @@ export const SingleProductPage = ({ prevUrl }: { prevUrl: string }) => {
         {!isLoading && product && (
           <div className="px-4 pb-5 sm:px-6 lg:px-8">
             <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
-              <ProductGallery images={product?.images} />
+              <ProductGallery images={product?.images ?? []} />
 
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
                 <Info data={product} discounts={[]} />

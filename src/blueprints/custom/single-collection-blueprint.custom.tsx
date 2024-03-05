@@ -44,7 +44,7 @@ export const SingleCollectionPage: FC<ICollectionPageProps> = ({
           <h1 className={cn("", config.typography.h1)}>{collection?.name}</h1>
           <div className="mt-6 lg:col-span-4">
             {collection?.products.length === 0 && <NoResults />}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {collection?.products.map((item) => (
                 <ProductCard key={item.id} data={item} />
               ))}{" "}
