@@ -52,13 +52,13 @@ const AttributeFilter: React.FC<FilterProps> = ({
       <h3 className={cn("text-lg font-semibold text-white", props.textStyles)}>
         {data.name}
       </h3>
-      <hr className={cn("my-4", props.dividerStyles)} />
+      <hr className={cn("my-2 border-purple-500 pb-4", props.dividerStyles)} />
       <div className="flex flex-wrap gap-2">
         {data.values.split(";").map((filter) => (
-          <div key={filter} className="flex items-center">
+          <div key={filter} className="flex w-full items-center">
             <Button
               className={cn(
-                "rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-800",
+                "rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-800 max-lg:grow",
                 selectedValue === filter &&
                   `bg-black text-white ${props.selectedStyles}`,
                 props.buttonStyles

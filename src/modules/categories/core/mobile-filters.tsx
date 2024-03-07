@@ -33,7 +33,7 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ data }) => {
       <Dialog
         open={open}
         as="div"
-        className="relative z-40 lg:hidden"
+        className="relative z-50 lg:hidden"
         onClose={onClose}
       >
         {/* Background color and opacity */}
@@ -41,12 +41,12 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ data }) => {
 
         {/* Dialog position */}
         <div className="fixed inset-0 z-40 flex">
-          <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-6 shadow-xl">
+          <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-zinc-950 py-4 pb-6 shadow-xl">
             {/* Close button */}
             <div className="flex items-center justify-end px-4">
               <IconButton icon={<X size={15} />} onClick={onClose} />
             </div>
-
+            <h2 className="px-4 text-3xl font-semibold text-white">Filters</h2>
             <div className="p-4">
               {data?.map((attribute, idx) => (
                 <AttributeFilter

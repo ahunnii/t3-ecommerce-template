@@ -208,7 +208,7 @@ type QuickAction = {
 
 const ProductCardQuickActions = ({ actions }: { actions: QuickAction[] }) => {
   return (
-    <div className="absolute bottom-5 z-50 w-full px-6 opacity-0 transition group-hover:opacity-100">
+    <div className="absolute bottom-5 z-50 w-full px-6 opacity-0 transition group-hover:opacity-100 max-md:hidden">
       <div className="flex justify-center gap-x-6">
         {actions.map((action, index) => (
           <Fragment key={index}>
