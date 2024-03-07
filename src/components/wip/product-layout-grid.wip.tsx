@@ -49,7 +49,7 @@ export const LayoutGrid = ({
       {cards.map((card, i) => (
         <div key={i} className={cn(card.className, "")}>
           <motion.div
-            onClick={() => handleClick(card)}
+            // onClick={() => handleClick(card)}
             className={cn(
               card.className,
               "relative overflow-hidden",

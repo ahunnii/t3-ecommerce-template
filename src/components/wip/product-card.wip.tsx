@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Fragment, useState, type MouseEventHandler } from "react";
 
+import Link from "next/link";
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
 import useCart from "~/modules/cart/hooks/use-cart";
@@ -12,6 +13,7 @@ import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
+import { Button } from "../ui/button";
 
 interface ProductCard {
   data: DetailedProductFull;
@@ -89,6 +91,22 @@ const ProductCard: React.FC<ProductCard> = ({ data, className, discounts }) => {
         onClick={goToProduct}
         discountBundle={bestDiscount ?? null}
       />
+
+      {data?.variants?.length > 0 ? (
+        <Button
+          className="w-full bg-purple-700 hover:bg-purple-500"
+          onClick={goToProduct}
+        >
+          View Product
+        </Button>
+      ) : (
+        <Button
+          className="w-full bg-purple-700 hover:bg-purple-500"
+          onClick={onAddToCart}
+        >
+          Add to Cart
+        </Button>
+      )}
     </div>
   );
 };

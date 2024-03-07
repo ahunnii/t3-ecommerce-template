@@ -47,7 +47,7 @@ export const HomePage = () => {
       videoURL: "/custom/ta_embroidery.mp4",
     },
     {
-      link: "/contact-us",
+      link: "/custom-request",
       title: "Custom Clothing",
       imageURL: "/custom/ta_custom.png",
       videoURL: "/custom/ta_custom.mp4",

@@ -2,7 +2,7 @@ export const TaHero = () => {
   return (
     <section
       id="home"
-      className={`py-6" flex flex-col   bg-[url('/custom/ta_hero.jpeg')] bg-cover bg-center bg-no-repeat sm:py-16 md:flex-row`}
+      className={`flex flex-col bg-[url('/custom/ta_hero.jpeg')]   bg-cover bg-center bg-no-repeat py-6 sm:py-16 md:flex-row`}
     >
       <div className={`flex-1   flex-col `}>
         <div className="relative flex h-[25vh] w-full flex-row items-center justify-between">
