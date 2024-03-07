@@ -35,14 +35,14 @@ export const HomePage = () => {
 
   const categoryCards = [
     {
-      link: "/collections/ff0990fa-b6f4-4cea-a391-46b05b9b04b8",
+      link: "/collections/clthr3eij0001gv08sekv32ij",
       title: "Bleach Collection",
       imageURL: "/custom/ta_bleach.jpg",
       gifURL: "/custom/ta_bleach.gif",
     },
     {
-      link: "/collections/1bf47853-88a3-40a3-9dc8-cd5954ad9b68",
-      title: "Embroidery",
+      link: "/collections/all-products",
+      title: "New Arrivals",
       imageURL: "/custom/ta_embroidery_still_alt.png",
       videoURL: "/custom/ta_embroidery.mp4",
     },
