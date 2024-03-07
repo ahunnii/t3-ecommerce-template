@@ -50,19 +50,23 @@ const CartItem: FC<TCartItemProps> = ({ data }) => {
   return (
     <>
       <li className="flex border-b py-6">
-        <div className="relative h-24 w-24 place-self-center overflow-hidden rounded-md sm:h-36 sm:w-36">
-          <Image
-            fill
-            src={
-              data?.product?.featuredImage ??
-              data?.product.images[0]?.url ??
-              "/placeholder-image.webp"
-            }
-            alt=""
-            className="object-cover object-center"
-          />
+        <div className="place-self-center ">
+          <div className="relative h-24  w-24 rounded-md sm:h-36 sm:w-36 ">
+            <Image
+              fill
+              src={
+                data?.product?.featuredImage ??
+                data?.product.images[0]?.url ??
+                "/placeholder-image.webp"
+              }
+              alt=""
+              className="object-cover object-center"
+              sizes={"(min-width: 1024px) 300px"}
+            />
+          </div>
         </div>
-        <div className="relative ml-4 flex w-full flex-1 justify-between  sm:ml-6">
+
+        <div className="relative ml-4 flex w-4/6  flex-1  justify-between sm:ml-6">
           <div className="relative mr-10 flex h-full w-11/12 flex-col  justify-between">
             <div className="relative   w-full justify-between gap-x-4 ">
               <>
