@@ -96,7 +96,7 @@ const useCart = create(
         } else {
           // Item (with or without variant) is not in the cart
           set({ cartItems: [...currentItems, data] });
-          return toastService.success("Item added to cart.");
+          // return toastService.success("Item added to cart.");
         }
       },
       removeCartItem: (data: CartItem) => {

@@ -31,13 +31,13 @@ const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
       <HoverCardTrigger>
         <ShoppingBagBtn quantity={cartItemCount} className={btnClassName} />
       </HoverCardTrigger>
-      <HoverCardContent className="w-80">
+      <HoverCardContent className="w-80  border-purple-500 bg-zinc-950 text-white">
         <div className="space-y-1">
           <h4 className="text-lg font-semibold">
             Cart ({cartItemCount}) items
           </h4>
 
-          <Separator />
+          <Separator className="bg-purple-500" />
 
           {cartItemCount > 0 &&
             cartItems.map((item, idx) => (
@@ -48,13 +48,16 @@ const CartShoppingBag = ({ btnClassName }: { btnClassName?: string }) => {
             <p>Subtotal:</p> <Currency value={cartTotal} />
           </div>
           <div className="flex items-center pt-2">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-zinc-400">
               Shipping and sales tax calculated at checkout
             </span>
           </div>
 
           <Link href="/cart">
-            <Button className="mt-4 w-full rounded-full" type="button">
+            <Button
+              className="text mt-4 w-full rounded-full bg-purple-700 hover:bg-purple-500"
+              type="button"
+            >
               View cart & check out
             </Button>
           </Link>

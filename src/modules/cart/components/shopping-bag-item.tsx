@@ -11,7 +11,7 @@ type TShoppingBagItemProps = {
 };
 const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
   return (
-    <div className="grid w-full  grid-cols-12 items-start gap-x-8 gap-y-8 border-b border-gray-200 py-2">
+    <div className="grid w-full  grid-cols-12 items-start gap-x-8 gap-y-8 border-b border-purple-500 py-2">
       <div className="col-span-3">
         <div className="relative aspect-square w-20">
           <Image
@@ -28,7 +28,7 @@ const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
       </div>
       <div className="col-span-5 ">
         {/* Common cart item data */}
-        <h1 className="text-base font-bold text-gray-900">
+        <h1 className="text-base font-bold text-white">
           {cartItem.product.name} ({cartItem.quantity})
         </h1>
         {/* Handle potential variant data */}
@@ -36,7 +36,7 @@ const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
           {cartItem.variant?.values.split(", ").map((item, idx) => (
             <p
               className={cn(
-                "  border-gray-200  text-gray-500",
+                "  border-purple-500  text-zinc-400",
                 idx > 0 ? "ml-2 border-l pl-2" : ""
               )}
               key={idx}
