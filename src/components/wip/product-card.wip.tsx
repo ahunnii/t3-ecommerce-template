@@ -1,11 +1,10 @@
-import { Discount, Prisma } from "@prisma/client";
+import type { Discount } from "@prisma/client";
 import { Expand, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 import { Fragment, useState, type MouseEventHandler } from "react";
 
-import Link from "next/link";
 import Currency from "~/components/core/ui/currency";
 import IconButton from "~/components/core/ui/icon-button";
 import useCart from "~/modules/cart/hooks/use-cart";

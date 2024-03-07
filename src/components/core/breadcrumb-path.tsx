@@ -25,7 +25,7 @@ export const BreadCrumbPath = ({ name, link }: CrumbPath) => {
           <Link
             href={link}
             className={cn(
-              " text-sm font-medium text-black transition-colors ",
+              " truncate text-sm font-medium text-black transition-colors max-md:max-w-20",
               config.breadCrumbs.secondary
             )}
           >
@@ -34,7 +34,7 @@ export const BreadCrumbPath = ({ name, link }: CrumbPath) => {
         ) : (
           <span
             className={cn(
-              "text-sm font-medium text-black transition-colors",
+              "truncate text-sm font-medium text-black transition-colors max-md:max-w-20",
               config.breadCrumbs.current
             )}
           >
