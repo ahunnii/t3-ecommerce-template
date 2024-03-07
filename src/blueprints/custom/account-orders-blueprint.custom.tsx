@@ -15,7 +15,7 @@ export const AccountOrdersPage = ({ orders }: { orders: Order[] }) => {
         Check out your order history.
       </p>
       <section className="flex w-full flex-col space-y-6 py-8">
-        <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+        <div className="flex flex-row items-center justify-between rounded-lg ">
           <UserOrderTable orders={orders} />
         </div>
       </section>

@@ -43,15 +43,15 @@ export default function ProfileLayout({ children }: SettingsLayoutProps) {
                 </p>
               </div>
             </div>
-            <Separator className="my-6" />
-            <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+            <Separator className="my-6 bg-zinc-900" />
+            <div className="flex w-full flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
               <aside className="-mx-4 lg:w-1/5">
                 <SidebarNav
                   items={ACCOUNT_NAV_ITEMS}
                   className={cn(" text-black")}
                 />
               </aside>
-              <div className="mx-6 flex-1 ">{children}</div>
+              <div className="flex-1 lg:mx-6 ">{children}</div>
             </div>
           </div>
         </Container>

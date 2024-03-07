@@ -61,8 +61,8 @@ export function UserOrderTable({ orders }: { orders: Order[] }) {
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
+    <div className="w-full rounded-md bg-white p-4">
+      <div className="flex flex-col items-center justify-start py-4 max-lg:space-y-2 lg:flex-row">
         <Input
           placeholder="Filter by date..."
           value={
@@ -75,7 +75,10 @@ export function UserOrderTable({ orders }: { orders: Order[] }) {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button
+              variant="outline"
+              className="max-w-sm max-lg:w-full lg:ml-auto"
+            >
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

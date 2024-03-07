@@ -22,12 +22,10 @@ export const AccountHomePage = ({ orders, user }: Props) => {
       <p className={cn(config.typography.subheader)}>
         Welcome back, {user?.name}!
       </p>
-      <section className="flex w-full flex-col space-y-6 py-8">
-        <div>
-          <h3 className={cn(config.typography.h4)}>Recent Orders</h3>
+      <section className="flex w-full flex-col  py-8">
+        <h3 className={cn(config.typography.h4)}>Recent Orders</h3>
 
-          <RecentOrdersCard recentOrders={recentOrders} />
-        </div>
+        <RecentOrdersCard recentOrders={recentOrders} />
       </section>
     </ProfileLayout>
   );

@@ -17,7 +17,7 @@ export function SidebarNav({ className, items, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
+        "flex space-x-2 max-md:rounded-md lg:flex-col lg:space-x-0 lg:space-y-1 ",
         className
       )}
       {...props}
@@ -28,10 +28,9 @@ export function SidebarNav({ className, items, ...props }: Props) {
           href={item.href}
           className={cn(
             buttonVariants({ variant: "ghost" }),
-            pathname === item.href
-              ? "bg-black text-white hover:bg-black hover:text-white/75"
-              : "hover:bg-transparent hover:underline",
-            "justify-start"
+            pathname === item.href && "bg-black text-white",
+            "justify-start hover:bg-purple-700  hover:text-white max-lg:grow",
+            pathname !== item.href && "bg-white text-black"
           )}
         >
           {item.title}
