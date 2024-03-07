@@ -11,6 +11,7 @@ import { useConfig } from "~/providers/style-config-provider";
 import { cn } from "~/utils/styles";
 
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import {
   contactFormSchema,
   type ContactFormValues,
@@ -18,6 +19,8 @@ import {
 
 type TContactFormBasicProps = {
   onSubmit: (values: ContactFormValues) => void;
+  clearForm?: boolean;
+  setClearForm?: (value: boolean) => void;
   loading?: boolean;
 };
 
@@ -30,21 +33,29 @@ const formPlaceholders = {
 
 export const ContactFormBasic = ({
   onSubmit,
+  clearForm,
+  setClearForm,
   loading = false,
 }: TContactFormBasicProps) => {
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
 
     defaultValues: {
-      email: undefined,
-      name: undefined,
-      body: undefined,
+      email: "",
+      name: "",
+      body: "",
       images: [],
     },
   });
 
   const config = useConfig();
 
+  useEffect(() => {
+    if (clearForm) {
+      form.reset();
+      setClearForm?.(false);
+    }
+  }, [clearForm, form]);
   return (
     <Form.Form {...form}>
       <form

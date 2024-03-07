@@ -42,17 +42,19 @@ const contactData = {
 
 export const ContactUsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [clearForm, setClearForm] = useState(false);
 
   const emailStore = (data: ContactFormValues) => {
     setIsLoading(true);
     axios
       .post(env.NEXT_PUBLIC_API_URL + "/inquiry", data)
       .then(() => {
-        toastService.success("Your request has been submitted!");
+        toastService.success("Your message has been submitted!");
+        setClearForm(true);
       })
       .catch((error: unknown) => {
         toastService.error(
-          "You can only submit a total of three requests per day. Please try again tomorrow.",
+          "You can only submit a total of three messages per day. Please try again tomorrow.",
           error
         );
       })
@@ -81,7 +83,12 @@ export const ContactUsPage = () => {
                 using the contact form below, or just shoot an email to
                 store@trendanomaly.com.
               </p>
-              <ContactFormBasic onSubmit={emailStore} loading={isLoading} />
+              <ContactFormBasic
+                onSubmit={emailStore}
+                loading={isLoading}
+                clearForm={clearForm}
+                setClearForm={setClearForm}
+              />
             </>
 
             <ContactInfo {...contactData} />
