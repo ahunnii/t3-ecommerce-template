@@ -39,11 +39,11 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                     active={pathname === navlink.href}
                     className={cn(
                       navigationMenuTriggerStyle(),
-                      primaryLinkStyle,
+                      primaryLinkStyle
 
-                      (pathname === navlink.href ||
-                        pathname?.startsWith(`${navlink.href}`)) &&
-                        highlightStyle
+                      // (pathname === navlink.href ||
+                      //   pathname?.startsWith(`${navlink.href}/`)) &&
+                      //   highlightStyle
                     )}
                   >
                     {navlink.title}
@@ -55,10 +55,10 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                 <NavigationMenuItem key={idx}>
                   <NavigationMenuTrigger
                     className={cn(
-                      primaryLinkStyle,
-                      (pathname === navlink?.pathname ||
-                        pathname?.startsWith(`${navlink?.pathname}`)) &&
-                        highlightStyle
+                      primaryLinkStyle
+                      // (pathname === navlink?.pathname ||
+                      //   pathname?.startsWith(`${navlink?.pathname}/`)) &&
+                      //   highlightStyle
                     )}
                   >
                     {navlink.title}
@@ -70,11 +70,11 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
                           key={index + component.href}
                           title={component.title}
                           href={component.href}
-                          className={cn(
-                            (pathname === component.href ||
-                              pathname?.startsWith(`${component.href}`)) &&
-                              highlightStyle
-                          )}
+                          // className={cn(
+                          //   (pathname === component.href ||
+                          //     pathname?.startsWith(`${component.href}/`)) &&
+                          //     highlightStyle
+                          // )}
                         >
                           {component.description}
                         </NavListItem>

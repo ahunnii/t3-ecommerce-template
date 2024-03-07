@@ -46,6 +46,10 @@ const Navbar = ({
   const navigationLinks = useMemo(() => {
     return [
       {
+        title: "Home",
+        href: "/",
+      },
+      {
         title: "Shop",
         href: "/collections/all-products",
       },

@@ -28,6 +28,13 @@ export const GalleryPage = () => {
                 {items.map((item, idx) => (
                   <GalleryCard key={idx} data={item} />
                 ))}
+
+                {items.length === 0 && (
+                  <p>
+                    We haven&apos;t posted anything yet, but check back later to
+                    see what we got going on!
+                  </p>
+                )}
               </div>
             </div>
           </div>

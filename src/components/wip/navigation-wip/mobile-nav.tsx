@@ -1,22 +1,31 @@
+import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-
 import { Button } from "~/components/ui/button";
 
+import { useRouter } from "next/navigation";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
-
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from "~/components/ui/sheet";
 import { env } from "~/env.mjs";
 
 import { cn } from "~/utils/styles";
 
+import { Instagram, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import type { SiteLinks } from "./navbar";
 
 export function MobileNav({ links }: { links: SiteLinks[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: sessionData } = useSession();
+  const router = useRouter();
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -57,8 +66,11 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="pr-0">
-        <Link href="/" className="flex items-center">
+      <SheetContent
+        side="left"
+        className="flex h-svh flex-col border-zinc-950 bg-zinc-950 text-secondary"
+      >
+        {/* <Link href="/" className="flex items-center">
           <p className="sr-only text-xl font-bold">
             {env.NEXT_PUBLIC_STORE_NAME}
           </p>
@@ -71,9 +83,9 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
               alt="logo"
             />
           </>
-        </Link>
+        </Link> */}
 
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+        <ScrollArea className="my-4 h-3/4 pb-10 ">
           <div className="flex flex-col space-y-8 pt-6 ">
             {links?.map((item, idx) => {
               if (item?.href) {
@@ -82,11 +94,11 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center text-xl font-medium  transition-colors hover:text-purple-500",
-                      pathname === item.href ||
-                        item.href?.startsWith(`${pathname}/`)
-                        ? "text-purple-500"
-                        : "text-neutral-500"
+                      "flex items-center text-xl font-light  text-white transition-colors hover:text-purple-500"
+                      // pathname === item.href ||
+                      //   item.href?.startsWith(`${pathname}/`)
+                      //   ? "text-purple-500"
+                      //   : "text-neutral-500"
                     )}
                   >
                     {item.title}
@@ -98,7 +110,7 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                 return (
                   <div className="flex flex-col space-y-2" key={idx}>
                     <div className="flex flex-col space-y-3 ">
-                      <h4 className="text-xl font-medium text-purple-800">
+                      <h4 className="text-xl font-semibold text-purple-800 ">
                         {item.title}
                       </h4>
                       {item.links.map((link, index) => (
@@ -106,10 +118,10 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                           key={link.href + index}
                           href={link.href}
                           className={cn(
-                            "text-xl font-medium transition-colors hover:text-purple-500",
-                            pathname === link.href
-                              ? "text-purple-500"
-                              : "text-neutral-500"
+                            "text-xl font-light text-white transition-colors hover:text-purple-500"
+                            // pathname === link.href
+                            //   ? "text-purple-500"
+                            //   : "text-neutral-500"
                           )}
                         >
                           {link.title}
@@ -122,6 +134,58 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
             })}
           </div>
         </ScrollArea>
+
+        <footer className="mt-auto flex items-center justify-between gap-4 border-t border-t-white pt-4">
+          {!sessionData && (
+            <Button
+              className="w-full bg-purple-700 hover:bg-purple-500"
+              onClick={() => void signIn()}
+            >
+              Sign in{" "}
+            </Button>
+          )}
+          {sessionData && (
+            <>
+              <Button
+                variant="ghost"
+                className="relative  w-fit gap-2 "
+                onClick={() => router.push("/account")}
+              >
+                <Avatar className="h-9 w-9">
+                  <AvatarImage
+                    src={sessionData?.user?.image ?? ""}
+                    alt={`@${sessionData?.user?.name}`}
+                  />
+                  <AvatarFallback>
+                    <User />
+                  </AvatarFallback>
+                </Avatar>
+
+                {sessionData?.user?.name}
+              </Button>
+
+              <Button
+                className="border:bg-purple-500 w-full border-purple-700 bg-transparent hover:bg-purple-500 hover:text-white"
+                onClick={() => void signOut()}
+                variant={"outline"}
+              >
+                Sign out{" "}
+              </Button>
+            </>
+          )}
+          <Link
+            href="https://www.instagram.com/trendanomaly/?hl=en"
+            target="_blank"
+          >
+            <Button
+              variant="ghost"
+              className="group  aspect-square rounded-full p-0"
+            >
+              {" "}
+              <Instagram className="h-6 w-6 text-white transition-all duration-150 ease-linear group-hover:text-black" />
+            </Button>
+          </Link>{" "}
+        </footer>
       </SheetContent>
     </Sheet>
   );
