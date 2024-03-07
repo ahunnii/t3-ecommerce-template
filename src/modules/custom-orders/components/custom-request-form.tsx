@@ -13,6 +13,7 @@ import { cn } from "~/utils/styles";
 import { Loader2 } from "lucide-react";
 
 import { CustomOrderType } from "@prisma/client";
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,8 @@ import { type CustomRequestFormValues } from "../types";
 
 type TContactFormBasicProps = {
   onSubmit: (values: CustomRequestFormValues) => void;
+  clearForm?: boolean;
+  setClearForm?: (value: boolean) => void;
   loading?: boolean;
 };
 
@@ -33,11 +36,13 @@ const formPlaceholders = {
   email: "e.g. janedoe@example.com",
   name: "e.g. Jane Doe",
   body: "e.g. Hey! I had a question about a product.",
-  submit: "Email Us",
+  submit: "Submit Request",
 };
 
 export const CustomRequestForm = ({
   onSubmit,
+  clearForm,
+  setClearForm,
   loading = false,
 }: TContactFormBasicProps) => {
   const form = useForm<CustomRequestFormValues>({
@@ -54,6 +59,12 @@ export const CustomRequestForm = ({
 
   const config = useConfig();
 
+  useEffect(() => {
+    if (clearForm) {
+      form?.reset();
+      setClearForm?.(false);
+    }
+  }, [clearForm]);
   return (
     <Form.Form {...form}>
       <form
@@ -140,7 +151,7 @@ export const CustomRequestForm = ({
             <Form.FormItem className=" sm:col-span-3">
               {" "}
               <Form.FormLabel className="label">
-                <span className="label-text text-error">Body</span>
+                <span className="label-text text-error">Request</span>
               </Form.FormLabel>
               <Form.FormControl>
                 <Textarea
@@ -149,6 +160,9 @@ export const CustomRequestForm = ({
                   {...field}
                 />
               </Form.FormControl>
+              <Form.FormDescription>
+                Be as detailed as you can!
+              </Form.FormDescription>
               <Form.FormMessage />
             </Form.FormItem>
           )}
@@ -158,7 +172,7 @@ export const CustomRequestForm = ({
           name="images"
           render={({ field }) => (
             <Form.FormItem>
-              <Form.FormLabel>Images</Form.FormLabel>
+              <Form.FormLabel>Images (optional)</Form.FormLabel>
               <Form.FormDescription>
                 Upload images to help us better understand your request (max of
                 3)

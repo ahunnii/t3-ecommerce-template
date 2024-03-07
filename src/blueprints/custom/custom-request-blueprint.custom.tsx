@@ -16,6 +16,7 @@ const metadata = {
 
 export const CustomRequestPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [clearForm, setClearForm] = useState(false);
 
   const createCustomRequest = (data: CustomRequestFormValues) => {
     setIsLoading(true);
@@ -23,6 +24,7 @@ export const CustomRequestPage = () => {
       .post(env.NEXT_PUBLIC_API_URL + "/custom", data)
       .then(() => {
         toastService.success("Your request has been submitted!");
+        setClearForm(true);
       })
       .catch((error: unknown) => {
         toastService.error(
@@ -55,6 +57,8 @@ export const CustomRequestPage = () => {
               <CustomRequestForm
                 onSubmit={createCustomRequest}
                 loading={isLoading}
+                clearForm={clearForm}
+                setClearForm={setClearForm}
               />
             </>
           </div>
