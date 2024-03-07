@@ -35,7 +35,7 @@ export const TaVideoCategoryCard = (props: Props) => {
       <p className="absolute bottom-20  left-5  z-10  text-2xl font-semibold text-white lg:text-3xl">
         {props?.title}
       </p>
-      <Button className="absolute bottom-5 left-5" variant={"outline"}>
+      <Button className="absolute bottom-5 left-5 z-50" variant={"outline"}>
         Shop {props.title}
       </Button>
 

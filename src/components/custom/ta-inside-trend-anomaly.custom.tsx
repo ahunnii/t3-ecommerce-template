@@ -20,7 +20,7 @@ export const InsideTrendAnomaly = () => {
           </p>
         </div>
 
-        <div className="relative h-96  w-1/3 p-4">
+        <div className="relative h-96  w-full p-4 md:w-1/3">
           <Image
             src="/custom/ta_nanako.png"
             fill
