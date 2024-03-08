@@ -31,7 +31,11 @@ export const ViewOrderSummary = ({
           className="flex h-5 items-center space-x-4 py-8 text-sm"
         >
           <Image
-            src={item.product?.images[0]?.url ?? ""}
+            src={
+              item.product?.featuredImage ??
+              item.product?.images[0]?.url ??
+              "/placeholder-image.webp"
+            }
             width={50}
             height={50}
             alt=""

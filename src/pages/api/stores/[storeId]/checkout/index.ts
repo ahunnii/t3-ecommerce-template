@@ -65,6 +65,7 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
               storeId: storeId as string,
               isPaid: false,
               userId: currentUser?.id ?? null,
+              shippingCost: Number(shipping * 100) ?? 0,
               orderItems: {
                 create: verifiedDBData.map((product: CartItem) => {
                   if (product.variant === null)
