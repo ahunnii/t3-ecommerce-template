@@ -1,4 +1,6 @@
+import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { env } from "~/env.mjs";
 
 import { prisma } from "~/server/db";
 
@@ -141,6 +143,20 @@ const handleCheckoutProcessing = async (
             }
           }
         });
+
+        try {
+          await axios.post(env.NEXT_PUBLIC_API_URL + "/new-order", {
+            link:
+              env.NEXT_PUBLIC_URL +
+              "/admin/" +
+              order.storeId +
+              "/orders/" +
+              order.id,
+          });
+        } catch (e) {
+          console.error("Error: Problem with sending new order email");
+          console.error(e);
+        }
 
         return order;
       } catch (e) {
