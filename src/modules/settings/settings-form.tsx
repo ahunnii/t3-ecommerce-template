@@ -1,23 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Prisma } from "@prisma/client";
 
-import { CheckIcon, ChevronsUpDown, LoaderIcon, Trash } from "lucide-react";
+import { LoaderIcon, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import * as z from "zod";
+
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { ApiAlert } from "~/components/ui/api-alert";
 import { Button } from "~/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "~/components/ui/command";
+
 import {
   Form,
   FormControl,
@@ -30,43 +23,26 @@ import {
 import { Heading } from "~/components/ui/heading";
 
 import { Input } from "~/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
+
 import { Separator } from "~/components/ui/separator";
-import { Switch } from "~/components/ui/switch";
+
 import { useOrigin } from "~/hooks/use-origin";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import { states } from "~/utils/shipping";
-import { cn } from "~/utils/styles";
 
-const formSchema = z.object({
-  name: z.string().min(2),
-
-  street: z.string(),
-  additional: z.string().optional(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.string().regex(/^\d{5}(?:[-\s]\d{4})?$/),
-  country: z.string(),
-  hasFreeShipping: z.boolean(),
-  minFreeShipping: z.coerce.number().nonnegative(),
-  hasPickup: z.boolean(),
-  maxPickupDistance: z.coerce.number().nonnegative().optional(),
-  hasFlatRate: z.boolean(),
-  flatRateAmount: z.coerce.number().nonnegative().optional(),
-});
-
-type SettingsFormValues = z.infer<typeof formSchema>;
+import { AddressSectionForm } from "./address-section.form";
+import { ContentSectionForm } from "./content-section.form";
+import { storeFormSchema } from "./schema";
+import { ShippingSectionForm } from "./shipping-section.form";
+import type { SettingsFormValues } from "./types";
 
 interface SettingsFormProps {
   initialData: Prisma.StoreGetPayload<{
     include: {
       gallery: true;
       address: true;
+      socialMedia: true;
+      content: true;
     };
   }>;
 }
@@ -82,23 +58,30 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SettingsFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(storeFormSchema),
     defaultValues: {
       name: initialData.name,
-
       street: initialData?.address?.street ?? "",
       additional: initialData?.address?.additional ?? "",
       city: initialData?.address?.city ?? "",
       state: initialData?.address?.state ?? "",
       zip: initialData?.address?.postal_code ?? "",
       country: initialData?.address?.country ?? "US",
-
       hasFreeShipping: initialData?.hasFreeShipping,
       minFreeShipping: initialData?.minFreeShipping ?? 0,
       hasPickup: initialData?.hasPickup,
       maxPickupDistance: initialData?.maxPickupDistance ?? 0,
       hasFlatRate: initialData?.hasFlatRate,
       flatRateAmount: initialData?.flatRateAmount ?? 0,
+      socialMedia: {
+        facebook: initialData?.socialMedia?.facebook ?? "",
+        instagram: initialData?.socialMedia?.instagram ?? "",
+        twitter: initialData?.socialMedia?.twitter ?? "",
+        tikTok: initialData?.socialMedia?.tikTok ?? "",
+      },
+      content: {
+        aboutPage: initialData?.content?.aboutPage ?? "",
+      },
     },
   });
 
@@ -140,6 +123,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: SettingsFormValues) => {
+    console.log(data);
     updateStore({
       storeId: params.query.storeId as string,
       name: data.name,
@@ -157,6 +141,9 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       maxPickupDistance: data.maxPickupDistance ?? undefined,
       flatRateAmount: data.flatRateAmount ?? undefined,
       hasFlatRate: data.hasFlatRate,
+      content: {
+        aboutPage: data.content?.aboutPage,
+      },
     });
   };
 
@@ -219,311 +206,10 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
               )}
             />{" "}
           </div>
-          <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
-            <div>
-              <FormLabel>Business address</FormLabel>{" "}
-              <FormDescription>
-                Set your business address for shipping and pickup.
-              </FormDescription>
-            </div>
-            <div className="flex items-center gap-4">
-              <FormField
-                control={form.control}
-                name="street"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Street address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. 1234 Main St." {...field} />
-                    </FormControl>
+          <AddressSectionForm form={form} />
+          <ShippingSectionForm form={form} />
+          <ContentSectionForm form={form} />
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="additional"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>
-                      Apt / Suite / Other{" "}
-                      <span className="text-xs text-gray-500">(optional)</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. 1234 Main St." {...field} />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-            </div>
-            <div className="flex items-center gap-4">
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>City</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g. Boulder City"
-                        {...field}
-                        className="col-span-1"
-                      />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="state"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>State</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              " w-full  justify-between ",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? states.find(
-                                  (state) => state.value === field.value
-                                )?.label
-                              : "Select state"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="max-h-96 w-[200px] overflow-y-scroll p-0">
-                        <Command>
-                          <CommandInput placeholder="Search state..." />
-                          <CommandEmpty>No state found.</CommandEmpty>
-                          <CommandGroup>
-                            {states.map((state) => (
-                              <CommandItem
-                                value={state.label ?? undefined}
-                                key={state.value}
-                                onSelect={() => {
-                                  form.setValue("state", state.value);
-                                }}
-                              >
-                                <CheckIcon
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    state.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {state.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-              <FormField
-                control={form.control}
-                name="zip"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Zip Code</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g. 44444"
-                        {...field}
-                        className="col-span-1"
-                      />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
-            </div>
-          </div>
-
-          <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
-            <div>
-              <FormLabel>Shipping</FormLabel>{" "}
-              <FormDescription className="pb-5">
-                Set how your store handles shipping.
-              </FormDescription>
-            </div>
-            <div
-              className={cn(
-                "grid grid-cols-1 gap-4",
-                form.watch("hasFreeShipping") && "grid-cols-2"
-              )}
-            >
-              <FormField
-                control={form.control}
-                name="hasFreeShipping"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Free Shipping</FormLabel>
-                      <FormDescription>
-                        Mark a minimum amount for order to qualify for free
-                        shipping.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              {form.watch("hasFreeShipping") && (
-                <FormField
-                  control={form.control}
-                  name="minFreeShipping"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Free Shipping Threshold</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your name"
-                          type="number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        What is the minimum amount for a user to qualify for
-                        free shipping? Defaults to 0.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
-            <div
-              className={cn(
-                "grid grid-cols-1 gap-4",
-                form.watch("hasPickup") && "grid-cols-2"
-              )}
-            >
-              <FormField
-                control={form.control}
-                name="hasPickup"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Pickup from Base
-                      </FormLabel>
-                      <FormDescription>
-                        Do you offer pickup from the address above?
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              {form.watch("hasPickup") && (
-                <FormField
-                  control={form.control}
-                  name="maxPickupDistance"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pickup Distance Threshold</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your name"
-                          type="number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        What is the max amount you want a user to see this
-                        option?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
-            <div
-              className={cn(
-                "grid grid-cols-1 gap-4",
-                form.watch("hasFlatRate") && "grid-cols-2"
-              )}
-            >
-              <FormField
-                control={form.control}
-                name="hasFlatRate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Flat Rate Shipping
-                      </FormLabel>
-                      <FormDescription>
-                        Mark if you want a standard, flat rate shipping for all
-                        orders. If not selected, it will be calculated at
-                        checkout and will select the base USPS option price.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              {form.watch("hasFlatRate") && (
-                <FormField
-                  control={form.control}
-                  name="flatRateAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Flat Rate Amount</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Your name"
-                          type="number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        What is the flat rate amount you want to charge per
-                        order? If you have free shipping enabled, it will be up
-                        until the min free shipping amount has been reached.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
-          </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {loading && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}
             Save changes

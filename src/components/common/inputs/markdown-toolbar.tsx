@@ -1,6 +1,7 @@
 import { type Editor } from "@tiptap/react";
 import {
   Bold,
+  Heading,
   Heading2,
   Italic,
   List,
@@ -21,7 +22,16 @@ const MarkdownToolbar: FC<Props> = ({ editor }) => {
     <div className="rounded-md border border-input bg-transparent ">
       <Toggle
         size="sm"
-        pressed={editor.isActive("heading")}
+        pressed={editor.isActive("heading", { level: 1 })}
+        onPressedChange={() =>
+          editor.chain().focus().toggleHeading({ level: 1 }).run()
+        }
+      >
+        <Heading className="h-4 w-4" />
+      </Toggle>
+      <Toggle
+        size="sm"
+        pressed={editor.isActive("heading", { level: 2 })}
         onPressedChange={() =>
           editor.chain().focus().toggleHeading({ level: 2 }).run()
         }

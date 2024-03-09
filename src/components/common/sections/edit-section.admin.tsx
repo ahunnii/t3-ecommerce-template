@@ -7,6 +7,7 @@ type Props = {
   title: string;
   description?: string;
   bodyClassName?: string;
+  hasError?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const EditSection: FC<Props> = ({
@@ -15,6 +16,7 @@ export const EditSection: FC<Props> = ({
   description,
   className,
   bodyClassName,
+  hasError,
 }) => {
   return (
     <div
@@ -23,7 +25,9 @@ export const EditSection: FC<Props> = ({
         className
       )}
     >
-      <FormLabel>{title}</FormLabel>{" "}
+      <FormLabel className={cn("", hasError && "text-red-500")}>
+        {title}
+      </FormLabel>{" "}
       {description && <FormDescription>{description}</FormDescription>}
       <div className={cn("mt-5", bodyClassName)}>{children}</div>
     </div>

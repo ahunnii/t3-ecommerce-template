@@ -19,7 +19,13 @@ export const storeRouter = createTRPCRouter({
   }),
 
   getStore: publicProcedure
-    .input(z.object({ storeId: z.string().optional() }))
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        includeContent: z.boolean().optional().default(false),
+        includeSocials: z.boolean().optional().default(false),
+      })
+    )
     .query(({ ctx, input }) => {
       if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
         throw new TRPCError({
@@ -32,6 +38,33 @@ export const storeRouter = createTRPCRouter({
         include: {
           gallery: true,
           address: true,
+          content: input.includeContent,
+          socialMedia: input.includeSocials,
+        },
+      });
+    }),
+
+  getAboutPage: publicProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
+      return ctx.prisma.store.findUnique({
+        where: { id: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
+        include: {
+          content: {
+            select: {
+              aboutPage: true,
+            },
+          },
         },
       });
     }),
@@ -49,6 +82,16 @@ export const storeRouter = createTRPCRouter({
         data: {
           name: input.name,
           userId: ctx.session.user.id,
+          content: {
+            create: {
+              aboutPage: null,
+            },
+          },
+          socialMedia: {
+            create: {
+              instagram: null,
+            },
+          },
         },
       });
     }),
@@ -72,6 +115,20 @@ export const storeRouter = createTRPCRouter({
         maxPickupDistance: z.coerce.number().nonnegative().optional(),
         hasFlatRate: z.boolean(),
         flatRateAmount: z.coerce.number().nonnegative().optional(),
+
+        content: z
+          .object({
+            aboutPage: z.string().optional(),
+          })
+          .optional(),
+        socialMedia: z
+          .object({
+            facebook: z.string().optional(),
+            instagram: z.string().optional(),
+            twitter: z.string().optional(),
+            tikTok: z.string().optional(),
+          })
+          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -102,6 +159,16 @@ export const storeRouter = createTRPCRouter({
           maxPickupDistance: input.maxPickupDistance,
           hasFlatRate: input.hasFlatRate,
           flatRateAmount: input.flatRateAmount,
+          content: {
+            upsert: {
+              create: {
+                aboutPage: input?.content?.aboutPage,
+              },
+              update: {
+                aboutPage: input?.content?.aboutPage,
+              },
+            },
+          },
         },
       });
     }),

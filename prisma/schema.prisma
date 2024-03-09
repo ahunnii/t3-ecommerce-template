@@ -116,18 +116,32 @@ model Store {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
+  content           StoreContent?  @relation("StoreToContent") 
+ socialMedia SocialMedia? @relation("StoreToSocialMedia")
 
   cart Cart[] @relation("StoreToCart")
   collections Collection[] @relation("StoreToCollection")
+ 
 }
 
 model StoreContent {
-  id            String    @id @default(cuid())
-  aboutPage     String    @db.Text
+  id            String      @id @default(cuid())
+  storeId       String      @unique
+  store         Store?      @relation("StoreToContent", fields: [storeId], references: [id])
+  aboutPage     String?      @db.Text
   heroImg       String?
+}
+
+model SocialMedia{
+  id            String      @id @default(cuid())
+  storeId       String      @unique
+  store         Store?      @relation("StoreToSocialMedia", fields: [storeId], references: [id])
   facebook      String?
   instagram     String?
   twitter       String?
+  tikTok        String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 model Billboard {
   id            String     @id @default(cuid())

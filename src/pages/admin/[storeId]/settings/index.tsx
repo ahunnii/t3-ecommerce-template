@@ -14,6 +14,8 @@ interface IProps {
 const SettingsPage: FC<IProps> = ({ storeId }) => {
   const { data: store, isLoading } = api.store.getStore.useQuery({
     storeId,
+    includeContent: true,
+    includeSocials: true,
   });
   return (
     <AdminLayout>
