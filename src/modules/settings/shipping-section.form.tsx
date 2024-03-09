@@ -93,7 +93,11 @@ export const ShippingSectionForm: FC<Props> = ({ form }) => {
               <FormItem>
                 <FormLabel>Free Shipping Threshold</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. 25" type="number" {...field} />
+                  <AdvancedNumericInput
+                    prependSpan="$"
+                    placeholder="e.g. 25"
+                    field={field}
+                  />
                 </FormControl>
                 <FormDescription>
                   What is the minimum amount for a user to qualify for free

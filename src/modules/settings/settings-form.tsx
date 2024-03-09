@@ -34,6 +34,7 @@ import { AddressSectionForm } from "./address-section.form";
 import { ContentSectionForm } from "./content-section.form";
 import { storeFormSchema } from "./schema";
 import { ShippingSectionForm } from "./shipping-section.form";
+import { SocialsSectionForm } from "./socials-section.form";
 import type { SettingsFormValues } from "./types";
 
 interface SettingsFormProps {
@@ -123,7 +124,6 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = (data: SettingsFormValues) => {
-    console.log(data);
     updateStore({
       storeId: params.query.storeId as string,
       name: data.name,
@@ -143,6 +143,12 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       hasFlatRate: data.hasFlatRate,
       content: {
         aboutPage: data.content?.aboutPage,
+      },
+      socialMedia: {
+        facebook: data.socialMedia?.facebook,
+        instagram: data.socialMedia?.instagram,
+        twitter: data.socialMedia?.twitter,
+        tikTok: data.socialMedia?.tikTok,
       },
     });
   };
@@ -209,6 +215,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           <AddressSectionForm form={form} />
           <ShippingSectionForm form={form} />
           <ContentSectionForm form={form} />
+          <SocialsSectionForm form={form} />
 
           <Button disabled={loading} className="ml-auto" type="submit">
             {loading && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}

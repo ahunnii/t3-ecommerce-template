@@ -38,13 +38,7 @@ export const ContentSectionForm: FC<Props> = ({ form }) => {
   const formErrors = form.formState.errors;
 
   const checkIfFormHasErrors = useMemo(() => {
-    const keys = [
-      "socialMedia.aboutPage",
-      "city",
-      "state",
-      "zip",
-      "additional",
-    ];
+    const keys = ["content.aboutPage"];
 
     const hasErrors = keys.some(
       (key) => formErrors[key as keyof typeof formErrors]

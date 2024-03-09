@@ -3,9 +3,11 @@ import Link from "next/link";
 import Container from "~/components/core/ui/container";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
+import { api } from "~/utils/api";
 
 const Footer = () => {
   const year = new Date().getFullYear();
+  const { data: store, isLoading } = api.store.getSocials.useQuery({});
   return (
     <div className="w-full bg-black px-4 sm:px-6 lg:px-8">
       <Container>
@@ -17,18 +19,17 @@ const Footer = () => {
             </p>
 
             <div className="flex gap-2 ">
-              <Link
-                href="https://www.instagram.com/trendanomaly/?hl=en"
-                target="_blank"
-              >
-                <Button
-                  variant="ghost"
-                  className="group  aspect-square rounded-full p-0"
-                >
-                  {" "}
-                  <Instagram className="h-6 w-6 text-white transition-all duration-150 ease-linear group-hover:text-black" />
-                </Button>
-              </Link>{" "}
+              {" "}
+              {store?.socialMedia?.instagram && (
+                <Link href={store?.socialMedia?.instagram} target="_blank">
+                  <Button
+                    variant="ghost"
+                    className="group  aspect-square rounded-full p-0"
+                  >
+                    <Instagram className="h-6 w-6 text-white transition-all duration-150 ease-linear group-hover:text-black" />
+                  </Button>
+                </Link>
+              )}
               {/* <Link href="/">
                 <Button
                   variant="ghost"
