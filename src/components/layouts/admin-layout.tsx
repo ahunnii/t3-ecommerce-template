@@ -62,7 +62,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
                 <CardContent>
                   <Link
                     prefetch={false}
-                    href="https://artisanal-futures-documentation.vercel.app/artisan-sites"
+                    href="https://artisan-ecommerce-docs.vercel.app"
                   >
                     <Button className="w-full">View Docs</Button>
                   </Link>
