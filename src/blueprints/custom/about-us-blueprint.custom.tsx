@@ -30,7 +30,7 @@ export const AboutUsPage = () => {
               </div>
             ) : (
               <div className={cn("py-4", config.layout.p)}>
-                {parse((aboutContent?.content?.aboutPage as string) ?? "")}
+                {parse(aboutContent?.content?.aboutPage ?? "")}
               </div>
             )}
           </>
