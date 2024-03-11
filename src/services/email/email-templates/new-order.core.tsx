@@ -3,11 +3,11 @@ import {
   Button,
   Container,
   Head,
+  Heading,
   Html,
   Img,
   Preview,
-  Row,
-  Section,
+  Tailwind,
   Text,
 } from "@react-email/components";
 import * as React from "react";
@@ -23,72 +23,48 @@ type Props = {
 const baseUrl = env.NEXT_PUBLIC_URL;
 
 export const NewOrderEmailTemplate = ({ link }: Props) => {
-  const previewText = `You have a new order!`;
+  const previewText = `You made a new sale!`;
 
   return (
     <Html>
       <Head />
       <Preview>{previewText}</Preview>
-
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={centeredSection}>
+      <Tailwind>
+        <Body className="bg-[#ffffff] p-8">
+          <Container className="border border-solid border-[#eaeaea] p-8">
             <Img
               src={`${baseUrl}/custom/logo.png`}
-              width="96"
-              height="96"
+              width="80"
+              height="80"
               alt=" Logo"
+              className="mx-auto mt-8"
             />
-          </Section>
-          <Section style={{ paddingBottom: "20px" }}>
-            <Row>
-              <Text style={heading}>You have a new order!</Text>
+            <div className="p-8">
+              <Heading className="text-center text-2xl">New Order</Heading>
+
+              <Text style={paragraph}>
+                It looks like you made a sale! Check out the new order!
+              </Text>
 
               <Button style={button} href={link}>
-                Check it out
+                View Order
               </Button>
-            </Row>
-          </Section>
-        </Container>
-      </Body>
+            </div>
+          </Container>
+        </Body>
+      </Tailwind>
     </Html>
   );
 };
 
 export default NewOrderEmailTemplate;
 
-const main = {
-  backgroundColor: "#ffffff",
-  fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-};
-
-const container = {
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  width: "580px",
-  maxWidth: "100%",
-};
-
-const heading = {
-  fontSize: "32px",
-  lineHeight: "1.3",
-  fontWeight: "700",
-  color: "#484848",
-  textAlign: "center" as const,
-};
-
 const paragraph = {
-  fontSize: "18px",
-  lineHeight: "1.4",
-  color: "#484848",
-};
-
-const review = {
-  ...paragraph,
-  padding: "24px",
-  backgroundColor: "#f2f3f3",
-  borderRadius: "4px",
+  fontSize: "16px",
+  lineHeight: "26px",
+  paddingLeft: "8px",
+  paddingRight: "8px",
+  textAlign: "center" as const,
 };
 
 const button = {
@@ -101,36 +77,5 @@ const button = {
   textDecoration: "none",
   textAlign: "center" as const,
   display: "block",
-  width: "100%",
-};
-
-const link = {
-  ...paragraph,
-  color: "#ff5a5f",
-  display: "block",
-};
-
-const reportLink = {
-  fontSize: "14px",
-  color: "#9ca299",
-  textDecoration: "underline",
-};
-
-const hr = {
-  borderColor: "#cccccc",
-  margin: "20px 0",
-};
-
-const footer = {
-  color: "#9ca299",
-  fontSize: "14px",
-  marginBottom: "10px",
-};
-
-const centeredSection = {
-  display: "flex",
-
-  justifyContent: "center",
-  padding: "0 20px",
   width: "100%",
 };

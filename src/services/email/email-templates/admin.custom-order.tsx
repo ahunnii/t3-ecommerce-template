@@ -3,11 +3,11 @@ import {
   Button,
   Container,
   Head,
-  Hr,
+  Heading,
   Html,
   Img,
   Preview,
-  Section,
+  Tailwind,
   Text,
 } from "@react-email/components";
 import * as React from "react";
@@ -23,7 +23,7 @@ interface NewCustomOrderEmailProps {
 //   ? `https://${process.env.VERCEL_URL}`
 //   : env.NEXT_PUBLIC_URL;
 
-const baseUrl = "https://trend-anomaly.vercel.app";
+const baseUrl = env.NEXT_PUBLIC_URL;
 
 const config = storeTheme;
 export const NewCustomOrderEmail = ({
@@ -33,47 +33,38 @@ export const NewCustomOrderEmail = ({
   <Html>
     <Head />
     <Preview>You have a new custom order request from {firstName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Img
-          src={`${baseUrl}${config.logo.default}`}
-          width="80"
-          height="80"
-          alt="logo"
-          style={logo}
-        />
-        <Text style={paragraph}>Hey there,</Text>
-        <Text style={paragraph}>
-          It looks like you got a new custom order request from {firstName}.
-          Check it out here!
-        </Text>
-        <Section style={btnContainer}>
-          <Button style={button} href={orderLink}>
-            Check it out
-          </Button>
-        </Section>
-        <Text style={paragraph}>
-          Best,
-          <br />
-          The {config.brand.name} team
-        </Text>
-      </Container>
-    </Body>
+    <Tailwind>
+      <Body className="p-8">
+        <Container className="border border-solid border-[#eaeaea] p-8">
+          <Img
+            src={`${baseUrl}${config.logo.default}`}
+            width="80"
+            height="80"
+            alt="logo"
+            className="mx-auto mt-8"
+            style={logo}
+          />
+          <div className="p-8">
+            <Heading className="text-center text-2xl">
+              New Custom Order Request
+            </Heading>
+
+            <Text style={paragraph}>
+              It looks like you got a new custom order request from {firstName}.
+              Check it out!
+            </Text>
+
+            <Button style={button} href={orderLink}>
+              View Order Request
+            </Button>
+          </div>
+        </Container>
+      </Body>
+    </Tailwind>
   </Html>
 );
 
 export default NewCustomOrderEmail;
-
-const main = {
-  backgroundColor: "#ffffff",
-  fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-};
-
-const container = {
-  margin: "0 auto",
-  padding: "20px 0 48px",
-};
 
 const logo = {
   margin: "0 auto",
@@ -82,14 +73,12 @@ const logo = {
 const paragraph = {
   fontSize: "16px",
   lineHeight: "26px",
-};
-
-const btnContainer = {
-  textAlign: "center" as const,
+  paddingLeft: "8px",
+  paddingRight: "8px",
 };
 
 const button = {
-  backgroundColor: "#5F51E8",
+  backgroundColor: "#000000",
   borderRadius: "3px",
   color: "#fff",
   fontSize: "16px",
@@ -97,4 +86,5 @@ const button = {
   textAlign: "center" as const,
   display: "block",
   padding: "12px",
+  width: "100%",
 };
