@@ -443,6 +443,7 @@ model ShippingLabel {
   id              String      @id @default(cuid())
   labelUrl        String?  @db.Text 
   trackingNumber  String?  @db.Text 
+  trackingUrl     String?  @db.Text
   cost            String?      
   carrier         String?
   timeEstimate    String?

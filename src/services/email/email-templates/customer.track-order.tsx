@@ -55,9 +55,7 @@ export const TrackingInfoCustomerTemplate = ({
                 </Heading>
               </Column>
               <Column>
-                <Link className="float-right" href={orderLink}>
-                  Order #{orderId}
-                </Link>
+                <Text className="float-right">Order #{orderId}</Text>
               </Column>
             </Row>
 

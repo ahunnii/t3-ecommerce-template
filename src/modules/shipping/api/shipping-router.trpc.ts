@@ -154,6 +154,7 @@ export const shippingLabelRouter = createTRPCRouter({
         data: {
           labelUrl: shippingLabel?.label_url,
           trackingNumber: shippingLabel?.tracking_number,
+          trackingUrl: shippingLabel?.tracking_url_provider,
           cost: input.cost,
           carrier: input.carrier,
           timeEstimate: input.timeEstimate,
@@ -166,8 +167,12 @@ export const shippingLabelRouter = createTRPCRouter({
         },
       });
 
-      const order = await ctx.prisma.order.findUnique({
+      const order = await ctx.prisma.order.update({
         where: { id: input.orderId },
+        data: {
+          status: "SHIPPED",
+          whenShipped: new Date(),
+        },
       });
 
       if (dbEntry.id && order?.email) {

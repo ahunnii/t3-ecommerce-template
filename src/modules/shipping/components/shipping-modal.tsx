@@ -19,6 +19,7 @@ import { api } from "~/utils/api";
 import { toastService } from "~/services/toast";
 
 import { create } from "domain";
+import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useShippingLabelStore } from "../store/use-shipping-label-store";
 import AddressForm from "./address-form";
@@ -79,6 +80,9 @@ export const ShippingModal = ({ data }: { data: string }) => {
       toastService.success("Label created successfully");
     },
     onError: (err) => toastService.error("Failed to create label", err),
+    onSettled: () => {
+      void apiContext.orders.invalidate();
+    },
   });
 
   const handleOnClose = () => {
@@ -342,6 +346,9 @@ export const ShippingModal = ({ data }: { data: string }) => {
                     disabled={createLabel.isLoading}
                     variant={"default"}
                   >
+                    {createLabel.isLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Purchase
                   </Button>
                 </div>
