@@ -44,13 +44,15 @@ export const HomePage = () => {
       link: "/collections/all-products",
       title: "New Arrivals",
       imageURL: "/custom/ta_embroidery_still_alt.png",
-      videoURL: "/custom/ta_embroidery.mp4",
+      videoURL:
+        "https://res.cloudinary.com/dsdmjwmxy/video/upload/v1710175136/ta_embroidery_dqiqcj.mp4",
     },
     {
       link: "/custom-request",
       title: "Custom Clothing",
       imageURL: "/custom/ta_custom.png",
-      videoURL: "/custom/ta_custom.mp4",
+      videoURL:
+        "https://res.cloudinary.com/dsdmjwmxy/video/upload/v1710168061/request-images/yczhhqr340bhegsjipfu.mp4",
     },
   ];
 

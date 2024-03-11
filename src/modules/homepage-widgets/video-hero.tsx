@@ -12,7 +12,7 @@ const VideoHero = () => {
       <div className="absolute left-0 top-0  z-20 flex h-full w-full bg-black/40"></div>
 
       <video
-        src="/videos/video-1.mp4"
+        src="https://res.cloudinary.com/dsdmjwmxy/video/upload/v1710175136/ta_embroidery_dqiqcj.mp4"
         autoPlay
         loop
         muted
