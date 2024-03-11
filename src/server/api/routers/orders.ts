@@ -2,7 +2,13 @@ import { TimeLineEntryType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
+import paymentService from "~/services/payment";
+import { DetailedOrder } from "~/types";
 
 export const ordersRouter = createTRPCRouter({
   getOrdersByUserId: protectedProcedure
@@ -62,6 +68,100 @@ export const ordersRouter = createTRPCRouter({
           shippingLabel: true,
         },
       });
+    }),
+
+  getPublicOrder: publicProcedure
+    .input(z.object({ orderId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      // if (
+      //   ctx.session.user.role !== "ADMIN" ||
+      //   ctx.session.user.id !== input.userId
+      // )
+      //   throw new TRPCError({
+      //     code: "UNAUTHORIZED",
+      //     message: "You are not authorized to perform this action.",
+      //   });
+
+      const order = await ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        include: {
+          orderItems: {
+            include: {
+              product: {
+                include: {
+                  images: true,
+                },
+              },
+              variant: true,
+              discount: true,
+            },
+          },
+          shippingLabel: true,
+        },
+      });
+
+      const allowSensitiveData =
+        ctx.session!.user &&
+        (ctx.session!.user.role === "ADMIN" ||
+          ctx.session!.user.id === order?.userId);
+
+      if (allowSensitiveData) {
+        return order;
+      }
+
+      return {
+        orderItems: order?.orderItems,
+        whenPaid: order?.whenPaid,
+        subtotal: (order?.subtotal ?? 0) + (order?.total ?? 0),
+        shippingCost: order?.shippingCost,
+        whenShipped: order?.whenShipped,
+        total: order?.total,
+        shippingLabel: {
+          trackingUrl: order?.shippingLabel?.trackingUrl,
+        },
+      };
+    }),
+
+  getPayment: protectedProcedure
+    .input(z.object({ orderId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      // if (
+      //   ctx.session.user.role !== "ADMIN" ||
+      //   ctx.session.user.id !== input.userId
+      // )
+      //   throw new TRPCError({
+      //     code: "UNAUTHORIZED",
+      //     message: "You are not authorized to perform this action.",
+      //   });
+
+      const order = await ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        include: {
+          orderItems: {
+            include: {
+              variant: true,
+              product: true,
+            },
+          },
+          shippingLabel: true,
+        },
+      });
+
+      try {
+        const paymentDetails = await paymentService.retrievePayment(
+          order as DetailedOrder
+        );
+        return paymentDetails;
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error fetching payment details",
+        });
+      }
     }),
   getAllOrders: protectedProcedure
     .input(

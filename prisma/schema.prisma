@@ -34,6 +34,8 @@ model Address {
   store         Store?   @relation( fields: [storeId], references: [id], onDelete: Cascade) 
   orderId       String?  @unique
   order         Order?   @relation( fields: [orderId], references: [id], onDelete: Cascade) 
+  shippingLabelId String? @unique
+  shippingLabel ShippingLabel? @relation( fields: [shippingLabelId], references: [id], onDelete: Cascade)
 
 }
 // Necessary for Next auth
@@ -450,6 +452,7 @@ model ShippingLabel {
   expireAt        DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+  address         Address?
 
   order           Order?      @relation( fields: [orderId], references: [id])
   orderId         String?     @unique
@@ -465,10 +468,15 @@ model OrderItem {
   variantId String? // Foreign Key to Variant
   variant   Variation? @relation(fields: [variantId], references: [id])
   quantity  Int        @default(1)
+  price     Float?      @default(0.00)
+  discountId String? // Foreign Key to Discount
+  discount Discount? @relation(fields: [discountId], references: [id])
+
 
   @@index([orderId])
   @@index([productId])
   @@index([variantId])
+@@index([discountId])
 }
 
 
@@ -596,6 +604,7 @@ model Discount {
 
   products Product[] @relation("DiscountToProduct")
   collections Collection[] @relation("DiscountToCollection")
+  orderItems OrderItem[] 
 
   @@index([storeId])
 

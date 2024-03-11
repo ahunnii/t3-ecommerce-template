@@ -1,4 +1,4 @@
-import type { Order } from "@prisma/client";
+import type { Order, Prisma } from "@prisma/client";
 import type { CartItem, CustomerShippingRate, DetailedOrder } from "~/types";
 import type {
   CheckoutSessionResponse,
@@ -19,7 +19,16 @@ type TCreateCheckoutSessionProps<TLineItems, TShippingOptions> = {
 
 export interface PaymentProcessor<TLineItems, TShippingOptions> {
   processPayment(order: Order): Promise<void>;
-  retrievePayment(order: DetailedOrder): Promise<retrievePaymentResult | null>;
+  retrievePayment<
+    T extends Prisma.OrderGetPayload<{
+      include: {
+        orderItems: true;
+        address: true;
+      };
+    }>
+  >(
+    order: T
+  ): Promise<retrievePaymentResult | null>;
   createLineItems(props: TCreateLineItemProps): TLineItems;
 
   createCheckoutSession(
@@ -64,7 +73,14 @@ export class PaymentService<TLineItems, TShippingOptions> {
     await this.paymentProcessor.processPayment(order);
   }
 
-  async retrievePayment(order: DetailedOrder) {
+  async retrievePayment<
+    T extends Prisma.OrderGetPayload<{
+      include: {
+        orderItems: true;
+        address: true;
+      };
+    }>
+  >(order: T) {
     const paymentDetails = await this.paymentProcessor.retrievePayment(order);
     return paymentDetails;
   }
