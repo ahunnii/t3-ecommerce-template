@@ -11,14 +11,15 @@ import { InsideTrendAnomaly } from "~/components/custom/ta-inside-trend-anomaly.
 
 import Marquee from "~/components/wip/marquee/ta-marquee.wip";
 
-import { ProductCardMarquee } from "~/components/wip/product-card-marquee.wip";
-
 import { TaProductGrid } from "~/components/custom/ta-product-grid.custom";
 
 import Link from "next/link";
-import { TaVideoCategoryCard } from "~/components/custom/ta-video-category-card.wip";
 import { Button } from "~/components/ui/button";
 import { storeTheme } from "~/data/config.custom";
+
+import ProductCard from "~/components/custom/ta-product-card.custom";
+import { CategoryCard } from "~/packages/ui/components/category-card";
+import { type contentSwitchWrapperVariants } from "~/packages/ui/components/content-switch-wrapper";
 
 const metadata = {
   title: "Trend Anomaly",
@@ -37,21 +38,30 @@ export const HomePage = () => {
     {
       link: "/collections/clthr3eij0001gv08sekv32ij",
       title: "Bleach Collection",
-      imageURL: "/custom/ta_bleach.jpg",
-      gifURL: "/custom/ta_bleach.gif",
+      primaryContentUrl: "/custom/ta_bleach.jpg",
+      secondaryContentUrl: "/custom/ta_bleach.gif",
+      subtitle: "Featured Collection",
+      overlay: "tinted" as keyof typeof contentSwitchWrapperVariants,
+      variant: "image" as keyof typeof contentSwitchWrapperVariants,
     },
     {
       link: "/collections/all-products",
       title: "New Arrivals",
-      imageURL: "/custom/ta_embroidery_still_alt.png",
-      videoURL:
+      primaryContentUrl: "/custom/ta_embroidery_still_alt.png",
+      variant: "video" as keyof typeof contentSwitchWrapperVariants,
+      overlay: "tinted" as keyof typeof contentSwitchWrapperVariants,
+      subtitle: "Featured Collection",
+      secondaryContentUrl:
         "https://res.cloudinary.com/dsdmjwmxy/video/upload/v1710175136/ta_embroidery_dqiqcj.mp4",
     },
     {
       link: "/custom-request",
       title: "Custom Clothing",
-      imageURL: "/custom/ta_custom.png",
-      videoURL:
+      primaryContentUrl: "/custom/ta_custom.png",
+      variant: "video" as keyof typeof contentSwitchWrapperVariants,
+      overlay: "tinted" as keyof typeof contentSwitchWrapperVariants,
+      subtitle: "Featured Collection",
+      secondaryContentUrl:
         "https://res.cloudinary.com/dsdmjwmxy/video/upload/v1710168061/request-images/yczhhqr340bhegsjipfu.mp4",
     },
   ];
@@ -77,10 +87,13 @@ export const HomePage = () => {
         <section className="max-md:py-8">
           <Marquee variant="secondary" className="bg-purple-300/90">
             {getAllProducts.data?.slice(0, 3).map((product, idx) => (
-              <ProductCardMarquee
+              <ProductCard
                 key={product.id + idx}
                 data={product}
                 className="h-full"
+                variant="marquee"
+                size="square"
+                discounts={[]}
               />
             ))}
           </Marquee>
@@ -92,8 +105,14 @@ export const HomePage = () => {
 
         <Container>
           <div className="mx-auto mb-8 flex w-full max-w-7xl flex-col gap-4 max-md:space-y-4 md:flex-row">
-            {categoryCards.map((card) => (
-              <TaVideoCategoryCard key={card.link} {...card} />
+            {categoryCards.map((card, idx) => (
+              <Link
+                key={idx}
+                href={card.link}
+                className="relative overflow-hidden max-md:w-11/12 md:w-1/3"
+              >
+                <CategoryCard {...card} className="rounded-md" />
+              </Link>
             ))}
           </div>
         </Container>

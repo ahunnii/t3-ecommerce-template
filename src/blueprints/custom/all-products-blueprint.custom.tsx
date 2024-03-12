@@ -2,7 +2,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { api } from "~/utils/api";
 
-import ProductCard from "~/components/wip/product-card.wip";
 import { SelectableFilter } from "~/components/wip/selectable-filter.wip";
 import { storeTheme } from "~/data/config.custom";
 
@@ -17,6 +16,7 @@ import { useConfig } from "~/providers/style-config-provider";
 
 import { cn } from "~/utils/styles";
 
+import ProductCard from "~/components/custom/ta-product-card.custom";
 import type { DetailedProductFull } from "~/types";
 
 const metadata = {
@@ -40,6 +40,7 @@ export const AllProductsPage = () => {
 
   const config = useConfig();
   const router = useRouter();
+
   return (
     <StorefrontLayout {...storeTheme.layout} metadata={metadata}>
       {areProductsLoading && <AbsolutePageLoader />}
@@ -78,6 +79,8 @@ export const AllProductsPage = () => {
                 <ProductCard
                   key={item.id}
                   data={item}
+                  variant={"default"}
+                  size={"default"}
                   discounts={[...(sales ?? []), ...item?.discounts] ?? []}
                 />
               ))}

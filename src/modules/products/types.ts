@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import type { MouseEventHandler } from "react";
 import type * as z from "zod";
 import { type productFormSchema } from "./schema";
 
@@ -27,5 +28,12 @@ export type CategoryProduct = Prisma.ProductGetPayload<{
     };
   };
 }>;
+
+export type QuickAction = {
+  onClick?: MouseEventHandler<HTMLButtonElement> | undefined;
+  icon: React.ReactElement;
+  className?: string;
+  renderIf: boolean;
+};
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;
