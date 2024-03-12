@@ -1,14 +1,47 @@
-import { GalleryPage as DefaultGalleryPage } from "~/blueprints/core/gallery-page-blueprint";
-import { GalleryPage as CustomGalleryPage } from "~/blueprints/custom/gallery-page-blueprint.custom";
+import GalleryCard from "~/components/core/ui/gallery-card";
 
-import useStorePageRender from "~/hooks/use-store-page-render";
+import StorefrontLayout from "~/components/layouts/storefront-layout";
 
+import { api } from "~/utils/api";
+
+import { storeTheme } from "~/data/config.custom";
+
+const metadata = {
+  title: `Gallery | Trend Anomaly`,
+  description: "Browse our gallery of products, events, and other coolness! ",
+};
 const GalleryPage = () => {
-  const { isTemplate } = useStorePageRender();
+  const { data: galleryImages } = api.gallery.getAllGalleryImages.useQuery({});
 
-  if (isTemplate) return <DefaultGalleryPage />;
+  const items = galleryImages?.map((image) => image.url) ?? [];
 
-  return <CustomGalleryPage />;
+  return (
+    <>
+      <StorefrontLayout {...storeTheme.layout} metadata={metadata}>
+        <div className="space-y-10 py-10">
+          <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
+            <div className="space-y-4">
+              <h1 className="mb-6 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+                Gallery
+              </h1>
+              <div className=" grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {items.map((item, idx) => (
+                  <GalleryCard key={idx} data={item} />
+                ))}
+
+                {items.length === 0 && (
+                  <p>
+                    We haven&apos;t posted anything yet, but check back later to
+                    see what we got going on!
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </StorefrontLayout>
+    </>
+  );
 };
 
 export default GalleryPage;

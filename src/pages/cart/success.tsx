@@ -1,13 +1,39 @@
-import { SuccessfulPurchasePage as DefaultSuccessPage } from "~/blueprints/core/cart-success-blueprint";
-import { SuccessfulPurchasePage as CustomSuccessPage } from "~/blueprints/custom/cart-success-blueprint.custom";
+import { useEffect } from "react";
 
-import useStorePageRender from "~/hooks/use-store-page-render";
+import Confetti from "react-confetti";
 
-const SuccessPage = () => {
-  const { isTemplate } = useStorePageRender();
+import StorefrontLayout from "~/components/layouts/storefront-layout";
+import useWindowSize from "~/hooks/use-window-size";
+import { useConfig } from "~/providers/style-config-provider";
 
-  if (isTemplate) return <DefaultSuccessPage />;
-  return <CustomSuccessPage />;
+import { SuccessPanel, useCheckout } from "~/modules/cart";
+
+const metadata = {
+  title: "Purchase Successful | Trend Anomaly",
+  description: "Break out of the system!",
 };
 
-export default SuccessPage;
+const SuccessfulPurchasePage = () => {
+  const { checkIfCheckoutWasSuccessful } = useCheckout();
+  const { width, height } = useWindowSize();
+  const config = useConfig();
+
+  useEffect(() => {
+    checkIfCheckoutWasSuccessful();
+  }, [checkIfCheckoutWasSuccessful]);
+
+  return (
+    <>
+      <StorefrontLayout
+        {...config.layout}
+        bodyStyle="items-center justify-center flex"
+        metadata={metadata}
+      >
+        <Confetti width={width} height={height} />
+        <SuccessPanel />
+      </StorefrontLayout>
+    </>
+  );
+};
+
+export default SuccessfulPurchasePage;
