@@ -20,9 +20,10 @@ import { Button } from "~/components/ui/button";
 
 import * as z from "zod";
 
-import type { DetailedProductFull, Variation } from "~/types";
+import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
 
+import type { ProductVariant } from "../types";
 import { VariantSearchSelect } from "./variant-search-select";
 
 const infoVariants = cva("", {
@@ -39,9 +40,9 @@ const infoVariants = cva("", {
 
 interface IProps extends VariantProps<typeof infoVariants> {
   product: DetailedProductFull;
-  variant: Variation | null;
+  variant: ProductVariant | null;
 
-  setVariant: (variant: Variation | null) => void;
+  setVariant: (variant: ProductVariant | null) => void;
   setQuantity: (quantity: number) => void;
 }
 const formSchema = z.object({

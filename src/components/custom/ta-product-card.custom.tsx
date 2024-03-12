@@ -8,15 +8,15 @@ import type { VariantProps } from "class-variance-authority";
 import useCart from "~/modules/cart/hooks/use-cart";
 import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 import {
+  ProductCardDescription,
   ProductCardImage,
   ProductCardPrice,
+  ProductCardQuickActions,
   ProductCardSaleBadge,
   ProductCardWrapper,
   type productCardImageVariants,
   type productCardVariants,
 } from "~/modules/products/components/product-card";
-import { ProductCardDescription } from "~/modules/products/components/product-card-description";
-import { ProductCardQuickActions } from "~/modules/products/components/product-card-quick-actions";
 
 import { Button } from "~/components/ui/button";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
@@ -31,12 +31,12 @@ interface ProductCard
   className?: string;
 }
 
-const ProductCard: React.FC<ProductCard> = ({
+export const TaProductCard: React.FC<ProductCard> = ({
   data,
   className,
   discounts,
-  variant,
-  size,
+  variant = "default",
+  size = "default",
 }) => {
   const previewModal = usePreviewModal();
   const cart = useCart();
@@ -138,5 +138,3 @@ const ProductCard: React.FC<ProductCard> = ({
     </ProductCardWrapper>
   );
 };
-
-export default ProductCard;

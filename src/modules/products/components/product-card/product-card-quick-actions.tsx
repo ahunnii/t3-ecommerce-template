@@ -8,7 +8,7 @@ import {
 import IconButton from "~/components/core/ui/icon-button";
 
 import { cn } from "~/utils/styles";
-import type { QuickAction } from "../types";
+import type { QuickAction } from "../../types";
 
 export interface ProductCardQuickActionsProps
   extends HTMLAttributes<ElementRef<"div">> {

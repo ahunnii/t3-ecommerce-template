@@ -5,27 +5,21 @@ import NextImage from "next/image";
 
 import type { Image } from "~/types";
 
-import GalleryTab from "./gallery-tab";
+import ProductImageGalleryTab from "./product-image-gallery-tab";
 
-import { DialogOverlay } from "@radix-ui/react-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
 interface GalleryProps {
   images: Image[];
 }
 
-const Gallery: React.FC<GalleryProps> = ({ images = [] }) => {
+const ProductImageGallery: React.FC<GalleryProps> = ({ images = [] }) => {
   return (
     <Tab.Group as="div" className="flex flex-col-reverse">
       <div className="mx-auto mt-6  block w-full max-w-2xl lg:max-w-none">
         <Tab.List className="grid grid-cols-4 gap-6">
           {images.map((image) => (
-            <GalleryTab key={image.id} image={image} />
+            <ProductImageGalleryTab key={image.id} image={image} />
           ))}
         </Tab.List>
       </div>
@@ -44,15 +38,14 @@ const Gallery: React.FC<GalleryProps> = ({ images = [] }) => {
                     src={image.url}
                     alt="Image"
                     className="object-contain object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </DialogTrigger>
                 <DialogContent className="w-full ">
                   <NextImage
                     src={image.url ?? ""}
                     alt=""
-                    width={462}
-                    height={825}
-                    layout="responsive"
+                    fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </DialogContent>
@@ -65,4 +58,4 @@ const Gallery: React.FC<GalleryProps> = ({ images = [] }) => {
   );
 };
 
-export default Gallery;
+export default ProductImageGallery;

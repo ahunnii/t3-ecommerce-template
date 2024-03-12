@@ -20,7 +20,7 @@ import { useConfig } from "~/providers/style-config-provider";
 import { cn } from "~/utils/styles";
 
 import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
-import ProductCard from "~/components/custom/ta-product-card.custom";
+import { TaProductCard } from "~/components/custom/ta-product-card.custom";
 
 import type { DetailedProductFull } from "~/types";
 
@@ -83,7 +83,7 @@ const AllProductsPage = () => {
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {products?.map((item: DetailedProductFull) => (
-                <ProductCard
+                <TaProductCard
                   key={item.id}
                   data={item}
                   variant={"default"}

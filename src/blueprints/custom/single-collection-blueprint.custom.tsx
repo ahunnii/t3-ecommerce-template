@@ -3,7 +3,7 @@ import type { FC } from "react";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
 import NoResults from "~/components/common/no-results";
-import ProductCard from "~/components/custom/ta-product-card.custom";
+import { TaProductCard } from "~/components/custom/ta-product-card.custom";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 
@@ -46,7 +46,7 @@ export const SingleCollectionPage: FC<ICollectionPageProps> = ({
             {collection?.products.length === 0 && <NoResults />}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {collection?.products.map((item) => (
-                <ProductCard key={item.id} data={item} discounts={[]} />
+                <TaProductCard key={item.id} data={item} discounts={[]} />
               ))}{" "}
             </div>
           </div>

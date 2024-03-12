@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type { FC } from "react";
 import NoResults from "~/components/common/no-results";
-import ProductCard from "~/components/custom/ta-product-card.custom";
+import { TaProductCard } from "~/components/custom/ta-product-card.custom";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
 
@@ -35,7 +35,7 @@ export const RelatedItemsList: FC<ProductListProps> = ({
       {items.length === 0 && <NoResults />}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {items.map((item) => (
-          <ProductCard key={item.id} data={item} discounts={[]} />
+          <TaProductCard key={item.id} data={item} discounts={[]} />
         ))}
       </div>
     </div>

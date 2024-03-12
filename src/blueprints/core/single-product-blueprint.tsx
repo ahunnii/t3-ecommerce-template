@@ -2,7 +2,7 @@ import { useParams } from "next/navigation";
 
 import PageLoader from "~/components/ui/page-loader";
 
-import Info from "~/modules/products/core/info";
+import ProductPageInfo from "~/modules/products/components/single-product/product-page-info";
 import ProductList from "~/modules/products/core/product-list";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
@@ -72,7 +72,7 @@ export const SingleProductPage = ({ prevUrl }: { prevUrl: string }) => {
               <ProductGallery images={product?.images ?? []} />
 
               <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-                <Info data={product} discounts={[]} />
+                <ProductPageInfo data={product} discounts={[]} />
               </div>
             </div>
             <hr className="my-10" />

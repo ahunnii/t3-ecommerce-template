@@ -8,7 +8,7 @@ interface GalleryTabProps {
   image: Image;
 }
 
-const GalleryTab: React.FC<GalleryTabProps> = ({ image }) => {
+const ProductImageGalleryTab: React.FC<GalleryTabProps> = ({ image }) => {
   return (
     <Tab className="relative flex aspect-square cursor-pointer items-center justify-center rounded-md bg-white">
       {({ selected }) => (
@@ -19,6 +19,7 @@ const GalleryTab: React.FC<GalleryTabProps> = ({ image }) => {
               src={image.url}
               alt=""
               className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </span>
           <span
@@ -33,4 +34,4 @@ const GalleryTab: React.FC<GalleryTabProps> = ({ image }) => {
   );
 };
 
-export default GalleryTab;
+export default ProductImageGalleryTab;

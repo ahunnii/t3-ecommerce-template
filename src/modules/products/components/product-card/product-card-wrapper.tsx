@@ -11,9 +11,9 @@ import {
 } from "react";
 
 import useCart from "~/modules/cart/hooks/use-cart";
-import { ProductCardDescription } from "~/modules/products/components/product-card-description";
-import { ProductCardImage } from "~/modules/products/components/product-card-image";
-import { ProductCardQuickActions } from "~/modules/products/components/product-card-quick-actions";
+import { ProductCardDescription } from "~/modules/products/components/product-card/product-card-description";
+import { ProductCardImage } from "~/modules/products/components/product-card/product-card-image";
+import { ProductCardQuickActions } from "~/modules/products/components/product-card/product-card-quick-actions";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 
 import type { DetailedProductFull } from "~/types";

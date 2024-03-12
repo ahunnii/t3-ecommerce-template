@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 
 import { TaHero } from "~/components/custom/ta-hero";
 import { InsideTrendAnomaly } from "~/components/custom/ta-inside-trend-anomaly.custom";
-import ProductCard from "~/components/custom/ta-product-card.custom";
+import { TaProductCard } from "~/components/custom/ta-product-card.custom";
 import { TaProductGrid } from "~/components/custom/ta-product-grid.custom";
 
 import Marquee from "~/components/wip/marquee/ta-marquee.wip";
@@ -55,7 +55,7 @@ const HomePage = () => {
         <section className="max-md:py-8">
           <Marquee variant="secondary" className="bg-purple-300/90">
             {getAllProducts.data?.slice(0, 3).map((product, idx) => (
-              <ProductCard
+              <TaProductCard
                 key={product.id + idx}
                 data={product}
                 className="h-full"

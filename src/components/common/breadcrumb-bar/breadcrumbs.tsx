@@ -20,16 +20,14 @@ const Breadcrumbs = forwardRef<ElementRef<"nav">, TBreadCrumbProps>(
         {...props}
       >
         <ol className="inline-flex items-center space-x-1 md:space-x-1">
-          <li className="inline-flex items-center">
-            <BreadCrumbPath
-              link="/"
-              name={"Home"}
-              linkClassName={cn(
-                "pb-1 text-zinc-500 hover:text-zinc-700 relative cursor-pointer after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-zinc-700 after:transition-all after:duration-300 hover:after:w-full",
-                linkClassName
-              )}
-            ></BreadCrumbPath>
-          </li>
+          <BreadCrumbPath
+            link="/"
+            name={"Home"}
+            linkClassName={cn(
+              "pb-1 text-zinc-500 hover:text-zinc-700 relative cursor-pointer after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-zinc-700 after:transition-all after:duration-300 hover:after:w-full",
+              linkClassName
+            )}
+          ></BreadCrumbPath>
 
           {pathway.map((path, idx) => (
             <BreadCrumbPath

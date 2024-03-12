@@ -1,6 +1,6 @@
 import Modal from "~/components/core/ui/modal";
-import Gallery from "~/modules/gallery/core";
-import Info from "~/modules/products/core/info";
+import ProductImageGallery from "~/modules/products/components/product-image-gallery";
+import ProductPageInfo from "~/modules/products/components/single-product/product-page-info";
 
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 
@@ -16,10 +16,10 @@ const PreviewModal = () => {
     <Modal open={previewModal.isOpen} onClose={previewModal.onClose}>
       <div className="grid w-full grid-cols-1 items-start gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
         <div className="sm:col-span-4 lg:col-span-5">
-          <Gallery images={product.images} />
+          <ProductImageGallery images={product.images} />
         </div>
         <div className="sm:col-span-8 lg:col-span-7">
-          <Info
+          <ProductPageInfo
             data={product}
             discounts={[]}
             variant="default"

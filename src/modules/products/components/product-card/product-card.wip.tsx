@@ -7,20 +7,20 @@ import { type MouseEventHandler } from "react";
 import { VariantProps } from "class-variance-authority";
 import useCart from "~/modules/cart/hooks/use-cart";
 import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
-import { ProductCardDescription } from "~/modules/products/components/product-card-description";
+import { ProductCardDescription } from "~/modules/products/components/product-card/product-card-description";
 import {
   ProductCardImage,
   productCardImageVariants,
-} from "~/modules/products/components/product-card-image";
-import { ProductCardQuickActions } from "~/modules/products/components/product-card-quick-actions";
+} from "~/modules/products/components/product-card/product-card-image";
+import { ProductCardQuickActions } from "~/modules/products/components/product-card/product-card-quick-actions";
 import {
   ProductCardWrapper,
   productCardVariants,
-} from "~/modules/products/components/product-card-wrapper";
+} from "~/modules/products/components/product-card/product-card-wrapper";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
-import { Button } from "../../../components/ui/button";
+import { Button } from "../../../../components/ui/button";
 import { ProductCardPrice } from "./product-card-price";
 import { ProductCardSaleBadge } from "./product-card-sale-badge";
 

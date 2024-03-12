@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma, Variation } from "@prisma/client";
 import type { MouseEventHandler } from "react";
 import type * as z from "zod";
 import { type productFormSchema } from "./schema";
@@ -37,3 +37,7 @@ export type QuickAction = {
 };
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;
+
+export type ProductVariants = Variation[];
+
+export type ProductVariant = Variation;
