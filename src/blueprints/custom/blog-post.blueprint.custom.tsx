@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { Button } from "~/components/ui/button";

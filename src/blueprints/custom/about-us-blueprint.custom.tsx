@@ -1,5 +1,5 @@
 import parse from "html-react-parser";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { useConfig } from "~/providers/style-config-provider";
 import { api } from "~/utils/api";

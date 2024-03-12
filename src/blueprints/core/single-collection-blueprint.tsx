@@ -1,8 +1,8 @@
 import type { FC } from "react";
 
-import Breadcrumbs from "~/components/core/breadcrumbs";
+import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
 
-import NoResults from "~/components/core/ui/no-results";
+import NoResults from "~/components/common/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import PageLoader from "~/components/ui/page-loader";

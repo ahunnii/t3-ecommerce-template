@@ -1,7 +1,7 @@
-import Breadcrumbs from "~/components/core/breadcrumbs";
+import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
 import { CollectionCard } from "~/modules/categories/core/collection-card";
 
-import NoResults from "~/components/core/ui/no-results";
+import NoResults from "~/components/common/no-results";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import PageLoader from "~/components/ui/page-loader";

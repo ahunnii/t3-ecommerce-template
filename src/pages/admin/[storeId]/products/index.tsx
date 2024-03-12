@@ -5,7 +5,7 @@ import type { GetServerSidePropsContext } from "next";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { ProductsClient } from "~/modules/products/admin/client";

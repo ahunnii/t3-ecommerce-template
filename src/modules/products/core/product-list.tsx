@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type { FC } from "react";
-import NoResults from "~/components/core/ui/no-results";
+import NoResults from "~/components/common/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";

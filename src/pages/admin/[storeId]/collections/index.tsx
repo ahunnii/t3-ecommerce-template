@@ -8,7 +8,7 @@ import AdminLayout from "~/components/layouts/admin-layout";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 
 interface IProps {
   storeId: string;

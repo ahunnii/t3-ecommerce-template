@@ -9,7 +9,7 @@ import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
-import Breadcrumbs from "~/components/core/breadcrumbs";
+import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
 
 import { ProductGallery } from "~/modules/products/core/product-gallery";
 import type { DetailedProductFull } from "~/types";

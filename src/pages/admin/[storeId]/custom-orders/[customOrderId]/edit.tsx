@@ -6,8 +6,8 @@ import { CustomOrderForm } from "~/modules/custom-orders/admin/custom-order-form
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 interface IProps {

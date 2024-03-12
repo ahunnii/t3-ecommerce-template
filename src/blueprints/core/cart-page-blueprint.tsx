@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { CartItem, Summary, useCart } from "~/modules/cart";

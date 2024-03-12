@@ -8,7 +8,7 @@ import { ShippingModal } from "~/modules/shipping/components/shipping-modal";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { formatOrderTableData } from "~/modules/orders/utils/format-order-table-data";
 import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";

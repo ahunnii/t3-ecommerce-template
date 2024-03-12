@@ -9,8 +9,8 @@ import { authenticateSession } from "~/utils/auth";
 
 import Image from "next/image";
 import Link from "next/link";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import Currency from "~/components/core/ui/currency";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";

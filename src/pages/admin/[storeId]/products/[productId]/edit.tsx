@@ -3,8 +3,8 @@ import { type FC } from "react";
 
 import { api } from "~/utils/api";
 
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { ProductForm } from "~/modules/products/admin/product-form";

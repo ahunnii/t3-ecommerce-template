@@ -4,9 +4,9 @@ import { type FC } from "react";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { ViewProductAttributes } from "~/modules/products/admin/view-product-attributes";

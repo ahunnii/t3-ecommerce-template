@@ -1,8 +1,8 @@
 import type { FC } from "react";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
-import Breadcrumbs from "~/components/core/breadcrumbs";
-import NoResults from "~/components/core/ui/no-results";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
+import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
+import NoResults from "~/components/common/no-results";
 import ProductCard from "~/components/custom/ta-product-card.custom";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";

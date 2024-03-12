@@ -5,7 +5,7 @@ import AdminLayout from "~/components/layouts/admin-layout";
 
 import { api } from "~/utils/api";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { GalleryImageClient } from "~/modules/gallery/admin/client";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 

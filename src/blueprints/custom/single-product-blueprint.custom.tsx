@@ -3,7 +3,7 @@ import { type FC } from "react";
 
 import Info from "~/modules/products/core/info";
 
-import Breadcrumbs from "~/components/core/breadcrumbs";
+import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
 import Gallery from "~/modules/gallery/core";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
@@ -12,7 +12,7 @@ import { api } from "~/utils/api";
 
 import type { DetailedProductFull } from "~/types";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
 

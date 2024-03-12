@@ -3,8 +3,8 @@ import type { DetailedProductFull } from "~/types";
 import AttributeFilter from "~/modules/categories/core/attribute-filter";
 
 import { useParams, useSearchParams } from "next/navigation";
+import NoResults from "~/components/common/no-results";
 import Billboard from "~/components/core/ui/billboard";
-import NoResults from "~/components/core/ui/no-results";
 import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import MobileFilters from "~/modules/categories/core/mobile-filters";

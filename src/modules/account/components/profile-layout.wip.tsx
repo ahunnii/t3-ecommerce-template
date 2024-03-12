@@ -5,7 +5,7 @@ import { SidebarNav } from "~/modules/account/core/sidebar-nav";
 
 import { Separator } from "~/components/ui/separator";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { storeTheme } from "~/data/config.custom";
 import { env } from "~/env.mjs";

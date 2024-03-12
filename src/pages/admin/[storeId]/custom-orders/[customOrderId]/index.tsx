@@ -5,8 +5,8 @@ import type { FC } from "react";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 
 import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";

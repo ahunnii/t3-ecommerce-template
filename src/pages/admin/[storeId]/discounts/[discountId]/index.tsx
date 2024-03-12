@@ -9,8 +9,8 @@ import PageLoader from "~/components/ui/page-loader";
 
 import { Pencil } from "lucide-react";
 import Link from "next/link";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { BackToButton } from "~/components/common/buttons/back-to-button";
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
 import { Button } from "~/components/ui/button";
 import { Heading } from "~/components/ui/heading";
 import { ViewBlogImage } from "~/modules/blog-posts/admin/view-blog-images";

@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import { type FC } from "react";
 
-import { AbsolutePageLoader } from "~/components/core/absolute-page-loader";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { api } from "~/utils/api";
