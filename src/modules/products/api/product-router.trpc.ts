@@ -531,4 +531,59 @@ export const productsRouter = createTRPCRouter({
         where: { id: input.productId },
       });
     }),
+
+  searchForProducts: publicProcedure
+    .input(z.object({ queryString: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (input.queryString === "") return [];
+
+      const products = await ctx.prisma.product.findMany({
+        where: {
+          storeId: env.NEXT_PUBLIC_STORE_ID,
+          OR: [
+            { name: { contains: input.queryString } },
+
+            { description: { contains: input.queryString } },
+
+            {
+              tags: {
+                some: {
+                  name: { contains: input.queryString },
+                },
+              },
+            },
+            {
+              materials: {
+                some: {
+                  name: { contains: input.queryString },
+                },
+              },
+            },
+            {
+              collections: {
+                some: {
+                  name: { contains: input.queryString },
+                },
+              },
+            },
+            {
+              category: {
+                name: { contains: input.queryString },
+              },
+            },
+          ],
+        },
+        include: {
+          collections: true,
+          category: true,
+          tags: true,
+          materials: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      return products;
+    }),
 });

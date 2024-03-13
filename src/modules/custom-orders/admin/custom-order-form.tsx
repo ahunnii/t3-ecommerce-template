@@ -166,9 +166,10 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onDelete}
         loading={loading}
+        asChild={true}
       />
       <BackToButton
         link={`/admin/${storeId}/custom-orders/${customOrderId ?? ""}`}

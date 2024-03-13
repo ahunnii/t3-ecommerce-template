@@ -205,6 +205,7 @@ export const customRouter = createTRPCRouter({
       z.object({
         storeId: z.string().optional(),
         customOrderId: z.string(),
+        productDescription: z.string().optional(),
         email: z.string().email(),
         name: z.string(),
         description: z.string(),
@@ -265,7 +266,7 @@ export const customRouter = createTRPCRouter({
           },
           update: {
             price: input.price,
-            description: input.notes ?? input.description,
+            description: input.productDescription,
           },
           create: {
             price: input.price,
@@ -473,5 +474,36 @@ export const customRouter = createTRPCRouter({
           message: "An error occurred while sending the email.",
         });
       }
+    }),
+
+  searchForCustomOrders: protectedProcedure
+    .input(z.object({ queryString: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (input.queryString === "") return [];
+
+      const orders = await ctx.prisma.customOrderRequest.findMany({
+        where: {
+          storeId: env.NEXT_PUBLIC_STORE_ID,
+          OR: [
+            { name: { contains: input.queryString } },
+
+            { email: { contains: input.queryString } },
+
+            { description: { contains: input.queryString } },
+
+            { notes: { contains: input.queryString } },
+
+            {
+              product: {
+                name: { contains: input.queryString },
+              },
+            },
+          ],
+        },
+        include: { product: true },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return orders;
     }),
 });
