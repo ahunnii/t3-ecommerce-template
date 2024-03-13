@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import StoreSwitcher from "~/components/admin/store-switcher";
-import { SEO } from "~/components/core/seo-head";
+import { SEO } from "~/components/common/seo-head";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -40,7 +40,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
         title={metadata?.title ?? `Admin Template Site`}
         description={metadata?.description ?? "Lorem Ipsum"}
       />
-      <div className="grid h-screen w-full overflow-hidden lg:grid-cols-[280px_1fr]">
+      <div className="grid h-screen w-full overflow-hidden bg-slate-100/50 lg:grid-cols-[280px_1fr]">
         <div className="fixed inset-0 z-10 hidden h-full translate-x-0 transform overflow-auto border-r bg-gray-100/40 transition-transform duration-200 ease-in-out dark:bg-gray-800/40 lg:static lg:z-auto lg:block lg:translate-x-0">
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-[60px] items-center border-b px-6">
@@ -72,10 +72,10 @@ const AdminLayout = ({ children, metadata }: IProps) => {
           </div>
         </div>
         <main className="flex h-screen flex-col overflow-y-auto">
-          <div className="flex items-center gap-4 px-4">
+          <div className="flex items-center gap-4 bg-white px-4">
             <Navbar stores={getAllStores.data ?? []} />
           </div>
-          <ScrollArea className="h-[calc(100vh-100px)]">{children}</ScrollArea>
+          <ScrollArea className="h-[calc(100vh-70px)] ">{children}</ScrollArea>
         </main>
       </div>
     </>

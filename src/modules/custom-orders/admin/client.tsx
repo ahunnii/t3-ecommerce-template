@@ -8,8 +8,8 @@ import { Separator } from "~/components/ui/separator";
 
 import Link from "next/link";
 
-import { AdvancedDataTable } from "~/components/ui/advanced-data-table";
-import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
+
 import type { CustomOrderColumn } from "../types";
 import { columns } from "./columns";
 import { filterOptions } from "./filter-options";

@@ -22,34 +22,37 @@ const metadata = {
 
 const BlogPostPage = () => {
   const params = useParams();
-  const { data: blog, isLoading } = api.blogPosts.getBlogPost.useQuery(
-    {
-      slug: params?.blogPostSlug as string,
-    },
-    {
-      enabled: !!params?.blogPostSlug,
-    }
+  const slug = params?.blogPostSlug as string;
+  const getBlogPost = api.blogPosts.getBlogPost.useQuery(
+    { slug },
+    { enabled: !!slug }
   );
   const config = useConfig();
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
-      {isLoading && <AbsolutePageLoader />}
+      {getBlogPost.isLoading && <AbsolutePageLoader />}
 
-      {!isLoading && (
+      {!getBlogPost.isLoading && (
         <>
           <TaBreadCrumbs
             pathway={[
               { name: "Blog", link: "/blog" },
-              blog ? { name: blog.title } : { name: "404" },
+              getBlogPost.data
+                ? { name: getBlogPost.data.title }
+                : { name: "404" },
             ]}
           />
-          <PageHeader>{blog?.title ?? "Blog Post Not Found"} </PageHeader>
-          {blog && (
+          <PageHeader>
+            {getBlogPost.data?.title ?? "Blog Post Not Found"}{" "}
+          </PageHeader>
+          {getBlogPost.data && (
             <>
-              {blog?.featuredImg && (
+              {getBlogPost.data?.featuredImg && (
                 <Image
-                  src={blog?.featuredImg ?? "/placeholder-image.webp"}
+                  src={
+                    getBlogPost.data?.featuredImg ?? "/placeholder-image.webp"
+                  }
                   width={800}
                   height={400}
                   alt=""
@@ -57,16 +60,16 @@ const BlogPostPage = () => {
               )}
 
               <p className={cn(config.typography.subheader, "mt-0")}>
-                {blog?.createdAt.toDateString()}
+                {getBlogPost.data?.createdAt.toDateString()}
               </p>
 
-              <LazyBlogPostContentSection content={blog.content} />
+              <LazyBlogPostContentSection content={getBlogPost.data.content} />
 
-              <BlogPostTagsSection tags={blog.tags} />
+              <BlogPostTagsSection tags={getBlogPost.data.tags} />
             </>
           )}
 
-          {!blog && (
+          {!getBlogPost.data && (
             <p>
               The blog post you are looking for does not exist. Please try
               again.

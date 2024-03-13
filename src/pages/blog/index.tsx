@@ -14,25 +14,25 @@ const metadata = {
 };
 
 const BlogHomePage = () => {
-  const { data: blogs, isLoading } = api.blogPosts.getAllBlogPosts.useQuery({});
+  const getAllBlogPosts = api.blogPosts.getAllBlogPosts.useQuery({
+    published: true,
+  });
   const config = useConfig();
-
-  const items = blogs?.filter((blog) => blog.published) ?? [];
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
       <PageHeader>Blog</PageHeader>
 
-      {isLoading && <AbsolutePageLoader />}
+      {getAllBlogPosts.isLoading && <AbsolutePageLoader />}
 
-      {!isLoading && (
+      {!getAllBlogPosts.isLoading && (
         <>
           <div className="flex w-full flex-col ">
-            {items.map((item, idx) => (
+            {getAllBlogPosts?.data?.map((item, idx) => (
               <BlogPostListing key={idx} blog={item} />
             ))}
 
-            {(!items || items.length === 0) && (
+            {(!getAllBlogPosts?.data || getAllBlogPosts?.data.length === 0) && (
               <p>
                 There are no blog posts yet. Check back soon for the latest
                 news!

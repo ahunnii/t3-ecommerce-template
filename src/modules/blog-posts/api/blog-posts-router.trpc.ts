@@ -37,17 +37,19 @@ export const blogPostRouter = createTRPCRouter({
     }),
   getAllBlogPosts: publicProcedure
     .input(
-      z.object({
-        published: z.boolean().optional(),
-        tags: z.array(z.string()).optional(),
-        storeId: z.string().optional(),
-        querySearch: z.string().optional(),
-      })
+      z
+        .object({
+          published: z.boolean().optional(),
+          tags: z.array(z.string()).optional(),
+          storeId: z.string().optional(),
+          querySearch: z.string().optional(),
+        })
+        .optional()
     )
     .query(({ ctx, input }) => {
       return ctx.prisma.blogPost.findMany({
         where: {
-          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          storeId: input?.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           published: input?.published,
         },
 

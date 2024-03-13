@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 
 import Container from "~/components/core/ui/container";
-import { SidebarNav } from "~/modules/account/core/sidebar-nav";
+import { AccountSideBarNav } from "~/modules/account/components/account-sidebar-nav";
 
 import { Separator } from "~/components/ui/separator";
 
@@ -31,7 +31,7 @@ export default function ProfileLayout({ children }: SettingsLayoutProps) {
         <AbsolutePageLoader />
       ) : (
         <Container>
-          <div className=" block space-y-6 px-8 py-10 pb-16">
+          <div className=" block space-y-6 px-8 ">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5 ">
                 <h2 className="text-2xl font-bold tracking-tight text-black">
@@ -46,7 +46,7 @@ export default function ProfileLayout({ children }: SettingsLayoutProps) {
             <Separator className="my-6 bg-zinc-900" />
             <div className="flex w-full flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
               <aside className="-mx-4 lg:w-1/5">
-                <SidebarNav
+                <AccountSideBarNav
                   items={ACCOUNT_NAV_ITEMS}
                   className={cn(" text-black")}
                 />

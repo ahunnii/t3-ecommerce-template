@@ -1,9 +1,9 @@
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
+import { SEO } from "~/components/common/seo-head";
 import { Footer as DefaultFooter } from "~/components/core/footer";
 import { Navbar as DefaultNavbar } from "~/components/core/navbar";
-import { SEO } from "~/components/core/seo-head";
 
 import useCart from "~/modules/cart/hooks/use-cart";
 import { useConfig } from "~/providers/style-config-provider";

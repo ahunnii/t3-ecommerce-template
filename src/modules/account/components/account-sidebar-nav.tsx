@@ -11,7 +11,7 @@ type Props = {
   }[];
 } & React.HTMLAttributes<HTMLElement>;
 
-export function SidebarNav({ className, items, ...props }: Props) {
+export function AccountSideBarNav({ className, items, ...props }: Props) {
   const pathname = usePathname();
 
   return (

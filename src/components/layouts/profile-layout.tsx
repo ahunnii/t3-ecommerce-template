@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useMemo } from "react";
 
 import Container from "~/components/core/ui/container";
-import { SidebarNav } from "~/modules/account/core/sidebar-nav";
+import { AccountSideBarNav } from "~/modules/account/components/account-sidebar-nav";
 
 import PageLoader from "~/components/ui/page-loader";
 import { Separator } from "~/components/ui/separator";
@@ -63,7 +63,7 @@ export default function ProfileLayout({ children }: SettingsLayoutProps) {
               <Separator className="my-6" />
               <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                 <aside className="-mx-4 lg:w-1/5">
-                  <SidebarNav items={navItems} />
+                  <AccountSideBarNav items={navItems} />
                 </aside>
                 <div className="mx-6 flex-1 ">{children}</div>
               </div>

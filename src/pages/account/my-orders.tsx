@@ -2,7 +2,7 @@ import type { Order } from "@prisma/client";
 
 import { UserOrderTable } from "~/modules/account/components/user-order-table";
 
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { getUserOrdersServerSide } from "~/modules/orders/utils/get-user-orders-server-side";
 import { useConfig } from "~/providers/style-config-provider";
 import { authenticateUser, redirectToSignIn } from "~/utils/auth";

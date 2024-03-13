@@ -7,7 +7,7 @@ import { storeRouter } from "~/server/api/routers/stores";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { shippingLabelRouter } from "../../modules/shipping/api/shipping-router.trpc";
 
-import { blogPostRouter } from "./routers/blog-posts";
+import { blogPostRouter } from "../../modules/blog-posts/api/blog-posts-router.trpc";
 
 import { galleryRouter } from "~/modules/gallery/api/gallery-router.trpc";
 import { productsRouter } from "~/modules/products/api/product-router.trpc";

@@ -1,5 +1,5 @@
 import type { Order } from "@prisma/client";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import type { User } from "next-auth/core/types";
 
 import ProfileLayout from "~/modules/account/components/profile-layout.wip";
@@ -38,10 +38,7 @@ export default AccountHomePage;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const user = await authenticateUser(ctx);
-
   if (!user) return redirectToSignIn();
-
   const orders = await getUserOrdersServerSide(user.id);
-
   return { props: { user, orders } };
 }

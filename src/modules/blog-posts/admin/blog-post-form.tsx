@@ -6,7 +6,7 @@ import type { Tag } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
@@ -30,9 +30,11 @@ import { TagInput } from "~/components/ui/tag-input";
 
 import { BackToButton } from "~/components/common/buttons/back-to-button";
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
+import { cn } from "~/utils/styles";
 import { blogPostFormSchema } from "../schema";
 import type { BlogPost, BlogPostFormValues } from "../types";
 
@@ -156,39 +158,51 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={loading}
-      />{" "}
-      <BackToButton
-        link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
-        title="Back to Blog Post"
       />
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
 
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+      <div
+        className={cn(
+          "sticky top-0 z-30 flex items-center justify-between bg-white px-8 py-4"
         )}
+      >
+        <div>
+          <BackToButton
+            link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
+            title="Back to Blog Post"
+          />
+          <Heading title={title} description={description} />
+        </div>
+        <div className="flex items-center gap-2">
+          {initialData && (
+            <Button
+              disabled={loading}
+              variant="destructive"
+              size="sm"
+              onClick={() => setOpen(true)}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
+
+          <Button disabled={loading} className="ml-auto" type="submit">
+            {action}
+          </Button>
+        </div>
       </div>
-      <Separator />
+      <Separator className="sticky top-32  z-30 shadow" />
       <Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="w-full space-y-8"
+          className="mt-4 w-full space-y-8 p-8"
         >
           <section className="flex w-full gap-4 max-lg:flex-col">
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
-              <div className="w-full  rounded-md border border-border bg-background/50 p-4 ">
-                <FormLabel>Details</FormLabel>{" "}
-                <FormDescription>
-                  Write to your heart&apos;s content.
-                </FormDescription>
-                <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
+              <EditSection
+                title="Details"
+                description=" Write to your heart's content."
+                className="bg-white shadow-sm"
+              >
+                <div className=" grid gap-8 md:grid-cols-2 ">
                   <FormField
                     control={form.control}
                     name="title"
@@ -211,7 +225,7 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
                     name="slug"
                     render={({ field }) => (
                       <FormItem className="col-span-full">
-                        <FormLabel>Slug</FormLabel>
+                        <FormLabel>Slug (optional)</FormLabel>
                         <FormControl>
                           <Input
                             disabled={loading}
@@ -248,7 +262,7 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
                     control={form.control}
                     name="published"
                     render={({ field }) => (
-                      <FormItem className="col-span- flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormItem className="col-span-full flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
@@ -266,26 +280,57 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
                     )}
                   />
                 </div>{" "}
-              </div>
-
-              <div className="w-full rounded-md border border-border bg-background/50 p-4 ">
-                <FormLabel>Attributes</FormLabel>{" "}
-                <FormDescription className="pb-5">
-                  Used for searching, SEO, and other info on blogs.
-                </FormDescription>
+              </EditSection>
+            </div>
+            <div className="flex w-full flex-col space-y-4 lg:w-4/12">
+              <EditSection
+                title="Media"
+                description="Images, videos, and more associated with the post."
+              >
+                <FormField
+                  control={form.control}
+                  name="featuredImg"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Featured Image (optional)</FormLabel>{" "}
+                      <FormDescription>
+                        Used to represent your blog on social media and other
+                        sharing
+                      </FormDescription>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          disabled={loading}
+                          onChange={(url) => {
+                            return field.onChange(url);
+                          }}
+                          onRemove={() => form.setValue("featuredImg", "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />{" "}
+              </EditSection>
+              <EditSection
+                title="Attributes"
+                description="Used for searching, SEO, and other info on blogs."
+              >
                 <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
                   <FormField
                     control={form.control}
                     name="tags"
                     render={({ field }) => (
                       <FormItem className="col-span-full flex flex-col items-start">
-                        <FormLabel className="text-left">Tags</FormLabel>
+                        <FormLabel className="text-left">
+                          Tags (optional)
+                        </FormLabel>
                         <FormControl>
                           <TagInput
                             {...field}
-                            placeholder="Enter a topic"
+                            placeholder="Enter a tag name and press enter."
                             tags={tags}
-                            className="sm:min-w-[450px]"
+                            className="w-full"
                             setTags={(newTags) => {
                               setTags(newTags);
                               setValue("tags", newTags as [Tag, ...Tag[]]);
@@ -300,39 +345,13 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
                     )}
                   />
                 </div>
-              </div>
-            </div>
-            <div className="flex w-full flex-col lg:w-4/12">
-              <FormField
-                control={form.control}
-                name="featuredImg"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Featured Image</FormLabel>{" "}
-                    <FormDescription>
-                      Used to represent your blog on social media and other
-                      sharing
-                    </FormDescription>
-                    <FormControl>
-                      <ImageUpload
-                        value={field.value ? [field.value] : []}
-                        disabled={loading}
-                        onChange={(url) => {
-                          return field.onChange(url);
-                        }}
-                        onRemove={() => form.setValue("featuredImg", "")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />{" "}
+              </EditSection>
             </div>
           </section>
 
-          <Button disabled={loading} className="ml-auto" type="submit">
+          {/* <Button disabled={loading} className="ml-auto" type="submit">
             {action}
-          </Button>
+          </Button> */}
         </form>
       </Form>
     </>

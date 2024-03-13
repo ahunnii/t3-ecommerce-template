@@ -17,8 +17,10 @@ import {
 } from "~/components/ui/tooltip";
 
 import Link from "next/link";
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import type { BlogPostColumn } from "../types";
 import { columns } from "./columns";
+import { filterOptions } from "./filter-options";
 
 type Props = { data: BlogPostColumn[] };
 
@@ -52,7 +54,12 @@ export const BlogPostClient: React.FC<Props> = ({ data }) => {
         </Link>
       </div>
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
+      <AdvancedDataTable
+        searchKey="name"
+        columns={columns}
+        data={data}
+        filters={filterOptions}
+      />
       <Heading title="API" description="API Calls for Blog Posts" />
       <Separator />
       <ApiList entityName="blog-posts" entityIdName="blogPostId" />
