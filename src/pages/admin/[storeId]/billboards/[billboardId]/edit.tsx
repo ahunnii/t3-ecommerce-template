@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { BillboardForm } from "~/modules/billboards/admin/billboard-form";
+import { BillboardForm } from "~/modules/billboards/components/admin/billboard-form";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
@@ -21,13 +21,10 @@ const EditBillboardPage: FC<IProps> = ({ billboardId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        {!isLoading && billboard && <BillboardForm initialData={billboard} />}
-        {!isLoading && !billboard && (
-          <DataFetchErrorMessage message="There seems to be an issue with loading the billboard" />
-        )}
-      </div>
+      {!isLoading && billboard && <BillboardForm initialData={billboard} />}
+      {!isLoading && !billboard && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the billboard" />
+      )}
     </AdminLayout>
   );
 };

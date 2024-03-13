@@ -4,9 +4,9 @@ import AttributeFilter from "~/modules/categories/core/attribute-filter";
 
 import { useParams, useSearchParams } from "next/navigation";
 import NoResults from "~/components/common/no-results";
-import Billboard from "~/components/core/ui/billboard";
 import ProductCard from "~/components/core/ui/product-card";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
+import Billboard from "~/modules/billboards/components/billboard";
 import MobileFilters from "~/modules/categories/core/mobile-filters";
 import { api } from "~/utils/api";
 

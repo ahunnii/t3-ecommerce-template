@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 
 import { ApiList } from "~/components/ui/api-list";
 import { Button } from "~/components/ui/button";
-import { DataTable } from "~/components/ui/data-table";
+
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
@@ -12,13 +12,14 @@ import Link from "next/link";
 
 import { columns } from "./columns";
 
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import type { BillboardColumn } from "../types";
+import type { BillboardColumn } from "../../types";
 
 type Props = { data: BillboardColumn[] };
 
@@ -27,7 +28,7 @@ export const BillboardClient: React.FC<Props> = ({ data }) => {
   const storeId = params.query.storeId as string;
 
   return (
-    <>
+    <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
         <TooltipProvider delayDuration={250}>
           <Tooltip>
@@ -54,10 +55,10 @@ export const BillboardClient: React.FC<Props> = ({ data }) => {
         </Link>
       </div>
       <Separator />
-      <DataTable searchKey="label" columns={columns} data={data} />
+      <AdvancedDataTable searchKey="label" columns={columns} data={data} />
       <Heading title="Public API" description="API Calls for Billboards" />
       <Separator />
       <ApiList entityName="billboards" entityIdName="billboardId" />
-    </>
+    </div>
   );
 };

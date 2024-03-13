@@ -7,7 +7,7 @@ import { AdvancedDataTableColumnHeader } from "~/components/common/tables/advanc
 
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import type { BlogPostColumn } from "../types";
+import type { BlogPostColumn } from "../../types";
 import { CellAction } from "./cell-action";
 
 export const columns: ColumnDef<BlogPostColumn>[] = [

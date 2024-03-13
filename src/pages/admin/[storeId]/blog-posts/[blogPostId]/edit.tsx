@@ -7,7 +7,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
-import { BlogPostForm } from "~/modules/blog-posts/admin/blog-post-form";
+import { BlogPostForm } from "~/modules/blog-posts/components/admin/blog-post-form";
 
 interface IProps {
   storeId: string;

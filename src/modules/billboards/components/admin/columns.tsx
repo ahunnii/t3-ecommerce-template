@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { CellAction } from "./cell-action";
 
 import { format } from "date-fns";
-import type { BillboardColumn } from "../types";
+import type { BillboardColumn } from "../../types";
 
 export const columns: ColumnDef<BillboardColumn>[] = [
   {

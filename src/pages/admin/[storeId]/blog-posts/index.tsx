@@ -9,7 +9,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import AdminLayout from "~/components/layouts/admin-layout";
 import PageLoader from "~/components/ui/page-loader";
 
-import { BlogPostClient } from "~/modules/blog-posts/admin/client";
+import { BlogPostClient } from "~/modules/blog-posts/components/admin/client";
 import type { BlogPost, BlogPostColumn } from "~/modules/blog-posts/types";
 
 interface IProps {

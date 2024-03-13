@@ -11,7 +11,7 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
-import type { BillboardColumn } from "../types";
+import type { BillboardColumn } from "../../types";
 
 type Props = { data: BillboardColumn };
 
@@ -55,7 +55,7 @@ export const CellAction: React.FC<Props> = ({ data }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onConfirm}
         loading={deleteBillboard.isLoading}
       />

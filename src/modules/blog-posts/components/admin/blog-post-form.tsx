@@ -34,8 +34,8 @@ import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
-import { blogPostFormSchema } from "../schema";
-import type { BlogPost, BlogPostFormValues } from "../types";
+import { blogPostFormSchema } from "../../schema";
+import type { BlogPost, BlogPostFormValues } from "../../types";
 
 type Props = { initialData: BlogPost | null };
 

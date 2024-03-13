@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import type { BlogPostColumn } from "../types";
+import type { BlogPostColumn } from "../../types";
 
 type Props = { data: BlogPostColumn };
 

@@ -18,7 +18,7 @@ import {
 
 import Link from "next/link";
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
-import type { BlogPostColumn } from "../types";
+import type { BlogPostColumn } from "../../types";
 import { columns } from "./columns";
 import { filterOptions } from "./filter-options";
 

@@ -6,15 +6,15 @@ import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
 
 import { Button } from "~/components/ui/button";
-import { Heading } from "~/components/ui/heading";
 
 import { Pencil } from "lucide-react";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
-import { ViewBillboard } from "~/modules/billboards/admin/view-billboard";
+import { ViewBillboard } from "~/modules/billboards/components/admin/view-billboard";
 
 interface IProps {
   billboardId: string;
@@ -33,31 +33,33 @@ const BillboardPage: FC<IProps> = ({ billboardId }) => {
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      <div className="flex-1 space-y-4 p-8 pt-6">
+      <>
         {!isLoading && billboard && (
           <>
-            <BackToButton
+            <AdminFormHeader
+              title={billboard.label}
+              description={
+                "View how your billboard will appear to your customers."
+              }
+              contentName="Billboards"
               link={`/admin/${billboard.storeId}/billboards`}
-              title="Back to Billboards"
-            />
-            <div className="flex w-full items-center justify-between">
-              <Heading
-                title={billboard.label}
-                description={billboard.description ?? "No description added"}
-              />
+            >
               <Link href={editBillboardURL}>
                 <Button className="flex gap-2" size={"sm"}>
-                  <Pencil className="h-5 w-5" /> Edit Billboard
+                  <Pencil className="h-5 w-5" /> Edit...
                 </Button>
               </Link>
-            </div>
-            {billboard && <ViewBillboard billboard={billboard} />}
+            </AdminFormHeader>
+
+            <AdminFormBody className="flex-col ">
+              <ViewBillboard billboard={billboard} />
+            </AdminFormBody>
           </>
         )}
         {!billboard && !isLoading && (
           <DataFetchErrorMessage message="There seems to be an issue with loading the billboard" />
         )}
-      </div>
+      </>
     </AdminLayout>
   );
 };
