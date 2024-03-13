@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Billboard } from "@prisma/client";
-import { Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
@@ -18,7 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Heading } from "~/components/ui/heading";
+
 import { Input } from "~/components/ui/input";
 import {
   Select,
@@ -27,9 +27,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Separator } from "~/components/ui/separator";
 
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+
+import { EditSection } from "~/components/common/sections/edit-section.admin";
+import { Checkbox } from "~/components/ui/checkbox";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import { categoryFormSchema } from "../schema";
@@ -63,6 +66,7 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
       name: initialData?.name ?? "",
       billboardId: initialData?.billboardId ?? undefined,
       attributes: initialData?.attributes ?? [],
+      createNewCollection: initialData?.collection?.id ? true : false,
     },
   });
 
@@ -146,148 +150,198 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-      <BackToButton
-        link={`/admin/${storeId}/categories/${categoryId ?? ""}`}
-        title="Back to Category"
-      />
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="w-full space-y-8"
-        >
-          <div className="gap-8 md:grid md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Category name"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="billboardId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Billboard</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a billboard"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {billboards.map((billboard) => (
-                        <SelectItem key={billboard.id} value={billboard.id}>
-                          {billboard.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>{" "}
-                  <FormDescription>
-                    Image associated with this category. Used in category pages.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>{" "}
-          <div className="flex flex-col space-y-3">
-            <FormLabel>Attributes</FormLabel>
-            <FormDescription>
-              Attributes are common product types associated with this category.
-              Add attributes to quickly make variants of your products. I.E.
-              sizes, colors, materials, etc.{" "}
-              <strong>
-                Note: Variant values are a single string separated by a
-                semicolon.(S;M;L;XL){" "}
-              </strong>
-            </FormDescription>
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <AdminFormHeader
+            title={title}
+            description={description}
+            contentName="Category"
+            link={`/admin/${storeId}/categories/${categoryId ?? ""}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
 
-            {fields.map((item, index) => (
-              <div key={item.id} className="flex items-center space-x-4">
-                <Controller
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Attribute (e.g., Size, Color)"
-                    />
-                  )}
-                  name={`attributes.${index}.name`}
-                  control={form.control}
-                  defaultValue={item.name}
-                />
-
-                <Controller
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="String of values i.e. S;M;L;XL"
-                    />
-                  )}
-                  name={`attributes.${index}.values`}
-                  control={form.control}
-                  defaultValue={item.values}
-                />
-
-                <Button
-                  onClick={() => remove(index)}
-                  variant="destructive"
-                  type="button"
-                >
-                  Remove
-                </Button>
-              </div>
-            ))}
-
-            <Button
-              onClick={() => append({ name: "", values: "" })}
-              type="button"
-              className="w-max"
-            >
-              Add Attribute
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
             </Button>
-          </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          </AdminFormHeader>
+          <AdminFormBody className="space-y-0">
+            <div className="flex w-8/12 flex-col space-y-4">
+              <EditSection
+                title="Details"
+                description="Assign basic info about the category"
+                bodyClassName="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="Category name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditSection>
+
+              <EditSection
+                title="Attributes"
+                description=" Attributes are common product types associated with this
+                category. Add attributes to quickly make variants of your
+                products. I.E. sizes, colors, materials, etc."
+                bodyClassName="space-y-4"
+              >
+                <FormDescription className="flex w-full gap-2">
+                  <span className="w-3/5 font-bold">
+                    Note: Variant values are a single string separated by a
+                    semicolon.(S;M;L;XL){" "}
+                  </span>
+
+                  <Button
+                    onClick={() => append({ name: "", values: "" })}
+                    type="button"
+                    className="w-2/5 gap-2"
+                  >
+                    <Plus className="h-5 w-5" />
+                    Add New
+                  </Button>
+                </FormDescription>
+
+                {fields.map((item, index) => (
+                  <div key={item.id} className="flex items-center space-x-4">
+                    <Controller
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Attribute (e.g., Size, Color)"
+                        />
+                      )}
+                      name={`attributes.${index}.name`}
+                      control={form.control}
+                      defaultValue={item.name}
+                    />
+
+                    <Controller
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="String of values i.e. S;M;L;XL"
+                        />
+                      )}
+                      name={`attributes.${index}.values`}
+                      control={form.control}
+                      defaultValue={item.values}
+                    />
+
+                    <Button
+                      onClick={() => remove(index)}
+                      variant="destructive"
+                      type="button"
+                    >
+                      <Trash className="h-5 w-5" />
+                    </Button>
+                  </div>
+                ))}
+              </EditSection>
+            </div>
+            <div className="flex w-4/12">
+              <EditSection
+                title="Collection"
+                description="Automatically create a collection based on this category."
+                bodyClassName="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="billboardId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Billboard</FormLabel>
+                      <Select
+                        disabled={loading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select a billboard"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {billboards.map((billboard) => (
+                            <SelectItem key={billboard.id} value={billboard.id}>
+                              {billboard.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>{" "}
+                      <FormDescription>
+                        Image associated with this category. Used in category
+                        pages.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {initialData?.collection ? (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox checked={true} disabled />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Create a new collection</FormLabel>
+                      <FormDescription>
+                        You already have a collection associated with this
+                        category.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="createNewCollection"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Create a new collection</FormLabel>
+                          <FormDescription>
+                            Checking this will create a new collection based on
+                            this category. It will also automatically add any
+                            products you tag with the category to the
+                            collection.
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </EditSection>
+            </div>
+          </AdminFormBody>{" "}
         </form>
       </Form>
     </>

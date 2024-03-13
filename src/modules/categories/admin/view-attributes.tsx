@@ -1,6 +1,5 @@
 import { Badge } from "~/components/ui/badge";
 import type { DetailedCategory } from "~/types";
-import { CategoryCard } from "../core/category-card";
 
 export const ViewAttributes = ({
   category,

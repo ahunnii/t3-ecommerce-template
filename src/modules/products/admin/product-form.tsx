@@ -247,7 +247,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onDelete}
         loading={loading}
       />{" "}

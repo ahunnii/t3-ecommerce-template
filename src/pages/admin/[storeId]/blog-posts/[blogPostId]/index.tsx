@@ -16,6 +16,7 @@ import { Button } from "~/components/ui/button";
 import dynamic from "next/dynamic";
 
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import { BlogPostTagsSection } from "~/modules/blog-posts/components/blog-post-tags.section";
 import { cn } from "~/utils/styles";
 
@@ -33,8 +34,8 @@ const BlogPostPage: FC<IProps> = ({ storeId, blogPostId }) => {
     <>
       <AdminLayout>
         {isLoading && <PageLoader />}
-        {!blogPost && <div>Blog post not found</div>}
-        {blogPost && (
+
+        {!isLoading && blogPost && (
           <>
             <AdminFormHeader
               title={blogPost.title}
@@ -81,6 +82,10 @@ const BlogPostPage: FC<IProps> = ({ storeId, blogPostId }) => {
               <BlogPostTagsSection tags={blogPost.tags} />
             </AdminFormBody>
           </>
+        )}
+
+        {!isLoading && !blogPost && (
+          <DataFetchErrorMessage message="There seems to be an issue with loading the blog post" />
         )}
       </AdminLayout>
     </>

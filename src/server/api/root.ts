@@ -1,5 +1,5 @@
-import { billboardsRouter } from "~/server/api/routers/billboards";
-import { categoriesRouter } from "~/server/api/routers/categories";
+import { billboardsRouter } from "~/modules/billboards/api/billboards-router.trpc";
+import { categoriesRouter } from "~/modules/categories/api/categories-router.trpc";
 import { collectionsRouter } from "~/server/api/routers/collections";
 
 import { ordersRouter } from "~/server/api/routers/orders";

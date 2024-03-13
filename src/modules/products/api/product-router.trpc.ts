@@ -431,7 +431,42 @@ export const productsRouter = createTRPCRouter({
         });
 
       try {
-        await ctx.prisma.product.update({
+        const categoryCollection = await ctx.prisma.product.findUnique({
+          where: {
+            id: input.productId,
+          },
+          include: {
+            category: {
+              include: {
+                collection: true,
+              },
+            },
+          },
+        });
+
+        if (categoryCollection?.category?.collection) {
+          await ctx.prisma.product.update({
+            where: {
+              id: input.productId,
+            },
+            data: {
+              collections: {
+                disconnect: {
+                  id: categoryCollection.category.collection.id,
+                },
+              },
+            },
+            include: {
+              category: {
+                include: {
+                  collection: true,
+                },
+              },
+            },
+          });
+        }
+
+        const product = await ctx.prisma.product.update({
           where: {
             id: input.productId,
           },
@@ -457,6 +492,7 @@ export const productsRouter = createTRPCRouter({
             materials: {
               deleteMany: {},
             },
+
             shippingCost: input.shippingCost,
             shippingType: input.shippingType,
             weight: input.weight,
@@ -464,7 +500,27 @@ export const productsRouter = createTRPCRouter({
             width: input.width,
             height: input.height,
           },
+          include: {
+            category: {
+              include: {
+                collection: true,
+              },
+            },
+          },
         });
+
+        if (product.category.collection) {
+          await ctx.prisma.collection.update({
+            where: { id: product.category.collection.id },
+            data: {
+              products: {
+                connect: {
+                  id: product.id,
+                },
+              },
+            },
+          });
+        }
 
         return ctx.prisma.product.update({
           where: {

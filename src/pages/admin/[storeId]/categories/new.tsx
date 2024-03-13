@@ -22,9 +22,7 @@ const NewCategoryPage: FC = () => {
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
       {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <CategoryForm billboards={billboards ?? []} initialData={null} />
-        </div>
+        <CategoryForm billboards={billboards ?? []} initialData={null} />
       )}
     </AdminLayout>
   );

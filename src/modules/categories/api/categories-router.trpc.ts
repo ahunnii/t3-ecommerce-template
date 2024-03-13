@@ -58,6 +58,7 @@ export const categoriesRouter = createTRPCRouter({
         include: {
           billboard: true,
           attributes: true,
+          collection: true,
         },
       });
     }),
@@ -75,6 +76,7 @@ export const categoriesRouter = createTRPCRouter({
             storeId: z.string(),
           })
         ),
+        createNewCollection: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -84,7 +86,7 @@ export const categoriesRouter = createTRPCRouter({
           message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.category.create({
+      const category = await ctx.prisma.category.create({
         data: {
           name: input.name,
           billboardId: input.billboardId,
@@ -104,6 +106,19 @@ export const categoriesRouter = createTRPCRouter({
           },
         },
       });
+
+      if (input.createNewCollection) {
+        await ctx.prisma.collection.create({
+          data: {
+            name: input.name,
+            storeId: input.storeId,
+            categoryId: category.id,
+            billboardId: input.billboardId,
+          },
+        });
+      }
+
+      return category;
     }),
 
   updateCategory: protectedProcedure
@@ -113,6 +128,7 @@ export const categoriesRouter = createTRPCRouter({
         storeId: z.string(),
         name: z.string(),
         billboardId: z.string(),
+        createNewCollection: z.boolean().optional(),
         attributes: z.array(
           z.object({
             name: z.string(),
@@ -137,7 +153,67 @@ export const categoriesRouter = createTRPCRouter({
             deleteMany: {},
           },
         },
+        include: { collection: true, products: true },
       });
+
+      console.log(category.collection?.id, input.createNewCollection);
+
+      if (input.createNewCollection) {
+        await ctx.prisma.collection.upsert({
+          where: { id: category?.collection?.id ?? "" },
+          create: {
+            name: input.name,
+            storeId: input.storeId,
+            categoryId: category.id,
+            billboardId: input.billboardId,
+            products: {
+              connect: [
+                ...category.products.map((product) => ({ id: product.id })),
+              ],
+            },
+          },
+          update: {
+            name: input.name,
+            billboardId: input.billboardId,
+            products: {
+              connect: [
+                ...category.products.map((product) => ({ id: product.id })),
+              ],
+            },
+          },
+        });
+      }
+
+      // if (input.createNewCollection && category.collection?.id) {
+      //   await ctx.prisma.collection.update({
+      //     where: { id: input.categoryId },
+      //     data: {
+      //       name: input.name,
+      //       billboardId: input.billboardId,
+      //       products: {
+      //         connect: [
+      //           ...category.products.map((product) => ({ id: product.id })),
+      //         ],
+      //       },
+      //     },
+      //   });
+      // }
+
+      // if (input.createNewCollection && !category.collection) {
+      //   await ctx.prisma.collection.create({
+      //     data: {
+      //       name: input.name,
+      //       storeId: input.storeId,
+      //       categoryId: category.id,
+      //       billboardId: input.billboardId,
+      //       products: {
+      //         connect: [
+      //           ...category.products.map((product) => ({ id: product.id })),
+      //         ],
+      //       },
+      //     },
+      //   });
+      // }
 
       return ctx.prisma.category.update({
         where: { id: category.id },

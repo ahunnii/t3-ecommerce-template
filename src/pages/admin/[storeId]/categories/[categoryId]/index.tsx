@@ -7,11 +7,13 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
-import { Heading } from "~/components/ui/heading";
+
 import { ViewAttributes } from "~/modules/categories/admin/view-attributes";
 import { ViewCategory } from "~/modules/categories/admin/view-category";
 
@@ -20,54 +22,38 @@ interface IProps {
   storeId: string;
 }
 const CategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
-  const { data: category, isLoading: isCategoryLoading } =
-    api.categories.getCategory.useQuery({
-      categoryId,
-    });
+  const { data: category, isLoading } = api.categories.getCategory.useQuery({
+    categoryId,
+  });
 
-  const { data: billboards, isLoading: areBillboardsLoading } =
-    api.billboards.getAllBillboards.useQuery({
-      storeId,
-    });
-
-  const editCategory = `/admin/${category?.storeId}/categories/${category?.id}/edit`;
+  const editCategory = `/admin/${storeId}/categories/${category?.id}/edit`;
   return (
     <AdminLayout>
-      {isCategoryLoading && areBillboardsLoading && <AbsolutePageLoader />}
+      {isLoading && <AbsolutePageLoader />}
 
-      {!isCategoryLoading && !areBillboardsLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {category && billboards && (
-            <>
-              <BackToButton
-                link={`/admin/${category.storeId}/categories`}
-                title="Back to Categories"
-              />
-              <div className="flex w-full items-center justify-between">
-                <Heading
-                  title={category.name}
-                  description={"No description added"}
-                />
-                <Link href={editCategory}>
-                  <Button className="flex gap-2" size={"sm"}>
-                    <Pencil className="h-5 w-5" /> Edit Category
-                  </Button>
-                </Link>
-              </div>
+      {!isLoading && category && (
+        <>
+          <AdminFormHeader
+            title={category.name}
+            description={"View details about the category at a glance."}
+            contentName="Categories"
+            link={`/admin/${category.storeId}/categories`}
+          >
+            <Link href={editCategory}>
+              <Button className="flex gap-2" size={"sm"}>
+                <Pencil className="h-5 w-5" /> Edit...
+              </Button>
+            </Link>
+          </AdminFormHeader>
 
-              <div className="flex space-x-4">
-                <ViewCategory category={category} />
-                <ViewAttributes category={category} />
-              </div>
-            </>
-          )}
-          {!category && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
-          )}
-          {!billboards && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
-          )}
-        </div>
+          <AdminFormBody>
+            <ViewCategory category={category} />
+            <ViewAttributes category={category} />
+          </AdminFormBody>
+        </>
+      )}
+      {!isLoading && !category && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
       )}
     </AdminLayout>
   );

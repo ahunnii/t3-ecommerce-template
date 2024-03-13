@@ -55,7 +55,7 @@ export const CellAction: React.FC<Props> = ({ data }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onConfirm}
         loading={deleteCategory.isLoading}
       />

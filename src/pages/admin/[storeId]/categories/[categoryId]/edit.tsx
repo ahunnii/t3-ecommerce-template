@@ -15,34 +15,32 @@ interface IProps {
   storeId: string;
 }
 const EditCategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
-  const { data: category, isLoading: isCategoryLoading } =
-    api.categories.getCategory.useQuery({
-      categoryId,
-    });
+  const getCategory = api.categories.getCategory.useQuery({
+    categoryId,
+  });
 
-  const { data: billboards, isLoading: areBillboardsLoading } =
-    api.billboards.getAllBillboards.useQuery({
-      storeId,
-    });
+  const getAllBillboards = api.billboards.getAllBillboards.useQuery({
+    storeId,
+  });
 
+  const isLoading = getCategory.isLoading || getAllBillboards.isLoading;
   return (
     <AdminLayout>
-      {(isCategoryLoading || areBillboardsLoading) && <AbsolutePageLoader />}
+      {isLoading && <AbsolutePageLoader />}
 
-      {!isCategoryLoading && !areBillboardsLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {category && billboards && (
-            <CategoryForm initialData={category} billboards={billboards} />
-          )}
+      {!isLoading && getCategory.data && getAllBillboards.data && (
+        <CategoryForm
+          initialData={getCategory.data}
+          billboards={getAllBillboards.data}
+        />
+      )}
 
-          {!category && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
-          )}
+      {!isLoading && !getCategory.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
+      )}
 
-          {!billboards && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
-          )}
-        </div>
+      {!isLoading && !getAllBillboards.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
       )}
     </AdminLayout>
   );

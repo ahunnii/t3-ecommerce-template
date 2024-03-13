@@ -7,6 +7,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
+import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import { BlogPostForm } from "~/modules/blog-posts/components/admin/blog-post-form";
 
 interface IProps {
@@ -24,6 +25,9 @@ const EditBlogPostPage: FC<IProps> = ({ blogPostId }) => {
       <AdminLayout>
         {isLoading && <AbsolutePageLoader />}
         {!isLoading && blogPost && <BlogPostForm initialData={blogPost} />}
+        {!isLoading && !blogPost && (
+          <DataFetchErrorMessage message="There seems to be an issue with loading the blog post." />
+        )}
       </AdminLayout>
     </>
   );
