@@ -14,11 +14,7 @@ interface IProps {
 const NewBlogPostPage: FC<IProps> = () => {
   return (
     <AdminLayout>
-      <div className="flex h-full flex-col bg-gray-50/25 dark:bg-slate-900">
-        <div className="flex-1  ">
-          <BlogPostForm initialData={null} />
-        </div>
-      </div>
+      <BlogPostForm initialData={null} />
     </AdminLayout>
   );
 };

@@ -3,10 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Tag } from "@prisma/client";
 
-import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
@@ -21,20 +20,20 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Heading } from "~/components/ui/heading";
 
 import { Input } from "~/components/ui/input";
 
-import { Separator } from "~/components/ui/separator";
 import { TagInput } from "~/components/ui/tag-input";
 
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import { cn } from "~/utils/styles";
+
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { blogPostFormSchema } from "../schema";
 import type { BlogPost, BlogPostFormValues } from "../types";
 
@@ -153,49 +152,29 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-
-      <div
-        className={cn(
-          "sticky top-0 z-30 flex items-center justify-between bg-white px-8 py-4"
-        )}
-      >
-        <div>
-          <BackToButton
-            link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
-            title="Back to Blog Post"
-          />
-          <Heading title={title} description={description} />
-        </div>
-        <div className="flex items-center gap-2">
-          {initialData && (
-            <Button
-              disabled={loading}
-              variant="destructive"
-              size="sm"
-              onClick={() => setOpen(true)}
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          )}
-
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
-        </div>
-      </div>
-      <Separator className="sticky top-32  z-30 shadow" />
       <Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="mt-4 w-full space-y-8 p-8"
-        >
-          <section className="flex w-full gap-4 max-lg:flex-col">
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <AdminFormHeader
+            title={title}
+            description={description}
+            contentName="Blog Post"
+            link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
+
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
+            </Button>
+          </AdminFormHeader>
+          <AdminFormBody>
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
               <EditSection
                 title="Details"
@@ -347,11 +326,7 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
                 </div>
               </EditSection>
             </div>
-          </section>
-
-          {/* <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button> */}
+          </AdminFormBody>
         </form>
       </Form>
     </>

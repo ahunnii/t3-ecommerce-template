@@ -86,7 +86,7 @@ export function AdvancedDataTable<TData, TValue>({
   return (
     <div className="w-full space-y-4">
       <DataTableToolbar table={table} searchKey={searchKey} filters={filters} />
-      <div className="rounded-md border">
+      <div className="rounded-md border bg-white">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

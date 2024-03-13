@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 import { ApiList } from "~/components/ui/api-list";
 import { Button } from "~/components/ui/button";
-import { DataTable } from "~/components/ui/data-table";
+
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -29,7 +29,7 @@ export const BlogPostClient: React.FC<Props> = ({ data }) => {
   const storeId = params.query.storeId as string;
 
   return (
-    <>
+    <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
         <TooltipProvider delayDuration={250}>
           <Tooltip>
@@ -63,6 +63,6 @@ export const BlogPostClient: React.FC<Props> = ({ data }) => {
       <Heading title="API" description="API Calls for Blog Posts" />
       <Separator />
       <ApiList entityName="blog-posts" entityIdName="blogPostId" />
-    </>
+    </div>
   );
 };

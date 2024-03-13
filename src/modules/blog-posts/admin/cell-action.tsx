@@ -3,7 +3,7 @@
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -58,11 +58,18 @@ export const CellAction: React.FC<Props> = ({ data }) => {
       );
   };
 
+  useEffect(() => {
+    if (!open) {
+      setTimeout(() => {
+        document.body.style.pointerEvents = "";
+      }, 500);
+    }
+  }, [open]);
   return (
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onConfirm}
         loading={deleteBlogPost.isLoading}
       />

@@ -10,7 +10,7 @@ import { Button } from "../../../components/ui/button";
 import { AdminSearch } from "./admin-search";
 const Navbar = ({ stores }: { stores: Store[] }) => {
   return (
-    <div className="w-full border-b shadow-sm">
+    <div className="w-full border-b shadow-sm ">
       <div className="flex h-16 items-center px-4">
         <Sheet>
           <SheetTrigger asChild>

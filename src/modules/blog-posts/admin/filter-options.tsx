@@ -1,4 +1,4 @@
-import { Mail, MailCheckIcon, MailXIcon } from "lucide-react";
+import { Mail, MailCheckIcon } from "lucide-react";
 
 export const filterOptions = [
   {

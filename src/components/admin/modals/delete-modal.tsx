@@ -24,14 +24,6 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (!open) {
-      setTimeout(() => {
-        document.body.style.pointerEvents = "";
-      }, 500);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
     setIsMounted(true);
   }, []);
 

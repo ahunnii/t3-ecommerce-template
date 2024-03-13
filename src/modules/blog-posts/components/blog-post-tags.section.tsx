@@ -7,7 +7,7 @@ type Props = {
 export const BlogPostTagsSection = ({ tags }: Props) => {
   if (tags.length === 0) return null;
   return (
-    <div className="flex flex-wrap gap-2 px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-wrap gap-2 ">
       {tags.map((tag, idx) => (
         <span
           key={idx}
