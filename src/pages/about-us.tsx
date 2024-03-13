@@ -15,27 +15,25 @@ const AboutUsPage = () => {
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
-      <div className="py-10">
-        <h1 className={config.layout.h1}>About Trend Anomaly</h1>
+      <h1 className={config.layout.h1}>About Trend Anomaly</h1>
 
-        {isLoading && <AbsolutePageLoader />}
+      {isLoading && <AbsolutePageLoader />}
 
-        {!isLoading && (
-          <>
-            {aboutContent?.content?.aboutPage === "" ||
-            aboutContent?.content?.aboutPage === null ||
-            aboutContent?.content?.aboutPage?.length === 0 ? (
-              <div className={cn("", "")}>
-                <p>No description provided.</p>
-              </div>
-            ) : (
-              <div className={cn("py-4", config.layout.p)}>
-                {parse(aboutContent?.content?.aboutPage ?? "")}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      {!isLoading && (
+        <>
+          {aboutContent?.content?.aboutPage === "" ||
+          aboutContent?.content?.aboutPage === null ||
+          aboutContent?.content?.aboutPage?.length === 0 ? (
+            <div className={cn("", "")}>
+              <p>No description provided.</p>
+            </div>
+          ) : (
+            <div className={cn("py-4", config.layout.p)}>
+              {parse(aboutContent?.content?.aboutPage ?? "")}
+            </div>
+          )}
+        </>
+      )}
     </StorefrontLayout>
   );
 };

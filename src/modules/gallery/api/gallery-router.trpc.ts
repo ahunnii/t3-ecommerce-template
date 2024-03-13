@@ -8,17 +8,20 @@ import {
 } from "~/server/api/trpc";
 
 export const galleryRouter = createTRPCRouter({
-  getAllGalleryImages: publicProcedure
-    .input(z.object({ storeId: z.string().optional() }))
+  getGalleryImages: publicProcedure
+    .input(z.object({ storeId: z.string().optional() }).optional())
     .query(({ ctx, input }) => {
-      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+      if (!input?.storeId && !env.NEXT_PUBLIC_STORE_ID)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "NEXT_PUBLIC_STORE_ID is not set.",
         });
 
       return ctx.prisma.galleryImage.findMany({
-        where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
+        where: {
+          storeId: input?.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          NOT: [{ url: "" || undefined }],
+        },
         orderBy: { createdAt: "desc" },
       });
     }),

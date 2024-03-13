@@ -12,6 +12,7 @@ import { api } from "~/utils/api";
 import { useConfig } from "~/providers/style-config-provider";
 
 import type { GetServerSidePropsContext } from "next";
+import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
 import { cn } from "~/utils/styles";
 
 type ICollectionPageProps = {
@@ -39,7 +40,7 @@ const SingleCollectionPage: FC<ICollectionPageProps> = ({ collectionId }) => {
 
       {!isLoading && (
         <>
-          <Breadcrumbs pathway={pathway} />
+          <TaBreadCrumbs pathway={pathway} />
           <h1 className={cn("", config.typography.h1)}>{collection?.name}</h1>
           <div className="mt-6 lg:col-span-4">
             {collection?.products.length === 0 && <NoResults />}

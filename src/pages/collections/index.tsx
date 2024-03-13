@@ -1,5 +1,5 @@
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
+
 import NoResults from "~/components/common/no-results";
 import { CollectionCard } from "~/modules/categories/core/collection-card";
 
@@ -9,6 +9,7 @@ import { api } from "~/utils/api";
 
 import type { DetailedCollection } from "~/types";
 
+import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
 import { useConfig } from "~/providers/style-config-provider";
 import { cn } from "~/utils/styles";
 
@@ -30,7 +31,7 @@ const CollectionPage = () => {
       {isLoading && <AbsolutePageLoader />}
       {!isLoading && (
         <>
-          <Breadcrumbs pathway={pathway} />
+          <TaBreadCrumbs pathway={pathway} />
           <h1 className={cn("", config.typography.h1)}>All Collections</h1>
 
           <div className="mt-6 lg:col-span-4 lg:mt-0">

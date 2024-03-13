@@ -1,17 +1,5 @@
 import type { Discount, Prisma, Product, ShippingType } from "@prisma/client";
 
-// export interface Product {
-//   id: string;
-//   category: Category;
-//   name: string;
-//   price: Prisma.Decimal | number | string;
-//   isFeatured: boolean;
-//   size?: Size;
-//   color?: Color;
-//   images: Image[];
-//   variants: Variation[];
-// }
-
 export interface Image {
   id: string;
   url: string;
@@ -35,12 +23,6 @@ export interface Size {
   name: string;
   value: string;
 }
-
-// export interface Color {
-//   id: string;
-//   name: string;
-//   value: string;
-// }
 
 export interface Variation {
   id: string;

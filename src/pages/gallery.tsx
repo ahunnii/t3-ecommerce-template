@@ -4,6 +4,8 @@ import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
+import { PageHeader } from "~/components/common/layout/page-header";
 import { storeTheme } from "~/data/config.custom";
 
 const metadata = {
@@ -11,34 +13,31 @@ const metadata = {
   description: "Browse our gallery of products, events, and other coolness! ",
 };
 const GalleryPage = () => {
-  const { data: galleryImages } = api.gallery.getAllGalleryImages.useQuery({});
-
-  const items = galleryImages?.map((image) => image.url) ?? [];
+  const getGalleryImages = api.gallery.getGalleryImages.useQuery();
 
   return (
     <>
       <StorefrontLayout {...storeTheme.layout} metadata={metadata}>
-        <div className="space-y-10 py-10">
-          <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-            <div className="space-y-4">
-              <h1 className="mb-6 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Gallery
-              </h1>
-              <div className=" grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {items.map((item, idx) => (
-                  <GalleryCard key={idx} data={item} />
-                ))}
+        <PageHeader>Gallery</PageHeader>
 
-                {items.length === 0 && (
-                  <p>
-                    We haven&apos;t posted anything yet, but check back later to
-                    see what we got going on!
-                  </p>
-                )}
+        {getGalleryImages.isLoading && <AbsolutePageLoader />}
+
+        {!getGalleryImages.isLoading && (
+          <>
+            {getGalleryImages?.data?.length === 0 ? (
+              <p>
+                We haven&apos;t posted anything yet, but check back later to see
+                what we got going on!
+              </p>
+            ) : (
+              <div className=" grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {getGalleryImages?.data?.map((image, idx) => (
+                  <GalleryCard key={idx} imageLink={image.url} />
+                ))}
               </div>
-            </div>
-          </div>
-        </div>
+            )}
+          </>
+        )}
       </StorefrontLayout>
     </>
   );

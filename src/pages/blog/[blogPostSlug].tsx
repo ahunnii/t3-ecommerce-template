@@ -1,13 +1,15 @@
-import parse from "html-react-parser";
-import { ArrowLeft } from "lucide-react";
+import dynamic from "next/dynamic";
+
 import Image from "next/image";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
+import { PageHeader } from "~/components/common/layout/page-header";
+import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
-import { Button } from "~/components/ui/button";
+import { BlogPostTagsSection } from "~/modules/blog-posts/components/blog-post-tags.section";
+
 import { useConfig } from "~/providers/style-config-provider";
 
 import { api } from "~/utils/api";
@@ -34,66 +36,54 @@ const BlogPostPage = () => {
     <StorefrontLayout {...config.layout} metadata={metadata}>
       {isLoading && <AbsolutePageLoader />}
 
-      {!isLoading && blog && (
-        <div className="space-y-10 py-10">
-          <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-            <div className="space-y-4">
-              <Link href={`/blog`}>
-                <Button
-                  variant={"link"}
-                  className={
-                    "mx-0 flex items-center gap-x-2 px-0 text-purple-800"
-                  }
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                  Back to Blog
-                </Button>
-              </Link>
+      {!isLoading && (
+        <>
+          <TaBreadCrumbs
+            pathway={[
+              { name: "Blog", link: "/blog" },
+              blog ? { name: blog.title } : { name: "404" },
+            ]}
+          />
+          <PageHeader>{blog?.title ?? "Blog Post Not Found"} </PageHeader>
+          {blog && (
+            <>
+              {blog?.featuredImg && (
+                <Image
+                  src={blog?.featuredImg ?? "/placeholder-image.webp"}
+                  width={800}
+                  height={400}
+                  alt=""
+                />
+              )}
 
-              <Image
-                src={blog?.featuredImg ?? ""}
-                width={800}
-                height={400}
-                alt=""
-              />
-              <h1 className={cn(config.typography.h1)}>{blog?.title} </h1>
               <p className={cn(config.typography.subheader, "mt-0")}>
                 {blog?.createdAt.toDateString()}
               </p>
-              <div className={cn("", "")}>
-                {parse(blog.content ?? "No description provided.")}
-              </div>
-            </div>
-          </div>
 
-          <div className="flex flex-wrap gap-2 px-4 sm:px-6 lg:px-8">
-            {blog.tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="rounded-md bg-gray-200 px-2 py-1 font-semibold text-gray-700"
-              >
-                {tag.name}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+              <LazyBlogPostContentSection content={blog.content} />
 
-      {!isLoading && !blog && (
-        <div className="space-y-10 py-10">
-          <div className="flex flex-col gap-y-8 px-4 sm:px-6 lg:px-8">
-            <div className="space-y-4">
-              <h3 className="text-3xl font-bold">Blog Post Not Found</h3>
-              <p>
-                The blog post you are looking for does not exist. Please try
-                again.
-              </p>
-            </div>
-          </div>
-        </div>
+              <BlogPostTagsSection tags={blog.tags} />
+            </>
+          )}
+
+          {!blog && (
+            <p>
+              The blog post you are looking for does not exist. Please try
+              again.
+            </p>
+          )}
+        </>
       )}
     </StorefrontLayout>
   );
 };
+
+const LazyBlogPostContentSection = dynamic(
+  () =>
+    import("~/modules/blog-posts/components/blog-post-content.section").then(
+      (mod) => mod.BlogPostContentSection
+    ),
+  { loading: () => <AbsolutePageLoader /> }
+);
 
 export default BlogPostPage;

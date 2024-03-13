@@ -27,7 +27,7 @@ const CartPage = () => {
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
-      <div className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         <h1
           className={cn(
             "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",

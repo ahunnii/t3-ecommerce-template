@@ -14,7 +14,7 @@ interface IProps {
 }
 const GalleryImagesPage: FC<IProps> = ({ storeId }) => {
   const { data: galleryImages, isLoading } =
-    api.gallery.getAllGalleryImages.useQuery({
+    api.gallery.getGalleryImages.useQuery({
       storeId,
     });
 

@@ -12,12 +12,14 @@ import { cn } from "~/utils/styles";
 const StorefrontLayout = ({
   children,
   metadata,
+  isLoading = false,
   NavBar = DefaultNavbar,
   Footer = DefaultFooter,
   bodyStyle = "",
   mainStyle = "",
   navStyles = "",
 }: {
+  isLoading?: boolean;
   children: React.ReactNode;
   metadata?: {
     title: string;
@@ -52,7 +54,7 @@ const StorefrontLayout = ({
 
         <div
           className={cn(
-            "mx-auto  h-full w-full max-w-7xl flex-grow px-4 pb-10 pt-16 sm:px-6 lg:px-8",
+            "mx-auto  h-full w-full max-w-7xl flex-grow px-4 pb-20 pt-28 sm:px-6 lg:px-8",
             bodyStyle
           )}
         >

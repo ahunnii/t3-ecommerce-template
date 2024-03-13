@@ -1,8 +1,5 @@
 import Image from "next/image";
-
-interface ProductCard {
-  data: string;
-}
+import type { FC } from "react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -12,7 +9,9 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 
-const GalleryCard: React.FC<ProductCard> = ({ data }) => {
+type Props = { imageLink: string };
+
+const GalleryCard: FC<Props> = ({ imageLink }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -20,7 +19,7 @@ const GalleryCard: React.FC<ProductCard> = ({ data }) => {
           {/* Image & actions */}
           <div className="relative aspect-square rounded-xl bg-gray-100">
             <Image
-              src={data ?? ""}
+              src={imageLink ?? "/placeholder-image.webp"}
               alt=""
               fill
               className="aspect-square rounded-md object-cover"
@@ -32,7 +31,7 @@ const GalleryCard: React.FC<ProductCard> = ({ data }) => {
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Image
-              src={data ?? ""}
+              src={imageLink ?? "/placeholder-image.webp"}
               alt=""
               fill
               className="aspect-square rounded-md object-cover"
