@@ -1,10 +1,9 @@
 "use client";
 
-import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
-import { AdvancedDataTable } from "./advanced-data-table";
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import { columns, type OrderColumn } from "./columns";
 import { statuses } from "./orders-table-data";
 
@@ -14,7 +13,7 @@ interface OrderClientProps {
 
 export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
   return (
-    <>
+    <div className="space-y-4 p-8">
       <Heading
         title={`Orders (${data.length})`}
         description="Manage orders for your store"
@@ -26,6 +25,6 @@ export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
         data={data}
         filters={[statuses]}
       />
-    </>
+    </div>
   );
 };

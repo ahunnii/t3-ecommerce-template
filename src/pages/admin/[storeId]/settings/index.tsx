@@ -19,13 +19,8 @@ const SettingsPage: FC<IProps> = ({ storeId }) => {
   });
   return (
     <AdminLayout>
-      <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {isLoading && <PageLoader />}
-
-          {!isLoading && store && <SettingsForm initialData={store} />}
-        </div>
-      </div>
+      {isLoading && <PageLoader />}
+      {!isLoading && store && <SettingsForm initialData={store} />}
     </AdminLayout>
   );
 };

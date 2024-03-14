@@ -28,6 +28,8 @@ import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { toastService } from "~/services/toast";
 import { phoneFormatStringToNumber } from "~/utils/format-utils.wip";
 
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { orderFormSchema } from "../../schemas";
 import type { OrderFormValues } from "../../types";
 import { CustomerDetailsSection } from "./customer-details.form-section";
@@ -174,64 +176,55 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
     updateOrder.isLoading || createOrder.isLoading || deleteOrder.isLoading;
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-      <BackToButton
-        link={`/admin/${storeId}/orders/${orderId ?? ""}`}
-        title="Back to Order"
-      />
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <Separator />
-
       <Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="w-full space-y-8"
-        >
-          <FormField
-            control={form.control}
-            name="isPaid"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    disabled={loading}
-                    placeholder="Is Order Paid"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Order Paid?</FormLabel>
-                  <FormDescription>
-                    This marks that the customer successfully paid for the order
-                    and awaiting shipment.
-                  </FormDescription>
-                </div>
-              </FormItem>
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <AdminFormHeader
+            title={title}
+            description={description}
+            contentName="Order"
+            link={`/admin/${storeId}/orders/${orderId ?? ""}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
             )}
-          />{" "}
-          <CustomerDetailsSection form={form} loading={loading} />
-          <OrderItemsSection form={form} loading={loading} />
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>{" "}
+
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
+            </Button>
+          </AdminFormHeader>
+          <AdminFormBody className="flex-col">
+            <FormField
+              control={form.control}
+              name="isPaid"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      disabled={loading}
+                      placeholder="Is Order Paid"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Order Paid?</FormLabel>
+                    <FormDescription>
+                      This marks that the customer successfully paid for the
+                      order and awaiting shipment.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />{" "}
+            <CustomerDetailsSection form={form} loading={loading} />
+            <OrderItemsSection form={form} loading={loading} />
+          </AdminFormBody>
         </form>
       </Form>
     </>

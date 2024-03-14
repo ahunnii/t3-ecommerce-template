@@ -34,11 +34,8 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
       {isLoading && <AbsolutePageLoader />}
 
       {orders && <ShippingModal data={data ?? ""} />}
-      <div className="flex h-full flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <OrderClient data={orderData ?? []} />
-        </div>
-      </div>
+
+      {!isLoading && <OrderClient data={orderData ?? []} />}
     </AdminLayout>
   );
 };

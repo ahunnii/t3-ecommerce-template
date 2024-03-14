@@ -21,13 +21,9 @@ const OrderPage: FC<IProps> = ({ orderId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {order && <OrderForm initialData={order} />}
-          {!order && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the order." />
-          )}
-        </div>
+      {!isLoading && order && <OrderForm initialData={order} />}
+      {!isLoading && !order && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the order." />
       )}
     </AdminLayout>
   );

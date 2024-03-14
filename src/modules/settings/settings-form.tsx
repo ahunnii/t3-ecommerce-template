@@ -30,6 +30,8 @@ import { useOrigin } from "~/hooks/use-origin";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { AddressSectionForm } from "./address-section.form";
 import { ContentSectionForm } from "./content-section.form";
 import { storeFormSchema } from "./schema";
@@ -161,34 +163,34 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-      <div className="flex items-center justify-between">
-        <Heading
-          title="Store settings"
-          description="Manage store preferences"
-        />
-        <Button
-          disabled={loading}
-          variant="destructive"
-          size="sm"
-          onClick={() => setOpen(true)}
-        >
-          <Trash className="h-4 w-4" />
-        </Button>
-      </div>
-      <Separator />
       <Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
           onChange={() => console.log(form.formState)}
-          className="w-full space-y-8"
         >
-          <div className=" gap-8">
+          <AdminFormHeader
+            title="Store settings"
+            description="Manage store preferences"
+            contentName="Home"
+            link={`/admin/${params.query.storeId as string}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
+
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {loading && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}
+              Save changes
+            </Button>
+          </AdminFormHeader>
+
+          <AdminFormBody className="flex-col">
             <FormField
               control={form.control}
               name="name"
@@ -211,24 +213,22 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />{" "}
-          </div>
-          <AddressSectionForm form={form} />
-          <ShippingSectionForm form={form} />
-          <ContentSectionForm form={form} />
-          <SocialsSectionForm form={form} />
+            <AddressSectionForm form={form} />
+            <ShippingSectionForm form={form} />
+            <ContentSectionForm form={form} />
+            <SocialsSectionForm form={form} />
+          </AdminFormBody>
 
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {loading && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}
-            Save changes
-          </Button>
+          <div className="space-y-4 p-8">
+            <Separator />
+            <ApiAlert
+              title="NEXT_PUBLIC_API_URL"
+              variant="public"
+              description={`${origin}/api/${params.query.storeId as string}`}
+            />
+          </div>
         </form>
       </Form>
-      <Separator />
-      <ApiAlert
-        title="NEXT_PUBLIC_API_URL"
-        variant="public"
-        description={`${origin}/api/${params.query.storeId as string}`}
-      />
     </>
   );
 };
