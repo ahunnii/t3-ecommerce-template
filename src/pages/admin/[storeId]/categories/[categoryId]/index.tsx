@@ -14,9 +14,14 @@ import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-mess
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
 
-import { ViewAttributes } from "~/modules/categories/admin/view-attributes";
-import { ViewCategoryCollection } from "~/modules/categories/admin/view-category";
-import { DetailedCollection } from "~/types";
+import {
+  ViewAvailableAttributes,
+  ViewCategoryCollection,
+  ViewCategoryProducts,
+} from "~/modules/categories/components/view-admin";
+
+import type { DetailedCollection } from "~/modules/collections/types";
+import type { CategoryProduct } from "~/modules/products/types";
 
 interface IProps {
   categoryId: string;
@@ -47,11 +52,20 @@ const CategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
             </Link>
           </AdminFormHeader>
 
-          <AdminFormBody>
-            <ViewCategoryCollection
-              collection={(category?.collection as DetailedCollection) ?? null}
-            />
-            <ViewAttributes category={category} />
+          <AdminFormBody className="space-y-0">
+            <div className="w-full lg:w-8/12">
+              <ViewCategoryProducts
+                products={category.products as CategoryProduct[]}
+              />
+            </div>
+            <div className="flex w-full flex-col space-y-4 lg:w-4/12">
+              <ViewAvailableAttributes category={category} />
+              <ViewCategoryCollection
+                collection={
+                  (category?.collection as DetailedCollection) ?? null
+                }
+              />
+            </div>
           </AdminFormBody>
         </>
       )}

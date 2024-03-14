@@ -1,7 +1,7 @@
 import type * as z from "zod";
 import type { collectionFormSchema } from "./schema";
 
-import type { Collection as CollectionDB } from "@prisma/client";
+import type { Collection as CollectionDB, Prisma } from "@prisma/client";
 
 export type CollectionFormValues = z.infer<typeof collectionFormSchema>;
 
@@ -17,3 +17,10 @@ export type CollectionColumn = {
 };
 
 export type Collection = CollectionDB;
+
+export type DetailedCollection = Prisma.CollectionGetPayload<{
+  include: {
+    products: true;
+    image: true;
+  };
+}>;

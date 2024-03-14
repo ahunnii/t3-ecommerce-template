@@ -1,13 +1,13 @@
 import { billboardsRouter } from "~/modules/billboards/api/billboards-router.trpc";
 import { categoriesRouter } from "~/modules/categories/api/categories-router.trpc";
-import { collectionsRouter } from "~/server/api/routers/collections";
+import { collectionsRouter } from "~/modules/collections/api/collections-router.trpc";
 
+import { shippingLabelRouter } from "~/modules/shipping/api/shipping-router.trpc";
 import { ordersRouter } from "~/server/api/routers/orders";
 import { storeRouter } from "~/server/api/routers/stores";
 import { createTRPCRouter } from "~/server/api/trpc";
-import { shippingLabelRouter } from "../../modules/shipping/api/shipping-router.trpc";
 
-import { blogPostRouter } from "../../modules/blog-posts/api/blog-posts-router.trpc";
+import { blogPostRouter } from "~/modules/blog-posts/api/blog-posts-router.trpc";
 
 import { galleryRouter } from "~/modules/gallery/api/gallery-router.trpc";
 import { productsRouter } from "~/modules/products/api/product-router.trpc";
