@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { GalleryImage } from "@prisma/client";
 
-import { Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -23,13 +22,15 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Heading } from "~/components/ui/heading";
 
 import { Input } from "~/components/ui/input";
 
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
-import { Separator } from "~/components/ui/separator";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
+
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
@@ -154,43 +155,32 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />{" "}
-      <BackToButton
-        link={`/admin/${storeId}/gallery/${galleryId ?? ""}`}
-        title="Back to Gallery"
-      />
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
-
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="w-full space-y-8"
-        >
-          <section className="flex w-full gap-4 max-lg:flex-col">
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <AdminFormHeader
+            title={title}
+            description={description}
+            contentName="Gallery Image"
+            link={`/admin/${storeId}/gallery/${galleryId ?? ""}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
+
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
+            </Button>
+          </AdminFormHeader>
+
+          <AdminFormBody className="flex w-full gap-4 space-y-0 max-lg:flex-col">
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
-              <div className="w-full  rounded-md border border-border bg-background/50 p-4 ">
-                <FormLabel>Details</FormLabel>{" "}
-                <FormDescription>
-                  Write to your heart&apos;s content.
-                </FormDescription>
+              <EditSection title="Details" description="Metadata and SEO">
                 <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
                   <FormField
                     control={form.control}
@@ -227,19 +217,20 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
                     )}
                   />
                 </div>{" "}
-              </div>
+              </EditSection>
             </div>
-            <div className="flex w-full flex-col lg:w-4/12">
+            <EditSection
+              title="Image"
+              description="Gallery items are visible to the public, so make sure they are appropriate"
+              className="flex h-fit w-full flex-col lg:w-4/12"
+            >
               <FormField
                 control={form.control}
                 name="url"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel> Image</FormLabel>{" "}
-                    <FormDescription>
-                      Used to represent your blog on social media and other
-                      sharing
-                    </FormDescription>
+                    <FormDescription></FormDescription>
                     <FormControl>
                       {/* <>
                     {!initialData?.images && <ImageLoader />} */}
@@ -257,12 +248,8 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
                   </FormItem>
                 )}
               />{" "}
-            </div>
-          </section>
-
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+            </EditSection>
+          </AdminFormBody>
         </form>
       </Form>
     </>

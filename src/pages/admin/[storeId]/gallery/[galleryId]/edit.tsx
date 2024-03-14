@@ -7,7 +7,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
-import { GalleryForm } from "~/modules/gallery/admin/gallery-form";
+import { GalleryForm } from "~/modules/gallery/components/admin/gallery-form";
 
 interface IProps {
   galleryId: string;
@@ -22,13 +22,9 @@ const EditGalleryImagePage: FC<IProps> = ({ galleryId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {galleryImage && <GalleryForm initialData={galleryImage} />}
-          {!galleryImage && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the image." />
-          )}
-        </div>
+      {!isLoading && galleryImage && <GalleryForm initialData={galleryImage} />}
+      {!isLoading && !galleryImage && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the image." />
       )}
     </AdminLayout>
   );

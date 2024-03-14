@@ -8,6 +8,7 @@ import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import { columns, type GalleryImageColumn } from "./columns";
 
 interface ProductsClientProps {
@@ -19,7 +20,7 @@ export const GalleryImageClient: React.FC<ProductsClientProps> = ({ data }) => {
   const router = useNavigationRouter();
 
   return (
-    <>
+    <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
         <Heading
           title={`Gallery Images (${data.length})`}
@@ -34,10 +35,10 @@ export const GalleryImageClient: React.FC<ProductsClientProps> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="title" columns={columns} data={data} />
+      <AdvancedDataTable searchKey="title" columns={columns} data={data} />
       <Heading title="Public API" description="API Calls for Gallery Images" />
       <Separator />
       <ApiList entityName="gallery" entityIdName="galleryId" />
-    </>
+    </div>
   );
 };

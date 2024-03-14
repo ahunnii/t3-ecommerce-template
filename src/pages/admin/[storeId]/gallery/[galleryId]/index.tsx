@@ -9,8 +9,11 @@ import { Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
+import { ViewSection } from "~/components/common/sections/view-section.admin";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/utils/styles";
@@ -28,58 +31,44 @@ const GalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {galleryImage && (
-            <>
-              <BackToButton
-                link={`/admin/${storeId}/gallery`}
-                title="Back to Gallery"
-              />
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-                    {galleryImage?.title === ""
-                      ? "Gallery Image"
-                      : galleryImage?.title}
-                  </h1>
-                  <p>Uploaded: {galleryImage?.createdAt.toDateString()}</p>
-                </div>
-                <Link
-                  href={`/admin/${storeId}/gallery/${galleryImage?.id}/edit`}
-                >
-                  <Button className="flex gap-2">
-                    {" "}
-                    <Pencil className="h-5 w-5" />
-                    Edit...
-                  </Button>
-                </Link>
-              </div>
+      {!isLoading && galleryImage && (
+        <>
+          <AdminFormHeader
+            title={"Gallery Image"}
+            description={"View details about the image at a glance"}
+            contentName="Gallery"
+            link={`/admin/${storeId}/gallery`}
+          >
+            <Link href={`/admin/${storeId}/gallery/${galleryImage?.id}/edit`}>
+              <Button className="flex gap-2" size={"sm"}>
+                <Pencil className="h-5 w-5" /> Edit...
+              </Button>
+            </Link>
+          </AdminFormHeader>
 
-              <Image
-                src={galleryImage?.url}
-                alt={galleryImage?.title ?? "gallery item"}
-                width={500}
-                height={500}
-                sizes="(max-width: 500px) 100vw, 500px"
-              />
+          <AdminFormBody className="flex-col">
+            <Image
+              src={galleryImage?.url}
+              alt={galleryImage?.title ?? "gallery item"}
+              width={500}
+              height={500}
+              sizes="(max-width: 500px) 100vw, 500px"
+            />
 
-              <div className="w-full rounded-md border border-border bg-background/50 p-4">
-                <div className={cn("leading-7 [&:not(:first-child)]:mt-6", "")}>
-                  {parse(
-                    galleryImage?.caption === "" ||
-                      galleryImage?.caption === null
-                      ? "No caption provided."
-                      : galleryImage.caption
-                  )}
-                </div>
+            <ViewSection title="Metadata" description="Helps with SEO ">
+              <div className={cn("leading-7 [&:not(:first-child)]:mt-6", "")}>
+                {parse(
+                  galleryImage?.caption === "" || galleryImage?.caption === null
+                    ? "No caption provided."
+                    : galleryImage.caption
+                )}
               </div>
-            </>
-          )}
-          {!galleryImage && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the image." />
-          )}
-        </div>
+            </ViewSection>
+          </AdminFormBody>
+        </>
+      )}
+      {!isLoading && !galleryImage && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the image." />
       )}
     </AdminLayout>
   );

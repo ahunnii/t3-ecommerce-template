@@ -6,7 +6,7 @@ import AdminLayout from "~/components/layouts/admin-layout";
 import { api } from "~/utils/api";
 
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { GalleryImageClient } from "~/modules/gallery/admin/client";
+import { GalleryImageClient } from "~/modules/gallery/components/admin/client";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
 interface IProps {
@@ -21,13 +21,7 @@ const GalleryImagesPage: FC<IProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            <GalleryImageClient data={galleryImages ?? []} />
-          </div>
-        </div>
-      )}
+      {!isLoading && <GalleryImageClient data={galleryImages ?? []} />}
     </AdminLayout>
   );
 };
