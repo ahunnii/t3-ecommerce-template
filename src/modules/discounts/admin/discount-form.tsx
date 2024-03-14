@@ -15,7 +15,6 @@ import { useRouter } from "next/router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -28,6 +27,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 // import ImageLoader from "~/components/ui/image-loader";
 
 import { Input } from "~/components/ui/input";

@@ -1,4 +1,4 @@
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 
 import * as React from "react";
 

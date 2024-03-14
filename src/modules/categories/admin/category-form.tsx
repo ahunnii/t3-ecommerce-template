@@ -7,7 +7,6 @@ import type { Billboard } from "@prisma/client";
 import { Plus, Trash } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -18,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { Input } from "~/components/ui/input";
 import {

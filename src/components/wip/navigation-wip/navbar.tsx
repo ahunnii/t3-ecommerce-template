@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
 import { env } from "~/env.mjs";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";

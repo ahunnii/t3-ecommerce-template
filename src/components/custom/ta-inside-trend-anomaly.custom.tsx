@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
 
 export const InsideTrendAnomaly = () => {
   return (

@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { api } from "~/utils/api";
 

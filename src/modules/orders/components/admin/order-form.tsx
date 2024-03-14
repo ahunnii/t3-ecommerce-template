@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 
 import { api } from "~/utils/api";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -20,6 +19,7 @@ import {
   FormLabel,
 } from "~/components/ui/form";
 import { Heading } from "~/components/ui/heading";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { Separator } from "~/components/ui/separator";
 

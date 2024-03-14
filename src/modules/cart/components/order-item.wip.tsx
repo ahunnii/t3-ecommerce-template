@@ -2,8 +2,8 @@ import { Tags, Truck, X } from "lucide-react";
 import Image from "next/image";
 import { type FC } from "react";
 
-import Currency from "~/components/core/ui/currency";
-import IconButton from "~/components/core/ui/icon-button";
+import IconButton from "~/components/common/buttons/icon-button";
+import Currency from "~/components/common/currency";
 
 import { Label } from "~/components/ui/label";
 import useCart from "~/modules/cart/hooks/use-cart";

@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC } from "react";
 
-import MainNav from "~/components/core/main-nav";
-import NavbarActions from "~/components/core/navbar-actions";
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
+import MainNav from "~/components/common/layout/main-nav";
+import NavbarActions from "~/components/common/layout/navbar-actions";
 import { env } from "~/env.mjs";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";

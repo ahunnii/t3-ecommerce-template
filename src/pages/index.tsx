@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from "react";
 
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 import { api } from "~/utils/api";
 
@@ -16,9 +16,9 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { storeTheme } from "~/data/config.custom";
 
-import { CategoryCard } from "~/packages/ui/components/category-card";
+import { CategoryCard } from "~/modules/categories/components/category-card";
 
-import { type contentSwitchWrapperVariants } from "~/packages/ui/components/content-switch-wrapper";
+import { type contentSwitchWrapperVariants } from "~/components/utility/content-switch-wrapper";
 
 const metadata = {
   title: "Trend Anomaly",

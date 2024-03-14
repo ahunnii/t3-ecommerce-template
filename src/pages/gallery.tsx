@@ -1,4 +1,4 @@
-import GalleryCard from "~/components/core/ui/gallery-card";
+import GalleryCard from "~/modules/gallery/components/gallery-card";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { StoreModal } from "~/components/admin/modals/store-modal";
+import { StoreModal } from "~/modules/admin/components/modals/store-modal";
 // import { ShippingModal } from "~/components/admin/orders/shipping-modal";
 // import { useShippingModal } from "~/hooks/admin/use-shipping-modal";
 

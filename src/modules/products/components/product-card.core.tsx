@@ -4,8 +4,8 @@ import Link from "next/link";
 
 import type { MouseEventHandler } from "react";
 
-import Currency from "~/components/core/ui/currency";
-import IconButton from "~/components/core/ui/icon-button";
+import IconButton from "~/components/common/buttons/icon-button";
+import Currency from "~/components/common/currency";
 import useCart from "~/modules/cart/hooks/use-cart";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import { useConfig } from "~/providers/style-config-provider";

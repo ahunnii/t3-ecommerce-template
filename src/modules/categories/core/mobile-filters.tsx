@@ -4,8 +4,8 @@ import { Dialog } from "@headlessui/react";
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
 
-import Button from "~/components/core/ui/button";
-import IconButton from "~/components/core/ui/icon-button";
+import IconButton from "~/components/common/buttons/icon-button";
+import Button from "~/modules/categories/components/button";
 
 import type { Attribute } from "@prisma/client";
 import AttributeFilter from "~/modules/categories/core/attribute-filter";

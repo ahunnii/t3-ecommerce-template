@@ -3,7 +3,7 @@ import Head from "next/head";
 
 import { useMemo } from "react";
 
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
 import { AccountSideBarNav } from "~/modules/account/components/account-sidebar-nav";
 
 import PageLoader from "~/components/ui/page-loader";

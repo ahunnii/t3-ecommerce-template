@@ -5,7 +5,6 @@ import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import Link from "next/link";
 import { toastService } from "~/services/toast";

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {

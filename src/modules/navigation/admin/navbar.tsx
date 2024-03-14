@@ -1,9 +1,9 @@
 import type { Store } from "@prisma/client";
 import { Menu } from "lucide-react";
 
-import StoreSwitcher from "~/components/admin/store-switcher";
-import { ThemeToggle } from "~/components/admin/theme-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
+import StoreSwitcher from "~/modules/admin/components/store-switcher";
+import { ThemeToggle } from "~/modules/admin/components/theme-toggle";
 import { MainNav } from "~/modules/navigation/admin/main-nav";
 
 import { Button } from "../../../components/ui/button";

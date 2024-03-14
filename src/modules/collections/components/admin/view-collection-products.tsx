@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 
 import { Button } from "~/components/ui/button";
 

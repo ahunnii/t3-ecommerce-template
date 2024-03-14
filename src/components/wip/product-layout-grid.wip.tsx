@@ -10,7 +10,7 @@ import { DirectionAwareHover } from "./direction-aware-card.wip";
 // import { useRouter } from "next/navigation";
 import { type MouseEventHandler } from "react";
 
-import IconButton from "~/components/core/ui/icon-button";
+import IconButton from "~/components/common/buttons/icon-button";
 import useCart from "~/modules/cart/hooks/use-cart";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";

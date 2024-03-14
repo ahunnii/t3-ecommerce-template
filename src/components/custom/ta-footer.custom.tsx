@@ -1,6 +1,6 @@
 import { Instagram } from "lucide-react";
 import Link from "next/link";
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
 import { api } from "~/utils/api";

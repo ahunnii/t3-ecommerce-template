@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import {
   ContentSwitchWrapper,
   type ContentSwitchWrapperProps,
-} from "./content-switch-wrapper";
+} from "../../../components/utility/content-switch-wrapper";
 
 export interface CategoryCardProps extends ContentSwitchWrapperProps {
   hasButton?: boolean;

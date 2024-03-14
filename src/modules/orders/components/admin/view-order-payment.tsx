@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { InfoButton } from "~/components/common/buttons/info-button";
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
 import { toastService } from "~/services/toast";

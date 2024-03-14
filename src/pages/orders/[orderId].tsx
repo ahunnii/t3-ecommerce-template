@@ -17,7 +17,7 @@ import { cn } from "~/utils/styles";
 
 import { Prisma } from "@prisma/client";
 import { GetServerSidePropsContext } from "next";
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 import { OrderViewItem } from "~/modules/cart/components/order-item.wip";
 import { createTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";

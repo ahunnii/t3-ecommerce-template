@@ -1,6 +1,6 @@
-import Modal from "~/components/core/ui/modal";
 import ProductImageGallery from "~/modules/products/components/product-image-gallery";
 import ProductPageInfo from "~/modules/products/components/single-product/product-page-info";
+import Modal from "~/modules/products/core/modal";
 
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 

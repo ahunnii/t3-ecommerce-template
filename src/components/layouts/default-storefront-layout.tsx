@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
+import { Footer as DefaultFooter } from "~/components/common/layout/footer";
+import { Navbar as DefaultNavbar } from "~/components/common/layout/navbar";
 import { SEO } from "~/components/common/seo-head";
-import { Footer as DefaultFooter } from "~/components/core/footer";
-import { Navbar as DefaultNavbar } from "~/components/core/navbar";
 
 import useCart from "~/modules/cart/hooks/use-cart";
 import { useConfig } from "~/providers/style-config-provider";

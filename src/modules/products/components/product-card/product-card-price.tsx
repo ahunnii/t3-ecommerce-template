@@ -1,5 +1,5 @@
 import { forwardRef, type ElementRef, type HTMLAttributes } from "react";
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 import { cn } from "~/utils/styles";
 
 type TProductCardPrice = {

@@ -14,7 +14,6 @@ import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -23,6 +22,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
 import { toastService } from "~/services/toast";

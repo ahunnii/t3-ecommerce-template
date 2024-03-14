@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 import { Separator } from "~/components/ui/separator";
 
 import type { OrderItem } from "~/modules/orders/types";

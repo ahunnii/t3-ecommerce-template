@@ -24,7 +24,6 @@ import {
   TableRow,
 } from "~/components/ui/table";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -36,6 +35,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 // import ImageLoader from "~/components/ui/image-loader";
 

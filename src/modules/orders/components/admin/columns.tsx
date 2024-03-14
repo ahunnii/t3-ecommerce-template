@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { format } from "date-fns";
 import Link from "next/link";
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { cn } from "~/utils/styles";

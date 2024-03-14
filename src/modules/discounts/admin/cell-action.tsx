@@ -6,7 +6,6 @@ import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { toastService } from "~/services/toast";
 import type { DiscountColumn } from "../types";

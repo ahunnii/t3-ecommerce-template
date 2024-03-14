@@ -1,7 +1,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
 
-import Button from "~/components/core/ui/button";
+import Button from "~/modules/categories/components/button";
 import type { Attribute } from "~/types";
 import { cn } from "~/utils/styles";
 

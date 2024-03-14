@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 
-import Container from "~/components/core/ui/container";
+import Container from "~/components/common/layout/container";
 import { AccountSideBarNav } from "~/modules/account/components/account-sidebar-nav";
 
 import { Separator } from "~/components/ui/separator";

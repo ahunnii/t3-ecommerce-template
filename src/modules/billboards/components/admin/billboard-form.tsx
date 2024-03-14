@@ -7,9 +7,9 @@ import type { Billboard } from "@prisma/client";
 
 import { useForm } from "react-hook-form";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import * as Form from "~/components/ui/form";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { Input } from "~/components/ui/input";
 

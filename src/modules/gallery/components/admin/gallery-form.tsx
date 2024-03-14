@@ -10,8 +10,8 @@ import { useForm } from "react-hook-form";
 
 import * as z from "zod";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import {
   Form,

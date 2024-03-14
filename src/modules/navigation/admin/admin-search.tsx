@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
-import SearchSelectOptions from "~/components/admin/search-select-options";
 import { Button } from "~/components/ui/button";
 import {
   CommandDialog,
@@ -30,6 +29,7 @@ import {
 } from "~/components/ui/command";
 import { CommandAdvancedDialog } from "~/components/ui/command-advanced";
 import { env } from "~/env.mjs";
+import SearchSelectOptions from "~/modules/admin/components/search-select-options";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 

@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { useContext, type ElementRef, type HTMLAttributes } from "react";
-import { ContentSwitchWrapper } from "~/packages/ui/components/content-switch-wrapper";
+import { ContentSwitchWrapper } from "~/components/utility/content-switch-wrapper";
 import { cn } from "~/utils/styles";
 import { ProductCardContext } from "./product-card-wrapper";
 

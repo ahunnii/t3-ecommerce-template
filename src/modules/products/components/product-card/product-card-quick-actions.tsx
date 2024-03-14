@@ -5,7 +5,7 @@ import {
   type HTMLAttributes,
 } from "react";
 
-import IconButton from "~/components/core/ui/icon-button";
+import IconButton from "~/components/common/buttons/icon-button";
 
 import { cn } from "~/utils/styles";
 import type { QuickAction } from "../../types";

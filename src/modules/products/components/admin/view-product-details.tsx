@@ -1,6 +1,6 @@
 import parse from "html-react-parser";
 
-import Currency from "~/components/core/ui/currency";
+import Currency from "~/components/common/currency";
 
 import { Label } from "~/components/ui/label";
 import { cn } from "~/utils/styles";

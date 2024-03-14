@@ -12,11 +12,11 @@ import { getTotalRevenue } from "~/modules/admin-overview/actions/get-total-reve
 import { authenticateAdminOrOwner } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
-import { Overview } from "~/components/admin/overview";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
+import { Overview } from "~/modules/admin-overview/components/overview";
 
 interface DashboardPageProps {
   totalRevenue: number;

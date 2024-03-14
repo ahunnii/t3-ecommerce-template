@@ -7,9 +7,9 @@ import { useRouter } from "next/router";
 import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";

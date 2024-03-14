@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Link from "next/link";
 import { useEffect } from "react";
-import StoreSwitcher from "~/components/admin/store-switcher";
 import { SEO } from "~/components/common/seo-head";
 import { Button } from "~/components/ui/button";
 import {
@@ -12,6 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import StoreSwitcher from "~/modules/admin/components/store-switcher";
 
 import { MainNav } from "~/modules/navigation/admin/main-nav";
 import Navbar from "~/modules/navigation/admin/navbar";
