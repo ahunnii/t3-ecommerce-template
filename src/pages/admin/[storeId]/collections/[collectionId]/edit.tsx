@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { CollectionForm } from "~/modules/collections/admin/collection-form";
+import { CollectionForm } from "~/modules/collections/components/admin/collection-form";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
@@ -15,45 +15,47 @@ interface IProps {
   storeId: string;
 }
 const CollectionPage: FC<IProps> = ({ collectionId, storeId }) => {
-  const { data: collection, isLoading: isCollectionLoading } =
-    api.collections.getCollection.useQuery({
-      collectionId,
-    });
+  const getCollection = api.collections.getCollection.useQuery({
+    collectionId,
+  });
 
-  const { data: products, isLoading: areProductsLoading } =
-    api.products.getAllProducts.useQuery({
-      storeId,
-    });
-  const { data: billboards, isLoading: areBillboardsLoading } =
-    api.billboards.getAllBillboards.useQuery({
-      storeId,
-    });
+  const getAllProducts = api.products.getAllProducts.useQuery({
+    storeId,
+  });
+  const getAllBillboards = api.billboards.getAllBillboards.useQuery({
+    storeId,
+  });
+
+  const isLoading =
+    getCollection.isLoading ||
+    getAllProducts.isLoading ||
+    getAllBillboards.isLoading;
 
   return (
     <AdminLayout>
-      {(isCollectionLoading || areProductsLoading || areBillboardsLoading) && (
-        <AbsolutePageLoader />
+      {isLoading && <AbsolutePageLoader />}
+
+      {!isLoading &&
+        getCollection.data &&
+        getAllProducts.data &&
+        getAllBillboards.data && (
+          <CollectionForm
+            products={getAllProducts.data ?? []}
+            billboards={getAllBillboards.data ?? []}
+            initialData={getCollection.data}
+          />
+        )}
+
+      {!isLoading && !getAllBillboards.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
       )}
-      {!isCollectionLoading && !areProductsLoading && !areBillboardsLoading && (
-        <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            {collection && (
-              <CollectionForm
-                products={products ?? []}
-                billboards={billboards ?? []}
-                initialData={collection}
-              />
-            )}
 
-            {!billboards && (
-              <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
-            )}
+      {!isLoading && !getAllProducts.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the products." />
+      )}
 
-            {!products && (
-              <DataFetchErrorMessage message="There seems to be an issue with loading the products." />
-            )}
-          </div>
-        </div>
+      {!isLoading && !getCollection.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the collection." />
       )}
     </AdminLayout>
   );

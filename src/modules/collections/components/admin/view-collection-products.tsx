@@ -1,24 +1,13 @@
-import type { GetServerSidePropsContext } from "next";
-import type { FC } from "react";
-
-import PageLoader from "~/components/ui/page-loader";
-import { CollectionForm } from "~/modules/collections/admin/collection-form";
-
-import { api } from "~/utils/api";
-import { authenticateSession } from "~/utils/auth";
-
 import Image from "next/image";
 import Link from "next/link";
-import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+
 import Currency from "~/components/core/ui/currency";
-import AdminLayout from "~/components/layouts/admin-layout";
+
 import { Button } from "~/components/ui/button";
-import { Heading } from "~/components/ui/heading";
+
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { CollectionCard } from "~/modules/categories/core/collection-card";
-import type { DetailedProductFull } from "~/types";
-import { CategoryProduct } from "../../products/types";
+
+import type { CategoryProduct } from "../../../products/types";
 
 export const ViewCollectionProducts = ({
   products,

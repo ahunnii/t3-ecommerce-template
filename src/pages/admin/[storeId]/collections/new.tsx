@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { CollectionForm } from "~/modules/collections/admin/collection-form";
+import { CollectionForm } from "~/modules/collections/components/admin/collection-form";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
@@ -11,38 +11,35 @@ import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
 
-const NewCollectionPage: FC = () => {
+const NewCollectionAdminPage: FC = () => {
   const { storeId } = useParams();
-  const { data: products, isLoading: areProductsLoading } =
-    api.products.getAllProducts.useQuery({
-      storeId: storeId as string,
-    });
-  const { data: billboards, isLoading: areBillboardsLoading } =
-    api.billboards.getAllBillboards.useQuery({
-      storeId: storeId as string,
-    });
+  const getAllProducts = api.products.getAllProducts.useQuery({
+    storeId: storeId as string,
+  });
 
+  const getAllBillboards = api.billboards.getAllBillboards.useQuery({
+    storeId: storeId as string,
+  });
+
+  const isLoading = getAllProducts.isLoading || getAllBillboards.isLoading;
   return (
     <AdminLayout>
-      {(areProductsLoading || areBillboardsLoading) && <AbsolutePageLoader />}
-      {!areProductsLoading && !areBillboardsLoading && (
-        <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            <CollectionForm
-              products={products ?? []}
-              billboards={billboards ?? []}
-              initialData={null}
-            />
+      {isLoading && <AbsolutePageLoader />}
 
-            {!billboards && (
-              <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
-            )}
+      {!isLoading && getAllBillboards.data && getAllProducts.data && (
+        <CollectionForm
+          products={getAllProducts.data ?? []}
+          billboards={getAllBillboards.data ?? []}
+          initialData={null}
+        />
+      )}
 
-            {!products && (
-              <DataFetchErrorMessage message="There seems to be an issue with loading the products." />
-            )}
-          </div>
-        </div>
+      {!isLoading && !getAllProducts.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the products." />
+      )}
+
+      {!isLoading && !getAllBillboards.data && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
       )}
     </AdminLayout>
   );
@@ -52,4 +49,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return await authenticateAdminOrOwner(ctx);
 }
 
-export default NewCollectionPage;
+export default NewCollectionAdminPage;

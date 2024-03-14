@@ -5,7 +5,6 @@ import { Plus } from "lucide-react";
 
 import { ApiList } from "~/components/ui/api-list";
 import { Button } from "~/components/ui/button";
-import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -15,7 +14,8 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 
-import type { CollectionColumn } from "../types";
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
+import type { CollectionColumn } from "../../types";
 import { columns } from "./columns";
 
 type Props = { data: CollectionColumn[] };
@@ -25,7 +25,7 @@ export const CollectionsClient: React.FC<Props> = ({ data }) => {
   const navigate = useNavigationRouter();
 
   return (
-    <>
+    <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
         <TooltipProvider delayDuration={250}>
           <Tooltip>
@@ -55,10 +55,10 @@ export const CollectionsClient: React.FC<Props> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
+      <AdvancedDataTable searchKey="name" columns={columns} data={data} />
       <Heading title="Public API" description="API Calls for Collections" />
       <Separator />
       <ApiList entityName="collections" entityIdName="categoryId" />
-    </>
+    </div>
   );
 };

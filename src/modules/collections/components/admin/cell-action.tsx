@@ -17,7 +17,7 @@ import { api } from "~/utils/api";
 
 import Link from "next/link";
 import { toastService } from "~/services/toast";
-import type { CollectionColumn } from "../types";
+import type { CollectionColumn } from "../../types";
 
 type Props = {
   data: CollectionColumn;
@@ -65,7 +65,7 @@ export const CellAction: React.FC<Props> = ({ data }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onConfirm}
         loading={deleteCollection.isLoading}
       />

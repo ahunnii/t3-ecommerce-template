@@ -8,15 +8,16 @@ import { Pencil } from "lucide-react";
 
 import Link from "next/link";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
-import { Heading } from "~/components/ui/heading";
 
-import { ViewCollectionPreview } from "~/modules/collections/admin/view-collection-preview";
-import { ViewCollectionProducts } from "~/modules/collections/admin/view-collection-products";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+import { ViewCollectionPreview } from "~/modules/collections/components/admin/view-collection-preview";
+import { ViewCollectionProducts } from "~/modules/collections/components/admin/view-collection-products";
 
 interface IProps {
   collectionId: string;
@@ -32,35 +33,29 @@ const CollectionPage: FC<IProps> = ({ collectionId, storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {collection && (
-            <>
-              <BackToButton
-                link={`/admin/${storeId}/collections`}
-                title="Back to Collections"
-              />
-              <div className="flex w-full items-center justify-between">
-                <Heading
-                  title={collection.name}
-                  description={"No description added"}
-                />
-                <Link href={editCollectionURL}>
-                  <Button className="flex gap-2" size={"sm"}>
-                    <Pencil className="h-5 w-5" /> Edit Collection
-                  </Button>
-                </Link>
-              </div>
-              <div className="flex gap-4">
-                <ViewCollectionPreview collection={collection} />
-                <ViewCollectionProducts products={collection?.products ?? []} />
-              </div>
-            </>
-          )}
-          {!collection && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
-          )}
-        </div>
+      {!isLoading && collection && (
+        <>
+          <AdminFormHeader
+            title={collection.name}
+            description={"View details about the collection at a glance"}
+            contentName="Collection"
+            link={`/admin/${storeId}/collections`}
+          >
+            <Link href={editCollectionURL}>
+              <Button className="flex gap-2" size={"sm"}>
+                <Pencil className="h-5 w-5" /> Edit...
+              </Button>
+            </Link>
+          </AdminFormHeader>
+
+          <AdminFormBody>
+            <ViewCollectionPreview collection={collection} />
+            <ViewCollectionProducts products={collection?.products ?? []} />
+          </AdminFormBody>
+        </>
+      )}
+      {!isLoading && !collection && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
       )}
     </AdminLayout>
   );

@@ -3,7 +3,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import type { CollectionColumn } from "../types";
+import type { CollectionColumn } from "../../types";
 import { CellAction } from "./cell-action";
 
 export const columns: ColumnDef<CollectionColumn>[] = [

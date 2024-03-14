@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import { type FC } from "react";
 
-import { CollectionsClient } from "~/modules/collections/admin/client";
+import { CollectionsClient } from "~/modules/collections/components/admin/client";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 
@@ -14,7 +14,7 @@ interface IProps {
   storeId: string;
 }
 
-const CategoriesPage: FC<IProps> = ({ storeId }) => {
+const CollectionsAdminPage: FC<IProps> = ({ storeId }) => {
   const { data: collections, isLoading } =
     api.collections.getAllCollections.useQuery({
       storeId,
@@ -23,13 +23,7 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            <CollectionsClient data={collections ?? []} />
-          </div>
-        </div>
-      )}
+      {!isLoading && <CollectionsClient data={collections ?? []} />}
     </AdminLayout>
   );
 };
@@ -37,4 +31,4 @@ const CategoriesPage: FC<IProps> = ({ storeId }) => {
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return await authenticateAdminOrOwner(ctx);
 }
-export default CategoriesPage;
+export default CollectionsAdminPage;
