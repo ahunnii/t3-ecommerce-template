@@ -1,8 +1,7 @@
 import parse from "html-react-parser";
-import { Pencil } from "lucide-react";
-import Link from "next/link";
+
 import Currency from "~/components/core/ui/currency";
-import { Button } from "~/components/ui/button";
+
 import { Label } from "~/components/ui/label";
 import { cn } from "~/utils/styles";
 
@@ -36,8 +35,7 @@ export const ViewProductDetails = ({
   price,
   estimatedCompletion,
   description,
-  storeId,
-  id,
+
   variants,
 }: Props) => {
   const lowestPrice =
@@ -51,13 +49,6 @@ export const ViewProductDetails = ({
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           {name}
         </h3>
-        <Link href={`/admin/${storeId}/products/${id}/edit`}>
-          <Button className="flex gap-2">
-            {" "}
-            <Pencil className="h-5 w-5" />
-            Edit...
-          </Button>
-        </Link>
       </div>
 
       <div className="grid grid-cols-3 items-start">

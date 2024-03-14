@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { ProductFormValues } from "../types";
+import { ProductFormValues } from "../../types";
 
 type Props = {
   form: UseFormReturn<ProductFormValues>;

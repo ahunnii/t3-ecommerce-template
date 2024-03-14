@@ -5,15 +5,20 @@ import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
+
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
 
-import { ViewProductAttributes } from "~/modules/products/admin/view-product-attributes";
-import { ViewProductDetails } from "~/modules/products/admin/view-product-details";
-import { ViewProductImages } from "~/modules/products/admin/view-product-images";
-import { ViewProductsShipping } from "~/modules/products/admin/view-product-shipping";
-import { ViewProductVariants } from "~/modules/products/admin/view-product-variants";
+import { Pencil } from "lucide-react";
+import Link from "next/link";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+import { Button } from "~/components/ui/button";
+import { ViewProductAttributes } from "~/modules/products/components/admin/view-product-attributes";
+import { ViewProductDetails } from "~/modules/products/components/admin/view-product-details";
+import { ViewProductImages } from "~/modules/products/components/admin/view-product-images";
+import { ViewProductsShipping } from "~/modules/products/components/admin/view-product-shipping";
+import { ViewProductVariants } from "~/modules/products/components/admin/view-product-variants";
 
 interface IProps {
   storeId: string;
@@ -25,35 +30,41 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
     productId,
   });
 
+  const editProduct = `/admin/${storeId}/products/${product?.id}/edit`;
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          {product && (
-            <>
-              <BackToButton
-                link={`/admin/${storeId}/products`}
-                title="Back to Products"
-              />
-              <section className="flex w-full gap-4 max-lg:flex-col">
-                <div className="flex w-full flex-col space-y-4 lg:w-8/12">
-                  <ViewProductDetails {...product} />{" "}
-                  <ViewProductAttributes {...product} />
-                  <ViewProductVariants {...product} />
-                  <ViewProductsShipping {...product} />
-                </div>
-                <div className="flex w-full flex-col lg:w-4/12">
-                  <ViewProductImages {...product} />
-                </div>
-              </section>
-            </>
-          )}
-          {!product && (
-            <DataFetchErrorMessage message="There seems to be an issue with loading the products." />
-          )}
-        </div>
+      {!isLoading && product && (
+        <>
+          <AdminFormHeader
+            title={product.name}
+            description={"View details about your product at a glance."}
+            contentName="Products"
+            link={`/admin/${product.storeId}/products`}
+          >
+            <Link href={editProduct}>
+              <Button className="flex gap-2" size={"sm"}>
+                <Pencil className="h-5 w-5" /> Edit...
+              </Button>
+            </Link>
+          </AdminFormHeader>
+
+          <AdminFormBody className="flex w-full gap-4 space-y-0 max-lg:flex-col">
+            <div className="flex w-full flex-col space-y-4 lg:w-8/12">
+              <ViewProductDetails {...product} />{" "}
+              <ViewProductAttributes {...product} />
+              <ViewProductVariants {...product} />
+              <ViewProductsShipping {...product} />
+            </div>
+            <div className="flex w-full flex-col lg:w-4/12">
+              <ViewProductImages {...product} />
+            </div>
+          </AdminFormBody>
+        </>
+      )}
+      {!isLoading && !product && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the product." />
       )}
     </AdminLayout>
   );

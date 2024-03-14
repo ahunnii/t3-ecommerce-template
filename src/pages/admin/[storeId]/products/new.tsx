@@ -7,7 +7,8 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
-import { ProductForm } from "~/modules/products/admin/product-form";
+import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
+import { ProductForm } from "~/modules/products/components/admin/product-form";
 
 interface IProps {
   storeId: string;
@@ -22,10 +23,13 @@ const NewProductPage: FC<IProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <ProductForm categories={categories ?? []} initialData={null} />
-        </div>
+
+      {!isLoading && categories && (
+        <ProductForm categories={categories ?? []} initialData={null} />
+      )}
+
+      {!isLoading && !categories && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the categories." />
       )}
     </AdminLayout>
   );

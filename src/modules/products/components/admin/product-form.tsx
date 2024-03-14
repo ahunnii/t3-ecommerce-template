@@ -36,10 +36,9 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Heading } from "~/components/ui/heading";
+
 // import ImageLoader from "~/components/ui/image-loader";
 
-import { BackToButton } from "~/components/common/buttons/back-to-button";
 import { Input } from "~/components/ui/input";
 import {
   Select,
@@ -48,15 +47,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Separator } from "~/components/ui/separator";
+
 import { TagInput } from "~/components/ui/tag-input";
 
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import MarkdownEditor from "../../../components/common/inputs/markdown-editor";
-import { productFormSchema } from "../schema";
-import type { ProductFormValues, SingleProduct } from "../types";
+import MarkdownEditor from "../../../../components/common/inputs/markdown-editor";
+import { productFormSchema } from "../../schema";
+import type { ProductFormValues, SingleProduct } from "../../types";
 
 type ExtendedCategory = Category & { attributes: Attribute[] };
 type Props = {
@@ -245,43 +247,36 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        setIsOpen={setOpen}
-        onConfirm={onDelete}
-        loading={loading}
-      />{" "}
-      <BackToButton
-        link={`/admin/${storeId}/products/${productId ?? ""}`}
-        title="Back to Product"
-      />
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
-
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className="w-full space-y-8"
-        >
-          <section className="flex w-full gap-4 max-lg:flex-col">
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <AdminFormHeader
+            title={title}
+            description={description}
+            contentName="Product"
+            link={`/admin/${storeId}/products/${productId ?? ""}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
+
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
+            </Button>
+          </AdminFormHeader>
+
+          <AdminFormBody className="flex w-full gap-4 space-y-0 max-lg:flex-col">
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
-              <div className="w-full  rounded-md border border-border bg-background/50 p-4 ">
-                <FormLabel>Details</FormLabel>{" "}
-                <FormDescription>
-                  To start selling, all you need is a name and a price.
-                </FormDescription>
+              <EditSection
+                title="Details"
+                description="To start selling, all you need is a name and a price."
+                bodyClassName="space-y-4"
+              >
                 <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
                   <FormField
                     control={form.control}
@@ -491,13 +486,13 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                     )}
                   />
                 </div>{" "}
-              </div>
+              </EditSection>
 
-              <div className="w-full rounded-md border border-border bg-background/50 p-4 ">
-                <FormLabel>Attributes</FormLabel>{" "}
-                <FormDescription className="pb-5">
-                  Used for searching, SEO, and other info on products.
-                </FormDescription>
+              <EditSection
+                title="Attributes"
+                description=" Used for searching, SEO, and other info on products."
+                bodyClassName="space-y-4"
+              >
                 <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
                   <FormField
                     control={form.control}
@@ -555,18 +550,17 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                     )}
                   />
                 </div>
-              </div>
-              <div className="w-full rounded-md border border-border bg-background/50 p-4 ">
+              </EditSection>
+              <EditSection
+                title="Variations"
+                description="                Create variations for customers to choose from. Note
+                        that these will override your default values above."
+              >
                 <FormField
                   control={form.control}
                   name="variants"
                   render={({ field }) => (
                     <>
-                      <FormLabel>Variations</FormLabel>{" "}
-                      <FormDescription>
-                        Create variations for customers to choose from. Note
-                        that these will override your default values above.
-                      </FormDescription>
                       {category === undefined ? (
                         <p className="leading-7 text-primary [&:not(:first-child)]:mt-6">
                           Choose a category first
@@ -675,14 +669,11 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                     </>
                   )}
                 />
-              </div>
-              <div className="w-full  rounded-md border border-border bg-background/50 p-4 ">
-                {" "}
-                <FormLabel>Shipping</FormLabel>{" "}
-                <FormDescription className="pb-5">
-                  Measurements and weight are used to calculate shipping rates.
-                  Measurements are in inches.
-                </FormDescription>
+              </EditSection>
+              <EditSection
+                title="Shipping"
+                description=" Measurements and weight are used to calculate shipping rates.  Measurements are in inches."
+              >
                 <div className="my-5 gap-8 md:grid md:grid-cols-2 ">
                   <FormField
                     control={form.control}
@@ -930,77 +921,79 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                     />
                   </div>
                 </div>
-              </div>
+              </EditSection>
             </div>
             <div className="flex w-full flex-col space-y-8 lg:w-4/12">
-              <FormField
-                control={form.control}
-                name="featuredImage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Featured Image</FormLabel>{" "}
-                    <FormDescription>
-                      Used to represent your product during checkout, social
-                      sharing and more.
-                    </FormDescription>
-                    <FormControl>
-                      <ImageUpload
-                        value={field.value ? [field.value] : []}
-                        disabled={loading}
-                        onChange={(url) => {
-                          form.setValue("images", [
-                            ...form.watch("images"),
-                            { url },
-                          ]);
+              <EditSection
+                title="Media"
+                description="Upload images for your product."
+                bodyClassName="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="featuredImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Featured Image</FormLabel>{" "}
+                      <FormDescription>
+                        Used to represent your product during checkout, social
+                        sharing and more.
+                      </FormDescription>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          disabled={loading}
+                          onChange={(url) => {
+                            form.setValue("images", [
+                              ...form.watch("images"),
+                              { url },
+                            ]);
 
-                          field.onChange(url);
-                          return field.onChange(url);
-                        }}
-                        onRemove={() => form.setValue("featuredImage", "")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="images"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Media</FormLabel>
-                    <FormDescription>
-                      Upload images for your product.{" "}
-                    </FormDescription>
-                    <FormControl>
-                      {/* <>
+                            field.onChange(url);
+                            return field.onChange(url);
+                          }}
+                          onRemove={() => form.setValue("featuredImage", "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Images and Vids</FormLabel>
+                      <FormDescription>
+                        Upload images for your product.{" "}
+                      </FormDescription>
+                      <FormControl>
+                        {/* <>
                     {!initialData?.images && <ImageLoader />} */}
-                      <ImageUpload
-                        value={field.value.map((image) => image.url)}
-                        disabled={loading}
-                        onChange={(url) => {
-                          return field.onChange([...field.value, { url }]);
-                        }}
-                        onRemove={(url) =>
-                          field.onChange([
-                            ...field.value.filter(
-                              (current) => current.url !== url
-                            ),
-                          ])
-                        }
-                      />
-                      {/* </> */}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        <ImageUpload
+                          value={field.value.map((image) => image.url)}
+                          disabled={loading}
+                          onChange={(url) => {
+                            return field.onChange([...field.value, { url }]);
+                          }}
+                          onRemove={(url) =>
+                            field.onChange([
+                              ...field.value.filter(
+                                (current) => current.url !== url
+                              ),
+                            ])
+                          }
+                        />
+                        {/* </> */}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </EditSection>
             </div>
-          </section>
-
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
-          </Button>
+          </AdminFormBody>
         </form>
       </Form>
     </>

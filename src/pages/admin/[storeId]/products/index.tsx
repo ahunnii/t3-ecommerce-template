@@ -8,7 +8,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
-import { ProductsClient } from "~/modules/products/admin/client";
+import { ProductsClient } from "~/modules/products/components/admin/client";
 
 interface IProps {
   storeId: string;
@@ -22,11 +22,7 @@ const ProductsPage: FC<IProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      <div className="flex h-full flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <ProductsClient data={products ?? []} />
-        </div>
-      </div>
+      {!isLoading && <ProductsClient data={products ?? []} />}
     </AdminLayout>
   );
 };
