@@ -20,7 +20,7 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
     productId,
   });
 
-  const { data: categories } = api.categories.getAllCategories.useQuery({
+  const { data: categories } = api.categories.getCategories.useQuery({
     storeId,
   });
 

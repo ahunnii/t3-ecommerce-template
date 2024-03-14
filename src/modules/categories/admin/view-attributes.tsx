@@ -1,11 +1,8 @@
 import { Badge } from "~/components/ui/badge";
 import type { DetailedCategory } from "~/types";
+import { Category } from "../types";
 
-export const ViewAttributes = ({
-  category,
-}: {
-  category: DetailedCategory;
-}) => {
+export const ViewAttributes = ({ category }: { category: Category }) => {
   return (
     <div className="w-full rounded-md border border-border bg-background/50 p-4">
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">

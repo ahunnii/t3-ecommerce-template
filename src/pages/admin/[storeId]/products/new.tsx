@@ -15,10 +15,11 @@ interface IProps {
 }
 
 const NewProductPage: FC<IProps> = ({ storeId }) => {
-  const { data: categories, isLoading } =
-    api.categories.getAllCategories.useQuery({
+  const { data: categories, isLoading } = api.categories.getCategories.useQuery(
+    {
       storeId,
-    });
+    }
+  );
 
   return (
     <AdminLayout>

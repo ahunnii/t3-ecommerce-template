@@ -152,8 +152,8 @@ model Billboard {
   label         String
   description   String?
   imageUrl      String
-  categories    Category[]
-  collections   Collection[]
+  // categories    Category[]
+  // collections   Collection[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -162,23 +162,21 @@ model Billboard {
 
 
 model Category {
-  id          String      @id @default(cuid())
-  storeId     String      // Foreign Key to Store
-  store       Store       @relation("StoreToCategory", fields: [storeId], references: [id])
-  billboardId String       // Foreign Key to Billboard
-  billboard   Billboard   @relation(fields: [billboardId], references: [id])
-  name        String
-  attributes  Attribute[]
-  products    Product[]   @relation("CategoryToProduct")
+  id            String      @id @default(cuid())
+  storeId       String     
+  store         Store       @relation("StoreToCategory", fields: [storeId], references: [id])
+  name          String
+  description   String? @db.Text
 
-  collection Collection? @relation("CategoryToCollection") 
-
+  attributes    Attribute[]
+  products      Product[]   @relation("CategoryToProduct")
+  collection    Collection? @relation("CategoryToCollection") 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([storeId])
-  @@index([billboardId])
+
 }
 
 model Collection {
@@ -186,16 +184,19 @@ model Collection {
   storeId String // Foreign Key to Store
   store   Store  @relation("StoreToCollection", fields: [storeId], references: [id])
 
-  billboardId String // Foreign Key to Billboard
-  billboard   Billboard   @relation(fields: [billboardId], references: [id])
+
+  imageId     String?      @unique
+  image       Image?       @relation(fields: [imageId], references: [id], onDelete: Cascade)
 
   categoryId  String?   @unique
   category    Category? @relation("CategoryToCollection", fields: [categoryId], references: [id])
-  
+
   isFeatured  Boolean      @default(false)
 
-
   name    String
+  description String? @db.Text
+  slug    String? @unique
+
   products  Product[] // Relation to Product model
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -203,7 +204,7 @@ model Collection {
   discounts Discount[] @relation("DiscountToCollection")
 
   @@index([storeId])
-  @@index([billboardId])
+ 
   @@index([categoryId])
 }
 enum ShippingType  {
@@ -217,12 +218,19 @@ VARIABLE
 
 model Product {
   id          String   @id @default(cuid())
+  slug        String?   @unique
+
   storeId     String // Foreign Key to Store
   store       Store    @relation("StoreToProduct", fields: [storeId], references: [id])
+
   categoryId  String // Foreign Key to Category
   category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+
   name        String
   price       Float    @default(0.00)
+
+  briefDescription String?
+
   description String    @db.Text
   quantity    Int      @default(1)
 
@@ -232,20 +240,23 @@ model Product {
   isFeatured  Boolean      @default(false)
   isArchived  Boolean      @default(false)
 
+  featuredImage String?
   images      Image[] // Relation to Image model
+
   orderItems  OrderItem[] // Relation to Order model
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
   variants    Variation[]
   collections Collection[]
-  featuredImage String?
+
   // handle       String? @unique
 
   cartItems CartItem[] // Relation to Order model
   weight    Float? @default(0) // in grams
   length    Float? @default(0) // in in
-  width Float? @default(0) // in in
-  height Float? @default(0) // in in
+  width     Float? @default(0) // in in
+  height    Float? @default(0) // in in
 
 
   shippingType ShippingType @default(FLAT_RATE)
@@ -260,11 +271,9 @@ model Product {
 
   discounts Discount[] @relation("DiscountToProduct")
 
-
-
   @@index([storeId])
   @@index([categoryId])
-
+  @@index([slug])
 }
 
 enum CustomOrderStatus {
@@ -488,13 +497,16 @@ model OrderItem {
 
 model Image {
   id            String   @id @default(cuid())
-    
   productId     String? // Foreign Key to Product
   product       Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
-    
   customOrderId String?
   customOrder   CustomOrderRequest?  @relation(fields: [customOrderId], references: [id], onDelete: Cascade)
+  
+
+  collection   Collection?
+
   url       String // URL of the image
+  alt       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

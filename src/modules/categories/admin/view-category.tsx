@@ -1,20 +1,25 @@
-import type { DetailedCategory } from "~/types";
+import { ViewSection } from "~/components/common/sections/view-section.admin";
+import { CollectionCard } from "~/modules/collections/components/collection-card";
+import type { Collection } from "~/modules/collections/types";
+import type { DetailedCategory, DetailedCollection } from "~/types";
 import { CategoryCard } from "../core/category-card";
 
-export const ViewCategory = ({ category }: { category: DetailedCategory }) => {
+type Props = {
+  collection: DetailedCollection | null;
+};
+export const ViewCategoryCollection = ({ collection }: Props) => {
   return (
-    <div className="w-full rounded-md border border-border bg-background/50 p-4">
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Preview
-      </h3>
-      <p className="text-sm text-muted-foreground">
-        This is what is shown at the top of each category page. (Currently just
-        migrated to all collections....)
-      </p>
-
-      <div className="grid grid-cols-3 py-8">
-        <CategoryCard category={category} />
-      </div>
-    </div>
+    <ViewSection
+      title="Collection Preview"
+      description="This is what is visible to customers."
+    >
+      {collection ? (
+        <div className="grid grid-cols-1">
+          <CollectionCard collection={collection} />
+        </div>
+      ) : (
+        <p>This category does not have a collection.</p>
+      )}
+    </ViewSection>
   );
 };

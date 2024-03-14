@@ -6,10 +6,31 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { attributeSchema, categorySchema } from "../schema";
 
 export const categoriesRouter = createTRPCRouter({
-  getAllCategories: publicProcedure
-    .input(z.object({ storeId: z.string().optional() }))
+  getCategory: publicProcedure
+    .input(z.object({ categoryId: z.string() }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.category.findUnique({
+        where: { id: input.categoryId },
+        include: {
+          attributes: true,
+          collection: {
+            include: { image: true, products: true },
+          },
+          products: true,
+        },
+      });
+    }),
+
+  getCategories: publicProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        includeProducts: z.boolean().optional(),
+      })
+    )
     .query(({ ctx, input }) => {
       if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
         throw new TRPCError({
@@ -19,13 +40,8 @@ export const categoriesRouter = createTRPCRouter({
 
       return ctx.prisma.category.findMany({
         where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
-        include: {
-          billboard: true,
-          attributes: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        include: { attributes: true, products: input.includeProducts },
+        orderBy: { createdAt: "desc" },
       });
     }),
 
@@ -50,33 +66,17 @@ export const categoriesRouter = createTRPCRouter({
       return attributes;
     }),
 
-  getCategory: publicProcedure
-    .input(z.object({ categoryId: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.category.findUnique({
-        where: { id: input.categoryId },
-        include: {
-          billboard: true,
-          attributes: true,
-          collection: true,
-        },
-      });
-    }),
-
   createCategory: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
-        billboardId: z.string(),
         storeId: z.string(),
+        ...categorySchema.shape,
         attributes: z.array(
           z.object({
-            name: z.string(),
-            values: z.string(),
+            ...attributeSchema.shape,
             storeId: z.string(),
           })
         ),
-        createNewCollection: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -88,9 +88,9 @@ export const categoriesRouter = createTRPCRouter({
 
       const category = await ctx.prisma.category.create({
         data: {
-          name: input.name,
-          billboardId: input.billboardId,
           storeId: input.storeId,
+          name: input.name,
+          description: input.description,
           attributes: {
             createMany: {
               data: [
@@ -107,13 +107,18 @@ export const categoriesRouter = createTRPCRouter({
         },
       });
 
-      if (input.createNewCollection) {
+      if (input.createNewCollection && input?.imageUrl) {
+        const image = await ctx.prisma.image.create({
+          data: { url: input?.imageUrl, alt: input?.alt ?? input.name },
+        });
+
         await ctx.prisma.collection.create({
           data: {
             name: input.name,
+            description: input.description,
             storeId: input.storeId,
             categoryId: category.id,
-            billboardId: input.billboardId,
+            imageId: image.id,
           },
         });
       }
@@ -125,16 +130,8 @@ export const categoriesRouter = createTRPCRouter({
     .input(
       z.object({
         categoryId: z.string(),
-        storeId: z.string(),
-        name: z.string(),
-        billboardId: z.string(),
-        createNewCollection: z.boolean().optional(),
-        attributes: z.array(
-          z.object({
-            name: z.string(),
-            values: z.string(),
-          })
-        ),
+        ...categorySchema.shape,
+        attributes: z.array(attributeSchema),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -148,7 +145,6 @@ export const categoriesRouter = createTRPCRouter({
         where: { id: input.categoryId },
         data: {
           name: input.name,
-          billboardId: input.billboardId,
           attributes: {
             deleteMany: {},
           },
@@ -156,16 +152,28 @@ export const categoriesRouter = createTRPCRouter({
         include: { collection: true, products: true },
       });
 
-      console.log(category.collection?.id, input.createNewCollection);
+      if (input.createNewCollection && input?.imageUrl) {
+        const image = await ctx.prisma.image.upsert({
+          where: {
+            id: category?.collection?.imageId ?? "",
+          },
+          create: {
+            url: input.imageUrl,
+            alt: input?.alt ?? input.name,
+          },
+          update: {
+            url: input.imageUrl,
+            alt: input?.alt ?? input.name,
+          },
+        });
 
-      if (input.createNewCollection) {
         await ctx.prisma.collection.upsert({
           where: { id: category?.collection?.id ?? "" },
           create: {
             name: input.name,
-            storeId: input.storeId,
+            storeId: category.storeId,
             categoryId: category.id,
-            billboardId: input.billboardId,
+            imageId: image.id,
             products: {
               connect: [
                 ...category.products.map((product) => ({ id: product.id })),
@@ -174,7 +182,8 @@ export const categoriesRouter = createTRPCRouter({
           },
           update: {
             name: input.name,
-            billboardId: input.billboardId,
+            imageId: image.id,
+
             products: {
               connect: [
                 ...category.products.map((product) => ({ id: product.id })),
@@ -184,37 +193,6 @@ export const categoriesRouter = createTRPCRouter({
         });
       }
 
-      // if (input.createNewCollection && category.collection?.id) {
-      //   await ctx.prisma.collection.update({
-      //     where: { id: input.categoryId },
-      //     data: {
-      //       name: input.name,
-      //       billboardId: input.billboardId,
-      //       products: {
-      //         connect: [
-      //           ...category.products.map((product) => ({ id: product.id })),
-      //         ],
-      //       },
-      //     },
-      //   });
-      // }
-
-      // if (input.createNewCollection && !category.collection) {
-      //   await ctx.prisma.collection.create({
-      //     data: {
-      //       name: input.name,
-      //       storeId: input.storeId,
-      //       categoryId: category.id,
-      //       billboardId: input.billboardId,
-      //       products: {
-      //         connect: [
-      //           ...category.products.map((product) => ({ id: product.id })),
-      //         ],
-      //       },
-      //     },
-      //   });
-      // }
-
       return ctx.prisma.category.update({
         where: { id: category.id },
         data: {
@@ -223,7 +201,7 @@ export const categoriesRouter = createTRPCRouter({
               data: [
                 ...input.attributes.map(
                   (attribute: { name: string; values: string }) => {
-                    return { ...attribute, storeId: input.storeId };
+                    return { ...attribute, storeId: category.storeId };
                   }
                 ),
               ],

@@ -1,5 +1,8 @@
 import type * as z from "zod";
 import type { collectionFormSchema } from "./schema";
+
+import type { Collection as CollectionDB } from "@prisma/client";
+
 export type CollectionFormValues = z.infer<typeof collectionFormSchema>;
 
 export type CollectionColumn = {
@@ -12,3 +15,5 @@ export type CollectionColumn = {
   }[];
   createdAt: Date;
 };
+
+export type Collection = CollectionDB;

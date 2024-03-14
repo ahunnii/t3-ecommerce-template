@@ -41,7 +41,7 @@ export const collectionsRouter = createTRPCRouter({
               },
             },
           },
-          billboard: true,
+          image: true,
         },
         orderBy: { createdAt: "desc" },
       });
@@ -67,7 +67,7 @@ export const collectionsRouter = createTRPCRouter({
               },
             },
           },
-          billboard: true,
+          image: true,
         },
       });
     }),
@@ -76,8 +76,10 @@ export const collectionsRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        storeId: z.string(),
-        billboardId: z.string(),
+        storeId: z.string().optional(),
+        imageUrl: z.string(),
+        alt: z.string().optional(),
+        description: z.string().optional(),
         isFeatured: z.boolean(),
         products: z.array(
           z.object({
@@ -86,24 +88,37 @@ export const collectionsRouter = createTRPCRouter({
         ),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.collection.create({
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
+      const image = await ctx.prisma.image.create({
+        data: { url: input.imageUrl, alt: input.alt ?? input.name },
+      });
+
+      const collection = await ctx.prisma.collection.create({
         data: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           name: input.name,
-          billboardId: input.billboardId,
+          description: input.description,
+          imageId: image.id,
           isFeatured: input.isFeatured,
-          storeId: input.storeId,
           products: {
             connect: input.products,
           },
         },
       });
+
+      return collection;
     }),
 
   updateCollection: protectedProcedure
@@ -111,7 +126,8 @@ export const collectionsRouter = createTRPCRouter({
       z.object({
         collectionId: z.string(),
         name: z.string(),
-        billboardId: z.string(),
+        imageUrl: z.string(),
+        alt: z.string().optional(),
         isFeatured: z.boolean(),
 
         products: z.array(
@@ -134,8 +150,19 @@ export const collectionsRouter = createTRPCRouter({
         },
         data: {
           name: input.name,
-          billboardId: input.billboardId,
           isFeatured: input.isFeatured,
+          image: {
+            upsert: {
+              create: {
+                url: input.imageUrl,
+                alt: input.alt ?? input.name,
+              },
+              update: {
+                url: input.imageUrl,
+                alt: input.alt ?? input.name,
+              },
+            },
+          },
           products: {
             set: [],
           },

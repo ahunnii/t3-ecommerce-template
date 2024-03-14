@@ -25,7 +25,7 @@ export function CollectionCard({ collection, className }: CollectionCardProps) {
     >
       <div className="relative aspect-square overflow-hidden rounded-xl">
         <Image
-          src={collection.billboard.imageUrl}
+          src={collection?.image?.url ?? "/placeholder-image.webp"}
           alt={collection.name}
           fill
           className={cn(
@@ -50,7 +50,7 @@ export function CollectionCard({ collection, className }: CollectionCardProps) {
             config.collection.card.caption
           )}
         >
-          {collection.products.length} products
+          {collection?.products?.length} products
         </p>
       </div>
     </Link>

@@ -25,7 +25,7 @@ export function CategoryCard({ category, className }: CategoryCardProps) {
     >
       <div className="relative aspect-square overflow-hidden rounded-xl">
         <Image
-          src={category.billboard.imageUrl}
+          src={category?.collection?.image?.url ?? "/placeholder-image.webp"}
           alt={category.name}
           fill
           className={cn(

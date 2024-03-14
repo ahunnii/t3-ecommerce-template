@@ -33,17 +33,17 @@ import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { Checkbox } from "~/components/ui/checkbox";
+import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import { categoryFormSchema } from "../schema";
-import type { CategoryFormValues, SingleCategory } from "../types";
+import type { Category, CategoryFormValues } from "../types";
 
 type Props = {
-  initialData: SingleCategory | null;
-  billboards: Billboard[];
+  initialData: Category | null;
 };
 
-export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
+export const CategoryForm: React.FC<Props> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const apiContext = api.useContext();
@@ -64,8 +64,12 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
       name: initialData?.name ?? "",
-      billboardId: initialData?.billboardId ?? undefined,
       attributes: initialData?.attributes ?? [],
+      description: initialData?.description ?? "",
+
+      imageUrl: initialData?.collection?.image?.url ?? undefined,
+      alt: initialData?.collection?.image?.alt ?? undefined,
+
       createNewCollection: initialData?.collection?.id ? true : false,
     },
   });
@@ -120,10 +124,8 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
   const onSubmit = (data: CategoryFormValues) => {
     if (initialData) {
       updateCategory.mutate({
-        storeId,
-        categoryId,
         ...data,
-
+        categoryId,
         attributes: data.attributes.map((attribute) => ({
           ...attribute,
           storeId,
@@ -266,36 +268,46 @@ export const CategoryForm: React.FC<Props> = ({ initialData, billboards }) => {
               >
                 <FormField
                   control={form.control}
-                  name="billboardId"
+                  name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Billboard</FormLabel>
-                      <Select
-                        disabled={loading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a billboard"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {billboards.map((billboard) => (
-                            <SelectItem key={billboard.id} value={billboard.id}>
-                              {billboard.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>{" "}
+                      <FormLabel>Featured Image</FormLabel>{" "}
                       <FormDescription>
-                        Image associated with this category. Used in category
-                        pages.
+                        Used to represent your product during checkout, social
+                        sharing and more.
                       </FormDescription>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          disabled={loading}
+                          onChange={(url) => {
+                            field.onChange(url);
+                            return field.onChange(url);
+                          }}
+                          onRemove={() => form.setValue("imageUrl", "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="alt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Alt Description</FormLabel>{" "}
+                      <FormDescription>
+                        Used for image SEO and accessibility.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="e.g. A black t-shirt on a white background."
+                          {...field}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

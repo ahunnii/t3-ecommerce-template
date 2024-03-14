@@ -38,11 +38,7 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
       label: "Overview",
       active: asPath === `/admin/${encodedStoreId}`,
     },
-    {
-      href: `/admin/${encodedStoreId}/billboards`,
-      label: "Billboards",
-      active: asPath === `/admin/${encodedStoreId}/billboards`,
-    },
+
     {
       href: `/admin/${encodedStoreId}/categories`,
       label: "Categories",

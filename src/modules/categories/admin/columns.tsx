@@ -21,17 +21,9 @@ export const columns: ColumnDef<CategoryColumn>[] = [
     ),
   },
   {
-    accessorKey: "billboard",
-    header: "Billboard",
-    cell: ({ row }) => (
-      <Link
-        href={`/admin/${row.original.storeId}/billboards/${row.original.billboard.id}`}
-      >
-        <Button variant={"link"} className="mx-0 px-0">
-          {row.original.billboard.label}
-        </Button>
-      </Link>
-    ),
+    accessorKey: "products",
+    header: "Products",
+    cell: ({ row }) => <span>{row.original.products?.length}</span>,
   },
   {
     accessorKey: "createdAt",

@@ -15,7 +15,8 @@ import AdminLayout from "~/components/layouts/admin-layout";
 import { Button } from "~/components/ui/button";
 
 import { ViewAttributes } from "~/modules/categories/admin/view-attributes";
-import { ViewCategory } from "~/modules/categories/admin/view-category";
+import { ViewCategoryCollection } from "~/modules/categories/admin/view-category";
+import { DetailedCollection } from "~/types";
 
 interface IProps {
   categoryId: string;
@@ -47,7 +48,9 @@ const CategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
           </AdminFormHeader>
 
           <AdminFormBody>
-            <ViewCategory category={category} />
+            <ViewCategoryCollection
+              collection={(category?.collection as DetailedCollection) ?? null}
+            />
             <ViewAttributes category={category} />
           </AdminFormBody>
         </>

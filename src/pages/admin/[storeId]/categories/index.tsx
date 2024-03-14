@@ -14,10 +14,9 @@ interface IProps {
   storeId: string;
 }
 const CategoriesPage: FC<IProps> = ({ storeId }) => {
-  const { data: categories, isLoading } =
-    api.categories.getAllCategories.useQuery({
-      storeId,
-    });
+  const { data: categories, isLoading } = api.categories.getCategories.useQuery(
+    { storeId, includeProducts: true }
+  );
 
   return (
     <AdminLayout>

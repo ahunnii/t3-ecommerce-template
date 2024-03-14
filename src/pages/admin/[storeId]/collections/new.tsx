@@ -17,29 +17,20 @@ const NewCollectionAdminPage: FC = () => {
     storeId: storeId as string,
   });
 
-  const getAllBillboards = api.billboards.getAllBillboards.useQuery({
-    storeId: storeId as string,
-  });
-
-  const isLoading = getAllProducts.isLoading || getAllBillboards.isLoading;
+  const isLoading = getAllProducts.isLoading;
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      {!isLoading && getAllBillboards.data && getAllProducts.data && (
+      {!isLoading && getAllProducts.data && (
         <CollectionForm
           products={getAllProducts.data ?? []}
-          billboards={getAllBillboards.data ?? []}
           initialData={null}
         />
       )}
 
       {!isLoading && !getAllProducts.data && (
         <DataFetchErrorMessage message="There seems to be an issue with loading the products." />
-      )}
-
-      {!isLoading && !getAllBillboards.data && (
-        <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
       )}
     </AdminLayout>
   );

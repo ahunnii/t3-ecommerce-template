@@ -19,28 +19,17 @@ const EditCategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
     categoryId,
   });
 
-  const getAllBillboards = api.billboards.getAllBillboards.useQuery({
-    storeId,
-  });
-
-  const isLoading = getCategory.isLoading || getAllBillboards.isLoading;
+  const isLoading = getCategory.isLoading;
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      {!isLoading && getCategory.data && getAllBillboards.data && (
-        <CategoryForm
-          initialData={getCategory.data}
-          billboards={getAllBillboards.data}
-        />
+      {!isLoading && getCategory.data && (
+        <CategoryForm initialData={getCategory.data} />
       )}
 
       {!isLoading && !getCategory.data && (
         <DataFetchErrorMessage message="There seems to be an issue with loading the category." />
-      )}
-
-      {!isLoading && !getAllBillboards.data && (
-        <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
       )}
     </AdminLayout>
   );

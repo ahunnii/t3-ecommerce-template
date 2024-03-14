@@ -35,6 +35,7 @@ import {
 } from "~/components/ui/select";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
+import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
@@ -44,14 +45,9 @@ import type { CollectionFormValues } from "../../types";
 type Props = {
   initialData: DetailedCollection | null;
   products: Product[];
-  billboards: Billboard[];
 };
 
-export const CollectionForm: React.FC<Props> = ({
-  initialData,
-  products,
-  billboards,
-}) => {
+export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const apiContext = api.useContext();
@@ -76,7 +72,9 @@ export const CollectionForm: React.FC<Props> = ({
     resolver: zodResolver(collectionFormSchema),
     defaultValues: {
       name: initialData?.name ?? "",
-      billboardId: initialData?.billboardId ?? undefined,
+      imageUrl: initialData?.image?.url ?? undefined,
+      alt: initialData?.image?.alt ?? "",
+      description: initialData?.description ?? "",
       products: initialData?.products ?? [],
     },
   });
@@ -365,32 +363,46 @@ export const CollectionForm: React.FC<Props> = ({
               >
                 <FormField
                   control={form.control}
-                  name="billboardId"
+                  name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Billboard</FormLabel>
-                      <Select
-                        disabled={loading}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a billboard"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {billboards.map((billboard) => (
-                            <SelectItem key={billboard.id} value={billboard.id}>
-                              {billboard.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Featured Image</FormLabel>{" "}
+                      <FormDescription>
+                        Used to represent your product during checkout, social
+                        sharing and more.
+                      </FormDescription>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value ? [field.value] : []}
+                          disabled={loading}
+                          onChange={(url) => {
+                            field.onChange(url);
+                            return field.onChange(url);
+                          }}
+                          onRemove={() => form.setValue("imageUrl", "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="alt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Alt Description</FormLabel>{" "}
+                      <FormDescription>
+                        Used for image SEO and accessibility.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="e.g. A black t-shirt on a white background."
+                          {...field}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -22,32 +22,18 @@ const CollectionPage: FC<IProps> = ({ collectionId, storeId }) => {
   const getAllProducts = api.products.getAllProducts.useQuery({
     storeId,
   });
-  const getAllBillboards = api.billboards.getAllBillboards.useQuery({
-    storeId,
-  });
 
-  const isLoading =
-    getCollection.isLoading ||
-    getAllProducts.isLoading ||
-    getAllBillboards.isLoading;
+  const isLoading = getCollection.isLoading || getAllProducts.isLoading;
 
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      {!isLoading &&
-        getCollection.data &&
-        getAllProducts.data &&
-        getAllBillboards.data && (
-          <CollectionForm
-            products={getAllProducts.data ?? []}
-            billboards={getAllBillboards.data ?? []}
-            initialData={getCollection.data}
-          />
-        )}
-
-      {!isLoading && !getAllBillboards.data && (
-        <DataFetchErrorMessage message="There seems to be an issue with loading the billboards." />
+      {!isLoading && getCollection.data && getAllProducts.data && (
+        <CollectionForm
+          products={getAllProducts.data ?? []}
+          initialData={getCollection.data}
+        />
       )}
 
       {!isLoading && !getAllProducts.data && (
