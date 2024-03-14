@@ -5,7 +5,6 @@ import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
@@ -18,7 +17,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import { toastService } from "~/services/toast";
-import { DiscountColumn } from "../types";
+import type { DiscountColumn } from "../types";
 
 interface CellActionProps {
   data: DiscountColumn;
@@ -59,7 +58,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={() => void onConfirm()}
         loading={loading}
       />

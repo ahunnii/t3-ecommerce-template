@@ -7,6 +7,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
+import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import { DiscountForm } from "~/modules/discounts/admin/discount-form";
 
 interface IProps {
@@ -22,12 +23,11 @@ const EditDiscountPage: FC<IProps> = ({ discountId }) => {
   return (
     <>
       <AdminLayout>
-        <div className="flex h-full flex-col bg-gray-50/25 dark:bg-slate-900">
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            {isLoading && <AbsolutePageLoader />}
-            {!isLoading && discount && <DiscountForm initialData={discount} />}
-          </div>
-        </div>
+        {isLoading && <AbsolutePageLoader />}
+        {!isLoading && discount && <DiscountForm initialData={discount} />}
+        {!isLoading && !discount && (
+          <DataFetchErrorMessage message="There seems to be an issue with loading the discount." />
+        )}
       </AdminLayout>
     </>
   );

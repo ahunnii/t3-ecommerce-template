@@ -10,6 +10,7 @@ import { DataTable } from "~/components/ui/data-table";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
+import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import type { DiscountColumn } from "../types";
 import { columns } from "./columns";
 
@@ -22,7 +23,7 @@ export const DiscountsClient: React.FC<Props> = ({ data }) => {
   const router = useNavigationRouter();
 
   return (
-    <>
+    <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
         <Heading
           title={`Discounts (${data.length})`}
@@ -39,10 +40,10 @@ export const DiscountsClient: React.FC<Props> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="code" columns={columns} data={data} />
+      <AdvancedDataTable searchKey="code" columns={columns} data={data} />
       <Heading title="API" description="API Calls for Discounts" />
       <Separator />
       <ApiList entityName="discounts" entityIdName="discountId" />
-    </>
+    </div>
   );
 };
