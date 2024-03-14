@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { CustomOrderForm } from "~/modules/custom-orders/admin/custom-order-form";
+import { CustomOrderForm } from "~/modules/custom-orders/components/admin/custom-order-form";
 
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
@@ -15,7 +15,7 @@ interface IProps {
 }
 
 const EditCustomOrderPage: FC<IProps> = ({ customOrderId }) => {
-  const { data: billboard, isLoading } =
+  const { data: customOrder, isLoading } =
     api.customOrder.getCustomRequest.useQuery({
       customOrderId,
     });
@@ -23,12 +23,12 @@ const EditCustomOrderPage: FC<IProps> = ({ customOrderId }) => {
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        {!isLoading && billboard && <CustomOrderForm initialData={billboard} />}
-        {!isLoading && !billboard && (
-          <DataFetchErrorMessage message="There seems to be an issue with loading the billboard" />
-        )}
-      </div>
+      {!isLoading && customOrder && (
+        <CustomOrderForm initialData={customOrder} />
+      )}
+      {!isLoading && !customOrder && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the custom order." />
+      )}
     </AdminLayout>
   );
 };

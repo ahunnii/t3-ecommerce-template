@@ -4,18 +4,17 @@ import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomOrderStatus, CustomOrderType } from "@prisma/client";
-import { Trash } from "lucide-react";
+
 import { useForm } from "react-hook-form";
 
 import { AlertModal } from "~/components/admin/modals/alert-modal";
 import { Button } from "~/components/ui/button";
 import * as Form from "~/components/ui/form";
-import { Heading } from "~/components/ui/heading";
+
 import { Input } from "~/components/ui/input";
-import { Separator } from "~/components/ui/separator";
+
 import ImageUpload from "~/services/image-upload/components/image-upload";
 
-import { BackToButton } from "~/components/common/buttons/back-to-button";
 import {
   Select,
   SelectContent,
@@ -25,12 +24,14 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import { customOrderAdminFormSchema } from "../schema";
-import { type CustomOrder, type CustomOrderAdminFormValues } from "../types";
+import { customOrderAdminFormSchema } from "../../schema";
+import { type CustomOrder, type CustomOrderAdminFormValues } from "../../types";
 
 type Props = {
   initialData: CustomOrder | null;
@@ -164,40 +165,30 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        setIsOpen={setOpen}
-        onConfirm={onDelete}
-        loading={loading}
-        asChild={true}
-      />
-      <BackToButton
-        link={`/admin/${storeId}/custom-orders/${customOrderId ?? ""}`}
-        title="Back to Custom Order"
-      />
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
-
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            type="button"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
-      <Separator />
       <Form.Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          className=" w-full  space-y-8"
-        >
-          <div className="flex space-x-4">
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <AdminFormHeader
+            title={title}
+            description={description}
+            contentName="Custom Order"
+            link={`/admin/${storeId}/custom-orders/${customOrderId ?? ""}`}
+          >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
+
+            <Button disabled={loading} className="ml-auto" type="submit">
+              {action}
+            </Button>
+          </AdminFormHeader>
+
+          <AdminFormBody>
             <section className="w-3/4 space-y-4">
               <EditSection
                 title="Customer Details"
@@ -450,7 +441,7 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
                 />
               </EditSection>
             </section>
-          </div>
+          </AdminFormBody>
 
           <div className="w-full">
             <Button

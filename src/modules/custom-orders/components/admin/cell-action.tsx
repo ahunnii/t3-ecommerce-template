@@ -19,8 +19,8 @@ import * as Dropdown from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
-import type { CustomOrderColumn } from "../types";
-import { saveAsPDF } from "../utils/save-as-pdf";
+import type { CustomOrderColumn } from "../../types";
+import { saveAsPDF } from "../../utils/save-as-pdf";
 
 interface CellActionProps {
   data: CustomOrderColumn;
@@ -101,7 +101,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     <>
       <AlertModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        setIsOpen={setOpen}
         onConfirm={onConfirm}
         loading={isLoading}
       />

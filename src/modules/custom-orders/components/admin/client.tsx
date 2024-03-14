@@ -10,7 +10,7 @@ import Link from "next/link";
 
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 
-import type { CustomOrderColumn } from "../types";
+import type { CustomOrderColumn } from "../../types";
 import { columns } from "./columns";
 import { filterOptions } from "./filter-options";
 
@@ -21,7 +21,7 @@ export const CustomOrderClient: React.FC<Props> = ({ data }) => {
   const storeId = params.query.storeId as string;
 
   return (
-    <>
+    <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
         <Heading
           title={`Custom Order Requests (${data.length})`}
@@ -41,6 +41,6 @@ export const CustomOrderClient: React.FC<Props> = ({ data }) => {
         data={data}
         filters={filterOptions}
       />
-    </>
+    </div>
   );
 };

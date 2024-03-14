@@ -6,7 +6,7 @@ import { CellAction } from "./cell-action";
 
 import { format } from "date-fns";
 import { Checkbox } from "~/components/ui/checkbox";
-import type { CustomOrderColumn } from "../types";
+import type { CustomOrderColumn } from "../../types";
 
 export const columns: ColumnDef<CustomOrderColumn>[] = [
   {

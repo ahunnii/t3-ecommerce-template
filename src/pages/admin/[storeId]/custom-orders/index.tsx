@@ -7,7 +7,7 @@ import AdminLayout from "~/components/layouts/admin-layout";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
-import { CustomOrderClient } from "~/modules/custom-orders/admin/client";
+import { CustomOrderClient } from "~/modules/custom-orders/components/admin/client";
 
 type TProps = { storeId: string };
 
@@ -20,13 +20,7 @@ const CustomOrdersPage: FC<TProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-      {!isLoading && (
-        <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4 p-8 pt-6">
-            <CustomOrderClient data={billboards ?? []} />
-          </div>
-        </div>
-      )}
+      {!isLoading && <CustomOrderClient data={billboards ?? []} />}
     </AdminLayout>
   );
 };

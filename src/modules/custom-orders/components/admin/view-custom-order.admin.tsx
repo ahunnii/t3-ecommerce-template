@@ -4,7 +4,7 @@ import { ViewSection } from "~/components/common/sections/view-section.admin";
 
 import { Label } from "~/components/ui/label";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import type { CustomOrder } from "../types";
+import type { CustomOrder } from "../../types";
 
 type Props = { customOrder: CustomOrder };
 export const ViewCustomOrder = ({ customOrder }: Props) => {

@@ -6,16 +6,16 @@ import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import { BackToButton } from "~/components/common/buttons/back-to-button";
 
 import { Button } from "~/components/ui/button";
-import { Heading } from "~/components/ui/heading";
 
 import { Pencil } from "lucide-react";
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
+import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
 import AdminLayout from "~/components/layouts/admin-layout";
-import { ViewCustomOrderImages } from "~/modules/custom-orders/admin/view-custom-order-images.admin";
-import { ViewCustomOrder } from "~/modules/custom-orders/admin/view-custom-order.admin";
+import { ViewCustomOrderImages } from "~/modules/custom-orders/components/admin/view-custom-order-images.admin";
+import { ViewCustomOrder } from "~/modules/custom-orders/components/admin/view-custom-order.admin";
 
 interface IProps {
   customOrderId: string;
@@ -32,36 +32,32 @@ const CustomOrderPage: FC<IProps> = ({ customOrderId }) => {
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
 
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        {!isLoading && customOrder && (
-          <>
-            <BackToButton
-              link={`/admin/${customOrder.storeId}/custom-orders`}
-              title="Back to Custom Orders"
-            />
-            <div className="flex w-full items-center justify-between">
-              <Heading
-                title={customOrder.email}
-                description={customOrder.createdAt.toDateString()}
-              />
-              <Link href={editBillboardURL}>
-                <Button className="flex gap-2" size={"sm"}>
-                  <Pencil className="h-5 w-5" /> Edit Custom Order
-                </Button>
-              </Link>
-            </div>
-            {customOrder && (
-              <div className="flex gap-2 ">
-                <ViewCustomOrder customOrder={customOrder} />
-                <ViewCustomOrderImages images={customOrder.images} />
-              </div>
-            )}
-          </>
-        )}
-        {!customOrder && !isLoading && (
-          <DataFetchErrorMessage message="There seems to be an issue with loading the custom order" />
-        )}
-      </div>
+      {!isLoading && customOrder && (
+        <>
+          <AdminFormHeader
+            title={
+              customOrder.email + " - " + customOrder.createdAt.toDateString()
+            }
+            description={"View details about the custom order at a glance."}
+            contentName="Custom Orders"
+            link={`/admin/${customOrder.storeId}/custom-orders`}
+          >
+            <Link href={editBillboardURL}>
+              <Button className="flex gap-2" size={"sm"}>
+                <Pencil className="h-5 w-5" /> Edit...
+              </Button>
+            </Link>
+          </AdminFormHeader>
+
+          <AdminFormBody className="space-y-0">
+            <ViewCustomOrder customOrder={customOrder} />
+            <ViewCustomOrderImages images={customOrder.images} />
+          </AdminFormBody>
+        </>
+      )}
+      {!customOrder && !isLoading && (
+        <DataFetchErrorMessage message="There seems to be an issue with loading the custom order" />
+      )}
     </AdminLayout>
   );
 };
