@@ -69,6 +69,31 @@ export const storeRouter = createTRPCRouter({
       });
     }),
 
+  getHero: publicProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "NEXT_PUBLIC_STORE_ID is not set.",
+        });
+
+      return ctx.prisma.store.findUnique({
+        where: { id: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
+        select: {
+          content: {
+            select: {
+              heroImg: true,
+            },
+          },
+        },
+      });
+    }),
+
   getSocials: publicProcedure
     .input(
       z.object({
@@ -89,7 +114,6 @@ export const storeRouter = createTRPCRouter({
         },
       });
     }),
-
   createStore: protectedProcedure
     .input(z.object({ name: z.string() }))
     .mutation(({ ctx, input }) => {
@@ -140,6 +164,7 @@ export const storeRouter = createTRPCRouter({
         content: z
           .object({
             aboutPage: z.string().optional(),
+            heroImg: z.string().optional(),
           })
           .optional(),
         socialMedia: z
@@ -184,9 +209,11 @@ export const storeRouter = createTRPCRouter({
             upsert: {
               create: {
                 aboutPage: input?.content?.aboutPage,
+                heroImg: input?.content?.heroImg,
               },
               update: {
                 aboutPage: input?.content?.aboutPage,
+                heroImg: input?.content?.heroImg,
               },
             },
           },

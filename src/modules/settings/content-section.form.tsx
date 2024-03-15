@@ -1,4 +1,4 @@
-import { CheckIcon, ChevronsUpDown } from "lucide-react";
+import { CheckIcon, ChevronsUpDown, Trash } from "lucide-react";
 import { useMemo, type FC } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -13,6 +13,7 @@ import {
 } from "~/components/ui/command";
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,7 +26,9 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 
+import Image from "next/image";
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
+import ImageUpload from "~/services/image-upload/components/image-upload";
 import { states } from "~/utils/shipping";
 import { cn } from "~/utils/styles";
 import type { SettingsFormValues } from "./types";
@@ -53,12 +56,12 @@ export const ContentSectionForm: FC<Props> = ({ form }) => {
       description="Manage your site content and pages"
       bodyClassName=""
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-4">
         <FormField
           control={form.control}
           name="content.aboutPage"
           render={({ field }) => (
-            <FormItem className="w-full">
+            <FormItem className="w-full lg:w-4/6">
               <FormLabel>About Page</FormLabel>
               <FormControl>
                 <MarkdownEditor
@@ -71,6 +74,65 @@ export const ContentSectionForm: FC<Props> = ({ form }) => {
             </FormItem>
           )}
         />{" "}
+        <FormField
+          control={form.control}
+          name="content.heroImg"
+          render={({ field }) => (
+            <FormItem className="w-full lg:w-2/6">
+              <FormLabel>Hero Image</FormLabel>{" "}
+              <FormControl>
+                <>
+                  {form.watch("content.heroImg") && (
+                    <div
+                      className={cn(
+                        " relative aspect-video overflow-hidden rounded-md"
+                      )}
+                    >
+                      <div className="absolute right-2 top-2 z-10">
+                        <Button
+                          type="button"
+                          onClick={() => form.setValue("content.heroImg", "")}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <Image
+                        fill
+                        className="object-cover"
+                        alt="Image"
+                        src={
+                          form.watch("content.heroImg") ??
+                          "/placeholder-image.webp"
+                        }
+                        sizes=" (max-width: 200px) 100vw, 200px"
+                        priority
+                        loading="eager"
+                      />
+                    </div>
+                  )}
+
+                  <ImageUpload
+                    value={field.value ? [field.value] : []}
+                    buttonClassName="w-full"
+                    onChange={(url) => {
+                      field.onChange(url);
+                      return field.onChange(url);
+                    }}
+                    onRemove={() => form.setValue("content.heroImg", "")}
+                    previewImages={false}
+                  />
+                </>
+              </FormControl>
+              <FormDescription>
+                The hero is the first image on the homepage.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </EditSection>
   );

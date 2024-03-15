@@ -84,6 +84,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       },
       content: {
         aboutPage: initialData?.content?.aboutPage ?? "",
+        heroImg: initialData?.content?.heroImg ?? "",
       },
     },
   });
@@ -145,6 +146,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       hasFlatRate: data.hasFlatRate,
       content: {
         aboutPage: data.content?.aboutPage,
+        heroImg: data.content?.heroImg,
       },
       socialMedia: {
         facebook: data.socialMedia?.facebook,

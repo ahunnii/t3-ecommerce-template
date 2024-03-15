@@ -4,11 +4,13 @@ import { ImagePlus } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { env } from "~/env.mjs";
+import { cn } from "~/utils/styles";
 
 type Results = { secure_url: string };
 
 type Props = {
   disabled?: boolean;
+  buttonClassName?: string;
   secure?: boolean;
   onChange: (value: string) => void;
 };
@@ -16,6 +18,7 @@ type Props = {
 export const CloudinaryUpload = ({
   disabled,
   onChange,
+  buttonClassName,
   secure = true,
 }: Props) => {
   const onUpload = (result: { event: string; info: Partial<Results> }) => {
@@ -44,6 +47,7 @@ export const CloudinaryUpload = ({
               disabled={disabled}
               variant="secondary"
               onClick={onClick}
+              className={cn(buttonClassName)}
             >
               <ImagePlus className="mr-2 h-4 w-4" />
               Upload an Image

@@ -2,6 +2,7 @@ import * as z from "zod";
 
 export const storeContentFormSchema = z.object({
   aboutPage: z.string().optional(),
+  heroImg: z.string().optional(),
 });
 
 export const socialMediaFormSchema = z.object({

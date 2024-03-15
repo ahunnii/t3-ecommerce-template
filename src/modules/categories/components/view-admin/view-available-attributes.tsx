@@ -15,7 +15,7 @@ export const ViewAvailableAttributes = ({ category }: Props) => {
       className="h-fit"
     >
       {category.attributes.map((attribute) => (
-        <div className="flex flex-col py-8" key={attribute.id}>
+        <div className="flex flex-col pb-4" key={attribute.id}>
           <p className="font-medium">{attribute.name}</p>
           <div className="flex space-x-2">
             {attribute?.values.split(";").map((value: string) => (

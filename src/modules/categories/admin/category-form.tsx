@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Billboard } from "@prisma/client";
+
 import { Plus, Trash } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
@@ -20,13 +20,6 @@ import {
 import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { Input } from "~/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
@@ -266,52 +259,56 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
                 description="Automatically create a collection based on this category."
                 bodyClassName="space-y-4"
               >
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Featured Image</FormLabel>{" "}
-                      <FormDescription>
-                        Used to represent your product during checkout, social
-                        sharing and more.
-                      </FormDescription>
-                      <FormControl>
-                        <ImageUpload
-                          value={field.value ? [field.value] : []}
-                          disabled={loading}
-                          onChange={(url) => {
-                            field.onChange(url);
-                            return field.onChange(url);
-                          }}
-                          onRemove={() => form.setValue("imageUrl", "")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {form.watch("createNewCollection") && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="imageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Featured Image</FormLabel>{" "}
+                          <FormDescription>
+                            Used to represent your product during checkout,
+                            social sharing and more.
+                          </FormDescription>
+                          <FormControl>
+                            <ImageUpload
+                              value={field.value ? [field.value] : []}
+                              disabled={loading}
+                              onChange={(url) => {
+                                field.onChange(url);
+                                return field.onChange(url);
+                              }}
+                              onRemove={() => form.setValue("imageUrl", "")}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name="alt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alt Description</FormLabel>{" "}
-                      <FormDescription>
-                        Used for image SEO and accessibility.
-                      </FormDescription>
-                      <FormControl>
-                        <Input
-                          disabled={loading}
-                          placeholder="e.g. A black t-shirt on a white background."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name="alt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Alt Description</FormLabel>{" "}
+                          <FormDescription>
+                            Used for image SEO and accessibility.
+                          </FormDescription>
+                          <FormControl>
+                            <Input
+                              disabled={loading}
+                              placeholder="e.g. A black t-shirt on a white background."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
 
                 {initialData?.collection ? (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">

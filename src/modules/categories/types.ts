@@ -25,3 +25,10 @@ export type CategoryColumn = {
   }[];
   createdAt: Date;
 };
+
+export type CategoryProductsColumn = {
+  id: string;
+  storeId: string;
+  name: string;
+  featuredImage: string | null | undefined;
+};

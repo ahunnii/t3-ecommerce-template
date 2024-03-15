@@ -5,6 +5,7 @@ type Props = {
   children: React.ReactNode;
   title: string;
   description?: string;
+  bodyClassName?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const ViewSection: FC<Props> = ({
@@ -12,6 +13,7 @@ export const ViewSection: FC<Props> = ({
   title,
   description,
   className,
+  bodyClassName,
   ...props
 }) => {
   return (
@@ -35,7 +37,7 @@ export const ViewSection: FC<Props> = ({
         <p className="text-sm text-muted-foreground">{description}</p>
       )}
 
-      {children}
+      <div className={cn("mt-5", bodyClassName)}>{children}</div>
     </div>
   );
 };

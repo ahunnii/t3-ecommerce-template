@@ -7,25 +7,20 @@ import {
   Calculator,
   Calendar,
   Check,
-  CreditCard,
   Loader2,
   Search,
-  Settings,
   Smile,
-  User,
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { Button } from "~/components/ui/button";
 import {
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "~/components/ui/command";
 import { CommandAdvancedDialog } from "~/components/ui/command-advanced";
 import { env } from "~/env.mjs";
@@ -41,7 +36,6 @@ export function AdminSearch() {
   const [selectedCustoms, setSelectedCustoms] = React.useState<string[]>([]);
 
   const [open, setOpen] = React.useState(false);
-
   const [value, setValue] = React.useState("");
 
   const getAllProducts = api.products.searchForProducts.useQuery(
@@ -63,7 +57,6 @@ export function AdminSearch() {
 
   function handleChange(data: string) {
     setValue(data);
-
     debounceFn();
   }
 
@@ -74,8 +67,6 @@ export function AdminSearch() {
       if (e.key === "j" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
-        // void getAllProducts.refetch();
-        // void getAllOrders.refetch();
       }
     };
 
@@ -84,9 +75,6 @@ export function AdminSearch() {
   }, []);
 
   const openSearchModal = () => {
-    // void getAllProducts.refetch();
-
-    // void getAllOrders.refetch();
     setOpen(true);
   };
 
@@ -108,6 +96,7 @@ export function AdminSearch() {
       }, 500);
     }
   }, [open]);
+
   return (
     <>
       <Button
