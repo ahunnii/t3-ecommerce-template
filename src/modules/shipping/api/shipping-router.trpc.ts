@@ -119,6 +119,24 @@ export const shippingLabelRouter = createTRPCRouter({
 
       return label;
     }),
+
+  getShipments: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.session.user.role !== "ADMIN")
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to perform this action.",
+      });
+
+    const shipments = await shippoClient.transaction.list();
+
+    if (!shipments)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Shipments not found.",
+      });
+
+    return shipments.results;
+  }),
   createLabel: protectedProcedure
     .input(
       z.object({
