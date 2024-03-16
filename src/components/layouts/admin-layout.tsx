@@ -72,7 +72,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
           </div>
         </div>
         <main className="flex h-svh flex-col overflow-y-auto">
-          <div className=" sticky top-0 flex items-center gap-4 bg-white px-4">
+          <div className=" sticky top-0 z-20 flex items-center gap-4 bg-white px-4">
             <Navbar stores={getAllStores.data ?? []} />
           </div>
           <div className="flex h-full flex-col bg-gray-50/25 dark:bg-slate-900">
