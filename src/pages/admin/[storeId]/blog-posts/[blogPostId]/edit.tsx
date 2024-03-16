@@ -8,7 +8,7 @@ import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import AdminLayout from "~/components/layouts/admin-layout";
 
 import { DataFetchErrorMessage } from "~/components/common/data-fetch-error-message";
-import { BlogPostForm } from "~/modules/blog-posts/components/admin/blog-post-form";
+import { BlogPostForm } from "~/modules/blog-posts/components/blog-post-form.admin";
 
 interface IProps {
   storeId: string;

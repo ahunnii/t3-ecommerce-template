@@ -5,7 +5,7 @@ import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 
-import { BlogPostForm } from "~/modules/blog-posts/components/admin/blog-post-form";
+import { BlogPostForm } from "~/modules/blog-posts/components/blog-post-form.admin";
 
 interface IProps {
   storeId: string;

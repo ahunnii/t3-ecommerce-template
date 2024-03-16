@@ -35,6 +35,8 @@ import {
 } from "~/components/ui/select";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
+import { Textarea } from "~/components/ui/textarea";
+import { env } from "~/env.mjs";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
@@ -76,6 +78,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
       alt: initialData?.image?.alt ?? "",
       description: initialData?.description ?? "",
       products: initialData?.products ?? [],
+      slug: initialData?.slug ?? "",
     },
   });
 
@@ -232,7 +235,6 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="isFeatured"
@@ -255,6 +257,67 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          disabled={loading}
+                          placeholder="e.g. Summer is here! Get your summer essentials now!"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Used for SEO. Make it short and sweet, but descriptive.
+                        Search engines love keywords!
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="slug"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Slug</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={loading}
+                          placeholder="e.g. summer-collection-2021"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Used for SEO. Defaults to your collection name if left
+                        blank. MUST BE UNIQUE
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormItem className="flex flex-col items-start  space-y-4 rounded-md border p-4">
+                  <FormLabel>Search Engine Preview</FormLabel>
+
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className=" mb-[0.125rem] break-words text-[1.125rem] leading-[1.3125rem] text-[#1a0dab]">
+                      {form.watch("name")}
+                    </FormLabel>
+                    <FormDescription className="mb-[0.125rem] break-words text-[.8125rem] leading-4 text-[#006621]">
+                      {env.NEXT_PUBLIC_URL}/products/
+                      {form.watch("slug") ??
+                        form.watch("name").toLowerCase().split(" ").join("-")}
+                    </FormDescription>
+                    <FormDescription className="line-clamp-5  break-words text-[.8125rem] leading-[1.125rem] text-[#545454]">
+                      {form.watch("description")}
+                    </FormDescription>
+                  </div>
+                </FormItem>
               </EditSection>
 
               <EditSection

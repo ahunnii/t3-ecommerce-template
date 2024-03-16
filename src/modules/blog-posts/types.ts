@@ -14,7 +14,7 @@ export type BlogPostColumn = {
   id: string;
   storeId: string;
   title: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   published: boolean;
 };

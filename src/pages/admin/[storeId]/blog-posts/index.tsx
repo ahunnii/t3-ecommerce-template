@@ -1,5 +1,4 @@
-import { format } from "date-fns";
-import { useCallback, useEffect, useState, type FC } from "react";
+import { type FC } from "react";
 
 import type { GetServerSidePropsContext } from "next";
 
@@ -7,43 +6,25 @@ import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
 import AdminLayout from "~/components/layouts/admin-layout";
-import PageLoader from "~/components/ui/page-loader";
 
-import { BlogPostClient } from "~/modules/blog-posts/components/admin/client";
-import type { BlogPost, BlogPostColumn } from "~/modules/blog-posts/types";
+import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
+import { BlogPostClient } from "~/modules/blog-posts/components/blog-post-client.admin";
 
 interface IProps {
   storeId: string;
 }
 
-const ProductsPage: FC<IProps> = ({ storeId }) => {
-  const [formattedBlogPosts, setFormattedBlogPosts] = useState<
-    BlogPostColumn[]
-  >([]);
-  const { data: blogPosts } = api.blogPosts.getAllBlogPosts.useQuery({
-    storeId,
-  });
-
-  const formatBlogPosts = useCallback((products: BlogPost[]) => {
-    return products.map((item: BlogPost) => ({
-      id: item.id,
-      storeId: item.storeId,
-      title: item.title,
-      published: item.published,
-      createdAt: format(item.createdAt, "MMMM do, yyyy"),
-      updatedAt: format(item.updatedAt, "MMMM do, yyyy"),
-    }));
-  }, []);
-
-  useEffect(() => {
-    if (blogPosts)
-      setFormattedBlogPosts(formatBlogPosts(blogPosts as BlogPost[]));
-  }, [blogPosts, formatBlogPosts]);
+const BlogPostsPage: FC<IProps> = ({ storeId }) => {
+  const { data: blogPosts, isLoading } = api.blogPosts.getAllBlogPosts.useQuery(
+    {
+      storeId,
+    }
+  );
 
   return (
     <AdminLayout>
-      {!blogPosts && <PageLoader />}
-      {blogPosts && <BlogPostClient data={formattedBlogPosts} />}
+      {isLoading && <AbsolutePageLoader />}
+      {!isLoading && <BlogPostClient data={blogPosts ?? []} />}
     </AdminLayout>
   );
 };
@@ -52,4 +33,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return await authenticateAdminOrOwner(ctx);
 }
 
-export default ProductsPage;
+export default BlogPostsPage;

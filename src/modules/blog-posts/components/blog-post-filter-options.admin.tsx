@@ -1,6 +1,6 @@
 import { Mail, MailCheckIcon } from "lucide-react";
 
-export const filterOptions = [
+export const blogPostFilterOptions = [
   {
     column: "published",
     title: "Status",

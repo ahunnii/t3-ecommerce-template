@@ -94,7 +94,7 @@ const BlogPostPage: FC<IProps> = ({ storeId, blogPostId }) => {
 
 const LazyBlogPostContentSection = dynamic(
   () =>
-    import("~/modules/blog-posts/components/blog-post-content.section").then(
+    import("~/modules/blog-posts/components/view-blog-post-content.admin").then(
       (mod) => mod.BlogPostContentSection
     ),
   { ssr: false }

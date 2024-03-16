@@ -6,6 +6,7 @@ export const collectionFormSchema = z.object({
   alt: z.string().optional(),
   description: z.string().optional(),
   isFeatured: z.boolean().default(false),
+  slug: z.string().optional(),
   products: z.array(
     z.object({
       id: z.string(),

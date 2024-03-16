@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -16,13 +16,14 @@ import {
 import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import Link from "next/link";
+import { IdCopyMenuItem } from "~/components/common/dropdown/id-copy-menu-item";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import type { BlogPostColumn } from "../../types";
+import type { BlogPostColumn } from "../types";
 
 type Props = { data: BlogPostColumn };
 
-export const CellAction: React.FC<Props> = ({ data }) => {
+export const BlogPostCellAction: React.FC<Props> = ({ data }) => {
   const [open, setOpen] = useState(false);
 
   const params = useRouter();
@@ -49,15 +50,6 @@ export const CellAction: React.FC<Props> = ({ data }) => {
   const onConfirm = () => deleteBlogPost.mutate({ blogPostId });
   const onDeleteSelection = () => setOpen(true);
 
-  const onCopySelection = () => {
-    navigator.clipboard
-      .writeText(blogPostId)
-      .then(() => toastService.success("Blog post ID copied to clipboard."))
-      .catch((err: unknown) =>
-        toastService.error("Failed to copy blog post ID to clipboard.", err)
-      );
-  };
-
   useEffect(() => {
     if (!open) {
       setTimeout(() => {
@@ -82,12 +74,7 @@ export const CellAction: React.FC<Props> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={onCopySelection}
-            className="cursor-pointer"
-          >
-            <Copy className="mr-2 h-4 w-4" /> Copy Id
-          </DropdownMenuItem>
+          <IdCopyMenuItem id={blogPostId} name="Blog Post ID" />
           <Link href={baseUrl}>
             <DropdownMenuItem className="cursor-pointer">
               <Eye className="mr-2 h-4 w-4" /> View
@@ -98,8 +85,10 @@ export const CellAction: React.FC<Props> = ({ data }) => {
               <Edit className="mr-2 h-4 w-4" /> Update
             </DropdownMenuItem>
           </Link>
-
-          <DropdownMenuItem onClick={onDeleteSelection}>
+          <DropdownMenuItem
+            onClick={onDeleteSelection}
+            className="cursor-pointer  "
+          >
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
