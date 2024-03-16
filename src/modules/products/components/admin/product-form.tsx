@@ -591,7 +591,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                             <TableHeader>
                               <TableRow>
                                 {/* <TableHead className="w-[100px]">ID</TableHead> */}
-                                {currentAttributes.length > 0 &&
+                                {currentAttributes?.length > 0 &&
                                   currentAttributes
                                     .map((attribute) => attribute.name)
                                     .map((name) => (
