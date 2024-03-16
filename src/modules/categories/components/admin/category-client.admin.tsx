@@ -9,7 +9,7 @@ import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 
 import Link from "next/link";
-import { columns } from "./columns";
+import { categoriesColumns } from "./category-columns.admin";
 
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import {
@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import type { CategoryColumn } from "../types";
+import type { CategoryColumn } from "../../types";
 
 type Props = { data: CategoryColumn[] };
 
@@ -35,7 +35,7 @@ export const CategoriesClient: React.FC<Props> = ({ data }) => {
               <Heading
                 title={`Categories (${data.length})`}
                 description="Manage categories for your store."
-              />{" "}
+              />
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-96">
@@ -52,7 +52,11 @@ export const CategoriesClient: React.FC<Props> = ({ data }) => {
         </Link>
       </div>
       <Separator />
-      <AdvancedDataTable searchKey="name" columns={columns} data={data} />
+      <AdvancedDataTable
+        searchKey="name"
+        columns={categoriesColumns}
+        data={data}
+      />
       <Heading title="Public API" description="API Calls for Categories" />
       <Separator />
       <ApiList entityName="categories" entityIdName="categoryId" />

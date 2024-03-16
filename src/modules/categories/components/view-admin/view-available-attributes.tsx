@@ -10,16 +10,15 @@ export const ViewAvailableAttributes = ({ category }: Props) => {
   return (
     <ViewSection
       title="Attributes"
-      description=" The main reason for categories is to be able to provide common
-    attributes for every product that is a part of this category."
+      description="Common attributes that each product in this category has access to for variants."
       className="h-fit"
     >
       {category.attributes.map((attribute) => (
         <div className="flex flex-col pb-4" key={attribute.id}>
-          <p className="font-medium">{attribute.name}</p>
+          <p className="font-base text-zinc-700">{attribute.name}</p>
           <div className="flex space-x-2">
             {attribute?.values.split(";").map((value: string) => (
-              <Badge key={value} color="primary">
+              <Badge key={value} variant="outline">
                 {value}
               </Badge>
             ))}

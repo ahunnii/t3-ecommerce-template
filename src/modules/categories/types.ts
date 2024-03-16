@@ -23,7 +23,11 @@ export type CategoryColumn = {
   products: {
     id: string;
   }[];
+  attributes: {
+    id: string;
+  }[];
   createdAt: Date;
+  updatedAt: Date;
 };
 
 export type CategoryProductsColumn = {

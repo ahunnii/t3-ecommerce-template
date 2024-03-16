@@ -3,10 +3,10 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import type { CategoryColumn } from "../types";
-import { CellAction } from "./cell-action";
+import type { CategoryColumn } from "../../types";
+import { CategoryCellAction } from "./category-cell-action.admin";
 
-export const columns: ColumnDef<CategoryColumn>[] = [
+export const categoriesColumns: ColumnDef<CategoryColumn>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -26,12 +26,18 @@ export const columns: ColumnDef<CategoryColumn>[] = [
     cell: ({ row }) => <span>{row.original.products?.length}</span>,
   },
   {
-    accessorKey: "createdAt",
-    header: "Date",
-    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
+    accessorKey: "attributes",
+    header: "Attributes",
+    cell: ({ row }) => <span>{row.original.attributes?.length}</span>,
   },
   {
+    accessorKey: "updatedAt",
+    header: "Last Updated",
+    cell: ({ row }) => format(row.original.updatedAt, "MMMM do, yyyy"),
+  },
+
+  {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row }) => <CategoryCellAction data={row.original} />,
   },
 ];

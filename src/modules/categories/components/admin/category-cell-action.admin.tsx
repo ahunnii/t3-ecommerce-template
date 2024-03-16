@@ -11,11 +11,11 @@ import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
-import type { CategoryColumn } from "../types";
+import type { CategoryColumn } from "../../types";
 
 type Props = { data: CategoryColumn };
 
-export const CellAction: React.FC<Props> = ({ data }) => {
+export const CategoryCellAction: React.FC<Props> = ({ data }) => {
   const [open, setOpen] = useState(false);
 
   const params = useRouter();

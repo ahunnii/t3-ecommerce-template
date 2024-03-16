@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ScrollArea } from "~/components/ui/scroll-area";
+
 import StoreSwitcher from "~/modules/admin/components/store-switcher";
 
 import { MainNav } from "~/modules/navigation/admin/main-nav";
@@ -76,7 +76,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
             <Navbar stores={getAllStores.data ?? []} />
           </div>
           <div className="flex h-full flex-col bg-gray-50/25 dark:bg-slate-900">
-            <div className="flex-1">{children}</div>
+            <div className="relative flex-1">{children}</div>
           </div>
           {/* <ScrollArea className="h-[calc(100vh-70px)] "></ScrollArea> */}
           {/* <>{children}</> */}

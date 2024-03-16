@@ -1,8 +1,7 @@
 import { ViewSection } from "~/components/common/sections/view-section.admin";
 import { CollectionCard } from "~/modules/collections/components/collection-card";
-import type { Collection } from "~/modules/collections/types";
-import type { DetailedCategory, DetailedCollection } from "~/types";
-import { CategoryCard } from "../../core/category-card";
+
+import type { DetailedCollection } from "~/types";
 
 type Props = {
   collection: DetailedCollection | null;
@@ -16,6 +15,7 @@ export const ViewCategoryCollection = ({ collection }: Props) => {
           ? "This is what is visible to customers."
           : "This category does not have a collection."
       }
+      className="h-fit"
     >
       {collection ? (
         <div className="grid grid-cols-1">

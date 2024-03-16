@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import type { FC } from "react";
 
-import { CategoryForm } from "~/modules/categories/admin/category-form";
+import { CategoryForm } from "~/modules/categories/components/admin/category-form.admin";
 
 import { authenticateAdminOrOwner } from "~/utils/auth";
 

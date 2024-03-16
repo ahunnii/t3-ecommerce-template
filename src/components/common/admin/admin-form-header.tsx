@@ -3,7 +3,7 @@ import type { ElementRef, FC, HTMLAttributes } from "react";
 import { Heading } from "~/components/ui/heading";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/utils/styles";
-import { BackToButton } from "../buttons/back-to-button";
+import { BackToButton } from "./back-to-button";
 
 type Props = {
   link: string;

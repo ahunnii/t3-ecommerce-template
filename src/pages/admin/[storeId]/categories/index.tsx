@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
 import { type FC } from "react";
 
-import { CategoriesClient } from "~/modules/categories/admin/client";
+import { CategoriesClient } from "~/modules/categories/components/admin/category-client.admin";
 
 import AdminLayout from "~/components/layouts/admin-layout";
 
@@ -15,7 +15,7 @@ interface IProps {
 }
 const CategoriesPage: FC<IProps> = ({ storeId }) => {
   const { data: categories, isLoading } = api.categories.getCategories.useQuery(
-    { storeId, includeProducts: true }
+    { storeId, includeProducts: true, includeVariants: true }
   );
 
   return (

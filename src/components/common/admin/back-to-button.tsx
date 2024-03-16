@@ -11,7 +11,7 @@ export const BackToButton = ({
 }) => {
   return (
     <Link href={link}>
-      <Button className="flex px-0" variant={"link"}>
+      <Button className="flex px-0 text-sm text-zinc-500" variant={"link"}>
         <ArrowLeft className="h-6 w-6" /> {title ?? "Go back"}
       </Button>
     </Link>

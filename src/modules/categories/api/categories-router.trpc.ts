@@ -29,6 +29,7 @@ export const categoriesRouter = createTRPCRouter({
       z.object({
         storeId: z.string().optional(),
         includeProducts: z.boolean().optional(),
+        includeVariants: z.boolean().optional(),
       })
     )
     .query(({ ctx, input }) => {
@@ -40,7 +41,10 @@ export const categoriesRouter = createTRPCRouter({
 
       return ctx.prisma.category.findMany({
         where: { storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID },
-        include: { attributes: true, products: input.includeProducts },
+        include: {
+          attributes: input.includeVariants,
+          products: input.includeProducts,
+        },
         orderBy: { createdAt: "desc" },
       });
     }),

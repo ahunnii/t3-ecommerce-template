@@ -29,8 +29,8 @@ import { Checkbox } from "~/components/ui/checkbox";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
-import { categoryFormSchema } from "../schema";
-import type { Category, CategoryFormValues } from "../types";
+import { categoryFormSchema } from "../../schema";
+import type { Category, CategoryFormValues } from "../../types";
 
 type Props = {
   initialData: Category | null;

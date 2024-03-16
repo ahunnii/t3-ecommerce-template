@@ -1,4 +1,3 @@
-import { HTMLAttributes } from "react";
 import { ViewSection } from "~/components/common/sections/view-section.admin";
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import type { CategoryProduct } from "../../../products/types";

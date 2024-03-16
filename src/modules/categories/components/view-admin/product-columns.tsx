@@ -1,12 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { CategoryProductsColumn } from "../../types";
-// import type { CategoryColumn } from "../types";
-// import { CellAction } from "./cell-action";
+import type { CategoryProductsColumn } from "../../types";
 
 export const productColumn: ColumnDef<CategoryProductsColumn>[] = [
   {
@@ -26,6 +23,7 @@ export const productColumn: ColumnDef<CategoryProductsColumn>[] = [
         <div className="ml-4">
           <Link
             href={`/admin/${row.original.storeId}/products/${row.original.id}`}
+            target="_blank"
           >
             <Button variant={"link"} className="mx-0 px-0">
               {row.original.name}
@@ -35,9 +33,4 @@ export const productColumn: ColumnDef<CategoryProductsColumn>[] = [
       </div>
     ),
   },
-
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => <CellAction data={row.original} />,
-  // },
 ];
