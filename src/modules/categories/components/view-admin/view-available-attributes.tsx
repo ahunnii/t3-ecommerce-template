@@ -16,9 +16,13 @@ export const ViewAvailableAttributes = ({ category }: Props) => {
       {category.attributes.map((attribute) => (
         <div className="flex flex-col pb-4" key={attribute.id}>
           <p className="font-base text-zinc-700">{attribute.name}</p>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             {attribute?.values.split(";").map((value: string) => (
-              <Badge key={value} variant="outline">
+              <Badge
+                key={value}
+                variant="outline"
+                className="line-clamp-1 block truncate "
+              >
                 {value}
               </Badge>
             ))}

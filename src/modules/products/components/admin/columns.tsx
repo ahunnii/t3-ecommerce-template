@@ -22,6 +22,9 @@ export type ProductColumn = {
   isFeatured: boolean;
   isArchived: boolean;
   featuredImage?: string | null;
+  customOrder: {
+    id: string;
+  };
   // images?: {
   //   id: string;
   //   url: string;
@@ -60,10 +63,25 @@ export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "isArchived",
     header: "Archived",
+    filterFn: (row, id, value) => {
+      const key = row.getValue(id) ? "Archived" : "Not Archived";
+      return value.includes(key);
+    },
+    cell: ({ row }) => (row.original.isArchived ? "Archived" : "Not Archived"),
   },
   {
     accessorKey: "isFeatured",
     header: "Featured",
+  },
+  {
+    accessorKey: "customOrder",
+    header: "Custom Order",
+    filterFn: (row, id, value) => {
+      const key = row.getValue(id) ? "Custom Order" : "Not Custom Order";
+      return value.includes(key);
+    },
+    cell: ({ row }) =>
+      row.original.customOrder?.id ? "Custom Order" : "Not Custom Order",
   },
   {
     accessorKey: "price",

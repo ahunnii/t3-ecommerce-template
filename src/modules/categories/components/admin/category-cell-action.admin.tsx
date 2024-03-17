@@ -2,7 +2,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  CloudLightning,
+  Copy,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import * as Dropdown from "~/components/ui/dropdown-menu";
@@ -24,6 +31,7 @@ export const CategoryCellAction: React.FC<Props> = ({ data }) => {
   const categoryId = data.id;
 
   const baseUrl = `/admin/${storeId}/categories/${categoryId}`;
+  const storePreviewUrl = `/collections/${data?.collection?.id}`;
 
   const deleteCategory = api.categories.deleteCategory.useMutation({
     onSuccess: () => toastService.success("Category deleted."),
@@ -71,9 +79,17 @@ export const CategoryCellAction: React.FC<Props> = ({ data }) => {
           <Dropdown.DropdownMenuItem onClick={onCopySelection}>
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </Dropdown.DropdownMenuItem>
+
+          {data?.collection?.id && (
+            <Link href={storePreviewUrl}>
+              <Dropdown.DropdownMenuItem>
+                <Eye className="mr-2 h-4 w-4" /> Preview in Store
+              </Dropdown.DropdownMenuItem>
+            </Link>
+          )}
           <Link href={baseUrl}>
             <Dropdown.DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" /> View
+              <CloudLightning className="mr-2 h-4 w-4" /> Quick View
             </Dropdown.DropdownMenuItem>
           </Link>
           <Link href={`${baseUrl}/edit`}>

@@ -40,6 +40,12 @@ export type FilterOption = {
   }[];
 };
 
+export type MassSelectOption = {
+  label: string;
+  icon?: LucideIcon;
+  onClick: (data: unknown) => void;
+};
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];

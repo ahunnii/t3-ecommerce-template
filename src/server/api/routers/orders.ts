@@ -170,6 +170,8 @@ export const ordersRouter = createTRPCRouter({
         searchParams: z
           .object({
             isShipped: z.boolean().optional(),
+            isPaid: z.boolean().optional(),
+            ignorePending: z.boolean().optional(),
           })
           .optional(),
       })

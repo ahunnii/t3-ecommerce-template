@@ -30,6 +30,7 @@ export const categoriesRouter = createTRPCRouter({
         storeId: z.string().optional(),
         includeProducts: z.boolean().optional(),
         includeVariants: z.boolean().optional(),
+        includeCollection: z.boolean().optional(),
       })
     )
     .query(({ ctx, input }) => {
@@ -44,6 +45,7 @@ export const categoriesRouter = createTRPCRouter({
         include: {
           attributes: input.includeVariants,
           products: input.includeProducts,
+          collection: input.includeCollection,
         },
         orderBy: { createdAt: "desc" },
       });

@@ -25,7 +25,9 @@ import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
+import { ViewSection } from "~/components/common/sections/view-section.admin";
 import { Checkbox } from "~/components/ui/checkbox";
+import { Tag, TagInput } from "~/components/ui/tag-input";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
@@ -150,8 +152,8 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Category"
-            link={`/admin/${storeId}/categories/${categoryId ?? ""}`}
+            contentName="Categories"
+            link={`/admin/${storeId}/categories`}
           >
             {initialData && (
               <AlertModal

@@ -15,7 +15,12 @@ interface IProps {
 }
 const CategoriesPage: FC<IProps> = ({ storeId }) => {
   const { data: categories, isLoading } = api.categories.getCategories.useQuery(
-    { storeId, includeProducts: true, includeVariants: true }
+    {
+      storeId,
+      includeProducts: true,
+      includeVariants: true,
+      includeCollection: true,
+    }
   );
 
   return (

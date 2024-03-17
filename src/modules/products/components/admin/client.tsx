@@ -12,6 +12,7 @@ import { Separator } from "~/components/ui/separator";
 
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import { columns, type ProductColumn } from "./columns";
+import { productFilterOptions } from "./product-filter-options.admin";
 
 interface ProductsClientProps {
   data: ProductColumn[];
@@ -37,7 +38,12 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <AdvancedDataTable searchKey="name" columns={columns} data={data} />
+      <AdvancedDataTable
+        searchKey="name"
+        columns={columns}
+        data={data}
+        // filters={productFilterOptions}
+      />
       <Heading title="Public API" description="API Calls for Products" />
       <Separator />
       <ApiList entityName="products" entityIdName="productId" />

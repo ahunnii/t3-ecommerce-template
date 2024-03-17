@@ -9,7 +9,7 @@ type Props = {
 export const ViewCategoryCollection = ({ collection }: Props) => {
   return (
     <ViewSection
-      title="Collection Preview"
+      title="Collection Enabled"
       description={
         collection
           ? "This is what is visible to customers."

@@ -26,6 +26,12 @@ export type CategoryColumn = {
   attributes: {
     id: string;
   }[];
+  collection:
+    | {
+        id: string;
+      }
+    | null
+    | undefined;
   createdAt: Date;
   updatedAt: Date;
 };
