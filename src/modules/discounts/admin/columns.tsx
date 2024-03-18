@@ -14,7 +14,7 @@ export const columns: ColumnDef<DiscountColumn>[] = [
     cell: ({ row }) => (
       <div className="flex flex-col items-start ">
         <Link
-          href={`/admin/${row.original.storeId}/discounts/${row.original.id}`}
+          href={`/admin/${row.original.storeId}/discounts/${row.original.id}/edit`}
           className="text-sm font-medium text-gray-900"
         >
           <Button variant={"link"} className="mx-0 px-0">

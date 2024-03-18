@@ -266,8 +266,8 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Discount"
-            link={`/admin/${storeId}/discounts/${discountId ?? ""}`}
+            contentName="Discounts"
+            link={`/admin/${storeId}/discounts`}
           >
             {initialData && (
               <AlertModal
@@ -284,7 +284,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
             </Button>
           </AdminFormHeader>
 
-          <AdminFormBody className="flex w-full flex-col gap-4 space-y-4">
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <EditSection
               title="Details"
               description="What is the discount and how is it being used?"

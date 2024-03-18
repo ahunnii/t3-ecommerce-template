@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import {
+  CloudLightning,
   Copy,
   Download,
   Edit,
@@ -122,7 +123,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </Dropdown.DropdownMenuItem>
           <Link href={baseUrl}>
             <Dropdown.DropdownMenuItem className="cursor-pointer">
-              <Eye className="mr-2 h-4 w-4" /> View
+              <CloudLightning className="mr-2 h-4 w-4" /> Quick View
             </Dropdown.DropdownMenuItem>
           </Link>
           <Link href={`${baseUrl}/edit`}>

@@ -44,7 +44,7 @@ export const blogPostColumns: ColumnDef<BlogPostColumn>[] = [
     ),
     cell: ({ row }) => (
       <Link
-        href={`/admin/${row.original.storeId}/blog-posts/${row.original.id}`}
+        href={`/admin/${row.original.storeId}/blog-posts/${row.original.id}/edit`}
         className="text-sm font-medium text-gray-900"
       >
         <Button variant={"link"} className="mx-0 px-0">

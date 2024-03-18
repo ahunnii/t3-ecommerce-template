@@ -160,8 +160,8 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Gallery Image"
-            link={`/admin/${storeId}/gallery/${galleryId ?? ""}`}
+            contentName="Gallery"
+            link={`/admin/${storeId}/gallery`}
           >
             {initialData && (
               <AlertModal
@@ -178,7 +178,7 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
             </Button>
           </AdminFormHeader>
 
-          <AdminFormBody className="flex w-full gap-4 space-y-0 max-lg:flex-col">
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
               <EditSection title="Details" description="Metadata and SEO">
                 <div className="my-5 gap-8 md:grid md:grid-cols-2 ">

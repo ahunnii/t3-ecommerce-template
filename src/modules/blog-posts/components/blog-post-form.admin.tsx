@@ -157,8 +157,8 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Blog Post"
-            link={`/admin/${storeId}/blog-posts/${blogPostId ?? ""}`}
+            contentName="Blog Posts"
+            link={`/admin/${storeId}/blog-posts`}
           >
             {initialData && (
               <AlertModal
@@ -174,7 +174,7 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
               {action}
             </Button>
           </AdminFormHeader>
-          <AdminFormBody>
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
               <EditSection
                 title="Details"

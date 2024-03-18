@@ -89,7 +89,7 @@ export const CollectionCellAction: React.FC<Props> = ({ data }) => {
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
 
-          <Link href={storePreviewUrl}>
+          <Link href={storePreviewUrl} target="_blank">
             <DropdownMenuItem>
               <Eye className="mr-2 h-4 w-4" /> Preview in Store
             </DropdownMenuItem>

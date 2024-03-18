@@ -192,7 +192,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
             </Button>
           </AdminFormHeader>
 
-          <AdminFormBody className="flex-col">
+          <AdminFormBody className="mx-auto w-full max-w-7xl flex-col space-y-0">
             <FormField
               control={form.control}
               name="name"
@@ -221,7 +221,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
             <SocialsSectionForm form={form} />
           </AdminFormBody>
 
-          <div className="space-y-4 p-8">
+          <div className="mx-auto w-full max-w-7xl space-y-4 p-8">
             <Separator />
             <ApiAlert
               title="NEXT_PUBLIC_API_URL"

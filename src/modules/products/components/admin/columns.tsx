@@ -18,13 +18,16 @@ export type ProductColumn = {
     name: string;
   };
 
-  createdAt: Date;
+  updatedAt: Date;
   isFeatured: boolean;
   isArchived: boolean;
   featuredImage?: string | null;
-  customOrder: {
-    id: string;
-  };
+  customOrder:
+    | {
+        id: string;
+      }
+    | undefined
+    | null;
   // images?: {
   //   id: string;
   //   url: string;
@@ -48,14 +51,13 @@ export const columns: ColumnDef<ProductColumn>[] = [
         </div>
         <div className="ml-4">
           <Link
-            href={`/admin/${row.original.storeId}/products/${row.original.id}`}
+            href={`/admin/${row.original.storeId}/products/${row.original.id}/edit`}
             className="text-sm font-medium text-gray-900"
           >
             <Button variant={"link"} className="mx-0 px-0">
               {row.original.name}
             </Button>
           </Link>
-          <div className="text-sm text-gray-500">{row.original.id}</div>
         </div>
       </div>
     ),
@@ -111,9 +113,9 @@ export const columns: ColumnDef<ProductColumn>[] = [
   },
 
   {
-    accessorKey: "createdAt",
-    header: "Date",
-    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
+    accessorKey: "updatedAt",
+    header: "Last updated on",
+    cell: ({ row }) => format(row.original.updatedAt, "MMMM do, yyyy"),
   },
   {
     id: "actions",

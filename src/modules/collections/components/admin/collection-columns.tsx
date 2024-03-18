@@ -41,9 +41,9 @@ export const collectionColumns: ColumnDef<CollectionColumn>[] = [
     cell: ({ row }) => <span> {row.original.products.length}</span>,
   },
   {
-    accessorKey: "createdAt",
-    header: "Date",
-    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
+    accessorKey: "updatedAt",
+    header: "Last updated at",
+    cell: ({ row }) => format(row.original.updatedAt, "MMMM do, yyyy"),
   },
   {
     id: "actions",

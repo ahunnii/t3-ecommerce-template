@@ -252,8 +252,8 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Product"
-            link={`/admin/${storeId}/products/${productId ?? ""}`}
+            contentName="Products"
+            link={`/admin/${storeId}/products`}
           >
             {initialData && (
               <AlertModal
@@ -270,7 +270,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
             </Button>
           </AdminFormHeader>
 
-          <AdminFormBody className="flex w-full gap-4 space-y-0 max-lg:flex-col">
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <div className="flex w-full flex-col space-y-4 lg:w-8/12">
               <EditSection
                 title="Details"

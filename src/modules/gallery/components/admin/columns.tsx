@@ -12,7 +12,7 @@ export type GalleryImageColumn = {
   storeId: string;
   title: string | null;
   url: string;
-  createdAt: Date;
+  updatedAt: Date;
 };
 
 export const columns: ColumnDef<GalleryImageColumn>[] = [
@@ -20,11 +20,10 @@ export const columns: ColumnDef<GalleryImageColumn>[] = [
     accessorKey: "title",
     header: "Image",
     cell: ({ row }) => {
-      console.log(row);
       return (
         <div className="flex flex-col items-start ">
           <Link
-            href={`/admin/${row.original.storeId}/gallery/${row.original.id}`}
+            href={`/admin/${row.original.storeId}/gallery/${row.original.id}/edit`}
             className="text-sm font-medium text-gray-900"
           >
             <Button variant={"link"} className="mx-0 px-0">
@@ -40,9 +39,9 @@ export const columns: ColumnDef<GalleryImageColumn>[] = [
   },
 
   {
-    accessorKey: "createdAt",
-    header: "Created at",
-    cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
+    accessorKey: "updatedAt",
+    header: "Last updated on",
+    cell: ({ row }) => format(row.original.updatedAt, "MMMM do, yyyy"),
   },
   {
     id: "actions",

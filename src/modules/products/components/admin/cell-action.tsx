@@ -1,4 +1,11 @@
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  CloudLightning,
+  Copy,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -35,6 +42,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const baseUrl = `/admin/${storeId}/products/${productId}`;
 
+  const storePreviewUrl = `/product/${productId}`;
   const { mutate: deleteProduct } = api.products.deleteProduct.useMutation({
     onSuccess: () => toastService.success("Product was successfully deleted"),
     onError: (error) =>
@@ -83,9 +91,15 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
 
+          <Link href={storePreviewUrl} target="_blank">
+            <DropdownMenuItem>
+              <Eye className="mr-2 h-4 w-4" /> Preview in Store
+            </DropdownMenuItem>
+          </Link>
+
           <Link href={baseUrl}>
             <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" /> View
+              <CloudLightning className="mr-2 h-4 w-4" /> Quick View
             </DropdownMenuItem>
           </Link>
           <Link href={`${baseUrl}/edit`}>

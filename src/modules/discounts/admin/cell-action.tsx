@@ -1,7 +1,14 @@
 "use client";
 
 import axios from "axios";
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  CloudLightning,
+  Copy,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -81,7 +88,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               )
             }
           >
-            <Eye className="mr-2 h-4 w-4" /> View
+            <CloudLightning className="mr-2 h-4 w-4" /> Quick View
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>

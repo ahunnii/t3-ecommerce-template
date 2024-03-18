@@ -8,9 +8,11 @@ import {
   Calendar,
   Check,
   CreditCard,
+  Inbox,
   Loader2,
   Search,
   Settings,
+  Shirt,
   Smile,
   User,
 } from "lucide-react";
@@ -146,7 +148,7 @@ export function AdminSearch() {
               href={`/admin/${env.NEXT_PUBLIC_STORE_ID}/orders`}
             >
               <CommandItem>
-                <Calendar className="mr-2 h-4 w-4" />
+                <Inbox className="mr-2 h-4 w-4" />
                 <span>Orders</span>
               </CommandItem>{" "}
             </Link>
@@ -155,7 +157,7 @@ export function AdminSearch() {
               href={`/admin/${env.NEXT_PUBLIC_STORE_ID}/products`}
             >
               <CommandItem>
-                <Smile className="mr-2 h-4 w-4" />
+                <Shirt className="mr-2 h-4 w-4" />
                 <span>Products</span>
               </CommandItem>
             </Link>
@@ -164,8 +166,8 @@ export function AdminSearch() {
               href={`/admin/${env.NEXT_PUBLIC_STORE_ID}/settings`}
             >
               <CommandItem>
-                <Calculator className="mr-2 h-4 w-4" />
-                <span>Calculator</span>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
               </CommandItem>
             </Link>
           </CommandGroup>

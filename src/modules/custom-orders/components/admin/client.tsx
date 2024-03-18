@@ -21,7 +21,7 @@ export const CustomOrderClient: React.FC<Props> = ({ data }) => {
   const storeId = params.query.storeId as string;
 
   return (
-    <div className="space-y-4 p-8">
+    <div className="mx-auto max-w-7xl space-y-4 p-8">
       <div className="flex items-center justify-between">
         <Heading
           title={`Custom Order Requests (${data.length})`}

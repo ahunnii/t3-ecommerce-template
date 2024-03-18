@@ -38,7 +38,7 @@ export const columns: ColumnDef<CustomOrderColumn>[] = [
     header: "Email",
     cell: ({ row }) => (
       <Link
-        href={`/admin/${row.original.storeId}/custom-orders/${row.original.id}`}
+        href={`/admin/${row.original.storeId}/custom-orders/${row.original.id}/edit`}
       >
         <Button variant={"link"} className="mx-0 px-0">
           {row.original.email}
@@ -56,7 +56,7 @@ export const columns: ColumnDef<CustomOrderColumn>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Created on",
     cell: ({ row }) => format(row.original.createdAt, "MMMM do, yyyy"),
   },
   {

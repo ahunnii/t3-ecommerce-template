@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import { CloudLightning, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -32,6 +32,7 @@ export const BlogPostCellAction: React.FC<Props> = ({ data }) => {
   const blogPostId = data.id;
 
   const baseUrl = `/admin/${storeId}/blog-posts/${blogPostId}`;
+  const storePreviewUrl = `/blog/${data.slug}`;
 
   const deleteBlogPost = api.blogPosts.deleteBlogPost.useMutation({
     onSuccess: () => toastService.success("Blog post deleted."),
@@ -75,9 +76,14 @@ export const BlogPostCellAction: React.FC<Props> = ({ data }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <IdCopyMenuItem id={blogPostId} name="Blog Post ID" />
+          <Link href={storePreviewUrl} target="_blank">
+            <DropdownMenuItem className="cursor-pointer">
+              <Eye className="mr-2 h-4 w-4" /> Preview in Store
+            </DropdownMenuItem>
+          </Link>{" "}
           <Link href={baseUrl}>
             <DropdownMenuItem className="cursor-pointer">
-              <Eye className="mr-2 h-4 w-4" /> View
+              <CloudLightning className="mr-2 h-4 w-4" /> Quick View
             </DropdownMenuItem>
           </Link>
           <Link href={`${baseUrl}/edit`}>

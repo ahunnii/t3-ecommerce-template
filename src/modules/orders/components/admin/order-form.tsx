@@ -194,7 +194,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
               {action}
             </Button>
           </AdminFormHeader>
-          <AdminFormBody className="flex-col">
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <FormField
               control={form.control}
               name="isPaid"

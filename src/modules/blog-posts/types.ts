@@ -16,5 +16,6 @@ export type BlogPostColumn = {
   title: string;
   createdAt: Date;
   updatedAt: Date;
+  slug: string;
   published: boolean;
 };

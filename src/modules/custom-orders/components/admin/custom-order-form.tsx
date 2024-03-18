@@ -170,8 +170,8 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Custom Order"
-            link={`/admin/${storeId}/custom-orders/${customOrderId ?? ""}`}
+            contentName="Custom Orders"
+            link={`/admin/${storeId}/custom-orders`}
           >
             {initialData && (
               <AlertModal
@@ -188,7 +188,7 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
             </Button>
           </AdminFormHeader>
 
-          <AdminFormBody>
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <section className="w-3/4 space-y-4">
               <EditSection
                 title="Customer Details"

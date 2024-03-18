@@ -57,7 +57,7 @@ const OrderPage: FC<IProps> = ({ orderId, storeId }) => {
               </Link>
             </AdminFormHeader>
 
-            <AdminFormBody className="flex w-full gap-4 max-lg:flex-col">
+            <AdminFormBody className="mx-auto flex w-full max-w-7xl gap-4 max-lg:flex-col">
               <div className="flex w-full flex-col space-y-4 lg:w-8/12">
                 <ViewOrderDetails {...order} />
                 <ViewOrderSummary {...order} />
