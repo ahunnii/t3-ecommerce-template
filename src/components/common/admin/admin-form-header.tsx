@@ -21,10 +21,10 @@ export const AdminFormHeader: FC<Props> = ({
   ...props
 }) => {
   return (
-    <>
+    <header className="sticky top-0 z-30 bg-white ">
       <div
         className={cn(
-          "sticky top-0 z-30 flex items-center justify-between bg-white px-8 py-4",
+          " mx-auto flex max-w-7xl items-center justify-between px-8 py-4",
           className
         )}
         {...props}
@@ -36,6 +36,6 @@ export const AdminFormHeader: FC<Props> = ({
         <div className="flex items-center gap-2">{children}</div>
       </div>
       <Separator className="sticky top-32  z-30 shadow" />
-    </>
+    </header>
   );
 };

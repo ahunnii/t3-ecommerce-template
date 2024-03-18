@@ -28,7 +28,7 @@ export const CollectionSection = ({
   return (
     <EditSection
       title="Collection"
-      description="Automatically create a collection based on this category."
+      description="Set up a public collection based on your category"
       bodyClassName="space-y-4"
       className="h-fit w-full xl:w-4/12"
     >

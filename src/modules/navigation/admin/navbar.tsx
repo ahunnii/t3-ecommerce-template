@@ -1,17 +1,18 @@
 import type { Store } from "@prisma/client";
-import { Menu } from "lucide-react";
+import { Home, Menu } from "lucide-react";
 
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 import StoreSwitcher from "~/modules/admin/components/store-switcher";
-import { ThemeToggle } from "~/modules/admin/components/theme-toggle";
+// import { ThemeToggle } from "~/modules/admin/components/theme-toggle";
 import { MainNav } from "~/modules/navigation/admin/main-nav";
 
+import Link from "next/link";
 import { Button } from "../../../components/ui/button";
 import { AdminSearch } from "./admin-search";
 const Navbar = ({ stores }: { stores: Store[] }) => {
   return (
     <div className="w-full border-b shadow-sm ">
-      <div className="flex h-16 items-center px-4">
+      <div className="relative flex h-16  items-center gap-4 px-4">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" className="hidden max-lg:flex">
@@ -30,8 +31,13 @@ const Navbar = ({ stores }: { stores: Store[] }) => {
           </SheetContent>
         </Sheet>
         <AdminSearch />
-        <div className="ml-auto flex items-center space-x-4">
-          <ThemeToggle />
+        <div className="right-8 flex items-center space-x-4 xl:fixed">
+          {/* <ThemeToggle /> */}
+          <Link href="/" target="_blank">
+            <Button className="gap-2" variant={"outline"} size="sm">
+              <Home /> <span className="max-lg:sr-only">Head to Store</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

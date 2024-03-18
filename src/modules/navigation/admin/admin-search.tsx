@@ -112,8 +112,8 @@ export function AdminSearch() {
     <>
       <Button
         onClick={openSearchModal}
-        className="flex w-96 items-center justify-between gap-2 "
-        variant="ghost"
+        className="flex w-full items-center justify-between gap-2 xl:mx-auto xl:max-w-2xl "
+        variant="outline"
       >
         <span className="flex items-center gap-2">
           <Search className="text-grey-50 size-5 " /> Search anything...

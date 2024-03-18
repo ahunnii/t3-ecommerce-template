@@ -73,8 +73,7 @@ export const AttributeSection = ({
                       </div>
                     </FormControl>
                     <FormDescription className="w-4/6 max-lg:w-full">
-                      Tip: This represents a type of product, so make sure it
-                      has a name that fits
+                      Tip: Make sure this attribute makes sense to customers
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

@@ -14,7 +14,6 @@ import AdminLayout from "~/components/layouts/admin-layout";
 import {
   ViewAvailableAttributes,
   ViewCategoryCollection,
-  ViewCategoryProducts,
 } from "~/modules/categories/components/view-admin";
 
 import { Eye } from "lucide-react";

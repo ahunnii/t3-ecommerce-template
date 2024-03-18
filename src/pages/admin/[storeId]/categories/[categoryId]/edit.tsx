@@ -14,7 +14,7 @@ interface IProps {
   categoryId: string;
   storeId: string;
 }
-const EditCategoryPage: FC<IProps> = ({ categoryId, storeId }) => {
+const EditCategoryPage: FC<IProps> = ({ categoryId }) => {
   const getCategory = api.categories.getCategory.useQuery({
     categoryId,
   });
@@ -40,7 +40,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return {
       props: {
         categoryId: ctx.query.categoryId,
-        storeId: ctx.query.storeId,
       },
     };
   });
