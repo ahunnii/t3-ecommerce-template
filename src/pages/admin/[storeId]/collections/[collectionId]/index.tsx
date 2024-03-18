@@ -48,7 +48,7 @@ const CollectionPage: FC<IProps> = ({ collectionId, storeId }) => {
             </Link>
           </AdminFormHeader>
 
-          <AdminFormBody>
+          <AdminFormBody className="mx-auto max-w-7xl">
             <ViewCollectionPreview collection={collection} />
             <ViewCollectionProducts products={collection?.products ?? []} />
           </AdminFormBody>

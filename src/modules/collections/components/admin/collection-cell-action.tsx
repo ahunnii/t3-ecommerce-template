@@ -1,7 +1,14 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  CloudLightning,
+  Copy,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -23,7 +30,7 @@ type Props = {
   data: CollectionColumn;
 };
 
-export const CellAction: React.FC<Props> = ({ data }) => {
+export const CollectionCellAction: React.FC<Props> = ({ data }) => {
   const params = useRouter();
   const apiContext = api.useContext();
   const [open, setOpen] = useState(false);
@@ -32,7 +39,7 @@ export const CellAction: React.FC<Props> = ({ data }) => {
   const collectionId = data.id;
 
   const baseUrl = `/admin/${storeId}/collections/${collectionId}`;
-
+  const storePreviewUrl = `/collections/${data?.id}`;
   const deleteCollection = api.collections.deleteCollection.useMutation({
     onSuccess: () =>
       toastService.success("Collection was successfully deleted"),
@@ -81,9 +88,16 @@ export const CellAction: React.FC<Props> = ({ data }) => {
           <DropdownMenuItem onClick={onCopySelection}>
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>
+
+          <Link href={storePreviewUrl}>
+            <DropdownMenuItem>
+              <Eye className="mr-2 h-4 w-4" /> Preview in Store
+            </DropdownMenuItem>
+          </Link>
+
           <Link href={baseUrl}>
             <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" /> View
+              <CloudLightning className="mr-2 h-4 w-4" /> Quick View
             </DropdownMenuItem>
           </Link>
           <Link href={`${baseUrl}/edit`}>

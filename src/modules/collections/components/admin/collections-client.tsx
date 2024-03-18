@@ -16,7 +16,7 @@ import {
 
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import type { CollectionColumn } from "../../types";
-import { columns } from "./columns";
+import { collectionColumns } from "./collection-columns";
 
 type Props = { data: CollectionColumn[] };
 
@@ -25,7 +25,7 @@ export const CollectionsClient: React.FC<Props> = ({ data }) => {
   const navigate = useNavigationRouter();
 
   return (
-    <div className="space-y-4 p-8">
+    <div className="mx-auto max-w-7xl space-y-4 p-8">
       <div className="flex items-center justify-between">
         <TooltipProvider delayDuration={250}>
           <Tooltip>
@@ -55,7 +55,11 @@ export const CollectionsClient: React.FC<Props> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <AdvancedDataTable searchKey="name" columns={columns} data={data} />
+      <AdvancedDataTable
+        searchKey="name"
+        columns={collectionColumns}
+        data={data}
+      />
       <Heading title="Public API" description="API Calls for Collections" />
       <Separator />
       <ApiList entityName="collections" entityIdName="categoryId" />

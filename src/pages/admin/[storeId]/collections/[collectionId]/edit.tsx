@@ -21,6 +21,7 @@ const CollectionPage: FC<IProps> = ({ collectionId, storeId }) => {
 
   const getAllProducts = api.products.getAllProducts.useQuery({
     storeId,
+    includeCustom: true,
   });
 
   const isLoading = getCollection.isLoading || getAllProducts.isLoading;

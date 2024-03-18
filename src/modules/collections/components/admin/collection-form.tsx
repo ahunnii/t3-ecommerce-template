@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Billboard, Product } from "@prisma/client";
 import { Command as CommandPrimitive } from "cmdk";
-import { X } from "lucide-react";
+import { Check, Search, X } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
@@ -14,7 +14,15 @@ import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Command, CommandGroup, CommandItem } from "~/components/ui/command";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "~/components/ui/command";
 import {
   Form,
   FormControl,
@@ -34,13 +42,17 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 
+import Image from "next/image";
+import Link from "next/link";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
+import { CommandAdvancedDialog } from "~/components/ui/command-advanced";
 import { Textarea } from "~/components/ui/textarea";
 import { env } from "~/env.mjs";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
+import { cn } from "~/utils/styles";
 import { collectionFormSchema } from "../../schema";
 import type { CollectionFormValues } from "../../types";
 
@@ -60,6 +72,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
   };
 
   const [open, setOpen] = useState(false);
+  const [productOpen, setProductOpen] = useState(false);
 
   const title = initialData ? "Edit collection" : "Create collection";
   const description = initialData
@@ -186,10 +199,24 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
     updateCollection.isLoading ||
     createCollection.isLoading ||
     deleteCollection.isLoading;
+
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (initialData?.products) setSelectedProducts(initialData?.products);
+  }, [initialData?.products]);
+
   return (
     <>
       <Form {...form}>
-        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+        <form
+          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
+        >
           <AdminFormHeader
             title={title}
             description={description}
@@ -211,7 +238,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
             </Button>
           </AdminFormHeader>
 
-          <AdminFormBody className="space-y-0">
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <div className="flex w-8/12 flex-col space-y-4">
               <EditSection
                 title="Details"
@@ -319,7 +346,6 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                   </div>
                 </FormItem>
               </EditSection>
-
               <EditSection
                 title="Products"
                 description="Add products to the collection"
@@ -330,87 +356,149 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Command
-                          onKeyDown={handleKeyDown}
-                          className="overflow-visible bg-transparent"
-                        >
-                          <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                            <div className="flex flex-wrap gap-1">
-                              {field?.value?.map((product) => {
-                                return (
-                                  <Badge
-                                    key={(product as Product).name}
-                                    variant="secondary"
+                        <>
+                          <Button
+                            onClick={() => setProductOpen(true)}
+                            type="button"
+                            className="flex w-full items-center justify-between gap-2  "
+                            variant="outline"
+                          >
+                            <span className="flex items-center gap-2">
+                              <Search className="text-grey-50 size-5 " /> Search
+                              products...
+                            </span>
+                          </Button>
+                          <CommandAdvancedDialog
+                            open={productOpen}
+                            onOpenChange={setProductOpen}
+                          >
+                            <CommandInput placeholder="Search by product name..." />
+                            <CommandList className="mb-12 ">
+                              <CommandEmpty>No results found.</CommandEmpty>
+
+                              <CommandGroup heading="Products" className="">
+                                {products?.map((product) => (
+                                  <CommandItem
+                                    key={product.id}
+                                    className="flex gap-2 font-light "
+                                    onSelect={() => {
+                                      field.onChange(
+                                        field.value.some(
+                                          (prod) => prod.id === product.id
+                                        )
+                                          ? field.value.filter(
+                                              (item) => item.id !== product.id
+                                            )
+                                          : [...field.value, product]
+                                      );
+                                    }}
                                   >
-                                    {(product as Product).name}
-                                    <button
-                                      className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                      aria-label={(product as Product).name}
-                                      onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                          handleUnselect(product as Product);
+                                    <div className="mr-2 flex aspect-square items-center justify-center rounded-md border border-border">
+                                      <Check
+                                        className={cn(
+                                          " h-4 w-4",
+                                          field.value.some(
+                                            (prod) => prod.id === product.id
+                                          )
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </div>
+                                    <div className="relative aspect-square h-6 rounded-lg ">
+                                      <Image
+                                        src={
+                                          product?.featuredImage ??
+                                          "/placeholder-image.webp"
                                         }
-                                      }}
-                                      onMouseDown={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                      }}
-                                      onClick={() =>
-                                        handleUnselect(product as Product)
-                                      }
-                                    >
-                                      <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                                    </button>
-                                  </Badge>
-                                );
-                              })}
-                              {/* Avoid having the "Search" Icon */}
-                              <CommandPrimitive.Input
-                                ref={inputRef}
-                                value={inputValue}
-                                onValueChange={setInputValue}
-                                onBlur={() => setProductsOpen(false)}
-                                onFocus={() => setProductsOpen(true)}
-                                placeholder={
-                                  products.length === 0
-                                    ? "Add some products first."
-                                    : "Select products..."
-                                }
-                                disabled={products.length === 0}
-                                className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-                              />
+                                        fill
+                                        sizes={"100vw"}
+                                        className="rounded-lg "
+                                        alt=""
+                                      />
+                                    </div>
+                                    {product.name}{" "}
+                                    <span className="sr-only">
+                                      {product.id}
+                                    </span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+
+                            <div className="absolute bottom-0  flex h-12 w-full items-center justify-end border-t border-t-zinc-200 px-2 py-4">
+                              <Button
+                                type="button"
+                                onClick={() => setProductOpen(false)}
+                                size={"sm"}
+                              >
+                                Done
+                              </Button>
                             </div>
+                          </CommandAdvancedDialog>
+                          <div>
+                            {field?.value?.map((product) => {
+                              return (
+                                <FormItem
+                                  className="flex h-14 items-center gap-4 border border-border px-4  odd:bg-zinc-100"
+                                  key={`selected_product_${product.id}`}
+                                >
+                                  {" "}
+                                  <div className="relative aspect-square h-6 rounded-lg ">
+                                    <Image
+                                      src={
+                                        (product as Product)?.featuredImage ??
+                                        "/placeholder-image.webp"
+                                      }
+                                      fill
+                                      sizes={"100vw"}
+                                      className="rounded-lg "
+                                      alt=""
+                                    />
+                                  </div>
+                                  <Link
+                                    href={`/admin/${storeId}/products/${product.id}`}
+                                    target="_blank"
+                                  >
+                                    <Button
+                                      type="button"
+                                      variant="link"
+                                      className="m-0 p-0"
+                                    >
+                                      {" "}
+                                      {(product as Product).name}
+                                    </Button>
+                                  </Link>
+                                  <div
+                                    className="ml-auto flex aspect-square cursor-pointer items-center justify-center rounded-md "
+                                    onClick={() => {
+                                      field.onChange(
+                                        field.value.some(
+                                          (prod) => prod.id === product.id
+                                        )
+                                          ? field.value.filter(
+                                              (item) => item.id !== product.id
+                                            )
+                                          : [...field.value, product]
+                                      );
+                                    }}
+                                  >
+                                    <X
+                                      className={cn(
+                                        " h-4 w-4",
+                                        field.value.some(
+                                          (prod) => prod.id === product.id
+                                        )
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </div>
+                                </FormItem>
+                              );
+                            })}
                           </div>
-                          <div className="relative mt-2">
-                            {productsOpen && selectables.length > 0 ? (
-                              <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-                                <CommandGroup className="h-full overflow-auto">
-                                  {selectables.map((product) => {
-                                    return (
-                                      <CommandItem
-                                        key={product.name}
-                                        onMouseDown={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }}
-                                        onSelect={() => {
-                                          setInputValue("");
-                                          form.setValue("products", [
-                                            ...field.value,
-                                            product,
-                                          ]);
-                                        }}
-                                        className={"cursor-pointer"}
-                                      >
-                                        {product.name}
-                                      </CommandItem>
-                                    );
-                                  })}
-                                </CommandGroup>
-                              </div>
-                            ) : null}
-                          </div>
-                        </Command>
+                        </>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

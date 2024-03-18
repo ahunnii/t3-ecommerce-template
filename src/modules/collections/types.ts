@@ -9,6 +9,12 @@ export type CollectionColumn = {
   id: string;
   storeId: string;
   name: string;
+  image:
+    | {
+        url: string;
+      }
+    | undefined
+    | null;
   products: {
     id: string;
     name: string;
