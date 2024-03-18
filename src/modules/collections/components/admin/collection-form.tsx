@@ -1,22 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Billboard, Product } from "@prisma/client";
-import { Command as CommandPrimitive } from "cmdk";
+import type { Product } from "@prisma/client";
+
 import { Check, Search, X } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
-  Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -34,14 +31,8 @@ import {
 } from "~/components/ui/form";
 
 import { Input } from "~/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 
+import type { TRPCError } from "@trpc/server";
 import Image from "next/image";
 import Link from "next/link";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
@@ -95,75 +86,55 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
     },
   });
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [productsOpen, setProductsOpen] = useState(false);
-
-  const [inputValue, setInputValue] = useState("");
-
-  const handleUnselect = useCallback((product: Product) => {
-    const current = form
-      .getValues("products")
-      .filter((s) => s.id !== product.id);
-    form.setValue("products", current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const input = inputRef.current;
-      if (input) {
-        if (e.key === "Delete" || e.key === "Backspace") {
-          if (input.value === "") {
-            const newSelected = [...form.getValues("products")];
-            newSelected.pop();
-
-            form.setValue("products", newSelected);
-          }
-        }
-        // This is not a default behaviour of the <input /> field
-        if (e.key === "Escape") {
-          input.blur();
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  const selectables = products.filter(
-    (product) => !form.getValues("products").includes(product)
-  );
-
   const updateCollection = api.collections.updateCollection.useMutation({
-    onSuccess: () => toastService.success(toastMessage),
-    onError: (error: unknown) =>
+    onSuccess: () => {
+      toastService.success(toastMessage);
+      router.push(`/admin/${storeId}/collections`);
+    },
+    onError: (error: unknown) => {
       toastService.error(
         "Something went wrong with updating your collection.",
         error
-      ),
+      );
+
+      if ((error as TRPCError)?.message?.includes("Collection_slug_key"))
+        form.setError("slug", {
+          type: "manual",
+          message: "Slug must be unique.",
+        });
+
+      if ((error as TRPCError)?.message?.includes("Collection_name_key"))
+        form.setError("name", {
+          type: "manual",
+          message: "Name must be unique.",
+        });
+    },
 
     onSettled: () => {
-      router.push(`/admin/${storeId}/collections`);
       void apiContext.collections.invalidate();
     },
   });
 
   const createCollection = api.collections.createCollection.useMutation({
-    onSuccess: () => toastService.success(toastMessage),
+    onSuccess: () => {
+      toastService.success(toastMessage);
+      router.push(`/admin/${storeId}/collections`);
+    },
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with creating your collection.",
         error
       ),
     onSettled: () => {
-      router.push(`/admin/${storeId}/collections`);
       void apiContext.collections.invalidate();
     },
   });
 
   const deleteCollection = api.collections.deleteCollection.useMutation({
-    onSuccess: () =>
-      toastService.success("Collection was successfully deleted"),
+    onSuccess: () => {
+      toastService.success("Collection was successfully deleted");
+      router.push(`/admin/${storeId}/collections`);
+    },
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with creating your collection.",
@@ -171,7 +142,6 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
       ),
 
     onSettled: () => {
-      router.push(`/admin/${storeId}/collections`);
       setOpen(false);
       void apiContext.collections.invalidate();
     },
@@ -200,12 +170,6 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
     createCollection.isLoading ||
     deleteCollection.isLoading;
 
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    if (initialData?.products) setSelectedProducts(initialData?.products);
-  }, [initialData?.products]);
-
   return (
     <>
       <Form {...form}>
@@ -220,8 +184,8 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
           <AdminFormHeader
             title={title}
             description={description}
-            contentName="Collection"
-            link={`/admin/${storeId}/collections/${collectionId ?? ""}`}
+            contentName="Collections"
+            link={`/admin/${storeId}/collections`}
           >
             {initialData && (
               <AlertModal
@@ -239,7 +203,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
           </AdminFormHeader>
 
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
-            <div className="flex w-8/12 flex-col space-y-4">
+            <div className=" flex w-full flex-col space-y-4 xl:w-8/12">
               <EditSection
                 title="Details"
                 description="Basic information on the Collection"
@@ -258,29 +222,10 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>
+                        Make sure the name is unique.
+                      </FormDescription>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="isFeatured"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Featured</FormLabel>
-                        <FormDescription>
-                          This collection will be featured on the homepage. It
-                          is recommended to have 3 to 4 featured collections at
-                          any one given time.
-                        </FormDescription>
-                      </div>
                     </FormItem>
                   )}
                 />
@@ -321,16 +266,20 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                         />
                       </FormControl>
                       <FormDescription>
-                        Used for SEO. Defaults to your collection name if left
-                        blank. MUST BE UNIQUE
+                        Used for better SEO within the collection URL. Defaults
+                        to your collection name if left blank. Must be unique
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <FormItem className="flex flex-col items-start  space-y-4 rounded-md border p-4">
-                  <FormLabel>Search Engine Preview</FormLabel>
-
+                  <div>
+                    <FormLabel>Search Engine Preview</FormLabel>
+                    <FormDescription>
+                      This is how your collection appears in search engines.
+                    </FormDescription>
+                  </div>
                   <div className="space-y-1 leading-none">
                     <FormLabel className=" mb-[0.125rem] break-words text-[1.125rem] leading-[1.3125rem] text-[#1a0dab]">
                       {form.watch("name")}
@@ -436,15 +385,14 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                               </Button>
                             </div>
                           </CommandAdvancedDialog>
-                          <div>
+                          <div className="flex w-full flex-col space-y-2 ">
                             {field?.value?.map((product) => {
                               return (
-                                <FormItem
-                                  className="flex h-14 items-center gap-4 border border-border px-4  odd:bg-zinc-100"
+                                <section
+                                  className="flex w-full items-center border  border-border px-4  py-2 odd:bg-zinc-100"
                                   key={`selected_product_${product.id}`}
                                 >
-                                  {" "}
-                                  <div className="relative aspect-square h-6 rounded-lg ">
+                                  <div className="relative my-auto aspect-square h-6 rounded-lg">
                                     <Image
                                       src={
                                         (product as Product)?.featuredImage ??
@@ -462,15 +410,15 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                                   >
                                     <Button
                                       type="button"
+                                      size={"sm"}
+                                      className=""
                                       variant="link"
-                                      className="m-0 p-0"
                                     >
-                                      {" "}
                                       {(product as Product).name}
                                     </Button>
                                   </Link>
                                   <div
-                                    className="ml-auto flex aspect-square cursor-pointer items-center justify-center rounded-md "
+                                    className="group ml-auto flex aspect-square cursor-pointer items-center justify-center rounded-md "
                                     onClick={() => {
                                       field.onChange(
                                         field.value.some(
@@ -485,7 +433,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                                   >
                                     <X
                                       className={cn(
-                                        " h-4 w-4",
+                                        " h-4 w-4 group-hover:text-zinc-600",
                                         field.value.some(
                                           (prod) => prod.id === product.id
                                         )
@@ -494,7 +442,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                                       )}
                                     />
                                   </div>
-                                </FormItem>
+                                </section>
                               );
                             })}
                           </div>
@@ -506,7 +454,30 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                 />
               </EditSection>
             </div>
-            <div className="flex w-4/12 flex-col space-y-4">
+            <div className="flex w-full flex-col space-y-4 xl:w-4/12">
+              {" "}
+              <FormField
+                control={form.control}
+                name="isFeatured"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Featured</FormLabel>
+                      <FormDescription>
+                        This collection will be featured on the homepage. It is
+                        recommended to have 3 to 4 featured collections at any
+                        one given time.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
               <EditSection
                 title="Media"
                 description="Add a cover image to the collection"

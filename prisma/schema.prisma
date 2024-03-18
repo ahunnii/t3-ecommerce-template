@@ -193,7 +193,7 @@ model Collection {
 
   isFeatured  Boolean      @default(false)
 
-  name    String
+  name    String  @unique
   description String? @db.Text
   slug    String? @unique
 

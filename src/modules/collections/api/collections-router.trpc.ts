@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import {
@@ -78,6 +79,7 @@ export const collectionsRouter = createTRPCRouter({
         name: z.string(),
         storeId: z.string().optional(),
         imageUrl: z.string(),
+        slug: z.string().optional(),
         alt: z.string().optional(),
         description: z.string().optional(),
         isFeatured: z.boolean(),
@@ -104,12 +106,16 @@ export const collectionsRouter = createTRPCRouter({
       const image = await ctx.prisma.image.create({
         data: { url: input.imageUrl, alt: input.alt ?? input.name },
       });
-
+      const initSlug =
+        input?.slug !== ""
+          ? input?.slug?.toLowerCase().replace(/ /g, "-")
+          : input.name.toLowerCase().replace(/ /g, "-");
       const collection = await ctx.prisma.collection.create({
         data: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           name: input.name,
           description: input.description,
+          slug: initSlug,
           imageId: image.id,
           isFeatured: input.isFeatured,
           products: {
@@ -129,6 +135,8 @@ export const collectionsRouter = createTRPCRouter({
         imageUrl: z.string(),
         alt: z.string().optional(),
         isFeatured: z.boolean(),
+        description: z.string().optional(),
+        slug: z.string().optional(),
 
         products: z.array(
           z.object({
@@ -144,39 +152,61 @@ export const collectionsRouter = createTRPCRouter({
           message: "You are not authorized to perform this action.",
         });
 
-      const collection = await ctx.prisma.collection.update({
-        where: {
-          id: input.collectionId,
-        },
-        data: {
-          name: input.name,
-          isFeatured: input.isFeatured,
-          image: {
-            upsert: {
-              create: {
-                url: input.imageUrl,
-                alt: input.alt ?? input.name,
-              },
-              update: {
-                url: input.imageUrl,
-                alt: input.alt ?? input.name,
+      const initSlug =
+        input?.slug !== ""
+          ? input?.slug?.toLowerCase().replace(/ /g, "-")
+          : input.name.toLowerCase().replace(/ /g, "-");
+
+      try {
+        const collection = await ctx.prisma.collection.update({
+          where: {
+            id: input.collectionId,
+          },
+          data: {
+            name: input.name,
+            isFeatured: input.isFeatured,
+            slug: initSlug,
+            image: {
+              upsert: {
+                create: {
+                  url: input.imageUrl,
+                  alt: input.alt ?? input.name,
+                },
+                update: {
+                  url: input.imageUrl,
+                  alt: input.alt ?? input.name,
+                },
               },
             },
+            products: {
+              set: [],
+            },
           },
-          products: {
-            set: [],
-          },
-        },
-      });
+        });
 
-      return ctx.prisma.collection.update({
-        where: { id: collection.id },
-        data: {
-          products: {
-            connect: input.products,
+        return ctx.prisma.collection.update({
+          where: { id: collection.id },
+          data: {
+            products: {
+              connect: input.products,
+            },
           },
-        },
-      });
+        });
+      } catch (error) {
+        if (
+          (error as TRPCError).code === "INTERNAL_SERVER_ERROR" &&
+          (error as TRPCError).message.includes("Collection_slug_key")
+        ) {
+          // Prisma's error code for unique constraint
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "A product collection with this slug already exists.",
+          });
+        } else {
+          // Handle other errors or re-throw
+          throw error;
+        }
+      }
     }),
 
   deleteCollection: protectedProcedure

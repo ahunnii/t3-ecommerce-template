@@ -100,7 +100,7 @@ export default function SearchSelectOptions({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="z-50 w-[200px] p-0"
+        className="z-[999] w-[200px] p-0"
         side="top"
         align="end"
         sideOffset={16}
@@ -111,6 +111,8 @@ export default function SearchSelectOptions({
         }}
       >
         <Command>
+          {" "}
+          <CommandInput placeholder="Type a command or search..." />
           <CommandList>
             <CommandGroup heading="Options">
               <CommandItem className="text-sm" onSelect={openSelectedProducts}>
