@@ -4,8 +4,7 @@ import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Plus, Trash } from "lucide-react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -25,14 +24,16 @@ import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
-import { ViewSection } from "~/components/common/sections/view-section.admin";
+
 import { Checkbox } from "~/components/ui/checkbox";
-import { Tag, TagInput } from "~/components/ui/tag-input";
-import ImageUpload from "~/services/image-upload/components/image-upload";
+
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
+import { cn } from "~/utils/styles";
 import { categoryFormSchema } from "../../schema";
 import type { Category, CategoryFormValues } from "../../types";
+import { AttributeSection } from "./attributes-section.form";
+import { CollectionSection } from "./collection-section.form";
 
 type Props = {
   initialData: Category | null;
@@ -59,7 +60,11 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
       name: initialData?.name ?? "",
-      attributes: initialData?.attributes ?? [],
+      attributes:
+        initialData?.attributes.map((attribute) => ({
+          ...attribute,
+          values: attribute.values.split(";").map((val) => ({ content: val })),
+        })) ?? [],
       description: initialData?.description ?? "",
 
       imageUrl: initialData?.collection?.image?.url ?? undefined,
@@ -67,11 +72,6 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
 
       createNewCollection: initialData?.collection?.id ? true : false,
     },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "attributes",
   });
 
   const updateCategory = api.categories.updateCategory.useMutation({
@@ -148,7 +148,14 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+        <form
+          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
+        >
           <AdminFormHeader
             title={title}
             description={description}
@@ -169,18 +176,33 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
               {action}
             </Button>
           </AdminFormHeader>
-          <AdminFormBody className="space-y-0">
-            <div className="flex w-8/12 flex-col space-y-4">
+          <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
+            <div
+              className={cn(
+                "flex w-full flex-col space-y-4 ",
+                form.watch("createNewCollection") && "xl:w-8/12"
+              )}
+            >
               <EditSection
                 title="Details"
                 description="Assign basic info about the category"
-                bodyClassName="space-y-4"
+                headerClassName={cn(
+                  !form.watch("createNewCollection") && "xl:w-4/12"
+                )}
+                bodyClassName={cn(
+                  "space-y-8 ",
+                  !form.watch("createNewCollection") && "xl:w-8/12 mt-0"
+                )}
+                className={cn(
+                  !form.watch("createNewCollection") &&
+                    "flex flex-col justify-between gap-8 xl:flex-row"
+                )}
               >
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="lg:max-w-sm">
                       <FormLabel>Name</FormLabel>
                       <FormControl>
                         <Input
@@ -189,128 +211,14 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription>
+                        Tip: This represents a type of product, so make sure it
+                        has a name that fits
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </EditSection>
-
-              <EditSection
-                title="Attributes"
-                description=" Attributes are common product types associated with this
-                category. Add attributes to quickly make variants of your
-                products. I.E. sizes, colors, materials, etc."
-                bodyClassName="space-y-4"
-              >
-                <FormDescription className="flex w-full gap-2">
-                  <span className="w-3/5 font-bold">
-                    Note: Variant values are a single string separated by a
-                    semicolon.(S;M;L;XL){" "}
-                  </span>
-
-                  <Button
-                    onClick={() => append({ name: "", values: "" })}
-                    type="button"
-                    className="w-2/5 gap-2"
-                  >
-                    <Plus className="h-5 w-5" />
-                    Add New
-                  </Button>
-                </FormDescription>
-
-                {fields.map((item, index) => (
-                  <div key={item.id} className="flex items-center space-x-4">
-                    <Controller
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Attribute (e.g., Size, Color)"
-                        />
-                      )}
-                      name={`attributes.${index}.name`}
-                      control={form.control}
-                      defaultValue={item.name}
-                    />
-
-                    <Controller
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="String of values i.e. S;M;L;XL"
-                        />
-                      )}
-                      name={`attributes.${index}.values`}
-                      control={form.control}
-                      defaultValue={item.values}
-                    />
-
-                    <Button
-                      onClick={() => remove(index)}
-                      variant="destructive"
-                      type="button"
-                    >
-                      <Trash className="h-5 w-5" />
-                    </Button>
-                  </div>
-                ))}
-              </EditSection>
-            </div>
-            <div className="flex w-4/12">
-              <EditSection
-                title="Collection"
-                description="Automatically create a collection based on this category."
-                bodyClassName="space-y-4"
-              >
-                {form.watch("createNewCollection") && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="imageUrl"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Featured Image</FormLabel>{" "}
-                          <FormDescription>
-                            Used to represent your product during checkout,
-                            social sharing and more.
-                          </FormDescription>
-                          <FormControl>
-                            <ImageUpload
-                              value={field.value ? [field.value] : []}
-                              disabled={loading}
-                              onChange={(url) => {
-                                field.onChange(url);
-                                return field.onChange(url);
-                              }}
-                              onRemove={() => form.setValue("imageUrl", "")}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="alt"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Alt Description</FormLabel>{" "}
-                          <FormDescription>
-                            Used for image SEO and accessibility.
-                          </FormDescription>
-                          <FormControl>
-                            <Input
-                              disabled={loading}
-                              placeholder="e.g. A black t-shirt on a white background."
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
 
                 {initialData?.collection ? (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
@@ -351,7 +259,30 @@ export const CategoryForm: React.FC<Props> = ({ initialData }) => {
                   />
                 )}
               </EditSection>
+              <EditSection
+                title="Attributes (optional)"
+                description=" Attributes are common product types associated with this
+    category. Add attributes to quickly make variants of your
+    products. I.E. sizes, colors, materials, etc."
+                headerClassName={cn(
+                  !form.watch("createNewCollection") && "xl:w-4/12"
+                )}
+                bodyClassName={cn(
+                  "space-y-8 ",
+                  !form.watch("createNewCollection") && "xl:w-8/12 mt-0"
+                )}
+                className={cn(
+                  !form.watch("createNewCollection") &&
+                    " flex flex-col justify-between gap-8 xl:flex-row"
+                )}
+              >
+                <AttributeSection form={form} />{" "}
+              </EditSection>
             </div>
+
+            {form.watch("createNewCollection") && (
+              <CollectionSection form={form} loading={loading} />
+            )}
           </AdminFormBody>{" "}
         </form>
       </Form>

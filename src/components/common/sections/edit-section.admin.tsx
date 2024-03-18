@@ -6,6 +6,7 @@ type Props = {
   children: React.ReactNode;
   title: string;
   description?: string;
+  headerClassName?: string;
   bodyClassName?: string;
   hasError?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -15,6 +16,7 @@ export const EditSection: FC<Props> = ({
   title,
   description,
   className,
+  headerClassName,
   bodyClassName,
   hasError,
 }) => {
@@ -25,10 +27,13 @@ export const EditSection: FC<Props> = ({
         className
       )}
     >
-      <FormLabel className={cn("", hasError && "text-red-500")}>
-        {title}
-      </FormLabel>{" "}
-      {description && <FormDescription>{description}</FormDescription>}
+      <div className={cn(headerClassName)}>
+        <FormLabel className={cn("", hasError && "text-red-500")}>
+          {title}
+        </FormLabel>{" "}
+        {description && <FormDescription>{description}</FormDescription>}
+      </div>
+
       <div className={cn("mt-5", bodyClassName)}>{children}</div>
     </div>
   );

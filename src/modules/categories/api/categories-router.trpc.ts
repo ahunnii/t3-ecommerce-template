@@ -1,3 +1,4 @@
+import { Attribute } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -92,6 +93,14 @@ export const categoriesRouter = createTRPCRouter({
           message: "You are not authorized to perform this action.",
         });
 
+      const attributes = input.attributes.map((att) => ({
+        name: att.name,
+        values: att.values
+          .filter((val) => val.content !== "")
+          .flatMap((val) => val.content)
+          .join(";"),
+        storeId: input.storeId,
+      }));
       const category = await ctx.prisma.category.create({
         data: {
           storeId: input.storeId,
@@ -100,7 +109,7 @@ export const categoriesRouter = createTRPCRouter({
           attributes: {
             createMany: {
               data: [
-                ...input.attributes.map(
+                ...attributes.map(
                   (attribute: {
                     name: string;
                     values: string;
@@ -198,6 +207,13 @@ export const categoriesRouter = createTRPCRouter({
           },
         });
       }
+      const attributes = input.attributes.map((att) => ({
+        name: att.name,
+        values: att.values
+          .filter((val) => val.content !== "")
+          .flatMap((val) => val.content)
+          .join(";"),
+      }));
 
       return ctx.prisma.category.update({
         where: { id: category.id },
@@ -205,7 +221,7 @@ export const categoriesRouter = createTRPCRouter({
           attributes: {
             createMany: {
               data: [
-                ...input.attributes.map(
+                ...attributes.map(
                   (attribute: { name: string; values: string }) => {
                     return { ...attribute, storeId: category.storeId };
                   }

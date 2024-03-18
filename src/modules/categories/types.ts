@@ -1,9 +1,9 @@
 import type { Prisma } from "@prisma/client";
 import type * as z from "zod";
-import type { categoryFormSchema } from "./schema";
+import type { attributeSchema, categoryFormSchema } from "./schema";
 
 export type CategoryFormValues = z.infer<typeof categoryFormSchema>;
-
+export type AttributeFormValues = z.infer<typeof attributeSchema>;
 export type Category = Prisma.CategoryGetPayload<{
   include: {
     attributes: true;
