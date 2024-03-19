@@ -12,8 +12,9 @@ import {
 } from "~/components/ui/card";
 
 import StoreSwitcher from "~/modules/admin/components/store-switcher";
+import { MainNavSublink } from "~/modules/navigation/admin/main-nav-sublink.wip";
 
-import { MainNav } from "~/modules/navigation/admin/main-nav";
+// import { MainNav } from "~/modules/navigation/admin/main-nav";
 import Navbar from "~/modules/navigation/admin/navbar";
 
 import { api } from "~/utils/api";
@@ -49,7 +50,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
               )}
             </div>
             <div className="flex-1 overflow-auto py-2">
-              <MainNav className="grid items-start px-4 text-sm font-medium lg:space-x-0" />
+              <MainNavSublink className="grid items-start px-4 text-sm font-medium lg:space-x-0" />
             </div>
             <div className="mt-auto p-4">
               <Card>

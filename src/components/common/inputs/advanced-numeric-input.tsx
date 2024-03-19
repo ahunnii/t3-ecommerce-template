@@ -32,6 +32,10 @@ export const AdvancedNumericInput = ({
           prependSpan && "pl-7",
           appendSpan && "pr-14"
         )}
+        min={prependSpan === "$" ? "0.01" : "0"}
+        step={prependSpan === "$" ? "0.01" : "1"}
+        // min="0.01"
+        // step="0.01"
         placeholder={placeholder ?? "0"}
         {...field}
       />

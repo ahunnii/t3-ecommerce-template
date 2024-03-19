@@ -10,6 +10,7 @@ interface ImageUploadProps {
   secure?: boolean;
   buttonClassName?: string;
   previewImages?: boolean;
+  isSimplifiedBtn?: boolean;
 
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
@@ -22,6 +23,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   onRemove,
   value,
   buttonClassName,
+  isSimplifiedBtn = false,
   secure = true,
   previewImages = true,
 }) => {
@@ -37,22 +39,44 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-4">
-        {previewImages &&
-          value.map((url) => (
-            <ImageUploadPreview
-              key={url}
-              url={url}
-              onRemove={onRemove}
-              className={value?.length > 1 ? "h-32 w-32" : ""}
-            />
-          ))}
-      </div>
+      {isSimplifiedBtn ? (
+        <>
+          <div className=" absolute z-40 flex flex-wrap items-center gap-4">
+            {previewImages &&
+              value.map((url) => (
+                <ImageUploadPreview
+                  key={url}
+                  url={url}
+                  onRemove={onRemove}
+                  className={"aspect-square h-10 w-10"}
+                  isSimplifiedBtn={isSimplifiedBtn}
+                />
+              ))}
+          </div>
+        </>
+      ) : (
+        <>
+          {" "}
+          <div className="mb-4 flex flex-wrap items-center gap-4">
+            {previewImages &&
+              value.map((url) => (
+                <ImageUploadPreview
+                  key={url}
+                  url={url}
+                  onRemove={onRemove}
+                  className={value?.length > 1 ? "h-32 w-32" : ""}
+                />
+              ))}
+          </div>
+        </>
+      )}
+
       <CloudinaryUpload
         disabled={disabled}
         onChange={onChange}
         secure={secure}
         buttonClassName={buttonClassName}
+        isSimplifiedBtn={isSimplifiedBtn}
       />
       {/* <UploadThingUpload disabled={disabled} onChange={onChange} /> */}
     </div>

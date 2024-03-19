@@ -12,6 +12,7 @@ import { getTotalRevenue } from "~/modules/admin-overview/actions/get-total-reve
 import { authenticateAdminOrOwner } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
+import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
@@ -43,10 +44,12 @@ const DashboardPage: FC<DashboardPageProps> = ({
       </Head>
 
       <AdminLayout>
-        <div className="flex h-full flex-col">
-          <div className="flex-1 space-y-4 p-8 pt-6">
+        <div className="mx-auto max-w-7xl space-y-4 p-8">
+          <div className="flex items-center justify-between">
             <Heading title="Dashboard" description="Overview of your store" />
-            <Separator />
+          </div>
+          <Separator />
+          <>
             <div className="grid grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -90,7 +93,7 @@ const DashboardPage: FC<DashboardPageProps> = ({
                 <Overview data={graphRevenue} />
               </CardContent>
             </Card>
-          </div>
+          </>
         </div>
       </AdminLayout>
     </>

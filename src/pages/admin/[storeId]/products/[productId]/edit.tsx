@@ -22,6 +22,7 @@ const ProductPage: FC<IProps> = ({ storeId, productId }) => {
 
   const { data: categories } = api.categories.getCategories.useQuery({
     storeId,
+    includeVariants: true,
   });
 
   return (

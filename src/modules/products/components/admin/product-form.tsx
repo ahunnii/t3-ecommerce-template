@@ -50,16 +50,28 @@ import {
 
 import { TagInput } from "~/components/ui/tag-input";
 
+import { TRPCError } from "@trpc/server";
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import MarkdownEditor from "../../../../components/common/inputs/markdown-editor";
 import { productFormSchema } from "../../schema";
 import type { ProductFormValues, SingleProduct } from "../../types";
-
+import { VariantProductFormSection } from "./variant-section.form";
 type ExtendedCategory = Category & { attributes: Attribute[] };
 type Props = {
   initialData: SingleProduct | null;
@@ -97,6 +109,8 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
           price: Number(variant.price),
           names: variant.names,
           quantity: variant.quantity,
+          imageUrl: variant?.imageUrl ?? undefined,
+          sku: variant?.sku ?? "",
         }))
       : [],
     shippingCost: initialData?.shippingCost ?? 0.0,
@@ -128,33 +142,41 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
       : [];
 
   const updateProduct = api.products.updateProduct.useMutation({
-    onSuccess: () => toastService.success(toastMessage),
+    onSuccess: () => {
+      toastService.success(toastMessage);
+      router.push(`/admin/${storeId}/products`);
+    },
     onError: (error: unknown) =>
       toastService.error(
-        "Something went wrong with updating the product",
+        (error as TRPCError).message,
+        // "Something went wrong with updating the product",
         error
       ),
     onSettled: () => {
-      router.push(`/admin/${storeId}/products`);
       void apiContext.products.getProduct.invalidate();
     },
   });
 
   const createProduct = api.products.createProduct.useMutation({
-    onSuccess: () => toastService.success(toastMessage),
+    onSuccess: () => {
+      toastService.success(toastMessage);
+      router.push(`/admin/${storeId}/products`);
+    },
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with creating the product",
         error
       ),
     onSettled: () => {
-      router.push(`/admin/${storeId}/products`);
       void apiContext.products.invalidate();
     },
   });
 
   const deleteProduct = api.products.deleteProduct.useMutation({
-    onSuccess: () => toastService.success("Product was successfully deleted"),
+    onSuccess: () => {
+      toastService.success("Product was successfully deleted");
+      router.push(`/admin/${storeId}/products`);
+    },
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong with deleting the product",
@@ -162,7 +184,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
       ),
     onSettled: () => {
       setOpen(false);
-      router.push(`/admin/${storeId}/products`);
+
       void apiContext.products.invalidate();
     },
   });
@@ -229,7 +251,8 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
 
     return generatedVariations;
   };
-
+  const [onCategoryOpen, setOnCategoryOpen] = useState(false);
+  const [handleOnClick, setHandleOnClick] = useState<() => void>(() => void 0);
   const { fields, remove, replace } = useFieldArray({
     control: form.control,
     name: "variants",
@@ -301,9 +324,55 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
+                        <AlertDialog
+                          open={onCategoryOpen}
+                          onOpenChange={setOnCategoryOpen}
+                        >
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action will wipe out existing variants.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() =>
+                                  form.setValue(
+                                    "categoryId",
+                                    initialData?.categoryId ?? ""
+                                  )
+                                }
+                                type="button"
+                              >
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => {
+                                  if (handleOnClick) {
+                                    handleOnClick();
+                                  }
+                                }}
+                                type="button"
+                              >
+                                {" "}
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+
                         <Select
                           disabled={loading}
-                          onValueChange={field.onChange}
+                          onValueChange={(e) => {
+                            setOnCategoryOpen(true);
+                            setHandleOnClick(() => {
+                              field.onChange(e);
+                              form.setValue("variants", []);
+                            });
+                          }}
                           value={field.value}
                           defaultValue={field.value}
                         >
@@ -327,6 +396,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="productType"
@@ -551,125 +621,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                   />
                 </div>
               </EditSection>
-              <EditSection
-                title="Variations"
-                description="                Create variations for customers to choose from. Note
-                        that these will override your default values above."
-              >
-                <FormField
-                  control={form.control}
-                  name="variants"
-                  render={({ field }) => (
-                    <>
-                      {category === undefined ? (
-                        <p className="leading-7 text-primary [&:not(:first-child)]:mt-6">
-                          Choose a category first
-                        </p>
-                      ) : (
-                        <div className="my-5 flex gap-5">
-                          <Button
-                            variant={"secondary"}
-                            className="my-2"
-                            type="button"
-                            onClick={() => replace(handleGenerateVariations())}
-                          >
-                            Generate Variations
-                          </Button>
-                          <Button
-                            variant={"destructive"}
-                            className="my-2"
-                            type="button"
-                            onClick={() => replace([])}
-                          >
-                            Delete all Variations
-                          </Button>
-                        </div>
-                      )}
-                      {field.value.length > 0 && (
-                        <div className="my-5 max-h-96 overflow-y-auto">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                {/* <TableHead className="w-[100px]">ID</TableHead> */}
-                                {currentAttributes?.length > 0 &&
-                                  currentAttributes
-                                    .map((attribute) => attribute.name)
-                                    .map((name) => (
-                                      <TableHead key={name}>{name}</TableHead>
-                                    ))}
-                                <TableHead className="">Quantity</TableHead>
-                                <TableHead>$ Price</TableHead>
-                                <TableHead className="text-right">
-                                  Delete Variant
-                                </TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {fields.map((item, index) => (
-                                <TableRow key={item.id}>
-                                  {/* <TableCell className="font-medium">
-                                VAR00{index}
-                              </TableCell> */}
-                                  {item?.values?.split(", ").map((name) => (
-                                    <TableCell key={name}>{name}</TableCell>
-                                  ))}
-                                  <TableCell>
-                                    <Controller
-                                      render={({ field }) => (
-                                        <Input
-                                          {...field}
-                                          type="number"
-                                          placeholder="Attribute (e.g., Size)"
-                                          onChange={(e) =>
-                                            field.onChange(
-                                              Number(e.target.value)
-                                            )
-                                          }
-                                        />
-                                      )}
-                                      name={`variants.${index}.quantity`}
-                                      control={form.control}
-                                      defaultValue={Number(item.quantity)}
-                                    />
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    {" "}
-                                    <Controller
-                                      render={({ field }) => (
-                                        <Input
-                                          {...field}
-                                          type="number"
-                                          placeholder="Value (e.g., M, Red)"
-                                          onChange={(e) =>
-                                            field.onChange(
-                                              Number(e.target.value)
-                                            )
-                                          }
-                                        />
-                                      )}
-                                      name={`variants.${index}.price`}
-                                      control={form.control}
-                                      defaultValue={Number(item.price)}
-                                    />{" "}
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <Button
-                                      onClick={() => remove(index)}
-                                      variant="destructive"
-                                    >
-                                      <Trash className="h-4 w-4" />
-                                    </Button>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      )}
-                    </>
-                  )}
-                />
-              </EditSection>
+              <VariantProductFormSection form={form} categories={categories} />
               <EditSection
                 title="Shipping"
                 description=" Measurements and weight are used to calculate shipping rates.  Measurements are in inches."

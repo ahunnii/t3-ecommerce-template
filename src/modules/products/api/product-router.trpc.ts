@@ -410,6 +410,8 @@ export const productsRouter = createTRPCRouter({
             values: z.string(),
             price: z.number(),
             quantity: z.number(),
+            sku: z.string().optional(),
+            imageUrl: z.string().optional(),
           })
         ),
         tags: z.array(z.object({ name: z.string() })),
@@ -467,6 +469,28 @@ export const productsRouter = createTRPCRouter({
                 },
               },
             },
+          });
+        }
+
+        const existingVariants = await ctx.prisma.variation.findMany({
+          where: {
+            productId: input.productId,
+          },
+          select: {
+            sku: true,
+          },
+        });
+
+        const duplicateSkus = input.variants.filter((variant) =>
+          existingVariants.some(
+            (existingVariant) => existingVariant.sku === variant.sku
+          )
+        );
+
+        if (duplicateSkus.length > 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Duplicate SKUs found.",
           });
         }
 
@@ -563,7 +587,14 @@ export const productsRouter = createTRPCRouter({
                       values: string;
                       price: number;
                       quantity: number;
-                    }) => variant
+                      sku?: string;
+                      imageUrl?: string;
+                    }) => ({
+                      ...variant,
+                      sku: variant.sku === "" ? null : variant.sku,
+                      imageUrl:
+                        variant.imageUrl === "" ? null : variant.imageUrl,
+                    })
                   ),
                 ],
               },

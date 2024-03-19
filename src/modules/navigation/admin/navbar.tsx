@@ -4,11 +4,11 @@ import { Home, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 import StoreSwitcher from "~/modules/admin/components/store-switcher";
 // import { ThemeToggle } from "~/modules/admin/components/theme-toggle";
-import { MainNav } from "~/modules/navigation/admin/main-nav";
 
 import Link from "next/link";
 import { Button } from "../../../components/ui/button";
 import { AdminSearch } from "./admin-search";
+import { MainNavSublink } from "./main-nav-sublink.wip";
 const Navbar = ({ stores }: { stores: Store[] }) => {
   return (
     <div className="w-full border-b shadow-sm ">
@@ -25,7 +25,7 @@ const Navbar = ({ stores }: { stores: Store[] }) => {
                 {stores?.length > 0 && <StoreSwitcher items={stores} />}
               </div>
               <div className="flex-1 overflow-auto py-2">
-                <MainNav className="grid items-start px-4 text-sm font-medium lg:space-x-0" />
+                <MainNavSublink className="grid items-start px-4 text-sm font-medium lg:space-x-0" />
               </div>
             </div>
           </SheetContent>

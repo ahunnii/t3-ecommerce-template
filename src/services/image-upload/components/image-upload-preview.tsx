@@ -8,22 +8,31 @@ import { cn } from "~/utils/styles";
 type ImageUploadPreviewProps = {
   url: string;
   onRemove: (value: string) => void;
+  isSimplifiedBtn?: boolean;
 } & HTMLAttributes<ElementRef<"div">>;
 export const ImageUploadPreview = forwardRef<
   ElementRef<"div">,
   ImageUploadPreviewProps
->(({ className, url, onRemove, ...props }) => {
+>(({ className, url, onRemove, isSimplifiedBtn, ...props }) => {
   return (
     <div
       className={cn("relative h-48 w-48 overflow-hidden rounded-md", className)}
       {...props}
     >
-      <div className="absolute right-2 top-2 z-10">
+      <div
+        className={cn(
+          "absolute right-2 top-2 z-10",
+          isSimplifiedBtn && "right-0 top-0 h-5 w-5 "
+        )}
+      >
         <Button
           type="button"
           onClick={() => onRemove(url)}
           variant="destructive"
           size="sm"
+          className={cn(
+            isSimplifiedBtn && "m-0 h-5 w-5 rounded-full p-0 hover:bg-red-400"
+          )}
         >
           <Trash className="h-4 w-4" />
         </Button>

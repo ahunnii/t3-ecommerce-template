@@ -552,6 +552,8 @@ model Variation {
   price      Float
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  sku        String?      @unique
+  imageUrl   String?
 
   cartItems CartItem[] // Relation to Order model
 

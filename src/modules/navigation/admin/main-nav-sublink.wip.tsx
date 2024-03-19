@@ -25,7 +25,7 @@ interface MainNavProps extends HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
+export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
   const { asPath, query } = useRouter();
   const { storeId } = query as { storeId: string };
   const { data: orders } = api.orders.getAllOrders.useQuery({
@@ -44,7 +44,7 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
   const routes: Route[] = [
     {
       href: `/admin/${encodedStoreId}`,
-      label: "Overview",
+      label: "Overvieww",
       active: asPath === `/admin/${encodedStoreId}`,
       Icon: Home,
     },
@@ -70,14 +70,14 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
       Icon: Shirt,
       subRoutes: [
         {
-          href: `/admin/${encodedStoreId}/categories`,
-          label: "Categories",
-          active: asPath === `/admin/${encodedStoreId}/categories`,
-        },
-        {
           href: `/admin/${encodedStoreId}/collections`,
           label: "Collections",
           active: asPath === `/admin/${encodedStoreId}/collections`,
+        },
+        {
+          href: `/admin/${encodedStoreId}/categories`,
+          label: "Product Categories",
+          active: asPath === `/admin/${encodedStoreId}/categories`,
         },
       ],
     },
