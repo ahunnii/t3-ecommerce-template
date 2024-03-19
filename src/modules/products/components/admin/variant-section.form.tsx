@@ -1,4 +1,4 @@
-import { useMemo, useState, type FC } from "react";
+import { useEffect, useMemo, useRef, useState, type FC } from "react";
 
 import type { Attribute, Category, Prisma } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
@@ -8,6 +8,7 @@ import {
   Currency,
   DollarSign,
   MoreHorizontal,
+  MoreVertical,
   Trash,
   User,
 } from "lucide-react";
@@ -82,7 +83,12 @@ type VariantColumn = {
 };
 
 export const VariantProductFormSection = ({ form, categories }: Props) => {
+  const [openPrice, setOpenPrice] = useState(false);
+
+  const [openQuantity, setOpenQuantity] = useState(false);
+
   const [open, setOpen] = useState(false);
+
   const currentAttributes: Attribute[] = useMemo(() => {
     return categories && form.watch("categoryId")
       ? categories.filter((cat) => cat.id === form.watch("categoryId"))[0]!
@@ -241,18 +247,18 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
 
                 <DropdownMenu open={open} onOpenChange={setOpen}>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal />
+                    <Button variant="outline" className="my-2">
+                      More Options...
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[200px]">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setOpenPrice(true)}>
                         <DollarSign className="mr-2 h-4 w-4" />
                         Set all prices to...
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setOpenQuantity(true)}>
                         <Boxes className="mr-2 h-4 w-4" />
                         Set all quantities...
                       </DropdownMenuItem>
@@ -309,9 +315,113 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
               ignoreColumns={["values", "actions", "imageUrl"]}
               renderSelect={currentAttributes}
             />
+
+            <AdjustVariationsDialog
+              open={openPrice}
+              setOpen={setOpenPrice}
+              title="Price"
+              onAccept={(value) => {
+                const newVariants = field.value.map((variant) => ({
+                  ...variant,
+                  price: Number(value),
+                }));
+
+                replace(newVariants);
+
+                console.log(value);
+                setOpenPrice(false);
+              }}
+            />
+
+            <AdjustVariationsDialog
+              open={openQuantity}
+              setOpen={setOpenQuantity}
+              title="Quantity"
+              onAccept={(value) => {
+                const newVariants = field.value.map((variant) => ({
+                  ...variant,
+                  quantity: Number(value),
+                }));
+
+                replace(newVariants);
+
+                console.log(value);
+                setOpenQuantity(false);
+              }}
+            />
           </>
         )}
       />
     </EditSection>
   );
 };
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+
+import { Label } from "~/components/ui/label";
+
+export function AdjustVariationsDialog({
+  title,
+  onAccept,
+  open,
+  setOpen,
+}: {
+  title: string;
+  onAccept: (e: number | string) => void;
+  open: boolean;
+  setOpen: (e: boolean) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setTimeout(() => {
+        document.body.style.pointerEvents = "";
+      }, 500);
+    }
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            Set all variant {title.toLowerCase()}s to the same value.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="username" className="text-right">
+              {title}
+            </Label>
+            <Input
+              type="number"
+              defaultValue="0"
+              min="0"
+              className="col-span-3"
+              ref={inputRef}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            type="button"
+            disabled={!inputRef?.current?.value}
+            onClick={() => onAccept(inputRef.current!.value)}
+          >
+            Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
