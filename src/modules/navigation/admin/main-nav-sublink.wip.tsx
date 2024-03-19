@@ -16,6 +16,7 @@ import {
   StickyNote,
   Tags,
 } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/utils/styles";
 import { Badge } from "../../../components/ui/badge";
@@ -24,15 +25,29 @@ import { Route } from "./types";
 interface MainNavProps extends HTMLAttributes<HTMLElement> {
   className?: string;
 }
+export function useActivePath(): (path: string) => boolean {
+  const { query } = useRouter();
+  const { storeId } = query as { storeId: string };
+  const pathname = usePathname();
+
+  const checkActivePath = (path: string) => {
+    if (path === `/admin/${encodeURIComponent(storeId)}` && pathname !== path) {
+      return false;
+    }
+    return pathname.startsWith(path);
+  };
+
+  return checkActivePath;
+}
 
 export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
-  const { asPath, query } = useRouter();
+  const { asPath, query, pathname } = useRouter();
   const { storeId } = query as { storeId: string };
   const { data: orders } = api.orders.getAllOrders.useQuery({
     storeId,
     searchParams: { isShipped: false },
   });
-
+  const checkActivePath = useActivePath();
   const { data: customOrders } = api.customOrder.getCustomRequests.useQuery({
     storeId,
   });
@@ -45,20 +60,20 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
     {
       href: `/admin/${encodedStoreId}`,
       label: "Overvieww",
-      active: asPath === `/admin/${encodedStoreId}`,
+      active: checkActivePath(`/admin/${encodedStoreId}`),
       Icon: Home,
     },
 
     {
       href: `/admin/${encodedStoreId}/orders`,
       label: `Orders`,
-      active: asPath === `/admin/${encodedStoreId}/orders`,
+      active: checkActivePath(`/admin/${encodedStoreId}/orders`),
       Icon: Inbox,
       subRoutes: [
         {
           href: `/admin/${encodedStoreId}/shipping`,
           label: `Shipping Labels`,
-          active: asPath === `/admin/${encodedStoreId}/shipping`,
+          active: checkActivePath(`/admin/${encodedStoreId}/shipping`),
         },
       ],
     },
@@ -66,18 +81,18 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
     {
       href: `/admin/${encodedStoreId}/products`,
       label: "Products",
-      active: asPath === `/admin/${encodedStoreId}/products`,
+      active: checkActivePath(`/admin/${encodedStoreId}/products`),
       Icon: Shirt,
       subRoutes: [
         {
           href: `/admin/${encodedStoreId}/collections`,
           label: "Collections",
-          active: asPath === `/admin/${encodedStoreId}/collections`,
+          active: checkActivePath(`/admin/${encodedStoreId}/collections`),
         },
         {
           href: `/admin/${encodedStoreId}/categories`,
           label: "Product Categories",
-          active: asPath === `/admin/${encodedStoreId}/categories`,
+          active: checkActivePath(`/admin/${encodedStoreId}/categories`),
         },
       ],
     },
@@ -85,33 +100,33 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
     {
       href: `/admin/${encodedStoreId}/discounts`,
       label: `Discounts`,
-      active: asPath === `/admin/${encodedStoreId}/discounts`,
+      active: checkActivePath(`/admin/${encodedStoreId}/discounts`),
       Icon: Tags,
     },
 
     {
       href: `/admin/${encodedStoreId}/custom-orders`,
       label: `Custom Requests`,
-      active: asPath === `/admin/${encodedStoreId}/custom-orders`,
+      active: checkActivePath(`/admin/${encodedStoreId}/custom-orders`),
       Icon: Boxes,
     },
     {
       href: `/admin/${encodedStoreId}/blog-posts`,
       label: "Blog Posts",
-      active: asPath === `/admin/${encodedStoreId}/blog-posts`,
+      active: checkActivePath(`/admin/${encodedStoreId}/blog-posts`),
       Icon: StickyNote,
     },
     {
       href: `/admin/${encodedStoreId}/gallery`,
       label: "Gallery",
-      active: asPath === `/admin/${encodedStoreId}/gallery`,
+      active: checkActivePath(`/admin/${encodedStoreId}/gallery`),
       Icon: Image,
     },
 
     {
       href: `/admin/${encodedStoreId}/settings`,
       label: "Settings",
-      active: asPath === `/admin/${encodedStoreId}/settings`,
+      active: checkActivePath(`/admin/${encodedStoreId}/settings`),
       Icon: Settings,
     },
   ];

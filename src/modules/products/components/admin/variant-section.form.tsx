@@ -1,51 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type FC } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { Attribute, Category, Prisma } from "@prisma/client";
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  Boxes,
-  Calendar,
-  Currency,
-  DollarSign,
-  MoreHorizontal,
-  MoreVertical,
-  Trash,
-  User,
-} from "lucide-react";
-import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
+import type { Attribute, Prisma } from "@prisma/client";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Boxes, DollarSign, Trash } from "lucide-react";
+import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
-import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
+
 import { AdvancedDataTableForm } from "~/components/common/tables/advanced-data-table-form";
 import { Button } from "~/components/ui/button";
-import { FormDescription, FormField, FormLabel } from "~/components/ui/form";
+import { FormField } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "~/components/ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,13 +19,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-import { uniqueId } from "lodash";
 import type { ProductFormValues } from "../../types";
 
 type Props = {
@@ -82,6 +43,54 @@ type VariantColumn = {
   [value: string]: string | number;
 };
 
+const columns: ColumnDef<VariantColumn>[] = [
+  {
+    accessorKey: "imageUrl",
+    header: "Image",
+  },
+
+  {
+    accessorKey: "values",
+    header: "Attribute Values",
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-col gap-2 ">
+          <span className="text-xs text-muted-foreground">
+            {row.original.names}
+          </span>
+          <span> {row.original.values}</span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "quantity",
+    header: "In Stock",
+  },
+
+  {
+    accessorKey: "price",
+    header: "Price",
+    cell: ({ row }) => {
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(row.original.price);
+
+      return <div>{formatted}</div>;
+    },
+  },
+
+  // {
+  //   accessorKey: "sku",
+  //   header: "SKU (optional)",
+  // },
+
+  {
+    id: "actions",
+  },
+];
+
 export const VariantProductFormSection = ({ form, categories }: Props) => {
   const [openPrice, setOpenPrice] = useState(false);
 
@@ -95,57 +104,6 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
           .attributes
       : [];
   }, [categories, form]);
-
-  const columns: ColumnDef<VariantColumn>[] = useMemo(
-    () => [
-      {
-        accessorKey: "imageUrl",
-        header: "Image",
-      },
-
-      {
-        accessorKey: "values",
-        header: "Attribute Values",
-        cell: ({ row }) => {
-          return (
-            <div className="flex flex-col gap-2 ">
-              <span className="text-xs text-muted-foreground">
-                {row.original.names}
-              </span>
-              <span> {row.original.values}</span>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "quantity",
-        header: "In Stock",
-      },
-
-      {
-        accessorKey: "price",
-        header: "Price",
-        cell: ({ row }) => {
-          const formatted = new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-          }).format(row.original.price);
-
-          return <div>{formatted}</div>;
-        },
-      },
-
-      // {
-      //   accessorKey: "sku",
-      //   header: "SKU (optional)",
-      // },
-
-      {
-        id: "actions",
-      },
-    ],
-    [currentAttributes]
-  );
 
   const handleGenerateVariations = () => {
     function splitValues(attribute: Attribute): string[] {
@@ -188,7 +146,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
     return generatedVariations;
   };
 
-  const { fields, remove, replace, prepend } = useFieldArray({
+  const { replace, prepend } = useFieldArray({
     control: form.control,
     name: "variants",
   });
@@ -363,7 +321,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
 
 import { Label } from "~/components/ui/label";
