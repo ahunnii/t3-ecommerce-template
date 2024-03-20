@@ -1,4 +1,5 @@
 import type { UseFormReturn } from "react-hook-form";
+import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
 import {
   FormControl,
@@ -37,25 +38,27 @@ export const ShippingSection = ({
             name="estimatedCompletion"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Estimated Completion</FormLabel>
+                <FormLabel>Estimated Completion (optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
+                  <AdvancedNumericInput
                     disabled={loading}
                     placeholder="e.g 48"
                     min={0}
-                    {...field}
+                    field={field}
+                    appendSpan="days"
+                    appendClassName="pr-4"
                   />
                 </FormControl>
                 <FormDescription>
-                  In days, roughly how long would it take you to make & ship out
-                  the product?
+                  This helps the customer know when to expect their order. If
+                  you have inventory on hand, you can set this to 0 to indicate
+                  that the item is ready to ship immediately.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="shippingType"
             render={({ field }) => (
@@ -86,26 +89,27 @@ export const ShippingSection = ({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           {form.watch("shippingType") === "FLAT_RATE" && (
             <FormField
               control={form.control}
               name="shippingCost"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Handling Fees</FormLabel>
+                  <FormLabel>Handling Fees (optional)</FormLabel>
                   <FormControl>
-                    <Input
+                    <AdvancedNumericInput
                       type="number"
                       disabled={loading}
                       placeholder="1"
                       min={0}
-                      {...field}
+                      field={field}
+                      prependSpan="$"
                     />
                   </FormControl>
                   <FormDescription>
-                    Optional: Are there any additional fees needing to be paid
-                    to ship this item out? Defaults to $0
+                    Set any additional fees for handling and packaging. This
+                    gets added to the shipping cost at checkout.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -122,20 +126,14 @@ export const ShippingSection = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <>
-                        <div className="relative ">
-                          <Input
-                            type="number"
-                            disabled={loading}
-                            className="block w-full rounded-md py-1.5 pr-7  text-gray-900     sm:text-sm sm:leading-6"
-                            placeholder="0.00"
-                            {...field}
-                          />
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span className="text-gray-500 sm:text-sm">lb</span>
-                          </div>
-                        </div>
-                      </>
+                      <AdvancedNumericInput
+                        type="number"
+                        disabled={loading}
+                        placeholder="e.g. 1"
+                        field={field}
+                        appendSpan="lb"
+                        min="0"
+                      />
                     </FormControl>
 
                     <FormMessage />
@@ -149,20 +147,14 @@ export const ShippingSection = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <>
-                        <div className="relative ">
-                          <Input
-                            type="number"
-                            disabled={loading}
-                            className="block w-full rounded-md py-1.5 pr-7  text-gray-900     sm:text-sm sm:leading-6"
-                            placeholder="0.00"
-                            {...field}
-                          />
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span className="text-gray-500 sm:text-sm">oz</span>
-                          </div>
-                        </div>
-                      </>
+                      <AdvancedNumericInput
+                        type="number"
+                        disabled={loading}
+                        placeholder="e.g. 10"
+                        field={field}
+                        min="0"
+                        appendSpan="oz"
+                      />
                     </FormControl>
 
                     <FormMessage />

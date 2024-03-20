@@ -14,6 +14,7 @@ import { productsRouter } from "~/modules/products/api/product-router.trpc";
 
 import { customRouter } from "~/modules/custom-orders/api/custom-order-router.trpc";
 import { discountRouter } from "~/modules/discounts/api/discount-router.trpc";
+import { cloudinaryRouter } from "~/services/image-upload/api/cloudinary-router.trpc";
 import { userRouter } from "./routers/users";
 
 /**
@@ -33,6 +34,7 @@ export const appRouter = createTRPCRouter({
   users: userRouter,
 
   shippingLabels: shippingLabelRouter,
+  mediaUpload: cloudinaryRouter,
 
   // Add your routers here
   customOrder: customRouter,

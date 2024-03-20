@@ -30,7 +30,7 @@ export const AttributeSection = ({
   return (
     <EditSection
       title="Attributes"
-      description=" Used for searching, SEO, and other info on products."
+      description="Used to help customers find your product in search as well as provide additional information about your product."
       bodyClassName="space-y-4"
     >
       <div className="my-5 gap-8 md:grid md:grid-cols-2 ">

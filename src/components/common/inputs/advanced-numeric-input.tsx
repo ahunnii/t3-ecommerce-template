@@ -8,13 +8,16 @@ type Props = {
   loading?: boolean;
   field: FieldValues;
   placeholder?: string;
-};
+  appendClassName?: string;
+} & React.InputHTMLAttributes<HTMLInputElement>;
 export const AdvancedNumericInput = ({
   appendSpan,
   prependSpan,
   loading,
   field,
   placeholder,
+  appendClassName,
+  ...props
 }: Props) => {
   return (
     <div className="relative ">
@@ -38,11 +41,17 @@ export const AdvancedNumericInput = ({
         // step="0.01"
         placeholder={placeholder ?? "0"}
         {...field}
+        {...props}
       />
 
       {appendSpan && (
         <div className="absolute inset-y-0 right-0 flex items-center">
-          <span className="py-0 pl-2 pr-7 text-gray-500 sm:text-sm">
+          <span
+            className={cn(
+              "py-0 pl-2 pr-7 text-gray-500 sm:text-sm",
+              appendClassName
+            )}
+          >
             {appendSpan}
           </span>
         </div>

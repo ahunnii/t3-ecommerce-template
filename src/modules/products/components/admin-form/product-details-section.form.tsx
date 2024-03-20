@@ -76,6 +76,28 @@ export const ProductDetailsSection = ({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Slug (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={loading}
+                  placeholder="e.g. cool-hat"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Used in the URL. If left empty, it will be generated from the
+                name. Must be unique.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="categoryId"
@@ -146,12 +168,16 @@ export const ProductDetailsSection = ({
                   ))}
                 </SelectContent>
               </Select>
+              <FormDescription>
+                Each category has its own set of attributes that the product can
+                have access to (i.e. Size and Material)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="productType"
           render={({ field }) => (
@@ -180,7 +206,7 @@ export const ProductDetailsSection = ({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         {fields.length === 0 && (
           <FormField
             control={form.control}
@@ -204,6 +230,8 @@ export const ProductDetailsSection = ({
                       disabled={loading}
                       className="block w-full rounded-md py-1.5 pl-7  text-gray-900     sm:text-sm sm:leading-6"
                       placeholder="0.00"
+                      min="0.01"
+                      step="0.01"
                       {...field}
                     />
                   </div>
@@ -216,10 +244,23 @@ export const ProductDetailsSection = ({
         )}
 
         {fields.length !== 0 && (
-          <FormItem>
-            <FormLabel>Price</FormLabel>
-            <FormDescription>Price is set within variants.</FormDescription>
-          </FormItem>
+          <>
+            <FormItem>
+              <FormLabel>Price</FormLabel>
+              <FormDescription>
+                You have variants generated. Pricing is set within the variant
+                section below.
+              </FormDescription>
+            </FormItem>
+
+            <FormItem>
+              <FormLabel>Quantity</FormLabel>
+              <FormDescription>
+                You have variants generated. Quantity is set within the variant
+                section below.
+              </FormDescription>
+            </FormItem>
+          </>
         )}
 
         {fields.length === 0 && (

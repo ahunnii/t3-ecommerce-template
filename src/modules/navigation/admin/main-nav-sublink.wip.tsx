@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import type { FC, HTMLAttributes } from "react";
+import { Fragment, type FC, type HTMLAttributes } from "react";
 import { api } from "~/utils/api";
 
-import { indexOf } from "lodash";
+import { indexOf, uniqueId } from "lodash";
 import {
   Boxes,
   CornerDownRight,
@@ -11,6 +11,7 @@ import {
   Image,
   Inbox,
   LucideIcon,
+  Server,
   Settings,
   Shirt,
   StickyNote,
@@ -59,7 +60,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
   const routes: Route[] = [
     {
       href: `/admin/${encodedStoreId}`,
-      label: "Overvieww",
+      label: "Overview",
       active: checkActivePath(`/admin/${encodedStoreId}`),
       Icon: Home,
     },
@@ -122,7 +123,21 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
       active: checkActivePath(`/admin/${encodedStoreId}/gallery`),
       Icon: Image,
     },
-
+    {
+      href: `/admin/${encodedStoreId}/services`,
+      label: "Services",
+      active: checkActivePath(`/admin/${encodedStoreId}/services`),
+      Icon: Server,
+      subRoutes: [
+        {
+          href: `/admin/${encodedStoreId}/services/media-uploads`,
+          label: "Media Uploads",
+          active: checkActivePath(
+            `/admin/${encodedStoreId}/services/media-uploads`
+          ),
+        },
+      ],
+    },
     {
       href: `/admin/${encodedStoreId}/settings`,
       label: "Settings",
@@ -137,9 +152,9 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
       {...props}
     >
       {routes.map((route) => (
-        <>
+        <Fragment key={uniqueId()}>
           <Link
-            key={route.href}
+            key={`${route.href}-${uniqueId()}`}
             href={route.href}
             className={cn(
               "relative flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
@@ -172,7 +187,12 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
           {(route.active ||
             (route.subRoutes &&
               route.subRoutes.some((subRoute) => subRoute.active))) && (
-            <div className="relative  flex flex-col space-y-3 py-2">
+            <div
+              className={cn(
+                "relative  flex flex-col space-y-3 ",
+                route.subRoutes && "py-2"
+              )}
+            >
               {route.subRoutes?.map((subRoute, idx) => {
                 const threshold = route?.subRoutes?.findIndex(
                   (sr) => sr.active
@@ -180,7 +200,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
 
                 return (
                   <Link
-                    key={subRoute.href}
+                    key={`${subRoute.href}-${uniqueId()}`}
                     href={subRoute.href}
                     className={cn(
                       "group  relative flex items-center gap-2 rounded-lg px-3  py-0 font-normal text-zinc-400 transition-all hover:text-zinc-700",
@@ -210,7 +230,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
               })}
             </div>
           )}
-        </>
+        </Fragment>
       ))}
     </nav>
   );

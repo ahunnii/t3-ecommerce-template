@@ -26,7 +26,7 @@ export const SearchEnginePreview = ({
           {slug ?? name.toLowerCase().split(" ").join("-")}
         </p>
         <p className="line-clamp-5  break-words text-[.8125rem] leading-[1.125rem] text-[#545454]">
-          {description}
+          {description.replace(/(<([^>]+)>)/gi, "")}
         </p>
       </div>
     </EditSection>

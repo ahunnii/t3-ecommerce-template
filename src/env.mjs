@@ -65,6 +65,7 @@ export const env = createEnv({
 
     // Uploads
     NEXT_PUBLIC_CLOUDINARY_API_KEY: z.string().optional(),
+    CLOUDINARY_API_KEY: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().optional(),
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: z.string().optional(),
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
@@ -127,7 +128,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     NEXT_PUBLIC_ENCRYPTION_KEY: process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
     NEXT_PUBLIC_STORE_ID: process.env.NEXT_PUBLIC_STORE_ID,
     EASYPOST_API_KEY: process.env.EASYPOST_API_KEY,
