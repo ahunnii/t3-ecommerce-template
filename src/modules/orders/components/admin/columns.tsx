@@ -18,7 +18,9 @@ export type OrderColumn = {
   createdAt: Date;
 
   isShipped: boolean;
-  labelCreated: boolean;
+  shippingLabel: {
+    labelUrl: string | null | undefined;
+  } | null;
 };
 
 export const columns: ColumnDef<OrderColumn>[] = [

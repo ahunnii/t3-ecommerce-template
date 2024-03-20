@@ -23,19 +23,19 @@ model Example {
 
 
 model Address {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   street        String
   additional    String?
   city          String
   state         String
   postal_code   String
   country       String?
-  storeId       String?  @unique
-  store         Store?   @relation( fields: [storeId], references: [id], onDelete: Cascade) 
-  orderId       String?  @unique
-  order         Order?   @relation( fields: [orderId], references: [id], onDelete: Cascade) 
-  shippingLabelId String? @unique
-  shippingLabel ShippingLabel? @relation( fields: [shippingLabelId], references: [id], onDelete: Cascade)
+  storeId       String?         @unique
+  store         Store?          @relation( fields: [storeId], references: [id], onDelete: Cascade) 
+  orderId       String?         @unique
+  order         Order?          @relation( fields: [orderId], references: [id], onDelete: Cascade) 
+  shippingLabelId String?       @unique
+  shippingLabel ShippingLabel?  @relation( fields: [shippingLabelId], references: [id], onDelete: Cascade)
 
 }
 // Necessary for Next auth

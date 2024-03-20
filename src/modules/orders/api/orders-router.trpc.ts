@@ -11,6 +11,23 @@ import paymentService from "~/services/payment";
 import { DetailedOrder } from "~/types";
 
 export const ordersRouter = createTRPCRouter({
+  getOrderCount: protectedProcedure
+    .input(z.object({ storeId: z.string().optional() }))
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.order.count({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          status: "PAID",
+        },
+      });
+    }),
+
   getOrdersByUserId: protectedProcedure
     .input(z.object({ storeId: z.string().optional(), userId: z.string() }))
     .query(({ ctx, input }) => {
@@ -163,6 +180,49 @@ export const ordersRouter = createTRPCRouter({
         });
       }
     }),
+
+  getAllPaidOrders: protectedProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.order.findMany({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          NOT: [
+            {
+              status: "PENDING",
+            },
+          ],
+        },
+        select: {
+          storeId: true,
+          id: true,
+          status: true,
+          name: true,
+          isShipped: true,
+          isPaid: true,
+          total: true,
+          createdAt: true,
+          shippingLabel: {
+            select: {
+              labelUrl: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
   getAllOrders: protectedProcedure
     .input(
       z.object({
@@ -201,6 +261,27 @@ export const ordersRouter = createTRPCRouter({
         },
         orderBy: {
           createdAt: "desc",
+        },
+      });
+    }),
+
+  getPaidOrders: protectedProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.order.count({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          status: "PAID",
         },
       });
     }),

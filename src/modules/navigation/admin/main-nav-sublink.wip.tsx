@@ -3,14 +3,13 @@ import { useRouter } from "next/router";
 import { Fragment, type FC, type HTMLAttributes } from "react";
 import { api } from "~/utils/api";
 
-import { indexOf, uniqueId } from "lodash";
+import { uniqueId } from "lodash";
 import {
   Boxes,
   CornerDownRight,
   Home,
   Image,
   Inbox,
-  LucideIcon,
   Server,
   Settings,
   Shirt,
@@ -18,10 +17,10 @@ import {
   Tags,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { Separator } from "~/components/ui/separator";
+
 import { cn } from "~/utils/styles";
 import { Badge } from "../../../components/ui/badge";
-import { Route } from "./types";
+import type { Route } from "./types";
 
 interface MainNavProps extends HTMLAttributes<HTMLElement> {
   className?: string;
@@ -42,11 +41,10 @@ export function useActivePath(): (path: string) => boolean {
 }
 
 export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
-  const { asPath, query, pathname } = useRouter();
+  const { query } = useRouter();
   const { storeId } = query as { storeId: string };
-  const { data: orders } = api.orders.getAllOrders.useQuery({
+  const { data: orders } = api.orders.getOrderCount.useQuery({
     storeId,
-    searchParams: { isShipped: false },
   });
   const checkActivePath = useActivePath();
   const { data: customOrders } = api.customOrder.getCustomRequests.useQuery({
@@ -167,7 +165,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
 
             {route.label}
 
-            {route.label === "Orders" && <Badge>{orders?.length ?? 0}</Badge>}
+            {route.label === "Orders" && <Badge>{orders ?? 0}</Badge>}
 
             {route.label === "Custom Requests" && (
               <Badge>{customOrders?.length ?? 0}</Badge>

@@ -41,6 +41,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
+  const labelCreated = data?.shippingLabel?.labelUrl;
+
   const deleteOrder = api.orders.deleteOrder.useMutation({
     onSuccess: () => {
       router.refresh();
@@ -129,15 +131,15 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           {data?.isPaid && (
             <DropdownMenuItem onClick={() => shippingModal.onOpen(data.id)}>
-              {data?.labelCreated ? (
+              {labelCreated ? (
                 <Download className="mr-2 h-4 w-4" />
               ) : (
                 <Package className="mr-2 h-4 w-4" />
               )}{" "}
-              {data?.labelCreated ? "Download" : "Create"} label
+              {labelCreated ? "Download" : "Create"} label
             </DropdownMenuItem>
           )}
-          {data?.isPaid && data?.labelCreated && (
+          {data?.isPaid && labelCreated && (
             <DropdownMenuItem
               onClick={() =>
                 updateShippingStatus.mutate({

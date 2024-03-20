@@ -2,8 +2,8 @@ import { billboardsRouter } from "~/modules/billboards/api/billboards-router.trp
 import { categoriesRouter } from "~/modules/categories/api/categories-router.trpc";
 import { collectionsRouter } from "~/modules/collections/api/collections-router.trpc";
 
+import { ordersRouter } from "~/modules/orders/api/orders-router.trpc";
 import { shippingLabelRouter } from "~/modules/shipping/api/shipping-router.trpc";
-import { ordersRouter } from "~/server/api/routers/orders";
 import { storeRouter } from "~/server/api/routers/stores";
 import { createTRPCRouter } from "~/server/api/trpc";
 
