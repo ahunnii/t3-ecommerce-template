@@ -48,10 +48,11 @@ const BlogPostPage = () => {
           </PageHeader>
           {getBlogPost.data && (
             <>
-              {getBlogPost.data?.featuredImg && (
+              {getBlogPost.data?.images[0] && (
                 <Image
                   src={
-                    getBlogPost.data?.featuredImg ?? "/placeholder-image.webp"
+                    getBlogPost.data?.images[0]?.url ??
+                    "/placeholder-image.webp"
                   }
                   width={800}
                   height={400}

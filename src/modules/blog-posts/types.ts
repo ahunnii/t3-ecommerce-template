@@ -4,7 +4,7 @@ import type { blogPostFormSchema } from "./schema";
 
 export type BlogPost = Prisma.BlogPostGetPayload<{
   include: {
-    tags: true;
+    images: true;
   };
 }>;
 

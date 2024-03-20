@@ -1,7 +1,5 @@
 type Props = {
-  tags: {
-    name: string;
-  }[];
+  tags: string[];
 };
 
 export const BlogPostTagsSection = ({ tags }: Props) => {
@@ -13,7 +11,7 @@ export const BlogPostTagsSection = ({ tags }: Props) => {
           key={idx}
           className="rounded-md bg-gray-200 px-2 py-1 font-semibold text-gray-700"
         >
-          {tag.name}
+          {tag}
         </span>
       ))}
     </div>

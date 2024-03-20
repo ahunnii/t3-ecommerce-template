@@ -31,7 +31,7 @@ export const blogPostRouter = createTRPCRouter({
           slug: input?.slug,
         },
         include: {
-          tags: true,
+          images: true,
         },
       });
     }),
@@ -69,32 +69,39 @@ export const blogPostRouter = createTRPCRouter({
         storeId: z.string().optional(),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to perform this action.",
         });
 
-      return ctx.prisma.blogPost.create({
+      const blogPost = await ctx.prisma.blogPost.create({
         data: {
           title: input.title,
-          featuredImg: input.featuredImg,
           content: input.content,
           slug: input.slug ?? input.title.toLowerCase().replace(/ /g, "-"),
-          tags: {
-            createMany: {
-              data: [
-                ...input.tags.map((tag: { name: string }) => ({
-                  name: tag.name,
-                })),
-              ],
-            },
-          },
+          tags: input.tags.map((tag) => tag.name),
           published: input.published,
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
         },
       });
+
+      if (input.featuredImg) {
+        await ctx.prisma.image.create({
+          data: {
+            url: input.featuredImg,
+            alt: input.title,
+            blog: {
+              connect: {
+                id: blogPost.id,
+              },
+            },
+          },
+        });
+      }
+
+      return blogPost;
     }),
 
   updateBlogPost: protectedProcedure
@@ -123,26 +130,30 @@ export const blogPostRouter = createTRPCRouter({
           title: input.title,
           slug: input?.slug,
           content: input.content,
-          tags: { deleteMany: {} },
+          tags: input.tags.map((tag) => tag.name),
           published: input.published,
-          featuredImg: input.featuredImg,
+          images: {
+            deleteMany: {},
+          },
+          // featuredImg: input.featuredImg,
         },
       });
 
-      return ctx.prisma.blogPost.update({
-        where: { id: blogPost.id },
-        data: {
-          tags: {
-            createMany: {
-              data: [
-                ...input.tags.map((tag: { name: string }) => ({
-                  name: tag.name,
-                })),
-              ],
+      if (input.featuredImg) {
+        await ctx.prisma.image.create({
+          data: {
+            url: input.featuredImg,
+            alt: input.title,
+            blog: {
+              connect: {
+                id: blogPost.id,
+              },
             },
           },
-        },
-      });
+        });
+      }
+
+      return blogPost;
     }),
   deleteBlogPost: protectedProcedure
     .input(z.object({ blogPostId: z.string() }))

@@ -33,6 +33,7 @@ import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
+import { uniqueId } from "lodash";
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { blogPostFormSchema } from "../schema";
 import type { BlogPost, BlogPostFormValues } from "../types";
@@ -59,12 +60,12 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
 
   const defaultValues = {
     title: initialData?.title ?? "",
-    featuredImg: initialData?.featuredImg ?? undefined,
+    featuredImg: initialData?.images?.[0]?.url ?? undefined,
     content: initialData?.content ?? "",
     author: initialData?.author ?? "",
     slug: initialData?.slug ?? "",
     published: initialData?.published ?? false,
-    tags: initialData?.tags ?? [],
+    tags: initialData?.tags.map((tag) => ({ id: uniqueId(), name: tag })) ?? [],
   };
 
   const form = useForm<BlogPostFormValues>({
@@ -145,7 +146,7 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
   const onDelete = () => deleteBlogPost.mutate({ blogPostId });
 
   const [tags, setTags] = useState<{ name: string; id: string }[]>(
-    initialData?.tags ?? []
+    (defaultValues?.tags as Tag[]) ?? []
   );
 
   const { setValue } = form;

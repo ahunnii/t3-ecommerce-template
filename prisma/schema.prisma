@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
+  provider     = "postgresql"
   // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
   // Further reading:
   // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -14,13 +14,6 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
-
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 
 model Address {
   id            String    @id @default(cuid())
@@ -226,16 +219,13 @@ model Product {
   categoryId  String // Foreign Key to Category
   category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
 
-  name        String
-  price       Float    @default(0.00)
-
-  briefDescription String?
-
-  description String    @db.Text
-  quantity    Int      @default(1)
+  name                String
+  price               Float     @default(0.00)
+  description         String    @db.Text
+  quantity            Int       @default(1)
 
   customOrder   CustomOrderRequest?
-  // handle      String?  @unique @default(cuid())
+
 
   isFeatured  Boolean      @default(false)
   isArchived  Boolean      @default(false)
@@ -319,14 +309,13 @@ model Tag {
   productId   String? // Foreign Key to Store
   product     Product?   @relation("ProductToTag", fields: [productId], references: [id], onDelete: Cascade)
 
-  blogPostId   String? // Foreign Key to Store
-  blogPost     BlogPost?   @relation("BlogPostToTag", fields: [blogPostId], references: [id], onDelete: Cascade)
+
   name        String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   @@index([productId])
-  @@index([blogPostId])
+
 }
 
 model ProductMaterial {
@@ -406,18 +395,18 @@ enum OrderStatus {
 
 
 model BlogPost {
-  id          String    @id @default(cuid())
-  storeId     String // Foreign Key to Product
-  store       Store  @relation( "StoreToBlogPost", fields: [storeId], references: [id], onDelete: Cascade)
+  id          String      @id @default(cuid())
+  storeId     String      // Foreign Key to Product
+  store       Store       @relation( "StoreToBlogPost", fields: [storeId], references: [id], onDelete: Cascade)
   title       String
-  content     String @db.Text
+  content     String      @db.Text
   author      String?
-  slug        String    @unique
-  tags        Tag[]     @relation("BlogPostToTag")
-  featuredImg String?   
-  published   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  slug        String      @unique
+  tags        String[]
+  images      Image[]
+  published   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([storeId])
 }
@@ -491,7 +480,7 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
   @@index([variantId])
-@@index([discountId])
+  @@index([discountId])
 }
 
 
@@ -499,6 +488,9 @@ model Image {
   id            String   @id @default(cuid())
   productId     String? // Foreign Key to Product
   product       Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    blogId     String? // Foreign Key to Product
+  blog       BlogPost?  @relation(fields: [blogId], references: [id], onDelete: Cascade)
   customOrderId String?
   customOrder   CustomOrderRequest?  @relation(fields: [customOrderId], references: [id], onDelete: Cascade)
   
@@ -513,6 +505,7 @@ model Image {
   @@index([productId])
   @@index([customOrderId])
   
+  @@index([blogId])
 }
 
 model GalleryImage {
