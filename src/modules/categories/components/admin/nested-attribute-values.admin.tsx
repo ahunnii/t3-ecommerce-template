@@ -52,6 +52,7 @@ export const NestedAttributeValues = ({
                       <Input
                         {...field}
                         placeholder="Attribute Value"
+                        id={`attributes.${nestIndex}.values.${k}.content`}
                         className=""
                         onChange={(e) => {
                           field.onChange(e);
@@ -63,6 +64,17 @@ export const NestedAttributeValues = ({
                               .filter((val) => val.content === "").length === 0
                           ) {
                             append({ content: "" }, { shouldFocus: false });
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && fields.length > 1) {
+                            document
+                              ?.getElementById?.(
+                                `attributes.${nestIndex}.values.${
+                                  k + 1
+                                }.content`
+                              )
+                              ?.focus();
                           }
                         }}
                       />
