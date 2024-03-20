@@ -85,30 +85,30 @@ export const columns: ColumnDef<OrderColumn>[] = [
       return <p className="">{`${row.original.status.toString()}`}</p>;
     },
   },
-  {
-    accessorKey: "isShipped",
-    header: "Shipped Out",
-  },
-  {
-    accessorKey: "isPaid",
-    header: "Payment Status",
-    cell: ({ row }) => {
-      return (
-        <p className="flex items-center gap-2">
-          <span className="relative flex h-3 w-3">
-            {/* <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span> */}
-            <span
-              className={cn(
-                "relative inline-flex h-2 w-2 rounded-full bg-gray-500",
-                row.original.isPaid && "bg-green-500"
-              )}
-            ></span>
-          </span>
-          {row.original.isPaid ? "Paid" : "Awaiting"}
-        </p>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "isShipped",
+  //   header: "Shipped Out",
+  // },
+  // {
+  //   accessorKey: "isPaid",
+  //   header: "Payment Status",
+  //   cell: ({ row }) => {
+  //     return (
+  //       <p className="flex items-center gap-2">
+  //         <span className="relative flex h-3 w-3">
+  //           {/* <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span> */}
+  //           <span
+  //             className={cn(
+  //               "relative inline-flex h-2 w-2 rounded-full bg-gray-500",
+  //               row.original.isPaid && "bg-green-500"
+  //             )}
+  //           ></span>
+  //         </span>
+  //         {row.original.isPaid ? "Paid" : "Awaiting"}
+  //       </p>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "total",
     header: "Total price",

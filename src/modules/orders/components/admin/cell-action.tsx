@@ -8,6 +8,7 @@ import {
   Eye,
   MoreHorizontal,
   Package,
+  Send,
   Trash,
 } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
@@ -64,6 +65,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     onSettled: () => {
       void apiContext.orders.invalidate();
     },
+  });
+
+  const sendReceiptEmail = api.emailService.sendReceiptEmail.useMutation({
+    onSuccess: () => {
+      toastService.success("Receipt email sent successfully");
+    },
+    onError: (error) =>
+      toastService.error("Failed to send receipt email", error),
   });
 
   const onConfirm = () => {
@@ -128,6 +137,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             }
           >
             <Edit className="mr-2 h-4 w-4" /> Update
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => sendReceiptEmail.mutate({ orderId: data.id })}
+          >
+            <Send className="mr-2 h-4 w-4" /> Resend Receipt
           </DropdownMenuItem>
           {data?.isPaid && (
             <DropdownMenuItem onClick={() => shippingModal.onOpen(data.id)}>
