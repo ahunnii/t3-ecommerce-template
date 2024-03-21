@@ -39,6 +39,7 @@ import { DataTableToolbar } from "./advanced-data-table-toolbar";
 import { uniqueId } from "lodash";
 import { Trash, type LucideIcon } from "lucide-react";
 import {
+  PathValue,
   useFieldArray,
   type ArrayPath,
   type FieldValues,
@@ -74,6 +75,7 @@ interface DataTableProps<
   SData extends { id: string; [key: string]: string | number | Date }
 > {
   columns: ColumnDef<TData, TValue>[];
+  handleOnMediaDelete?: (url: string) => void;
   data: TData[];
   searchKey: string;
   filters?: FilterOption[];
@@ -91,6 +93,7 @@ export function AdvancedDataTableForm<
 >({
   columns,
   data,
+  handleOnMediaDelete,
   searchKey,
   filters,
   form,
@@ -180,16 +183,44 @@ export function AdvancedDataTableForm<
                                       <FormControl>
                                         <ImageUpload
                                           isSimplifiedBtn={true}
+                                          selectPreviousImages={true}
+                                          folder="products"
+                                          maxFiles={1}
                                           value={
                                             field.value ? [field.value] : []
                                           }
+                                          onBulkChange={(urls) => {
+                                            form.setValue(
+                                              "images" as Path<FData>,
+                                              [
+                                                ...new Set([
+                                                  ...form.watch(
+                                                    "images" as Path<FData>
+                                                  ),
+                                                  urls?.[0],
+                                                ]),
+                                              ] as PathValue<FData, Path<FData>>
+                                            );
+
+                                            return field.onChange(urls[0]);
+                                          }}
                                           onChange={(url) => {
+                                            form.setValue(
+                                              "images" as Path<FData>,
+                                              [
+                                                ...new Set([
+                                                  ...form.watch(
+                                                    "images" as Path<FData>
+                                                  ),
+                                                  url,
+                                                ]),
+                                              ] as PathValue<FData, Path<FData>>
+                                            );
+
                                             return field.onChange(url);
                                           }}
-                                          onRemove={
-                                            () => field.onChange("")
-                                            // form.setValue("featuredImage", "")
-                                          }
+                                          onRemove={() => field.onChange("")}
+                                          onMediaDelete={handleOnMediaDelete}
                                         />
                                       </FormControl>
                                       <FormMessage />

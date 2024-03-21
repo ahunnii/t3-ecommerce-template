@@ -15,7 +15,7 @@ export const imageSchema = z.object({ url: z.string() });
 export const productFormSchema = z.object({
   name: z.string().min(1),
   slug: z.string().optional(),
-  images: z.array(imageSchema),
+  images: z.array(z.string()),
   price: z.coerce.number().min(0),
   categoryId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
@@ -26,7 +26,9 @@ export const productFormSchema = z.object({
   variants: z.array(variantSchema),
   tags: z.array(z.object({ name: z.string(), id: z.string() })),
   materials: z.array(z.object({ name: z.string(), id: z.string() })),
-  featuredImage: z.string().min(1),
+  featuredImage: z.string().min(1, {
+    message: "You need at least a featured image",
+  }),
   shippingCost: z.coerce.number().min(0).optional(),
 
   weight: z.coerce.number().min(0).optional(),

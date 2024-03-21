@@ -140,7 +140,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
       names: currentAttributes.map((attribute) => attribute.name).join(", "),
       values: variation.join(", "),
       price: form.getValues("price"),
-      quantity: 1,
+      quantity: form.getValues("quantity"),
     }));
 
     return generatedVariations;
@@ -150,6 +150,22 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
     control: form.control,
     name: "variants",
   });
+
+  const handleOnMediaDelete = (url: string) => {
+    form.setValue("images", [
+      ...form.watch("images").filter((current) => current !== url),
+    ]);
+
+    if (form.watch("featuredImage") === url) {
+      form.setValue("featuredImage", "");
+    }
+
+    form.watch("variants").forEach((variant, idx) => {
+      if (variant.imageUrl === url) {
+        form.setValue(`variants.${idx}.imageUrl`, "");
+      }
+    });
+  };
 
   return (
     <EditSection
@@ -272,6 +288,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
               formKey="variants"
               ignoreColumns={["values", "actions", "imageUrl"]}
               renderSelect={currentAttributes}
+              handleOnMediaDelete={handleOnMediaDelete}
             />
 
             <AdjustVariationsDialog

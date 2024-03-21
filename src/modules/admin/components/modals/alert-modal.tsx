@@ -8,6 +8,7 @@ import { Modal } from "~/components/ui/modal";
 
 interface AlertModalProps {
   isOpen: boolean;
+  message?: string;
   setIsOpen: (open: boolean) => void;
   onConfirm: () => void;
   loading: boolean;
@@ -20,6 +21,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   onConfirm,
   loading,
   asChild = false,
+  message = "This action cannot be undone.",
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -43,7 +45,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
     <>
       <Modal
         title="Are you sure?"
-        description="This action cannot be undone."
+        description={message}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
       >

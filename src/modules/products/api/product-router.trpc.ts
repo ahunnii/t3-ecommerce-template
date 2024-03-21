@@ -24,6 +24,7 @@ export const productsRouter = createTRPCRouter({
       z.object({
         storeId: z.string().optional(),
         queryString: z.string().optional(),
+        isFeatured: z.boolean().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -39,6 +40,7 @@ export const productsRouter = createTRPCRouter({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           status: "ACTIVE",
+          isFeatured: input.isFeatured ?? undefined,
         },
         include: {
           collections: {
@@ -309,7 +311,7 @@ export const productsRouter = createTRPCRouter({
         tags: z.array(z.object({ name: z.string() })),
         materials: z.array(z.object({ name: z.string() })),
 
-        images: z.array(imageSchema),
+        images: z.array(z.string()),
         variants: z.array(variantSchema),
       })
     )
@@ -355,7 +357,7 @@ export const productsRouter = createTRPCRouter({
 
           images: {
             createMany: {
-              data: [...input.images.map((image: { url: string }) => image)],
+              data: input.images.map((url) => ({ url })),
             },
           },
           variants: {
@@ -379,6 +381,7 @@ export const productsRouter = createTRPCRouter({
     .input(
       z.object({
         productId: z.string(),
+        slug: z.string().optional(),
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
@@ -392,7 +395,7 @@ export const productsRouter = createTRPCRouter({
         description: z.string().optional(),
 
         quantity: z.number(),
-        images: z.array(imageSchema),
+        images: z.array(z.string()),
         variants: z.array(variantSchema),
         tags: z.array(z.object({ name: z.string() })),
         materials: z.array(z.object({ name: z.string() })),
@@ -413,16 +416,40 @@ export const productsRouter = createTRPCRouter({
         });
 
       try {
-        const slug = input.name.toLowerCase().replace(/ /g, "-");
-
-        const checkForUniqueSlug = await ctx.prisma.product.count({
-          where: {
-            slug,
-            NOT: {
-              id: input.productId,
-            },
+        const slugProduct = await ctx.prisma.product.findUnique({
+          where: { id: input.productId },
+          select: {
+            name: true,
+            slug: true,
           },
         });
+
+        if (!slugProduct)
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Product not found.",
+          });
+
+        let slug = slugProduct.slug;
+
+        if (slugProduct.name !== input.name) {
+          slug = input.name.toLowerCase().replace(/ /g, "-");
+          // Ensure the slug is unique by appending a number if necessary
+          let unique = false;
+          let suffix = 1;
+          while (!unique) {
+            const slugToCheck: string = suffix > 1 ? `${slug}-${suffix}` : slug;
+            const existingSlug = await ctx.prisma.product.findUnique({
+              where: { slug: slugToCheck },
+            });
+            if (!existingSlug) {
+              unique = true;
+              slug = slugToCheck;
+            } else {
+              suffix++;
+            }
+          }
+        }
 
         const categoryCollection = await ctx.prisma.product.findUnique({
           where: { id: input.productId },
@@ -478,14 +505,11 @@ export const productsRouter = createTRPCRouter({
           },
           data: {
             ...rest,
+            slug,
             images: { deleteMany: {} },
             variants: { deleteMany: {} },
             tags: input.tags.map((tag) => tag.name),
             materials: input.materials.map((materials) => materials.name),
-            slug:
-              checkForUniqueSlug > 0
-                ? `${slug}-${uniqueId().slice(0, 3)}`
-                : slug,
           },
           include: {
             category: {
@@ -516,7 +540,7 @@ export const productsRouter = createTRPCRouter({
           data: {
             images: {
               createMany: {
-                data: [...input.images.map((image: { url: string }) => image)],
+                data: input.images.map((url) => ({ url })),
               },
             },
 

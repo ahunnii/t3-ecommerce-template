@@ -17,6 +17,22 @@ export const MediaSection = ({
   form: UseFormReturn<ProductFormValues>;
   loading: boolean;
 }) => {
+  const handleOnMediaDelete = (url: string) => {
+    console.log(url);
+    form.setValue("images", [
+      ...form.watch("images").filter((current) => current !== url),
+    ]);
+
+    if (form.watch("featuredImage") === url) {
+      form.setValue("featuredImage", "");
+    }
+
+    form.watch("variants").forEach((variant, idx) => {
+      if (variant.imageUrl === url) {
+        form.setValue(`variants.${idx}.imageUrl`, "");
+      }
+    });
+  };
   return (
     <EditSection
       title="Media"
@@ -37,13 +53,26 @@ export const MediaSection = ({
               <ImageUpload
                 value={field.value ? [field.value] : []}
                 disabled={loading}
+                maxFiles={1}
+                selectPreviousImages={true}
+                folder="products"
                 onChange={(url) => {
-                  form.setValue("images", [...form.watch("images"), { url }]);
-
+                  form.setValue("images", [
+                    ...new Set([...form.watch("images"), url]),
+                  ]);
                   field.onChange(url);
                   return field.onChange(url);
                 }}
+                onBulkChange={(urls) => {
+                  if (urls?.length > 0 && urls[0]) {
+                    form.setValue("images", [
+                      ...new Set([...form.watch("images"), urls[0]]),
+                    ]);
+                    return field.onChange(urls[0]);
+                  }
+                }}
                 onRemove={() => form.setValue("featuredImage", "")}
+                onMediaDelete={handleOnMediaDelete}
               />
             </FormControl>
             <FormMessage />
@@ -56,23 +85,29 @@ export const MediaSection = ({
         render={({ field }) => (
           <FormItem>
             <FormLabel>Images and Vids</FormLabel>
-            <FormDescription>Upload images for your product. </FormDescription>
+            <FormDescription>Upload images for your product.</FormDescription>
             <FormControl>
-              {/* <>
-            {!initialData?.images && <ImageLoader />} */}
               <ImageUpload
-                value={field.value.map((image) => image.url)}
+                value={field.value}
                 disabled={loading}
+                maxFiles={10}
+                folder="products"
+                selectPreviousImages={true}
                 onChange={(url) => {
-                  return field.onChange([...field.value, { url }]);
+                  return field.onChange([...new Set([...field.value, url])]);
+                }}
+                onBulkChange={(urls) => {
+                  return field.onChange([
+                    ...new Set([...field.value, ...urls]),
+                  ]);
                 }}
                 onRemove={(url) =>
                   field.onChange([
-                    ...field.value.filter((current) => current.url !== url),
+                    ...field.value.filter((current) => current !== url),
                   ])
                 }
+                onMediaDelete={handleOnMediaDelete}
               />
-              {/* </> */}
             </FormControl>
             <FormMessage />
           </FormItem>

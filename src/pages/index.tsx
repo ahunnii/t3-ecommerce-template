@@ -26,8 +26,8 @@ const metadata = {
 };
 
 const HomePage = () => {
-  const getAllProducts = api.products.getAllProducts.useQuery(
-    { isArchived: false },
+  const getAllProducts = api.products.getAllStoreProducts.useQuery(
+    { isFeatured: true },
     { enabled: false }
   );
 

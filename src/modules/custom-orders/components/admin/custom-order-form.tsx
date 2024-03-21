@@ -310,6 +310,8 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
                         <ImageUpload
                           value={field.value.map((image) => image.url)}
                           disabled={loading}
+                          folder="request-images"
+                          maxFiles={3}
                           onChange={(url) => {
                             return field.onChange([...field.value, { url }]);
                           }}

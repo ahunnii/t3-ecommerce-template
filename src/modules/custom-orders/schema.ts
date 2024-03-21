@@ -15,7 +15,7 @@ export const customOrderAdminFormSchema = z.object({
   description: z.string(),
   productDescription: z.string(),
   notes: z.string().optional(),
-  images: z.object({ url: z.string() }).array(),
+  images: z.array(z.object({ url: z.string() })).max(3),
   status: z.nativeEnum(CustomOrderStatus),
   type: z.nativeEnum(CustomOrderType),
   price: z.coerce.number().min(0),

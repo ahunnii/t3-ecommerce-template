@@ -61,7 +61,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
   const defaultValues = {
     name: initialData?.name ?? "",
     slug: initialData?.slug ?? "",
-    images: initialData?.images ?? [],
+    images: initialData?.images.map((image) => image.url) ?? [],
     price: initialData?.price ?? 0.0,
     categoryId: initialData?.categoryId ?? undefined,
     description: initialData?.description ?? "",
@@ -182,7 +182,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
       <Form {...form}>
         <form
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          onChange={() => console.log(form.formState.errors)}
+          onChange={() => console.log(form.watch("images"))}
         >
           <AdminFormHeader
             title={title}
