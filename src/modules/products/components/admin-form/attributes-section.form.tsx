@@ -1,4 +1,4 @@
-import type { ProductMaterial, Tag } from "@prisma/client";
+import { uniqueId } from "lodash";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { EditSection } from "~/components/common/sections/edit-section.admin";
@@ -10,7 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { TagInput } from "~/components/ui/tag-input";
+import { type Tag, TagInput } from "~/components/ui/tag-input";
 import type { ProductFormValues } from "../../types";
 
 export const AttributeSection = ({
@@ -19,13 +19,16 @@ export const AttributeSection = ({
   initialMaterials,
 }: {
   form: UseFormReturn<ProductFormValues>;
-  initialTags: Tag[];
-  initialMaterials: ProductMaterial[];
+  initialTags: string[];
+  initialMaterials: string[];
 }) => {
-  const [tags, setTags] = useState<{ name: string; id: string }[]>(initialTags);
+  const [tags, setTags] = useState<{ name: string; id: string }[]>(
+    initialTags.map((tag) => ({ name: tag, id: uniqueId() }))
+  );
 
-  const [materials, setMaterials] =
-    useState<{ name: string; id: string }[]>(initialMaterials);
+  const [materials, setMaterials] = useState<{ name: string; id: string }[]>(
+    initialMaterials.map((tag) => ({ name: tag, id: uniqueId() }))
+  );
 
   return (
     <EditSection

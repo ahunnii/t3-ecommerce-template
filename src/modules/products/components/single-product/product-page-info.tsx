@@ -7,7 +7,7 @@ import React, { useMemo, useState } from "react";
 import { Separator } from "~/components/ui/separator";
 import useCart from "~/modules/cart/hooks/use-cart";
 import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
-import type { DetailedProductFull } from "~/types";
+import type { DetailedProductFull } from "~/modules/products/types";
 import { cn } from "~/utils/styles";
 import VariantSelector from "../../core/variant-selector";
 import type { ProductVariant } from "../../types";

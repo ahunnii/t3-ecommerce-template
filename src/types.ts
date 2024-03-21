@@ -73,8 +73,6 @@ export type DetailedProductFull = Prisma.ProductGetPayload<{
   include: {
     images: true;
     variants: true;
-    materials: true;
-    tags: true;
     category: {
       include: {
         attributes: true;
@@ -98,7 +96,6 @@ export type DetailedCategory = Prisma.CategoryGetPayload<{
 export type DetailedCollection = Prisma.CollectionGetPayload<{
   include: {
     products: true;
-
     image: true;
   };
 }>;

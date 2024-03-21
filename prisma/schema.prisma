@@ -220,9 +220,14 @@ model Product {
   category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
 
   name                String
+
+  // Handles default values for a product without variants
   price               Float     @default(0.00)
-  description         String    @db.Text
   quantity            Int       @default(1)
+
+
+  description         String    @db.Text
+
 
   customOrder   CustomOrderRequest?
 
@@ -237,27 +242,28 @@ model Product {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  variants    Variation[]
-  collections Collection[]
+  variants      Variation[]
+  collections   Collection[]
+  cartItems     CartItem[] // Relation to Order model
 
-  // handle       String? @unique
 
-  cartItems CartItem[] // Relation to Order model
+  // Product Specifics
   weight    Float? @default(0) // in grams
   length    Float? @default(0) // in in
   width     Float? @default(0) // in in
   height    Float? @default(0) // in in
+  materials String[]
+  tags      String[]
+
+  estimatedCompletion Int @default(0)
 
 
   shippingType ShippingType @default(FLAT_RATE)
   shippingCost Float? @default(0)
 
-  estimatedCompletion Int @default(0)
 
   productType ProductType @default(PHYSICAL)
 
-  materials ProductMaterial[] @relation("ProductMaterialToTag")
-  tags Tag[] @relation("ProductToTag")
 
   discounts Discount[] @relation("DiscountToProduct")
 
@@ -302,32 +308,6 @@ model CustomOrderRequest {
 
 }
 
-
-
-model Tag {
-  id          String   @id @default(cuid())
-  productId   String? // Foreign Key to Store
-  product     Product?   @relation("ProductToTag", fields: [productId], references: [id], onDelete: Cascade)
-
-
-  name        String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  @@index([productId])
-
-}
-
-model ProductMaterial {
-  id          String   @id @default(cuid())
-  productId   String // Foreign Key to Store
-  product     Product    @relation("ProductMaterialToTag", fields: [productId], references: [id], onDelete: Cascade)
-  name        String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  @@index([productId])
-}
 
 enum ProductType {
   PHYSICAL

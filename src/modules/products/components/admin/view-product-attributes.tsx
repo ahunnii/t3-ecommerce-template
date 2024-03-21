@@ -1,11 +1,12 @@
+import { uniqueId } from "lodash";
 import * as React from "react";
 
 import { Label } from "~/components/ui/label";
 
 type ViewProductVariantsProps = {
   weight: number | null;
-  materials: { id: string; name: string }[];
-  tags: { id: string; name: string }[];
+  materials: string[];
+  tags: string[];
   length: number | null;
   width: number | null;
   height: number | null;
@@ -65,8 +66,8 @@ export const ViewProductAttributes = ({
         <div className="col-span-2 flex items-center text-sm">
           {tags?.length === 0 && <p>No tags provided</p>}
           {tags.map((tag, idx) => (
-            <span key={tag.id}>
-              {tag?.name} {idx < tags?.length - 1 ? "," : ""}
+            <span key={tag + "-" + uniqueId()}>
+              {tag} {idx < tags?.length - 1 ? "," : ""}
             </span>
           ))}
         </div>
@@ -78,8 +79,8 @@ export const ViewProductAttributes = ({
         <div className="col-span-2 flex items-center text-sm">
           {materials?.length === 0 && <p>No materials provided</p>}
           {materials.map((material, idx) => (
-            <span key={material.id}>
-              {material?.name} {idx < materials?.length - 1 ? "," : ""}
+            <span key={material + "-" + uniqueId()}>
+              {material} {idx < materials?.length - 1 ? "," : ""}
             </span>
           ))}
         </div>

@@ -2,6 +2,7 @@
 "use client";
 
 import { CommandLoading } from "cmdk";
+import { uniqueId } from "lodash";
 import _debounce from "lodash/debounce";
 import {
   Calculator,
@@ -186,14 +187,14 @@ export function AdminSearch() {
                     </span>
                   ))}
                   {product.tags.map((tag) => (
-                    <span key={tag.id} className="sr-only">
-                      {tag.name}
+                    <span key={tag + "-" + uniqueId()} className="sr-only">
+                      {tag}
                     </span>
                   ))}
 
-                  {product.materials.map((materials) => (
-                    <span key={materials.id} className="sr-only">
-                      {materials.name}
+                  {product.materials.map((material) => (
+                    <span key={material + "-" + uniqueId()} className="sr-only">
+                      {material}
                     </span>
                   ))}
 

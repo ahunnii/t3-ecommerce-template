@@ -25,6 +25,7 @@ import { SearchEnginePreview } from "~/components/common/admin/search-engine-pre
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
+import { uniqueId } from "lodash";
 import { productFormSchema } from "../../schema";
 import type { ProductFormValues, SingleProduct } from "../../types";
 import { AttributeSection } from "../admin-form/attributes-section.form";
@@ -81,8 +82,12 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
     width: initialData?.width ?? 0.0,
     height: initialData?.height ?? 0.0,
     estimatedCompletion: initialData?.estimatedCompletion ?? 0,
-    tags: initialData?.tags ?? [],
-    materials: initialData?.materials ?? [],
+    tags: initialData?.tags.map((tag) => ({ id: uniqueId(), name: tag })) ?? [],
+    materials:
+      initialData?.materials.map((material) => ({
+        id: uniqueId(),
+        name: material,
+      })) ?? [],
     featuredImage: initialData?.featuredImage ?? undefined,
     productType: initialData?.productType ?? ("PHYSICAL" as ProductType),
     weight_oz: (initialData?.weight ?? 0.0) % 16,

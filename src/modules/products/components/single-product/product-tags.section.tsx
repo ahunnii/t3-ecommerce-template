@@ -1,9 +1,7 @@
 import { cn } from "~/utils/styles";
 
 type Props = {
-  tags: {
-    name: string;
-  }[];
+  tags: string[];
 };
 
 export const ProductTagsSection = ({ tags }: Props) => {
@@ -15,7 +13,7 @@ export const ProductTagsSection = ({ tags }: Props) => {
         {tags.map((tags, idx) => {
           return (
             <span key={idx} className="bg-white text-black">
-              {tags.name}
+              {tags}
             </span>
           );
         })}

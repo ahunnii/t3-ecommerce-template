@@ -1,9 +1,7 @@
 import { cn } from "~/utils/styles";
 
 type Props = {
-  materials: {
-    name: string;
-  }[];
+  materials: string[];
 };
 
 export const ProductMaterialsSection = ({ materials }: Props) => {
@@ -15,7 +13,7 @@ export const ProductMaterialsSection = ({ materials }: Props) => {
         {materials.map((material, idx) => {
           return (
             <span key={idx} className="text-black">
-              {material.name}
+              {material}
             </span>
           );
         })}

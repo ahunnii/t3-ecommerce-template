@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Tag } from "@prisma/client";
 
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
@@ -23,7 +22,7 @@ import { AlertModal } from "~/modules/admin/components/modals/alert-modal";
 
 import { Input } from "~/components/ui/input";
 
-import { TagInput } from "~/components/ui/tag-input";
+import { type Tag, TagInput } from "~/components/ui/tag-input";
 
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 

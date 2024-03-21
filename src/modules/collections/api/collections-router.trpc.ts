@@ -33,8 +33,6 @@ export const collectionsRouter = createTRPCRouter({
             include: {
               images: true,
               variants: true,
-              materials: true,
-              tags: true,
               category: {
                 include: {
                   attributes: true,
@@ -59,8 +57,7 @@ export const collectionsRouter = createTRPCRouter({
               discounts: true,
               images: true,
               variants: true,
-              materials: true,
-              tags: true,
+
               category: {
                 include: {
                   attributes: true,

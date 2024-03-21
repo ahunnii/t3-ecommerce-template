@@ -67,8 +67,6 @@ export const productsRouter = createTRPCRouter({
           },
           variants: true,
           images: true,
-          tags: true,
-          materials: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -157,8 +155,7 @@ export const productsRouter = createTRPCRouter({
           images: true,
           variants: true,
           discounts: true,
-          materials: true,
-          tags: true,
+
           category: {
             include: {
               attributes: true,
@@ -193,8 +190,6 @@ export const productsRouter = createTRPCRouter({
             },
           },
           variants: true,
-          materials: true,
-          tags: true,
           category: {
             include: {
               attributes: true,
@@ -357,24 +352,8 @@ export const productsRouter = createTRPCRouter({
             },
           },
 
-          tags: {
-            createMany: {
-              data: [
-                ...input.tags.map((tag: { name: string }) => ({
-                  name: tag.name,
-                })),
-              ],
-            },
-          },
-          materials: {
-            createMany: {
-              data: [
-                ...input.materials.map((tag: { name: string }) => ({
-                  name: tag.name,
-                })),
-              ],
-            },
-          },
+          tags: input.tags.map((tag) => tag.name),
+          materials: input.materials.map((materials) => materials.name),
           shippingCost: input.shippingCost,
           shippingType: input.shippingType,
           weight: input.weight,
@@ -514,12 +493,8 @@ export const productsRouter = createTRPCRouter({
             variants: {
               deleteMany: {},
             },
-            tags: {
-              deleteMany: {},
-            },
-            materials: {
-              deleteMany: {},
-            },
+            tags: input.tags.map((tag) => tag.name),
+            materials: input.materials.map((materials) => materials.name),
 
             shippingCost: input.shippingCost,
             shippingType: input.shippingType,
@@ -560,24 +535,7 @@ export const productsRouter = createTRPCRouter({
                 data: [...input.images.map((image: { url: string }) => image)],
               },
             },
-            tags: {
-              createMany: {
-                data: [
-                  ...input.tags.map((tag: { name: string }) => ({
-                    name: tag.name,
-                  })),
-                ],
-              },
-            },
-            materials: {
-              createMany: {
-                data: [
-                  ...input.materials.map((material: { name: string }) => ({
-                    name: material.name,
-                  })),
-                ],
-              },
-            },
+
             variants: {
               createMany: {
                 data: [
@@ -637,18 +595,10 @@ export const productsRouter = createTRPCRouter({
             { description: { contains: input.queryString } },
 
             {
-              tags: {
-                some: {
-                  name: { contains: input.queryString },
-                },
-              },
+              tags: { has: input.queryString },
             },
             {
-              materials: {
-                some: {
-                  name: { contains: input.queryString },
-                },
-              },
+              materials: { has: input.queryString },
             },
             {
               collections: {
@@ -667,8 +617,6 @@ export const productsRouter = createTRPCRouter({
         include: {
           collections: true,
           category: true,
-          tags: true,
-          materials: true,
         },
         orderBy: {
           createdAt: "desc",
