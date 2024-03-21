@@ -29,6 +29,7 @@ const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
 
   const { data: product, isLoading } = api.products.getProduct.useQuery({
     productId: params?.productId as string,
+    status: "ACTIVE",
   });
 
   const { data: collection } = api.collections.getCollection.useQuery({

@@ -34,7 +34,6 @@ const AllProductsPage = () => {
 
   const { data: products, isLoading: areProductsLoading } =
     api.products.getAllStoreProducts.useQuery({
-      isArchived: false,
       queryString: searchParams.toString(),
     });
 

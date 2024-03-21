@@ -2,33 +2,27 @@ import { Mail, MailCheckIcon } from "lucide-react";
 
 export const productFilterOptions = [
   {
-    column: "isArchived",
+    column: "status",
     title: "Archive Status",
     filters: [
       {
-        value: "Archived",
+        value: "ARCHIVED",
         label: "Archived",
         icon: Mail,
       },
       {
-        value: "Not Archived",
-        label: "Not Archived",
+        value: "DRAFT",
+        label: "Draft",
         icon: MailCheckIcon,
       },
-    ],
-  },
-  {
-    column: "customOrder",
-    title: "Custom Orders",
-    filters: [
       {
-        value: "Custom Order",
-        label: "Custom Order",
-        icon: Mail,
+        value: "ACTIVE",
+        label: "Active Listing",
+        icon: MailCheckIcon,
       },
       {
-        value: "Not Custom Order",
-        label: "Not Custom Order",
+        value: "CUSTOM",
+        label: "Custom Order",
         icon: MailCheckIcon,
       },
     ],

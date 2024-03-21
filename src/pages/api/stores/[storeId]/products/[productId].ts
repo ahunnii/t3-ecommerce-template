@@ -32,6 +32,7 @@ const productByIdHandler = async (
         const getProduct = await ctx.prisma.product.findUnique({
           where: {
             id: productId as string,
+            status: "ACTIVE",
           },
           include: {
             images: true,

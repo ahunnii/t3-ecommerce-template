@@ -14,6 +14,7 @@ type Props = {
   isSimplifiedBtn?: boolean;
   secure?: boolean;
   onChange: (value: string) => void;
+  productUpload?: boolean;
 };
 
 export const CloudinaryUpload = ({
@@ -22,6 +23,7 @@ export const CloudinaryUpload = ({
   buttonClassName,
   isSimplifiedBtn = false,
   secure = true,
+  productUpload = false,
 }: Props) => {
   const onUpload = (result: { event: string; info: Partial<Results> }) => {
     onChange(result.info.secure_url!);

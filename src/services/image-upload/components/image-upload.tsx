@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { CloudinaryUpload } from "./cloudinary-upload";
+import { ImageManagementPanel } from "./image-management-panel";
 import { ImageUploadPreview } from "./image-upload-preview";
 
 interface ImageUploadProps {
@@ -11,7 +12,7 @@ interface ImageUploadProps {
   buttonClassName?: string;
   previewImages?: boolean;
   isSimplifiedBtn?: boolean;
-
+  productUpload?: boolean;
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
   value: string[];
@@ -26,6 +27,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   isSimplifiedBtn = false,
   secure = true,
   previewImages = true,
+  productUpload = false,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -78,6 +80,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         buttonClassName={buttonClassName}
         isSimplifiedBtn={isSimplifiedBtn}
       />
+      <ImageManagementPanel />
       {/* <UploadThingUpload disabled={disabled} onChange={onChange} /> */}
     </div>
   );

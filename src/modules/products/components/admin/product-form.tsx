@@ -26,6 +26,9 @@ import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 
 import { uniqueId } from "lodash";
+import { Archive, Boxes, Eye, PencilLine } from "lucide-react";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
+import { cn } from "~/utils/styles";
 import { productFormSchema } from "../../schema";
 import type { ProductFormValues, SingleProduct } from "../../types";
 import { AttributeSection } from "../admin-form/attributes-section.form";
@@ -177,7 +180,10 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+        <form
+          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          onChange={() => console.log(form.formState.errors)}
+        >
           <AdminFormHeader
             title={title}
             description={description}
@@ -200,7 +206,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
           </AdminFormHeader>
 
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
-            <div className="flex w-full flex-col space-y-4 lg:w-8/12">
+            <div className=" flex w-full flex-col space-y-4 xl:w-8/12">
               <ProductDetailsSection
                 {...{
                   loading,
@@ -226,7 +232,81 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
               <ShippingSection form={form} loading={loading} />
             </div>
 
-            <div className="flex w-full flex-col space-y-8 lg:w-4/12">
+            <div className="flex w-full flex-col space-y-8 xl:w-4/12">
+              <EditSection
+                title="Product Status"
+                description="Manage the visibility and availability of your product."
+              >
+                <div
+                  onClick={() => form.setValue("status", ProductStatus.DRAFT)}
+                  className={cn(
+                    "-mx-2 flex cursor-pointer items-start space-x-4 rounded-md p-2 transition-all hover:bg-accent hover:text-accent-foreground",
+                    form.watch("status") === "DRAFT" &&
+                      " bg-accent text-accent-foreground "
+                  )}
+                >
+                  <PencilLine className="mt-px h-5 w-5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">Draft</p>
+                    <p className="text-sm text-muted-foreground">
+                      Edit your product without publishing. Only visible to you.
+                    </p>
+                  </div>
+                </div>
+                <div
+                  onClick={() => form.setValue("status", ProductStatus.ACTIVE)}
+                  className={cn(
+                    "-mx-2 flex cursor-pointer items-start space-x-4 rounded-md p-2 transition-all hover:bg-accent hover:text-accent-foreground",
+                    form.watch("status") === "ACTIVE" &&
+                      " bg-accent text-accent-foreground "
+                  )}
+                >
+                  <Eye className="mt-px h-5 w-5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">Active</p>
+                    <p className="text-sm text-muted-foreground">
+                      Your customers can see and buy your product.
+                    </p>
+                  </div>
+                </div>
+                <div
+                  onClick={() =>
+                    form.setValue("status", ProductStatus.ARCHIVED)
+                  }
+                  className={cn(
+                    "-mx-2 flex cursor-pointer items-start space-x-4 rounded-md p-2 transition-all hover:bg-accent hover:text-accent-foreground",
+                    form.watch("status") === "ARCHIVED" &&
+                      " bg-accent text-accent-foreground "
+                  )}
+                >
+                  <Archive className="mt-px h-5 w-5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">Archived</p>
+                    <p className="text-sm text-muted-foreground">
+                      The product is no longer available for purchase.
+                    </p>
+                  </div>
+                </div>
+                <div
+                  onClick={() => form.setValue("status", ProductStatus.CUSTOM)}
+                  className={cn(
+                    "-mx-2 flex cursor-pointer items-start space-x-4 rounded-md p-2 transition-all hover:bg-accent hover:text-accent-foreground",
+                    form.watch("status") === "CUSTOM" &&
+                      " bg-accent text-accent-foreground "
+                  )}
+                >
+                  <Boxes className="mt-px h-5 w-5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      Custom Product
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Product not available to the general public, accessible
+                      via a direct link.
+                    </p>
+                  </div>
+                </div>
+              </EditSection>
               <MediaSection form={form} loading={loading} />
             </div>
           </AdminFormBody>

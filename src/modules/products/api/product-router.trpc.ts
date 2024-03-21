@@ -1,6 +1,7 @@
 import { ProductStatus, ProductType } from "@prisma/client";
 
 import { TRPCError } from "@trpc/server";
+import { rest, uniqueId } from "lodash";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import {
@@ -14,6 +15,7 @@ import {
   extractQueryString,
   filterProductsByVariants,
 } from "~/utils/filtering";
+import { imageSchema, variantSchema } from "../schema";
 
 export const productsRouter = createTRPCRouter({
   // Queries for the frontend
@@ -21,10 +23,7 @@ export const productsRouter = createTRPCRouter({
     .input(
       z.object({
         storeId: z.string().optional(),
-        isFeatured: z.boolean().optional(),
-        isArchived: z.boolean().optional(),
         queryString: z.string().optional(),
-        categoryId: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -39,9 +38,7 @@ export const productsRouter = createTRPCRouter({
       const products = await ctx.prisma.product.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          isFeatured: input.isFeatured,
-          categoryId: input.categoryId,
-          status: input.isArchived ? "ARCHIVED" : undefined,
+          status: "ACTIVE",
         },
         include: {
           collections: {
@@ -83,7 +80,13 @@ export const productsRouter = createTRPCRouter({
     }),
 
   getAllSuggestedProducts: publicProcedure
-    .input(z.object({ storeId: z.string().optional(), categoryId: z.string() }))
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        categoryId: z.string(),
+        collectionId: z.string().optional(),
+      })
+    )
     .query(({ ctx, input }) => {
       if (!input.storeId && !env.NEXT_PUBLIC_STORE_ID)
         throw new TRPCError({
@@ -94,10 +97,11 @@ export const productsRouter = createTRPCRouter({
       return ctx.prisma.product.findMany({
         where: {
           storeId: input?.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          categoryId: input.categoryId,
-          NOT: {
-            status: "ARCHIVED",
-          },
+          OR: [
+            { collections: { some: { id: input.collectionId } } },
+            { category: { id: input.categoryId } },
+          ],
+          status: "ACTIVE",
         },
         include: {
           category: true,
@@ -174,10 +178,15 @@ export const productsRouter = createTRPCRouter({
     }),
 
   getProduct: publicProcedure
-    .input(z.object({ productId: z.string() }))
+    .input(
+      z.object({
+        productId: z.string(),
+        status: z.nativeEnum(ProductStatus).optional(),
+      })
+    )
     .query(({ ctx, input }) => {
       return ctx.prisma.product.findUnique({
-        where: { id: input.productId },
+        where: { id: input.productId, status: input.status },
         include: {
           collections: {
             include: {
@@ -286,10 +295,7 @@ export const productsRouter = createTRPCRouter({
         description: z.string(),
 
         featuredImage: z.string(),
-
         isFeatured: z.boolean().optional(),
-
-        shippingCost: z.coerce.number().min(0).optional(),
 
         type: z.nativeEnum(ProductType),
         status: z.nativeEnum(ProductStatus),
@@ -299,45 +305,54 @@ export const productsRouter = createTRPCRouter({
         width: z.coerce.number().min(0).optional(),
         height: z.coerce.number().min(0).optional(),
         estimatedCompletion: z.coerce.number().min(0).optional(),
+        shippingCost: z.coerce.number().min(0).optional(),
         tags: z.array(z.object({ name: z.string() })),
         materials: z.array(z.object({ name: z.string() })),
 
-        images: z.array(
-          z.object({
-            url: z.string(),
-          })
-        ),
-
-        variants: z.array(
-          z.object({
-            names: z.string(),
-            values: z.string(),
-            price: z.number(),
-            quantity: z.number(),
-          })
-        ),
+        images: z.array(imageSchema),
+        variants: z.array(variantSchema),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to perform this action.",
         });
 
+      const slug = input.name.toLowerCase().replace(/ /g, "-");
+
+      const checkForUniqueSlug = await ctx.prisma.product.count({
+        where: {
+          slug,
+        },
+      });
+
+      const duplicateSKUs = input.variants
+        .filter((variant) => variant.sku !== undefined)
+        .map((variant) => variant.sku!);
+
+      const checkForDuplicateSKUs = await ctx.prisma.variation.count({
+        where: {
+          sku: {
+            in: duplicateSKUs,
+          },
+        },
+      });
+
+      if (checkForDuplicateSKUs > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Duplicate SKUs found.",
+        });
+      }
+
       return ctx.prisma.product.create({
         data: {
-          name: input.name,
-          price: input.price,
-          isFeatured: input.isFeatured,
-          status: input.status,
-          type: input.type,
-          categoryId: input.categoryId,
-          description: input.description,
-          estimatedCompletion: input.estimatedCompletion ?? 0,
-          storeId: input.storeId,
-          quantity: input.quantity,
-          featuredImage: input.featuredImage,
+          ...input,
+          tags: input.tags.map((tag) => tag.name),
+          materials: input.materials.map((materials) => materials.name),
+
           images: {
             createMany: {
               data: [...input.images.map((image: { url: string }) => image)],
@@ -346,26 +361,16 @@ export const productsRouter = createTRPCRouter({
           variants: {
             createMany: {
               data: [
-                ...input.variants.map(
-                  (variant: {
-                    names: string;
-                    values: string;
-                    price: number;
-                    quantity: number;
-                  }) => variant
-                ),
+                ...input.variants.map((variant) => ({
+                  ...variant,
+                  sku: variant.sku === "" ? null : variant.sku,
+                  imageUrl: variant.imageUrl === "" ? null : variant.imageUrl,
+                })),
               ],
             },
           },
-
-          tags: input.tags.map((tag) => tag.name),
-          materials: input.materials.map((materials) => materials.name),
-          shippingCost: input.shippingCost,
-
-          weight: input.weight,
-          length: input.length,
-          width: input.width,
-          height: input.height,
+          slug:
+            checkForUniqueSlug > 0 ? `${slug}-${uniqueId().slice(0, 3)}` : slug,
         },
       });
     }),
@@ -387,21 +392,8 @@ export const productsRouter = createTRPCRouter({
         description: z.string().optional(),
 
         quantity: z.number(),
-        images: z.array(
-          z.object({
-            url: z.string(),
-          })
-        ),
-        variants: z.array(
-          z.object({
-            names: z.string(),
-            values: z.string(),
-            price: z.number(),
-            quantity: z.number(),
-            sku: z.string().optional(),
-            imageUrl: z.string().optional(),
-          })
-        ),
+        images: z.array(imageSchema),
+        variants: z.array(variantSchema),
         tags: z.array(z.object({ name: z.string() })),
         materials: z.array(z.object({ name: z.string() })),
         featuredImage: z.string(),
@@ -421,13 +413,22 @@ export const productsRouter = createTRPCRouter({
         });
 
       try {
-        const categoryCollection = await ctx.prisma.product.findUnique({
+        const slug = input.name.toLowerCase().replace(/ /g, "-");
+
+        const checkForUniqueSlug = await ctx.prisma.product.count({
           where: {
-            id: input.productId,
+            slug,
+            NOT: {
+              id: input.productId,
+            },
           },
-          include: {
+        });
+
+        const categoryCollection = await ctx.prisma.product.findUnique({
+          where: { id: input.productId },
+          select: {
             category: {
-              include: {
+              select: {
                 collection: true,
               },
             },
@@ -436,9 +437,7 @@ export const productsRouter = createTRPCRouter({
 
         if (categoryCollection?.category?.collection) {
           await ctx.prisma.product.update({
-            where: {
-              id: input.productId,
-            },
+            where: { id: input.productId },
             data: {
               collections: {
                 disconnect: {
@@ -446,68 +445,47 @@ export const productsRouter = createTRPCRouter({
                 },
               },
             },
-            include: {
-              category: {
-                include: {
-                  collection: true,
-                },
-              },
+            select: {
+              category: { select: { collection: true } },
             },
           });
         }
 
-        const existingVariants = await ctx.prisma.variation.findMany({
+        const existingVariants = await ctx.prisma.variation.count({
           where: {
-            productId: input.productId,
-          },
-          select: {
-            sku: true,
+            sku: {
+              in: input.variants
+                .filter(
+                  (variant) => variant.sku !== undefined || variant.sku !== ""
+                )
+                .map((variant) => variant.sku!),
+            },
           },
         });
 
-        const duplicateSkus = input.variants.filter((variant) =>
-          existingVariants.some(
-            (existingVariant) => existingVariant.sku === variant.sku
-          )
-        );
-
-        if (duplicateSkus.length > 0) {
+        if (existingVariants > 0) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Duplicate SKUs found.",
           });
         }
 
+        const { productId, ...rest } = input;
+
         const product = await ctx.prisma.product.update({
           where: {
-            id: input.productId,
+            id: productId,
           },
           data: {
-            name: input.name,
-            price: input.price,
-            isFeatured: input.isFeatured,
-            status: input.status,
-            type: input.type,
-            categoryId: input.categoryId,
-            estimatedCompletion: input.estimatedCompletion ?? 0,
-            description: input.description,
-            quantity: input.quantity,
-            featuredImage: input.featuredImage,
-            images: {
-              deleteMany: {},
-            },
-            variants: {
-              deleteMany: {},
-            },
+            ...rest,
+            images: { deleteMany: {} },
+            variants: { deleteMany: {} },
             tags: input.tags.map((tag) => tag.name),
             materials: input.materials.map((materials) => materials.name),
-
-            shippingCost: input.shippingCost,
-
-            weight: input.weight,
-            length: input.length,
-            width: input.width,
-            height: input.height,
+            slug:
+              checkForUniqueSlug > 0
+                ? `${slug}-${uniqueId().slice(0, 3)}`
+                : slug,
           },
           include: {
             category: {
@@ -545,21 +523,11 @@ export const productsRouter = createTRPCRouter({
             variants: {
               createMany: {
                 data: [
-                  ...input.variants.map(
-                    (variant: {
-                      names: string;
-                      values: string;
-                      price: number;
-                      quantity: number;
-                      sku?: string;
-                      imageUrl?: string;
-                    }) => ({
-                      ...variant,
-                      sku: variant.sku === "" ? null : variant.sku,
-                      imageUrl:
-                        variant.imageUrl === "" ? null : variant.imageUrl,
-                    })
-                  ),
+                  ...input.variants.map((variant) => ({
+                    ...variant,
+                    sku: variant.sku === "" ? null : variant.sku,
+                    imageUrl: variant.imageUrl === "" ? null : variant.imageUrl,
+                  })),
                 ],
               },
             },

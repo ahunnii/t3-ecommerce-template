@@ -77,7 +77,7 @@ export const ProductDetailsSection = ({
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="slug"
           render={({ field }) => (
@@ -97,7 +97,7 @@ export const ProductDetailsSection = ({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name="categoryId"
@@ -210,43 +210,8 @@ export const ProductDetailsSection = ({
             </FormItem>
           )}
         />
-        {fields.length === 0 && (
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  {/* <Input
-                  type="number"
-                  disabled={loading}
-                  placeholder="9.99"
-                  {...field}
-                /> */}
-                  <div className="relative ">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <span className="text-gray-500 sm:text-sm">$</span>
-                    </div>
-                    <Input
-                      type="number"
-                      disabled={loading}
-                      className="block w-full rounded-md py-1.5 pl-7  text-gray-900     sm:text-sm sm:leading-6"
-                      placeholder="0.00"
-                      min="0.01"
-                      step="0.01"
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <FormDescription>Base price before taxes</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
 
-        {fields.length !== 0 && (
+        {form.watch("variants").length !== 0 && (
           <>
             <FormItem>
               <FormLabel>Price</FormLabel>
@@ -266,8 +231,41 @@ export const ProductDetailsSection = ({
           </>
         )}
 
-        {fields.length === 0 && (
+        {form.watch("variants").length === 0 && (
           <>
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    {/* <Input
+                  type="number"
+                  disabled={loading}
+                  placeholder="9.99"
+                  {...field}
+                /> */}
+                    <div className="relative ">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <span className="text-gray-500 sm:text-sm">$</span>
+                      </div>
+                      <Input
+                        type="number"
+                        disabled={loading}
+                        className="block w-full rounded-md py-1.5 pl-7  text-gray-900     sm:text-sm sm:leading-6"
+                        placeholder="0.00"
+                        min="0.01"
+                        step="0.01"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>Base price before taxes</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="quantity"
