@@ -39,14 +39,24 @@ import { DataTableToolbar } from "./advanced-data-table-toolbar";
 import { uniqueId } from "lodash";
 import { Trash, type LucideIcon } from "lucide-react";
 import {
-  PathValue,
   useFieldArray,
   type ArrayPath,
   type FieldValues,
   type Path,
+  type PathValue,
   type UseFormReturn,
 } from "react-hook-form";
+
+import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { FormControl, FormField, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import ImageUpload from "~/services/image-upload/components/image-upload";
@@ -109,6 +119,8 @@ export function AdvancedDataTableForm<
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
+  // const updatedData = React.useMemo(() => data, [sorting]);
+
   const table = useReactTable({
     data,
     columns,
@@ -129,6 +141,7 @@ export function AdvancedDataTableForm<
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    autoResetAll: false,
   });
 
   const { remove } = useFieldArray({
@@ -164,7 +177,7 @@ export function AdvancedDataTableForm<
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row, idx) => (
                   <TableRow
-                    key={row.id + "row"}
+                    key={row.id + "-" + uniqueId()}
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -313,6 +326,7 @@ export function AdvancedDataTableForm<
                                 />
                               </div>
                             )}
+
                             {/* 
                             {flexRender(
                               cell.column.columnDef.cell,
@@ -374,5 +388,128 @@ export function AdvancedDataTableForm<
       </div>
       <DataTablePagination table={table} />
     </div>
+  );
+}
+
+export function EditVariationDialog<
+  FData extends FieldValues,
+  SData extends { id: string; [key: string]: string | number | Date }
+>({
+  id,
+  form,
+
+  formKey,
+  renderSelect,
+  currentVal,
+
+  cellId,
+}: {
+  id: number;
+  currentVal: string;
+  // onAccept: (e: number | string) => void;
+  // open: boolean;
+  formKey: ArrayPath<FData>;
+  form: UseFormReturn<FData>;
+  renderSelect?: SData[];
+  cellId: string;
+}) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (!open) {
+      setTimeout(() => {
+        document.body.style.pointerEvents = "";
+      }, 500);
+    }
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger>
+        <Button
+          onClick={() => {
+            setOpen(true);
+            document.body.style.pointerEvents = "none";
+          }}
+          variant="link"
+          type="button"
+        >
+          Edit
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Variant</DialogTitle>
+          <DialogDescription>Edit variant...</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <div className="flex gap-2 ">
+              <FormField
+                control={form.control}
+                name={`${formKey}.${id}.${cellId}` as Path<FData>}
+                render={({ field }) => (
+                  <>
+                    {renderSelect?.map((selectItem, idx) => {
+                      const currentValues = currentVal?.split(`, `);
+
+                      // const currentValues = field.value?.split(`, `);
+
+                      return (
+                        <Select
+                          key={`${selectItem.id}-${uniqueId()}`}
+                          defaultValue={currentValues?.[idx] ?? ""}
+                          onValueChange={(value) => {
+                            const newValues = field.value.split(", ");
+                            newValues[idx] = value;
+                            field.onChange(newValues.join(", "));
+                          }}
+                        >
+                          <SelectTrigger
+                            className="w-24"
+                            defaultValue={currentValues?.[idx] ?? ""}
+                          >
+                            <SelectValue
+                              placeholder={`Select a ${
+                                selectItem.name as string
+                              }`}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>
+                                {selectItem.name as string}
+                              </SelectLabel>
+                              {(selectItem?.values as string)
+                                ?.split(";")
+                                .map((value: string) => (
+                                  <SelectItem
+                                    value={value}
+                                    key={`${uniqueId()}-${value}`}
+                                  >
+                                    {value}
+                                  </SelectItem>
+                                ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      );
+                    })}
+                  </>
+                )}
+              />
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            type="button"
+
+            // onClick={() => onAccept(inputRef.current!.value)}
+          >
+            Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

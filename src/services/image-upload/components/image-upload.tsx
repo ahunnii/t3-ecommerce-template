@@ -61,7 +61,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     <>
       <div
         className={cn(
-          isSimplifiedBtn && " absolute z-40 flex flex-wrap items-center gap-4",
+          isSimplifiedBtn && " absolute z-0 flex flex-wrap items-center gap-4",
           !isSimplifiedBtn && "mb-4 flex flex-wrap items-center gap-4"
         )}
       >

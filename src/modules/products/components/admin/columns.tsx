@@ -21,6 +21,11 @@ export type ProductColumn = {
   updatedAt: Date;
   isFeatured: boolean;
   status: ProductStatus;
+  variants: {
+    id: string;
+    name: string;
+    price: number;
+  }[];
 
   featuredImage?: string | null;
 };
@@ -71,12 +76,22 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => {
+      const prices =
+        row.original.variants?.length > 0
+          ? row.original.variants.map((v) => v.price)
+          : [row.original.price];
+      const minPrice = Math.min(...prices);
+
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
-      }).format(row.original.price);
+      }).format(minPrice);
 
-      return <div>{formatted}</div>;
+      return (
+        <div>
+          {formatted} {prices?.length > 0 && "+"}
+        </div>
+      );
     },
   },
   {

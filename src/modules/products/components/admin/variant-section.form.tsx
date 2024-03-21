@@ -8,9 +8,6 @@ import { EditSection } from "~/components/common/sections/edit-section.admin";
 
 import { AdvancedDataTableForm } from "~/components/common/tables/advanced-data-table-form";
 import { Button } from "~/components/ui/button";
-import { FormField } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +18,17 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { FormField } from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 
 import type { ProductFormValues } from "../../types";
 
@@ -47,6 +55,9 @@ const columns: ColumnDef<VariantColumn>[] = [
   {
     accessorKey: "imageUrl",
     header: "Image",
+    meta: {
+      type: "image",
+    },
   },
 
   {
@@ -81,11 +92,10 @@ const columns: ColumnDef<VariantColumn>[] = [
     },
   },
 
-  // {
-  //   accessorKey: "sku",
-  //   header: "SKU (optional)",
-  // },
-
+  {
+    accessorKey: "edit",
+    header: "",
+  },
   {
     id: "actions",
   },
@@ -98,12 +108,13 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
 
   const [open, setOpen] = useState(false);
 
+  const categoryId = form.watch("categoryId");
+
   const currentAttributes: Attribute[] = useMemo(() => {
-    return categories && form.watch("categoryId")
-      ? categories.filter((cat) => cat.id === form.watch("categoryId"))[0]!
-          .attributes
+    return categories && categoryId
+      ? categories.filter((cat) => cat.id === categoryId)[0]!.attributes
       : [];
-  }, [categories, form]);
+  }, [categories, categoryId]);
 
   const handleGenerateVariations = () => {
     function splitValues(attribute: Attribute): string[] {
@@ -207,7 +218,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
                   type="button"
                   onClick={() =>
                     prepend({
-                      imageUrl: undefined,
+                      imageUrl: "",
                       sku: "",
                       values: "",
                       names: "",
@@ -286,7 +297,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
               form={form}
               searchKey="values"
               formKey="variants"
-              ignoreColumns={["values", "actions", "imageUrl"]}
+              ignoreColumns={["values", "actions", "imageUrl", "edit"]}
               renderSelect={currentAttributes}
               handleOnMediaDelete={handleOnMediaDelete}
             />
@@ -340,6 +351,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 
+import { uniqueId } from "lodash";
 import { Label } from "~/components/ui/label";
 
 export function AdjustVariationsDialog({
