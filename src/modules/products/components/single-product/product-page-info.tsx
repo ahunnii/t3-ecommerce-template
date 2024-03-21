@@ -2,8 +2,9 @@ import type { Discount } from "@prisma/client";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import dynamic from "next/dynamic";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Separator } from "~/components/ui/separator";
 import useCart from "~/modules/cart/hooks/use-cart";
 import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
@@ -15,6 +16,7 @@ import { ProductAddToCartButton } from "./product-add-to-cart-button";
 import { ProductDiscountLabel } from "./product-discount-label";
 import { ProductMaterialsSection } from "./product-materials.section";
 import { ProductPrice } from "./product-price";
+import { ProductShippingSection } from "./product-shipping.section";
 import { ProductTagsSection } from "./product-tags.section";
 
 interface InfoProps extends VariantProps<typeof infoVariants> {
@@ -62,7 +64,25 @@ const ProductPageInfo: React.FC<InfoProps> = (props) => {
     });
   };
 
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  function handleSearch(term: string) {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set("variant", term);
+    } else {
+      params.delete("variant");
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
   const textStyles = infoVariants({ variant: props?.variant ?? "default" });
+
+  useEffect(() => {
+    if (variant) handleSearch(variant.id);
+  }, [variant]);
 
   return (
     <div>
@@ -105,6 +125,13 @@ const ProductPageInfo: React.FC<InfoProps> = (props) => {
         <LazyProductDescription description={props?.data?.description} />
         <ProductMaterialsSection materials={props?.data?.materials} />
         <ProductTagsSection tags={props?.data?.tags} />
+        <ProductShippingSection
+          estimatedCompletion={props?.data?.estimatedCompletion}
+          hasFlatRateShipping={props?.data?.store?.hasFlatRate}
+          hasFreeShipping={props?.data?.store?.hasFreeShipping}
+          flatRateAmount={props?.data?.store?.flatRateAmount}
+          minFreeShippingAmount={props?.data?.store?.minFreeShipping}
+        />
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ import type { DetailedProductFull } from "~/types";
 
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
+import { Separator } from "~/components/ui/separator";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
 
@@ -110,7 +111,7 @@ const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
                 />
               </div>
             </div>
-            <hr className="my-10" />
+            <Separator className="my-10 bg-zinc-400" />
             {suggested && (
               <RelatedItemsList
                 title="You may also like"

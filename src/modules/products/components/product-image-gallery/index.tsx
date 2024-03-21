@@ -7,6 +7,8 @@ import type { Image } from "~/types";
 
 import ProductImageGalleryTab from "./product-image-gallery-tab";
 
+import { Variation } from "@prisma/client";
+import { useSearchParams } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
 interface GalleryProps {

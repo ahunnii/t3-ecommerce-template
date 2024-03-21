@@ -25,6 +25,15 @@ export type DetailedProductFull = Prisma.ProductGetPayload<{
       };
     };
     discounts: true;
+    store: {
+      select: {
+        id: true;
+        hasFlatRate: true;
+        flatRateAmount: true;
+        hasFreeShipping: true;
+        minFreeShipping: true;
+      };
+    };
   };
 }>;
 

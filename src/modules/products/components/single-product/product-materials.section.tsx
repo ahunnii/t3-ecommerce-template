@@ -1,3 +1,4 @@
+import { Badge } from "~/components/ui/badge";
 import { cn } from "~/utils/styles";
 
 type Props = {
@@ -12,9 +13,9 @@ export const ProductMaterialsSection = ({ materials }: Props) => {
         {materials.length === 0 && <p>No materials provided.</p>}
         {materials.map((material, idx) => {
           return (
-            <span key={idx} className="text-black">
+            <Badge key={idx} variant={"secondary"}>
               {material}
-            </span>
+            </Badge>
           );
         })}
       </div>

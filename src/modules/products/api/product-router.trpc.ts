@@ -190,6 +190,15 @@ export const productsRouter = createTRPCRouter({
       return ctx.prisma.product.findUnique({
         where: { id: input.productId, status: input.status },
         include: {
+          store: {
+            select: {
+              id: true,
+              hasFlatRate: true,
+              hasFreeShipping: true,
+              flatRateAmount: true,
+              minFreeShipping: true,
+            },
+          },
           collections: {
             include: {
               discounts: {
