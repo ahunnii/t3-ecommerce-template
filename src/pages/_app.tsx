@@ -12,10 +12,10 @@ import { ConfigProvider } from "~/providers/style-config-provider";
 import { ThemeProvider } from "~/providers/theme-provider";
 import { ToastProvider } from "~/services/toast/toaster-provider";
 // import { ToastProvider } from "~/providers/toast-provider";
-import { AxiomWebVitals } from "next-axiom";
-import { storeTheme as storeThemeCore } from "~/data/config.core";
+// import { AxiomWebVitals } from "next-axiom";
+// import { storeTheme as storeThemeCore } from "~/data/config.core";
 import { storeTheme } from "~/data/config.custom";
-import { env } from "~/env.mjs";
+// import { env } from "~/env.mjs";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 

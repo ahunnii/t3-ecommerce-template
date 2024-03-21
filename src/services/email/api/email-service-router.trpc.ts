@@ -1,11 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { storeTheme } from "~/data/config.custom";
-import { env } from "~/env.mjs";
+
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { emailService } from "~/services/email";
 import {
-  CustomerReceiptEmailData,
+  type CustomerReceiptEmailData,
   CustomerReceiptTemplate,
 } from "../email-templates/customer.reciept";
 

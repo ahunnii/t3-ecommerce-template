@@ -69,9 +69,9 @@ const BlogPostPage: FC<IProps> = ({ storeId, blogPostId }) => {
                 {blogPost?.createdAt.toDateString()}
               </p>
 
-              {blogPost?.featuredImg && (
+              {blogPost?.images[0] && (
                 <Image
-                  src={blogPost?.featuredImg ?? "/placeholder-image.webp"}
+                  src={blogPost?.images[0]?.url ?? "/placeholder-image.webp"}
                   width={800}
                   height={400}
                   alt=""

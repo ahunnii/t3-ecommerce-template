@@ -55,6 +55,7 @@ export const ContactFormBasic = ({
       form.reset();
       setClearForm?.(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clearForm, form]);
   return (
     <Form.Form {...form}>

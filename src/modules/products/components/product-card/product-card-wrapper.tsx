@@ -1,22 +1,12 @@
-import { VariantProps, cva } from "class-variance-authority";
-import { Expand, ShoppingCart } from "lucide-react";
+import { type VariantProps, cva } from "class-variance-authority";
 
-import { useRouter } from "next/navigation";
 import {
-  ElementRef,
-  HTMLAttributes,
+  type ElementRef,
+  type HTMLAttributes,
   useEffect,
   useState,
-  type MouseEventHandler,
 } from "react";
 
-import useCart from "~/modules/cart/hooks/use-cart";
-import { ProductCardDescription } from "~/modules/products/components/product-card/product-card-description";
-import { ProductCardImage } from "~/modules/products/components/product-card/product-card-image";
-import { ProductCardQuickActions } from "~/modules/products/components/product-card/product-card-quick-actions";
-import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
-
-import type { DetailedProductFull } from "~/types";
 import { cn } from "~/utils/styles";
 
 import { createContext } from "react";

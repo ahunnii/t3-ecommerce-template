@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Instagram } from "lucide-react";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
 

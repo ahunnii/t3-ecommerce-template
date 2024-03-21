@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { api } from "~/utils/api";
+
 import { cn } from "~/utils/styles";
 
 export const TaHero = () => {

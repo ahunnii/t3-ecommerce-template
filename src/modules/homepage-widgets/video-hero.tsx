@@ -1,11 +1,3 @@
-import { Button } from "~/components/ui/button";
-
-type TVideoHeroProps = {
-  videoURL: string;
-  title: string;
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
-
 const VideoHero = () => {
   return (
     <div className="relative mb-12 flex h-screen items-center justify-center overflow-hidden">

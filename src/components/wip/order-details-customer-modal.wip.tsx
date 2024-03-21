@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import type { Order } from "@prisma/client";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -11,10 +11,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+
 import { usePayment } from "~/hooks/wip/use-payment";
-import { DetailedOrder } from "~/types";
 
 export function OrderDetailsCustomerModal({
   data,
@@ -25,15 +23,11 @@ export function OrderDetailsCustomerModal({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    isFetching,
-    data: yeet,
-    paymentDetails,
-    fetchPaymentDetails,
-  } = usePayment();
+  const { isFetching, paymentDetails, fetchPaymentDetails } = usePayment();
 
   useEffect(() => {
     if (isOpen && data && !isFetching) void fetchPaymentDetails(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   return (

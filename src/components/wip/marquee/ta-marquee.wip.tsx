@@ -2,7 +2,6 @@
 import { Children, type Component, type FC, type ReactNode } from "react";
 import { default as FastMarquee } from "react-fast-marquee";
 import { cn } from "~/utils/styles";
-import s from "./ta-marquee.wip.module.css";
 
 interface MarqueeProps {
   className?: string;
@@ -10,11 +9,7 @@ interface MarqueeProps {
   variant?: "primary" | "secondary";
 }
 
-const Marquee: FC<MarqueeProps> = ({
-  className = "",
-  children,
-  variant = "primary",
-}) => {
+const Marquee: FC<MarqueeProps> = ({ children, variant = "primary" }) => {
   // const rootClassName = cn(
   //   s.root,
   //   {

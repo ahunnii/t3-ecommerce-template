@@ -1,6 +1,5 @@
 import { ShoppingBag } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+
 import React from "react";
 
 import { Button } from "~/components/ui/button";
@@ -10,7 +9,6 @@ const ShoppingBagBtn = ({
   quantity,
   className,
 }: { quantity: string | number } & React.HTMLAttributes<HTMLDivElement>) => {
-  const router = useRouter();
   return (
     // <Link href="/cart" className="flex">
     <Button

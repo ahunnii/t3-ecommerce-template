@@ -2,10 +2,9 @@ import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { storeTheme } from "~/data/config.custom";
-import type { ContactFormValues } from "~/modules/contact/types";
 
 import { emailService } from "~/services/email";
-import InquiryEmailTemplate from "~/services/email/email-templates/inquiry.core";
+
 import NewOrderEmailTemplate from "~/services/email/email-templates/new-order.core";
 
 const sendInquiryHandler = async (

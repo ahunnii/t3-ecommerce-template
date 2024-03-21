@@ -7,7 +7,7 @@ interface ImageUploadProps {
   onChange: (value: string) => void;
 }
 
-export const UploadThingUpload = ({ disabled, onChange }: ImageUploadProps) => {
+export const UploadThingUpload = ({ onChange }: ImageUploadProps) => {
   if (!env.NEXT_PUBLIC_UPLOADTHING_APP_ID) return null;
 
   return (

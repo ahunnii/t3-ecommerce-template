@@ -1,4 +1,4 @@
-import { Component, type FC, type ReactNode } from "react";
+import { type FC, type ReactNode } from "react";
 import { cn } from "~/utils/styles";
 import s from "./ta-product-grid.wip.module.css";
 

@@ -1,4 +1,3 @@
-import { Separator } from "~/components/ui/separator";
 import { phoneFormatStringToNumber } from "~/utils/format-utils.wip";
 
 type ViewOrderDetailsProps = {

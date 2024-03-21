@@ -2,12 +2,10 @@ import {
   ArrowDownIcon,
   ArrowRightIcon,
   ArrowUpIcon,
-  CheckCheckIcon,
   CircleIcon,
   HelpCircleIcon,
-  LucideIcon,
+  type LucideIcon,
   TimerIcon,
-  XCircleIcon,
 } from "lucide-react";
 
 export const labels = [

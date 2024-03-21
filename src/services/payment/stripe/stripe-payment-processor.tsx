@@ -282,7 +282,7 @@ export const stripePaymentProcessor: PaymentProcessor<
     return data;
   },
 
-  processPayment: async (order) => {
+  processPayment: async () => {
     // TODO: Process payment
   },
 

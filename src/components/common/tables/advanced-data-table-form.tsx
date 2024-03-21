@@ -37,24 +37,16 @@ import { DataTablePagination } from "./advanced-data-table-pagination";
 import { DataTableToolbar } from "./advanced-data-table-toolbar";
 
 import { uniqueId } from "lodash";
-import { Plus, Trash, type LucideIcon } from "lucide-react";
+import { Trash, type LucideIcon } from "lucide-react";
 import {
-  ArrayPath,
-  Controller,
-  FieldValue,
-  FieldValues,
-  Path,
-  PathValue,
-  UseFormReturn,
   useFieldArray,
+  type ArrayPath,
+  type FieldValues,
+  type Path,
+  type UseFormReturn,
 } from "react-hook-form";
 import { Button } from "~/components/ui/button";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
+import { FormControl, FormField, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { AdvancedNumericInput } from "../inputs/advanced-numeric-input";
@@ -114,8 +106,6 @@ export function AdvancedDataTableForm<
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const [tempData, setTempData] = React.useState(data);
-
   const table = useReactTable({
     data,
     columns,
@@ -138,7 +128,7 @@ export function AdvancedDataTableForm<
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  const { fields, remove, replace } = useFieldArray({
+  const { remove } = useFieldArray({
     control: form.control,
     name: formKey,
   });

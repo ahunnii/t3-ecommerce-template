@@ -31,13 +31,13 @@ export const LayoutGrid = ({
   cards: Card[];
   className?: string;
 }) => {
-  const [selected, setSelected] = useState<Card | null>(null);
-  const [lastSelected, setLastSelected] = useState<Card | null>(null);
+  const [selected] = useState<Card | null>(null);
+  const [lastSelected] = useState<Card | null>(null);
 
-  const handleClick = (card: Card) => {
-    setLastSelected(selected);
-    setSelected(card);
-  };
+  // const handleClick = (card: Card) => {
+  //   setLastSelected(selected);
+  //   setSelected(card);
+  // };
 
   return (
     <div

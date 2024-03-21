@@ -8,7 +8,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import paymentService from "~/services/payment";
-import { DetailedOrder } from "~/types";
+import type { DetailedOrder } from "~/types";
 
 export const ordersRouter = createTRPCRouter({
   getOrderCount: protectedProcedure

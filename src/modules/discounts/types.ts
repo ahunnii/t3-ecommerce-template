@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
-import * as z from "zod";
-import { discountFormSchema } from "./schemas";
+import type * as z from "zod";
+import type { discountFormSchema } from "./schemas";
 
 export type SingleDiscount = Prisma.DiscountGetPayload<{
   include: {

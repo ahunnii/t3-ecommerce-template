@@ -1,5 +1,3 @@
-import axios from "axios";
-
 import type Shippo from "shippo";
 import { create } from "zustand";
 

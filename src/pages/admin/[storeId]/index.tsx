@@ -12,7 +12,6 @@ import { getTotalRevenue } from "~/modules/admin-overview/actions/get-total-reve
 import { authenticateAdminOrOwner } from "~/utils/auth";
 import { formatter } from "~/utils/styles";
 
-import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import AdminLayout from "~/components/layouts/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";

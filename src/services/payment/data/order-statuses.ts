@@ -1,4 +1,4 @@
-import { TimeLineEntry } from "@prisma/client";
+import type { TimeLineEntry } from "@prisma/client";
 
 export const PAYMENT_STATUS_UPDATES: Record<string, Partial<TimeLineEntry>> = {
   PAYMENT_SUCCESSFUL: {

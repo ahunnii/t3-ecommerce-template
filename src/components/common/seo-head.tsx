@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import appleTouchIcon from "~/assets/favicons/apple-touch-icon.png";
+// import appleTouchIcon from "~/assets/favicons/apple-touch-icon.png";
 import { env } from "~/env.mjs";
 
 import favicon16Custom from "~/assets/favicons/favicon-16x16.png";

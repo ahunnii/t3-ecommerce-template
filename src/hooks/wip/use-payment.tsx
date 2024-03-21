@@ -1,17 +1,16 @@
-import { Order } from "@prisma/client";
+import type { Order } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import { env } from "~/env.mjs";
-import paymentService from "~/services/payment";
-import { retrievePaymentResult } from "~/services/payment/types";
+
+import type { retrievePaymentResult } from "~/services/payment/types";
 import { toastService } from "~/services/toast";
-import type { DetailedOrder } from "~/types";
 
 export const usePayment = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const { error, data, isFetching } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["repoData"],
     queryFn: () =>
       axios

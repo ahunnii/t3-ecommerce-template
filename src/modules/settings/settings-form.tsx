@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Prisma } from "@prisma/client";
 
-import { LoaderIcon, Trash } from "lucide-react";
+import { LoaderIcon } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -20,7 +20,6 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Heading } from "~/components/ui/heading";
 
 import { Input } from "~/components/ui/input";
 

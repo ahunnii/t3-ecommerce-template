@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 
@@ -18,7 +19,6 @@ import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
 
-import { create } from "domain";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useShippingLabelStore } from "../store/use-shipping-label-store";

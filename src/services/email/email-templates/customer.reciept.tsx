@@ -1,9 +1,8 @@
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import {
   Body,
   Button,
   Column,
-  Container,
   Head,
   Heading,
   Html,
@@ -44,17 +43,14 @@ export type CustomerReceiptEmailData = {
 const baseUrl = `https://www.trendanomaly.com` ?? env.NEXT_PUBLIC_URL;
 
 export const CustomerReceiptTemplate = ({
-  name,
   storeName,
-  email,
+
   orderId,
   orderItems,
   subtotal,
   tax,
   shipping,
   total,
-  purchaseDate,
-  notes,
 }: CustomerReceiptEmailData) => (
   <Html>
     <Head />
@@ -105,7 +101,7 @@ export const CustomerReceiptTemplate = ({
           </div>
         </Section>
 
-        {orderItems?.map((item, index) => (
+        {orderItems?.map((item) => (
           <Section
             className="max-w-5xl border border-solid border-[#eaeaea] px-8"
             key={item.id}

@@ -1,4 +1,3 @@
-import { useTheme } from "next-themes";
 import { useEffect } from "react";
 
 import { Footer as DefaultFooter } from "~/components/common/layout/footer";
@@ -12,7 +11,7 @@ import { cn } from "~/utils/styles";
 const StorefrontLayout = ({
   children,
   metadata,
-  isLoading = false,
+
   NavBar = DefaultNavbar,
   Footer = DefaultFooter,
   bodyStyle = "",

@@ -4,18 +4,18 @@ import { Expand, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type MouseEventHandler } from "react";
 
-import { VariantProps } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import useCart from "~/modules/cart/hooks/use-cart";
 import { getBestDiscount } from "~/modules/discounts/utils/get-best-discount";
 import { ProductCardDescription } from "~/modules/products/components/product-card/product-card-description";
 import {
   ProductCardImage,
-  productCardImageVariants,
+  type productCardImageVariants,
 } from "~/modules/products/components/product-card/product-card-image";
 import { ProductCardQuickActions } from "~/modules/products/components/product-card/product-card-quick-actions";
 import {
   ProductCardWrapper,
-  productCardVariants,
+  type productCardVariants,
 } from "~/modules/products/components/product-card/product-card-wrapper";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
@@ -76,6 +76,7 @@ const ProductCard: React.FC<ProductCard> = ({
   };
 
   const bestDiscount =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     discounts?.length > 0 ? getBestDiscount(data.price, discounts) : null;
 
   const primaryContentUrl =

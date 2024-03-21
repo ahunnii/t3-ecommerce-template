@@ -1,13 +1,8 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-import { NextRequest, NextResponse } from "next/server";
+
 import { redis } from "~/server/redis/client";
 
-import { TRPCError } from "@trpc/server";
-import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
 
 const ratelimit = new Ratelimit({
   redis: redis,

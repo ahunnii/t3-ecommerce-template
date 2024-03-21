@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Container from "~/components/common/layout/container";
-import { env } from "~/env.mjs";
+
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 
@@ -10,7 +10,6 @@ import { STORE_NAME } from "../../../data/config.custom";
 import MainNav from "./main-nav";
 import NavbarActions from "./navbar-actions";
 
-import { useTheme } from "next-themes";
 import { useEffect, useMemo } from "react";
 import { storeTheme } from "~/data/config.custom";
 import { MobileNav } from "./mobile-nav";
@@ -41,6 +40,7 @@ const Navbar = ({
     { enabled: false }
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => void getAllCollections.refetch(), []);
 
   const navigationLinks = useMemo(() => {

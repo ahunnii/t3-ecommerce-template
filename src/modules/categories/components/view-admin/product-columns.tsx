@@ -1,10 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { Eye, Pencil } from "lucide-react";
+import { Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
+
 import type { CategoryProductsColumn } from "../../types";
 
 import {

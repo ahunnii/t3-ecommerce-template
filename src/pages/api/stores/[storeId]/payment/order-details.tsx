@@ -1,10 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { appRouter } from "~/server/api/root";
+
 import { createTRPCContext } from "~/server/api/trpc";
 import paymentService from "~/services/payment";
-import { DetailedOrder } from "~/types";
+import type { DetailedOrder } from "~/types";
 
 const paymentDetailsHandler = async (
   req: NextApiRequest,
@@ -12,7 +12,6 @@ const paymentDetailsHandler = async (
 ) => {
   // Create context and caller
   const ctx = await createTRPCContext({ req, res });
-  const caller = appRouter.createCaller(ctx);
 
   const userId = ctx.session?.user.id;
 

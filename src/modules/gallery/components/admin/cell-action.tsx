@@ -1,16 +1,13 @@
-import axios from "axios";
 import {
   CloudLightning,
   Copy,
   Edit,
-  Eye,
   MoreHorizontal,
   Trash,
 } from "lucide-react";
-import { useRouter as useNavigationRouter } from "next/navigation";
+
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -35,7 +32,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
-  const router = useNavigationRouter();
+
   const params = useRouter();
 
   const apiContext = api.useContext();

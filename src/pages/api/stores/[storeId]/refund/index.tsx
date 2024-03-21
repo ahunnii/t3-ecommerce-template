@@ -1,21 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import type { NextApiRequest, NextApiResponse } from "next";
-// import { appRouter } from "~/server/api/root";
-import { createTRPCContext } from "~/server/api/trpc";
 
-import axios from "axios";
-import type { Stripe } from "stripe";
-import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe/client";
-import { type CartItem } from "~/types";
 
 const refundHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const ctx = await createTRPCContext({ req, res });
-
   const { referenceId, orderId } = req.body;
-  const { storeId } = req.query;
 
   try {
     switch (req.method) {

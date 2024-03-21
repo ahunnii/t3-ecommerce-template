@@ -44,6 +44,7 @@ const CartItemQuantity: FC<TCartItemQuantityProps> = ({
     onQuantityChange(Number(quantity));
 
     if (Number(quantity) === 0) onQuantityEmpty();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quantity, cartItem]);
 
   if (!cartItem) return null;

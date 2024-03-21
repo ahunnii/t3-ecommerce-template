@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +10,7 @@ import {
   type Product,
 } from "@prisma/client";
 import { Command as CommandPrimitive } from "cmdk";
-import { CalendarIcon, Trash, X } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -66,7 +67,7 @@ export const DiscountForm: React.FC<FormProps> = ({ initialData }) => {
   const params = useRouter();
   const router = useNavigationRouter();
 
-  const { storeId, discountId } = params.query as {
+  const { storeId } = params.query as {
     storeId: string;
     discountId: string;
   };

@@ -7,7 +7,6 @@ import {
   Copy,
   Download,
   Edit,
-  Eye,
   Mail,
   MoreHorizontal,
   Trash,

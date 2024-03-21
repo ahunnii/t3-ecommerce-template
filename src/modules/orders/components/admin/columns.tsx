@@ -5,7 +5,7 @@ import Link from "next/link";
 import Currency from "~/components/common/currency";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { cn } from "~/utils/styles";
+
 import { CellAction } from "./cell-action";
 
 export type OrderColumn = {

@@ -1,19 +1,13 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetTrigger,
-} from "~/components/ui/sheet";
-import { env } from "~/env.mjs";
+import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 
 import { cn } from "~/utils/styles";
 
@@ -22,7 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import type { SiteLinks } from "./navbar";
 
 export function MobileNav({ links }: { links: SiteLinks[] }) {
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { data: sessionData } = useSession();
   const router = useRouter();

@@ -5,7 +5,6 @@ import {
   CloudLightning,
   Copy,
   Edit,
-  Eye,
   MoreHorizontal,
   Trash,
 } from "lucide-react";

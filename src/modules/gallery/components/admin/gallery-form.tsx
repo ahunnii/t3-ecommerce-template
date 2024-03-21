@@ -77,9 +77,8 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
   });
 
   const apiContext = api.useContext();
-  const { storeId, galleryId } = params.query as {
+  const { storeId } = params.query as {
     storeId: string;
-    galleryId: string;
   };
 
   const { mutate: updateBlogPost } = api.gallery.updateGalleryImage.useMutation(

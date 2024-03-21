@@ -3,31 +3,17 @@
 
 import { CommandLoading } from "cmdk";
 import _debounce from "lodash/debounce";
-import {
-  Calculator,
-  Calendar,
-  Check,
-  CreditCard,
-  Inbox,
-  Loader2,
-  Search,
-  Settings,
-  Shirt,
-  Smile,
-  User,
-} from "lucide-react";
+import { Check, Inbox, Loader2, Search, Settings, Shirt } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { Button } from "~/components/ui/button";
 import {
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "~/components/ui/command";
 import { CommandAdvancedDialog } from "~/components/ui/command-advanced";
 import { env } from "~/env.mjs";

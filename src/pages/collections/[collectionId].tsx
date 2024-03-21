@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
-import Breadcrumbs from "~/components/common/breadcrumb-bar/breadcrumbs";
+
 import NoResults from "~/components/common/no-results";
 import { TaProductCard } from "~/components/custom/ta-product-card.custom";
 

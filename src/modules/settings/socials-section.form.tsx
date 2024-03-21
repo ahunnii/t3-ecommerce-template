@@ -1,22 +1,9 @@
-import {
-  CheckIcon,
-  ChevronsUpDown,
-  Facebook,
-  Instagram,
-  Twitter,
-} from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 import { useMemo, type FC } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
-import { Button } from "~/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "~/components/ui/command";
+
 import {
   FormControl,
   FormField,
@@ -24,17 +11,9 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
 
 import { AdvancedInput } from "~/components/common/inputs/advanced-input";
-import MarkdownEditor from "~/components/common/inputs/markdown-editor";
-import { states } from "~/utils/shipping";
-import { cn } from "~/utils/styles";
+
 import type { SettingsFormValues } from "./types";
 
 type Props = {

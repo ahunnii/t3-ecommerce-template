@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { FieldValues } from "react-hook-form";
 import { Input } from "~/components/ui/input";
 import { cn } from "~/utils/styles";

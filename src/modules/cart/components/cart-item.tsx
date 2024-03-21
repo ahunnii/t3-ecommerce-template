@@ -5,12 +5,10 @@ import { type FC } from "react";
 import IconButton from "~/components/common/buttons/icon-button";
 import Currency from "~/components/common/currency";
 
-import { Label } from "~/components/ui/label";
 import useCart from "~/modules/cart/hooks/use-cart";
 
 import type { CartItem as TCartItem } from "~/types";
 
-import { toastService } from "~/services/toast";
 import { cn } from "~/utils/styles";
 import CartItemQuantity from "./cart-item-quantity";
 import CartItemVariant from "./cart-item-variant";

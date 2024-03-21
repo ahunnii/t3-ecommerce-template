@@ -51,6 +51,7 @@ export function MultipleSelect({
 
     console.log(selectedPeople);
     setSelectedPeople(selectedPeople);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const testThing = (peeps: typeof people) => {

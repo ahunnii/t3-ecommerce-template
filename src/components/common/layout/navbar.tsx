@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FC } from "react";
+import type { FC } from "react";
 
 import Container from "~/components/common/layout/container";
 import MainNav from "~/components/common/layout/main-nav";
@@ -12,7 +12,7 @@ import { cn } from "~/utils/styles";
 export const Navbar: FC<{
   navStyles?: string;
   linkStyles?: string;
-}> = ({ navStyles = "", linkStyles = "" }) => {
+}> = ({ navStyles = "" }) => {
   const { data: categories } = api.collections.getAllCollections.useQuery({
     isFeatured: true,
   });

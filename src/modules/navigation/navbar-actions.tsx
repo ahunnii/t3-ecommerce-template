@@ -1,10 +1,9 @@
-import { ShoppingBag, User } from "lucide-react";
+import { User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Currency from "~/components/common/currency";
+
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -15,15 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "~/components/ui/hover-card";
+
 import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
 
-import { Separator } from "~/components/ui/separator";
-import { cn } from "~/utils/styles";
 const NavbarActions = () => {
   const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();

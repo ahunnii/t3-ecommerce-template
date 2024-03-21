@@ -10,7 +10,6 @@ import { cn } from "~/utils/styles";
 
 const Navbar = ({
   navStyles = "",
-  linkStyles = "",
 }: {
   navStyles?: string;
   linkStyles: string;

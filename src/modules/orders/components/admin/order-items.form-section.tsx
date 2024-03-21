@@ -2,14 +2,7 @@ import { type FC } from "react";
 
 import { Controller, useFieldArray, type UseFormReturn } from "react-hook-form";
 
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
+import { FormDescription, FormField, FormLabel } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
 import { Label } from "~/components/ui/label";
@@ -29,17 +22,10 @@ import {
   TableRow,
 } from "~/components/ui/table";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
+import { Trash } from "lucide-react";
 
-import { CheckIcon, ChevronsUpDown, Trash } from "lucide-react";
-import { FormattedNumericInput } from "~/components/common/inputs/formatted-numeric-input";
 import { Button } from "~/components/ui/button";
-import { states } from "~/utils/shipping";
-import { cn } from "~/utils/styles";
+
 import type { OrderFormValues, OrderItem } from "../../types";
 
 type Props = {

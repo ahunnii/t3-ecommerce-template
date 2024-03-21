@@ -1,20 +1,9 @@
 import type { Order } from "@prisma/client";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "~/components/ui/button";
-import { Checkbox } from "~/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-
-import { OrderDetailsCustomerModal } from "~/components/wip/order-details-customer-modal.wip";
 
 export const columns: ColumnDef<Order>[] = [
   {

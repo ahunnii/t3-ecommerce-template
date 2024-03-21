@@ -12,7 +12,6 @@ import { Separator } from "~/components/ui/separator";
 
 import { AdvancedDataTable } from "~/components/common/tables/advanced-data-table";
 import { columns, type ProductColumn } from "./columns";
-import { productFilterOptions } from "./product-filter-options.admin";
 
 interface ProductsClientProps {
   data: ProductColumn[];

@@ -1,0 +1,562 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Address {
+  id String [pk]
+  street String [not null]
+  additional String
+  city String [not null]
+  state String [not null]
+  postal_code String [not null]
+  country String
+  storeId String [unique]
+  store Store
+  orderId String [unique]
+  order Order
+  shippingLabelId String [unique]
+  shippingLabel ShippingLabel
+}
+
+Table Account {
+  id String [pk]
+  userId String [not null]
+  type String [not null]
+  provider String [not null]
+  providerAccountId String [not null]
+  refresh_token String
+  access_token String
+  expires_at Int
+  token_type String
+  scope String
+  id_token String
+  session_state String
+  user User [not null]
+
+  indexes {
+    (provider, providerAccountId) [unique]
+  }
+}
+
+Table Session {
+  id String [pk]
+  sessionToken String [unique, not null]
+  userId String [not null]
+  expires DateTime [not null]
+  user User [not null]
+}
+
+Table User {
+  id String [pk]
+  name String
+  email String [unique]
+  emailVerified DateTime
+  image String
+  accounts Account [not null]
+  sessions Session [not null]
+  role Role [not null, default: 'USER']
+  orders Order [not null]
+  cart Cart [not null]
+}
+
+Table VerificationToken {
+  identifier String [not null]
+  token String [unique, not null]
+  expires DateTime [not null]
+
+  indexes {
+    (identifier, token) [unique]
+  }
+}
+
+Table Store {
+  id String [pk]
+  name String [not null]
+  slug String [unique]
+  userId String [not null]
+  businessAddress String [not null, default: '']
+  customRequests CustomOrderRequest [not null]
+  address Address
+  billboards Billboard [not null]
+  categories Category [not null]
+  products Product [not null]
+  orders Order [not null]
+  gallery Image [not null]
+  blog BlogPost [not null]
+  discounts Discount [not null]
+  hasFreeShipping Boolean [not null, default: false]
+  minFreeShipping Float [default: 0]
+  hasPickup Boolean [not null, default: false]
+  maxPickupDistance Float [default: 0]
+  hasFlatRate Boolean [not null, default: false]
+  flatRateAmount Float [default: 0]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  content StoreContent
+  socialMedia SocialMedia
+  cart Cart [not null]
+  collections Collection [not null]
+}
+
+Table StoreContent {
+  id String [pk]
+  storeId String [unique, not null]
+  store Store
+  aboutPage String
+  heroImg String
+}
+
+Table SocialMedia {
+  id String [pk]
+  storeId String [unique, not null]
+  store Store
+  facebook String
+  instagram String
+  twitter String
+  tikTok String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Billboard {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  label String [not null]
+  description String
+  imageUrl String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Category {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  name String [not null]
+  description String
+  attributes Attribute [not null]
+  products Product [not null]
+  collection Collection
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Collection {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  imageId String [unique]
+  image Image
+  categoryId String [unique]
+  category Category
+  isFeatured Boolean [not null, default: false]
+  name String [unique, not null]
+  description String
+  slug String [unique]
+  products Product [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  discounts Discount [not null]
+}
+
+Table Product {
+  id String [pk]
+  status ProductStatus [not null, default: 'DRAFT']
+  type ProductType [not null, default: 'PHYSICAL']
+  slug String [unique]
+  storeId String [not null]
+  store Store [not null]
+  categoryId String [not null]
+  category Category [not null]
+  name String [not null]
+  description String [not null]
+  customOrder CustomOrderRequest
+  isFeatured Boolean [not null, default: false]
+  cover String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  variants Variation [not null]
+  collections Collection [not null]
+  images Image [not null]
+  orderItems OrderItem [not null]
+  cartItems CartItem [not null]
+  weight Float [default: 0]
+  length Float [default: 0]
+  width Float [default: 0]
+  height Float [default: 0]
+  shippingCost Float [default: 0]
+  estimatedCompletion Int [not null, default: 0]
+  materials String[] [not null]
+  tags String[] [not null]
+  discounts Discount [not null]
+}
+
+Table Variation {
+  id String [pk]
+  productId String [not null]
+  product Product [not null]
+  title String [not null]
+  names String [not null]
+  values String [not null]
+  quantity Int [not null, default: 1]
+  price Float [not null, default: 0]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  sku String [unique]
+  cover String
+  cartItems CartItem [not null]
+  orderItems OrderItem [not null]
+}
+
+Table CustomOrderRequest {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  type CustomOrderType [not null, default: 'SHIRT']
+  email String [not null]
+  name String [not null]
+  description String [not null]
+  notes String
+  images Image [not null]
+  status CustomOrderStatus [not null, default: 'PENDING']
+  price Float
+  invoiceId String
+  productId String [unique]
+  product Product
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Order {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  orderItems OrderItem [not null]
+  timeline TimeLineEntry [not null]
+  status OrderStatus [not null, default: 'PENDING']
+  isPaid Boolean [not null, default: false]
+  isRefunded Boolean [not null, default: false]
+  isShipped Boolean [not null, default: false]
+  whenPaid DateTime
+  total Float [not null, default: 0]
+  taxes Float [default: 0]
+  subtotal Float [not null, default: 0]
+  shippingCost Float [default: 0]
+  referenceId String [not null, default: '']
+  paymentId String
+  refundId String
+  name String [not null, default: '']
+  email String [not null, default: '']
+  phone String [not null, default: '']
+  address Address
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  shippingLabel ShippingLabel
+  whenShipped DateTime
+  userId String
+  user User
+}
+
+Table BlogPost {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  title String [not null]
+  content String [not null]
+  author String
+  slug String [unique, not null]
+  tags String[] [not null]
+  images Image [not null]
+  published Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table TimeLineEntry {
+  id String [pk]
+  title String [not null]
+  description String
+  type TimeLineEntryType [not null, default: 'ORDER_GENERIC']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  order Order
+  orderId String
+}
+
+Table ShippingLabel {
+  id String [pk]
+  labelUrl String
+  trackingNumber String
+  trackingUrl String
+  cost String
+  carrier String
+  timeEstimate String
+  expireAt DateTime
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  address Address
+  order Order
+  orderId String [unique]
+}
+
+Table OrderItem {
+  id String [pk]
+  orderId String [not null]
+  order Order [not null]
+  productId String [not null]
+  product Product [not null]
+  variantId String
+  variant Variation
+  quantity Int [not null, default: 1]
+  price Float [default: 0]
+  discountId String
+  discount Discount
+}
+
+Table Image {
+  id String [pk]
+  productId String
+  product Product
+  blogId String
+  blog BlogPost
+  customOrderId String
+  customOrder CustomOrderRequest
+  collection Collection
+  storeId String
+  store Store
+  url String [not null]
+  alt String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Attribute {
+  id String [pk]
+  categoryId String [not null]
+  category Category [not null]
+  name String [not null]
+  values String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  storeId String [not null]
+}
+
+Table CartItem {
+  id String [pk]
+  cartId String [not null]
+  cart Cart [not null]
+  productId String [not null]
+  product Product [not null]
+  variantId String
+  variant Variation
+  quantity Int [not null, default: 1]
+}
+
+Table Cart {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  userId String [not null]
+  user User [not null]
+  cartItems CartItem [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Discount {
+  id String [pk]
+  storeId String [not null]
+  store Store [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  startDate DateTime [not null]
+  endDate DateTime
+  code String [unique, not null]
+  description String
+  active Boolean [not null, default: true]
+  value Float [not null, default: 0]
+  stackable Boolean [not null, default: false]
+  valueType DiscountValueType [not null]
+  type DiscountType [not null]
+  methodType DiscountMethodType [not null]
+  minValue Float
+  maxValue Float
+  products Product [not null]
+  collections Collection [not null]
+  orderItems OrderItem [not null]
+}
+
+Table CollectionToProduct {
+  productsId String [ref: > Product.id]
+  collectionsId String [ref: > Collection.id]
+}
+
+Table DiscountToCollection {
+  discountsId String [ref: > Discount.id]
+  collectionsId String [ref: > Collection.id]
+}
+
+Table DiscountToProduct {
+  discountsId String [ref: > Discount.id]
+  productsId String [ref: > Product.id]
+}
+
+Enum ShippingType {
+  FLAT_RATE
+  FREE
+  LOCAL_PICKUP
+  VARIABLE
+}
+
+Enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+Enum ProductType {
+  PHYSICAL
+  DIGITAL
+  SERVICE
+}
+
+Enum CustomOrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+Enum CustomOrderType {
+  HAT
+  SHIRT
+  HOODIE
+}
+
+Enum OrderStatus {
+  NEW
+  ABANDONED
+  PENDING
+  PAID
+  SHIPPED
+  REFUNDED
+  PAYMENT_FAILED
+}
+
+Enum TimeLineEntryType {
+  ORDER_PLACED
+  ORDER_PAID
+  ORDER_SHIPPED
+  ORDER_COMPLETED
+  ORDER_CANCELLED
+  ORDER_REFUNDED
+  ORDER_RETURNED
+  ORDER_NOTE
+  ORDER_GENERIC
+  PAYMENT_FAILED
+  PAYMENT_SUCCESSFUL
+  PAYMENT_PENDING
+  PAYMENT_REFUNDED
+  PAYMENT_INITIATED
+  ORDER_PENDING
+  ORDER_SUCCESSFUL
+}
+
+Enum DiscountValueType {
+  PERCENTAGE
+  FIXED
+}
+
+Enum DiscountMethodType {
+  SALE
+  COUPON
+}
+
+Enum DiscountType {
+  GLOBAL
+  PER_PRODUCT
+  PER_COLLECTION
+  SHIPPING
+  ORDER
+}
+
+Enum Role {
+  USER
+  ADMIN
+  BUSINESS_OWNER
+}
+
+Ref: Address.storeId - Store.id [delete: Cascade]
+
+Ref: Address.orderId - Order.id [delete: Cascade]
+
+Ref: Address.shippingLabelId - ShippingLabel.id [delete: Cascade]
+
+Ref: Account.userId > User.id [delete: Cascade]
+
+Ref: Session.userId > User.id [delete: Cascade]
+
+Ref: StoreContent.storeId - Store.id
+
+Ref: SocialMedia.storeId - Store.id
+
+Ref: Billboard.storeId > Store.id
+
+Ref: Category.storeId > Store.id
+
+Ref: Collection.storeId > Store.id
+
+Ref: Collection.imageId - Image.id [delete: Cascade]
+
+Ref: Collection.categoryId - Category.id
+
+Ref: Product.storeId > Store.id
+
+Ref: Product.categoryId > Category.id
+
+Ref: Variation.productId > Product.id [delete: Cascade]
+
+Ref: CustomOrderRequest.storeId > Store.id
+
+Ref: CustomOrderRequest.productId - Product.id [delete: Set Null]
+
+Ref: Order.storeId > Store.id
+
+Ref: Order.userId > User.id
+
+Ref: BlogPost.storeId > Store.id [delete: Cascade]
+
+Ref: TimeLineEntry.orderId > Order.id
+
+Ref: ShippingLabel.orderId - Order.id
+
+Ref: OrderItem.orderId > Order.id [delete: Cascade]
+
+Ref: OrderItem.productId > Product.id
+
+Ref: OrderItem.variantId > Variation.id
+
+Ref: OrderItem.discountId > Discount.id
+
+Ref: Image.productId > Product.id [delete: Cascade]
+
+Ref: Image.blogId > BlogPost.id [delete: Cascade]
+
+Ref: Image.customOrderId > CustomOrderRequest.id [delete: Cascade]
+
+Ref: Image.storeId > Store.id [delete: Cascade]
+
+Ref: Attribute.categoryId > Category.id [delete: Cascade]
+
+Ref: CartItem.cartId > Cart.id
+
+Ref: CartItem.productId > Product.id
+
+Ref: CartItem.variantId > Variation.id
+
+Ref: Cart.storeId > Store.id
+
+Ref: Cart.userId > User.id
+
+Ref: Discount.storeId > Store.id

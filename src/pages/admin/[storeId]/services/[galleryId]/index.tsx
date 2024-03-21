@@ -58,6 +58,7 @@ const GalleryImagePage: FC<IProps> = ({ galleryId, storeId }) => {
             <ViewSection title="Metadata" description="Helps with SEO ">
               <div className={cn("leading-7 [&:not(:first-child)]:mt-6", "")}>
                 {parse(
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                   galleryImage?.caption === "" || galleryImage?.caption === null
                     ? "No caption provided."
                     : galleryImage.caption

@@ -2,12 +2,10 @@ import {
   Body,
   Button,
   Column,
-  Container,
   Head,
   Heading,
   Html,
   Img,
-  Link,
   Preview,
   Row,
   Section,
@@ -29,7 +27,6 @@ interface RoutingMagicLinkProps {
 const baseUrl = env.NEXT_PUBLIC_URL;
 
 export const TrackingInfoCustomerTemplate = ({
-  orderLink = "https://test.com",
   trackingLink = "https://test.com",
   orderId = "easfdsfadsfdasf",
 }: RoutingMagicLinkProps) => (

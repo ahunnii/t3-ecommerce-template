@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 
 const Footer = () => {
   const year = new Date().getFullYear();
-  const { data: store, isLoading } = api.store.getSocials.useQuery({});
+  const { data: store } = api.store.getSocials.useQuery({});
   return (
     <div className="w-full bg-black px-4 sm:px-6 lg:px-8">
       <Container>

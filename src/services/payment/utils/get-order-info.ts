@@ -1,5 +1,4 @@
-import { Order } from "@prisma/client";
-import { CheckoutOrderDetails, PaymentOrderData } from "../types";
+import type { CheckoutOrderDetails, PaymentOrderData } from "../types";
 
 export const getOrderInfo = ({
   orderData,

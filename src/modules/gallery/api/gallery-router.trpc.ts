@@ -90,7 +90,7 @@ export const galleryRouter = createTRPCRouter({
         id: z.string(),
       })
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(({ ctx, input }) => {
       if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",

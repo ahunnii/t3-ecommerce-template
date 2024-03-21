@@ -1,14 +1,7 @@
 import type { FC } from "react";
 
-import BulletList from "@tiptap/extension-bullet-list";
-import { Color } from "@tiptap/extension-color";
-import Document from "@tiptap/extension-document";
-import Heading from "@tiptap/extension-heading";
 import Highlight from "@tiptap/extension-highlight";
-import ListItem from "@tiptap/extension-list-item";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
-import TextStyle from "@tiptap/extension-text-style";
+
 import Typography from "@tiptap/extension-typography";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";

@@ -1,16 +1,10 @@
-import { CheckIcon, ChevronsUpDown, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useMemo, type FC } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { Button } from "~/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "~/components/ui/command";
+
 import {
   FormControl,
   FormDescription,
@@ -19,17 +13,11 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
 
 import Image from "next/image";
 import MarkdownEditor from "~/components/common/inputs/markdown-editor";
 import ImageUpload from "~/services/image-upload/components/image-upload";
-import { states } from "~/utils/shipping";
+
 import { cn } from "~/utils/styles";
 import type { SettingsFormValues } from "./types";
 

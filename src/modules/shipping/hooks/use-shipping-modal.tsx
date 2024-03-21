@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { OrderColumn } from "~/modules/orders/components/admin/columns";
 
 interface useShippingModalStore {
   isOpen: boolean;

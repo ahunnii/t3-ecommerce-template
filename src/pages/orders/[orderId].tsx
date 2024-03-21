@@ -1,28 +1,19 @@
-import parse from "html-react-parser";
-import { ArrowLeft } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-
-import Link from "next/link";
-import { redirect, useParams } from "next/navigation";
-import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { ViewSection } from "~/components/common/sections/view-section.admin";
 
 import StorefrontLayout from "~/components/layouts/storefront-layout";
-import { Button } from "~/components/ui/button";
+
 import { useConfig } from "~/providers/style-config-provider";
 
-import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 
-import { Prisma } from "@prisma/client";
-import { GetServerSidePropsContext } from "next";
+import type { Prisma } from "@prisma/client";
+import type { GetServerSidePropsContext } from "next";
 import Currency from "~/components/common/currency";
 import { OrderViewItem } from "~/modules/cart/components/order-item.wip";
-import { createTRPCContext } from "~/server/api/trpc";
+
+import { useParams } from "next/navigation";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
-import paymentService from "~/services/payment";
 
 const metadata = {
   title: "Thank You! | Trend Anomaly",

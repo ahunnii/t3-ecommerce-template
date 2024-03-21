@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { CheckoutOrderDetails } from "../types";
+import type { CheckoutOrderDetails } from "../types";
 
 export const formatSessionData = (
   session: Stripe.Checkout.Session

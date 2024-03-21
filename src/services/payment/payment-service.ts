@@ -1,5 +1,5 @@
 import type { Order, Prisma } from "@prisma/client";
-import type { CartItem, CustomerShippingRate, DetailedOrder } from "~/types";
+import type { CartItem, CustomerShippingRate } from "~/types";
 import type {
   CheckoutSessionResponse,
   THandleCheckoutProps,

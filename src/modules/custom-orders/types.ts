@@ -1,11 +1,10 @@
-import {
-  CustomOrderStatus,
-  CustomOrderType,
-  type Prisma,
-} from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 import type { LucideIcon } from "lucide-react";
 import * as z from "zod";
-import { customOrderAdminFormSchema, customRequestFormSchema } from "./schema";
+import type {
+  customOrderAdminFormSchema,
+  customRequestFormSchema,
+} from "./schema";
 
 export type CustomProduct = "hat" | "shirt" | "hoodie";
 

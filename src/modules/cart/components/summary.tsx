@@ -3,11 +3,11 @@ import { Button } from "~/components/ui/button";
 
 import { useConfig } from "~/providers/style-config-provider";
 
-import { CreditCard, X } from "lucide-react";
-import { ClipboardEventHandler, useRef, useState } from "react";
+import { X } from "lucide-react";
+import { useRef, useState } from "react";
 import { Badge } from "~/components/ui/badge";
-import { Input } from "~/components/ui/input";
-import { toastService } from "~/services/toast";
+
+// import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 import useCheckout from "../hooks/use-checkout";
@@ -36,29 +36,29 @@ const Summary = ({ cartSize }: { cartSize: number }) => {
 
   const validCode = getCoupon?.data && couponValue !== "";
 
-  const checkForCoupon = () => {
-    if (couponValue) {
-      if (couponValue === getCoupon?.data?.code) {
-        toastService.error(
-          "Only one coupon can be used at a time",
-          "Invalid Coupon"
-        );
-      }
-      getCoupon
-        .refetch({})
-        .then(({ data }) => {
-          if (data) {
-            toastService.success("Coupon applied successfully");
-          } else {
-            toastService.error("Coupon not found", "Invalid Coupon");
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          toastService.error("Coupon not found", "Invalid Coupon");
-        });
-    }
-  };
+  // const checkForCoupon = () => {
+  //   if (couponValue) {
+  //     if (couponValue === getCoupon?.data?.code) {
+  //       toastService.error(
+  //         "Only one coupon can be used at a time",
+  //         "Invalid Coupon"
+  //       );
+  //     }
+  //     getCoupon
+  //       .refetch({})
+  //       .then(({ data }) => {
+  //         if (data) {
+  //           toastService.success("Coupon applied successfully");
+  //         } else {
+  //           toastService.error("Coupon not found", "Invalid Coupon");
+  //         }
+  //       })
+  //       .catch((e) => {
+  //         console.log(e);
+  //         toastService.error("Coupon not found", "Invalid Coupon");
+  //       });
+  //   }
+  // };
 
   const subTotal = totalDiscount ?? totalPrice;
 

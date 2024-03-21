@@ -25,7 +25,6 @@ const MainNav: React.FC<MainNavProps> = ({ links }) => {
   const primaryLinkStyle =
     "cursor-pointer text-neutral-500 text-sm font-medium transition-colors hover:text-purple-500 bg-transparent hover:bg-transparent focus:bg-transparent focus:text-purple-400 data-[active]:bg-transparent data-[state=open]:bg-transparent";
 
-  const highlightStyle = "text-purple-500";
   return (
     <nav className="mx-6 flex items-center space-x-4 max-md:hidden lg:space-x-6">
       <NavigationMenu>

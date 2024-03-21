@@ -1,6 +1,6 @@
 import type { FC } from "react";
 
-import type { Prisma, Product } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 
 import Image, { type ImageProps } from "next/image";
@@ -29,7 +29,7 @@ const ProductCard: FC<Props> = ({
   noNameTag = false,
   variant = "default",
 }) => {
-  const { price, id } = product;
+  const { price } = product;
 
   const rootClassName = cn(
     s.root,
