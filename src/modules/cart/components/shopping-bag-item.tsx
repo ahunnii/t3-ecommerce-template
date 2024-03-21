@@ -1,15 +1,22 @@
+import { Trash } from "lucide-react";
 import Image from "next/image";
 
 import Currency from "~/components/common/currency";
+import { Button } from "~/components/ui/button";
 
 import type { CartItem } from "~/types";
 
 import { cn } from "~/utils/styles";
+import useCart from "../hooks/use-cart";
 
 type TShoppingBagItemProps = {
   cartItem: CartItem;
 };
 const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
+  const cart = useCart();
+
+  const onCartRemove = () => cart.removeCartItem(cartItem);
+
   return (
     <div className="grid w-full  grid-cols-12 items-start gap-x-8 gap-y-8 border-b border-purple-500 py-2">
       <div className="col-span-3">
@@ -27,6 +34,14 @@ const ShoppingBagItem = ({ cartItem }: TShoppingBagItemProps) => {
         </div>
       </div>
       <div className="col-span-5 ">
+        <Button
+          variant={"ghost"}
+          size={"icon"}
+          className="absolute right-4 hover:bg-purple-500"
+          onClick={onCartRemove}
+        >
+          <Trash className="  h-6 w-6 text-white" />
+        </Button>
         {/* Common cart item data */}
         <h1 className="text-base font-bold text-white">
           {cartItem.product.name} ({cartItem.quantity})

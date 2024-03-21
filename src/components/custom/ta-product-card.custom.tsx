@@ -18,6 +18,7 @@ import {
   type productCardVariants,
 } from "~/modules/products/components/product-card";
 
+import { useSession } from "next-auth/react";
 import { Button } from "~/components/ui/button";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
