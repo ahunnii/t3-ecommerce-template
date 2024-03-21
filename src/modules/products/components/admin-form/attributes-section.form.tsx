@@ -13,15 +13,17 @@ import {
 import { type Tag, TagInput } from "~/components/ui/tag-input";
 import type { ProductFormValues } from "../../types";
 
+type Props = {
+  form: UseFormReturn<ProductFormValues>;
+  initialTags: string[];
+  initialMaterials: string[];
+};
+
 export const AttributeSection = ({
   form,
   initialTags,
   initialMaterials,
-}: {
-  form: UseFormReturn<ProductFormValues>;
-  initialTags: string[];
-  initialMaterials: string[];
-}) => {
+}: Props) => {
   const [tags, setTags] = useState<{ name: string; id: string }[]>(
     initialTags.map((tag) => ({ name: tag, id: uniqueId() }))
   );
@@ -46,7 +48,7 @@ export const AttributeSection = ({
               <FormControl>
                 <TagInput
                   {...field}
-                  placeholder="Enter a topic"
+                  placeholder="Enter a word or short phrase and press enter"
                   tags={tags}
                   className="sm:min-w-[450px]"
                   setTags={(newTags) => {
@@ -72,7 +74,7 @@ export const AttributeSection = ({
               <FormControl>
                 <TagInput
                   {...field}
-                  placeholder="Enter a topic"
+                  placeholder="Enter a material and press enter"
                   tags={materials}
                   className="sm:min-w-[450px]"
                   setTags={(newTags) => {

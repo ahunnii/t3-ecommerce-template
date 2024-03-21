@@ -1,4 +1,4 @@
-import { type ShippingType } from "@prisma/client";
+import { ProductStatus, ProductType } from "@prisma/client";
 
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -41,7 +41,7 @@ export const productsRouter = createTRPCRouter({
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured,
           categoryId: input.categoryId,
-          isArchived: input.isArchived,
+          status: input.isArchived ? "ARCHIVED" : undefined,
         },
         include: {
           collections: {
@@ -95,7 +95,9 @@ export const productsRouter = createTRPCRouter({
         where: {
           storeId: input?.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           categoryId: input.categoryId,
-          isArchived: false,
+          NOT: {
+            status: "ARCHIVED",
+          },
         },
         include: {
           category: true,
@@ -134,9 +136,12 @@ export const productsRouter = createTRPCRouter({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured ?? undefined,
-          isArchived: input.includeCustom
+          status: input.includeCustom
             ? undefined
-            : input.isArchived ?? false,
+            : input.isArchived
+            ? "ARCHIVED"
+            : undefined,
+
           collections: input.collectionId
             ? {
                 some: {
@@ -272,23 +277,23 @@ export const productsRouter = createTRPCRouter({
   createProduct: protectedProcedure
     .input(
       z.object({
+        storeId: z.string(),
+        categoryId: z.string(),
+
         name: z.string(),
         price: z.number(),
-        categoryId: z.string(),
+        quantity: z.number(),
+        description: z.string(),
+
         featuredImage: z.string(),
 
-        description: z.string(),
-        quantity: z.number(),
-        storeId: z.string(),
         isFeatured: z.boolean().optional(),
-        isArchived: z.boolean().optional(),
+
         shippingCost: z.coerce.number().min(0).optional(),
-        shippingType: z.enum([
-          "FLAT_RATE" as ShippingType,
-          "FREE" as ShippingType,
-          "VARIABLE" as ShippingType,
-        ]),
-        handle: z.string().optional(),
+
+        type: z.nativeEnum(ProductType),
+        status: z.nativeEnum(ProductStatus),
+
         weight: z.coerce.number().min(0).optional(),
         length: z.coerce.number().min(0).optional(),
         width: z.coerce.number().min(0).optional(),
@@ -325,7 +330,8 @@ export const productsRouter = createTRPCRouter({
           name: input.name,
           price: input.price,
           isFeatured: input.isFeatured,
-          isArchived: input.isArchived,
+          status: input.status,
+          type: input.type,
           categoryId: input.categoryId,
           description: input.description,
           estimatedCompletion: input.estimatedCompletion ?? 0,
@@ -355,7 +361,7 @@ export const productsRouter = createTRPCRouter({
           tags: input.tags.map((tag) => tag.name),
           materials: input.materials.map((materials) => materials.name),
           shippingCost: input.shippingCost,
-          shippingType: input.shippingType,
+
           weight: input.weight,
           length: input.length,
           width: input.width,
@@ -374,9 +380,12 @@ export const productsRouter = createTRPCRouter({
         estimatedCompletion: z.coerce.number().min(0).optional(),
         storeId: z.string(),
         isFeatured: z.boolean().optional(),
-        isArchived: z.boolean().optional(),
+
+        type: z.nativeEnum(ProductType),
+        status: z.nativeEnum(ProductStatus),
+
         description: z.string().optional(),
-        handle: z.string().optional(),
+
         quantity: z.number(),
         images: z.array(
           z.object({
@@ -397,11 +406,7 @@ export const productsRouter = createTRPCRouter({
         materials: z.array(z.object({ name: z.string() })),
         featuredImage: z.string(),
         shippingCost: z.coerce.number().min(0).optional(),
-        shippingType: z.enum([
-          "FLAT_RATE" as ShippingType,
-          "FREE" as ShippingType,
-          "VARIABLE" as ShippingType,
-        ]),
+
         weight: z.coerce.number().min(0).optional(),
         length: z.coerce.number().min(0).optional(),
         width: z.coerce.number().min(0).optional(),
@@ -481,7 +486,8 @@ export const productsRouter = createTRPCRouter({
             name: input.name,
             price: input.price,
             isFeatured: input.isFeatured,
-            isArchived: input.isArchived,
+            status: input.status,
+            type: input.type,
             categoryId: input.categoryId,
             estimatedCompletion: input.estimatedCompletion ?? 0,
             description: input.description,
@@ -497,7 +503,7 @@ export const productsRouter = createTRPCRouter({
             materials: input.materials.map((materials) => materials.name),
 
             shippingCost: input.shippingCost,
-            shippingType: input.shippingType,
+
             weight: input.weight,
             length: input.length,
             width: input.width,

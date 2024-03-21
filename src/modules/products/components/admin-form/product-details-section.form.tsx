@@ -128,7 +128,10 @@ export const ProductDetailsSection = ({
                     </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => {
-                        if (handleOnClick) {
+                        if (
+                          handleOnClick &&
+                          form.watch("categoryId") !== undefined
+                        ) {
                           handleOnClick();
                         }
                       }}
@@ -177,14 +180,14 @@ export const ProductDetailsSection = ({
           )}
         />
 
-        {/* <FormField
+        <FormField
           control={form.control}
-          name="productType"
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Product Type</FormLabel>
               <Select
-                disabled={loading}
+                disabled={true}
                 onValueChange={field.onChange}
                 value={field.value}
                 defaultValue={field.value}
@@ -206,7 +209,7 @@ export const ProductDetailsSection = ({
               <FormMessage />
             </FormItem>
           )}
-        /> */}
+        />
         {fields.length === 0 && (
           <FormField
             control={form.control}
@@ -319,26 +322,6 @@ export const ProductDetailsSection = ({
                 <FormLabel>Featured</FormLabel>
                 <FormDescription>
                   This product will appear on the home page
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="isArchived"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Archived</FormLabel>
-                <FormDescription>
-                  This product will not appear anywhere in the store.
                 </FormDescription>
               </div>
             </FormItem>

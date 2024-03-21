@@ -200,24 +200,35 @@ model Collection {
  
   @@index([categoryId])
 }
-enum ShippingType  {
-FLAT_RATE
-FREE
-LOCAL_PICKUP
-VARIABLE 
+
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+  CUSTOM
+}
+
+enum ShippingOption {
+  FREE
+  FLAT_RATE
+  PICKUP
+  CUSTOM
 }
 
 
-
 model Product {
-  id          String   @id @default(cuid())
-  slug        String?   @unique
+  id          String          @id @default(cuid())
 
-  storeId     String // Foreign Key to Store
-  store       Store    @relation("StoreToProduct", fields: [storeId], references: [id])
+  status      ProductStatus   @default(DRAFT)
+  type        ProductType     @default(PHYSICAL)
+  slug        String?         @unique
 
-  categoryId  String // Foreign Key to Category
-  category    Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  storeId     String          // Foreign Key to Store
+  store       Store           @relation("StoreToProduct", fields: [storeId], references: [id])
+
+  categoryId  String            // Foreign Key to Category
+  category    Category        @relation("CategoryToProduct", fields: [categoryId], references: [id])
 
   name                String
 
@@ -233,7 +244,7 @@ model Product {
 
 
   isFeatured  Boolean      @default(false)
-  isArchived  Boolean      @default(false)
+
 
   featuredImage String?
   images      Image[] // Relation to Image model
@@ -258,11 +269,11 @@ model Product {
   estimatedCompletion Int @default(0)
 
 
-  shippingType ShippingType @default(FLAT_RATE)
+  
   shippingCost Float? @default(0)
 
 
-  productType ProductType @default(PHYSICAL)
+
 
 
   discounts Discount[] @relation("DiscountToProduct")

@@ -1,4 +1,4 @@
-import type { Discount, Prisma, Product, ShippingType } from "@prisma/client";
+import type { Discount, Prisma, Product } from "@prisma/client";
 
 export interface Image {
   id: string;
@@ -119,6 +119,13 @@ export type DetailedOrder = Prisma.OrderGetPayload<{
     timeline: true;
   };
 }>;
+
+export enum ShippingType {
+  FREE = "FREE",
+  FLAT_RATE = "FLAT_RATE",
+  PICKUP = "PICKUP",
+  CUSTOM = "CUSTOM",
+}
 
 export type CustomerShippingRate = {
   type: ShippingType;

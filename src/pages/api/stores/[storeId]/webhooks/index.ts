@@ -102,7 +102,7 @@ const handleCheckoutProcessing = async (
                       id: orderItem.productId,
                     },
                     data: {
-                      isArchived: true,
+                      status: "ARCHIVED",
                     },
                   });
                 }
@@ -137,7 +137,7 @@ const handleCheckoutProcessing = async (
                   id: orderItem.productId,
                 },
                 data: {
-                  isArchived: true,
+                  status: "ARCHIVED",
                 },
               });
             }

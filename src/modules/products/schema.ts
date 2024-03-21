@@ -1,4 +1,4 @@
-import { ProductType, ShippingType } from "@prisma/client";
+import { ProductStatus, ProductType } from "@prisma/client";
 import * as z from "zod";
 
 export const productFormSchema = z.object({
@@ -8,7 +8,8 @@ export const productFormSchema = z.object({
   price: z.coerce.number().min(0.01),
   categoryId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
-  isArchived: z.boolean().default(false).optional(),
+  status: z.nativeEnum(ProductStatus),
+  type: z.nativeEnum(ProductType),
   description: z.string(),
   quantity: z.coerce.number().min(1).default(1),
   variants: z.array(
@@ -25,13 +26,13 @@ export const productFormSchema = z.object({
   materials: z.array(z.object({ name: z.string(), id: z.string() })),
   featuredImage: z.string().min(1),
   shippingCost: z.coerce.number().min(0).optional(),
-  shippingType: z.nativeEnum(ShippingType),
+
   weight: z.coerce.number().min(0).optional(),
   length: z.coerce.number().min(0).optional(),
   width: z.coerce.number().min(0).optional(),
   height: z.coerce.number().min(0).optional(),
   estimatedCompletion: z.coerce.number().min(0).int(),
-  productType: z.nativeEnum(ProductType),
+
   weight_oz: z.coerce.number().min(0).optional(),
   weight_lb: z.coerce.number().min(0).optional(),
 });

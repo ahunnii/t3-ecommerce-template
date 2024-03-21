@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 
+import type { ProductStatus } from "@prisma/client";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,21 +18,11 @@ export type ProductColumn = {
     id: string;
     name: string;
   };
-
   updatedAt: Date;
   isFeatured: boolean;
-  isArchived: boolean;
+  status: ProductStatus;
+
   featuredImage?: string | null;
-  customOrder:
-    | {
-        id: string;
-      }
-    | undefined
-    | null;
-  // images?: {
-  //   id: string;
-  //   url: string;
-  // }[];
 };
 
 export const columns: ColumnDef<ProductColumn>[] = [
@@ -63,28 +54,19 @@ export const columns: ColumnDef<ProductColumn>[] = [
     ),
   },
   {
-    accessorKey: "isArchived",
-    header: "Archived",
+    accessorKey: "status",
+    header: "Status",
     filterFn: (row, id, value) => {
-      const key = row.getValue(id) ? "Archived" : "Not Archived";
+      const key = row.getValue(id);
       return value.includes(key);
     },
-    cell: ({ row }) => (row.original.isArchived ? "Archived" : "Not Archived"),
+    cell: ({ row }) => row.original.status,
   },
   {
     accessorKey: "isFeatured",
     header: "Featured",
   },
-  {
-    accessorKey: "customOrder",
-    header: "Custom Order",
-    filterFn: (row, id, value) => {
-      const key = row.getValue(id) ? "Custom Order" : "Not Custom Order";
-      return value.includes(key);
-    },
-    cell: ({ row }) =>
-      row.original.customOrder?.id ? "Custom Order" : "Not Custom Order",
-  },
+
   {
     accessorKey: "price",
     header: "Price",

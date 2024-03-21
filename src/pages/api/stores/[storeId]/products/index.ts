@@ -30,7 +30,7 @@ const productsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
               },
             },
             isFeatured: isFeatured ? isFeatured === "true" : undefined,
-            isArchived: false,
+            status: "ACTIVE",
           },
           include: {
             images: true,

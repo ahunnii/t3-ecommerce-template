@@ -84,32 +84,31 @@ export const ShippingSection = ({
               </FormItem>
             )}
           /> */}
-          {form.watch("shippingType") === "FLAT_RATE" && (
-            <FormField
-              control={form.control}
-              name="shippingCost"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Handling Fees (optional)</FormLabel>
-                  <FormControl>
-                    <AdvancedNumericInput
-                      type="number"
-                      disabled={loading}
-                      placeholder="1"
-                      min={0}
-                      field={field}
-                      prependSpan="$"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Set any additional fees for handling and packaging. This
-                    gets added to the shipping cost at checkout.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+
+          <FormField
+            control={form.control}
+            name="shippingCost"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Handling Fees (optional)</FormLabel>
+                <FormControl>
+                  <AdvancedNumericInput
+                    type="number"
+                    disabled={loading}
+                    placeholder="1"
+                    min={0}
+                    field={field}
+                    prependSpan="$"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Set any additional fees for handling and packaging. This gets
+                  added to the shipping cost at checkout.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <div className="flex flex-col justify-center">
             <FormLabel>Weight (g):</FormLabel>

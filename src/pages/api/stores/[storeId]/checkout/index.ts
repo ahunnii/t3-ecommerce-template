@@ -6,7 +6,7 @@ import { createTRPCContext } from "~/server/api/trpc";
 
 import axios from "axios";
 
-import { type CartItem } from "~/types";
+import { ShippingType, type CartItem } from "~/types";
 
 import paymentService from "~/services/payment";
 
@@ -45,14 +45,14 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
 
           const shipping_options = paymentService.createShippingOptions([
-            shipping === "FREE"
+            (shipping as string) === "FREE"
               ? {
-                  type: "FREE",
+                  type: ShippingType.FREE,
                   label: "Free Shipping",
                   cost: 0,
                 }
               : {
-                  type: "FLAT_RATE",
+                  type: ShippingType.FLAT_RATE,
                   label: "[Fixed] Standard 5-7 days after product processing.",
                   cost: shipping,
                 },

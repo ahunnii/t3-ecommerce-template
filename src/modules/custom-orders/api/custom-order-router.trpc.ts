@@ -176,7 +176,7 @@ export const customRouter = createTRPCRouter({
             },
             create: {
               price: input.price ?? 0.0,
-              isArchived: true,
+              status: "CUSTOM",
               name: `Custom ${input.type}`,
               categoryId: category?.id ?? "",
               storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
@@ -270,7 +270,7 @@ export const customRouter = createTRPCRouter({
           },
           create: {
             price: input.price,
-            isArchived: true,
+            status: "CUSTOM",
             name: `Custom ${input.type}`,
             categoryId: category?.id ?? "",
             storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,

@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  Attribute,
-  Category,
+import {
+  ProductStatus,
   ProductType,
-  ShippingType,
+  type Attribute,
+  type Category,
 } from "@prisma/client";
 
 import { useRouter as useNavigationRouter } from "next/navigation";
@@ -64,7 +64,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
     description: initialData?.description ?? "",
     quantity: initialData?.quantity ?? 1,
     isFeatured: initialData?.isFeatured ?? false,
-    isArchived: initialData?.isArchived ?? false,
+
     variants: initialData?.variants
       ? initialData?.variants?.map((variant) => ({
           values: variant.values,
@@ -76,7 +76,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
         }))
       : [],
     shippingCost: initialData?.shippingCost ?? 0.0,
-    shippingType: initialData?.shippingType ?? ("FLAT_RATE" as ShippingType),
+
     weight: initialData?.weight ?? 0.0,
     length: initialData?.length ?? 0.0,
     width: initialData?.width ?? 0.0,
@@ -89,7 +89,8 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
         name: material,
       })) ?? [],
     featuredImage: initialData?.featuredImage ?? undefined,
-    productType: initialData?.productType ?? ("PHYSICAL" as ProductType),
+    type: ProductType.PHYSICAL,
+    status: initialData?.status ?? ProductStatus.DRAFT,
     weight_oz: (initialData?.weight ?? 0.0) % 16,
     weight_lb: Math.floor((initialData?.weight ?? 0.0) / 16),
   };
