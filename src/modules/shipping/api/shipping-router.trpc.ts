@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { shippoClient } from "~/server/shippo/client";
 import { emailService } from "~/services/email";
-import TrackingInfoCustomerTemplate from "~/services/email/email-templates/customer.track-order";
+import { CustomerTrackOrderEmail } from "~/services/email/email-templates/customer.track-order";
 import { addressFormSchema, packageFormSchema } from "../schema";
 
 export const shippingLabelRouter = createTRPCRouter({
@@ -231,13 +231,15 @@ export const shippingLabelRouter = createTRPCRouter({
       if (dbEntry.id && order?.email) {
         const emailData = {
           trackingLink: shippingLabel.tracking_url_provider,
+          orderLink: `${process.env.NEXT_PUBLIC_URL}/orders/${input.orderId}`,
+          orderId: input.orderId,
         };
         await emailService.sendEmail<typeof emailData>({
           to: order.email,
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
           subject: `A shipment from order ${input.orderId} is on the way`,
           data: emailData,
-          template: TrackingInfoCustomerTemplate,
+          template: CustomerTrackOrderEmail,
         });
       }
 

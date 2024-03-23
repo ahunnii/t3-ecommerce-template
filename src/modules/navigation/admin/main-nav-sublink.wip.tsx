@@ -135,6 +135,11 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
             `/admin/${encodedStoreId}/services/media-uploads`
           ),
         },
+        {
+          href: `/admin/${encodedStoreId}/services/emails`,
+          label: "Emails",
+          active: checkActivePath(`/admin/${encodedStoreId}/services/emails`),
+        },
       ],
     },
     {

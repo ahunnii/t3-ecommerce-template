@@ -36,6 +36,13 @@ const MediaUploadAdminPage: FC<IProps> = ({ storeId }) => {
       dashboard: `/admin/${storeId}/services/media-uploads`,
       disabled: false,
     },
+    {
+      name: "Emails",
+      description: "Check and manage your email service and emails sent out",
+      // homepage: "https://console.cloudinary.com/pm/",
+      dashboard: `/admin/${storeId}/services/emails`,
+      disabled: false,
+    },
     // {
     //   name: "Payment Gateway",
     //   description: "How you accept payments on your site (COMING SOON)",
@@ -65,7 +72,7 @@ const MediaUploadAdminPage: FC<IProps> = ({ storeId }) => {
     //     "How you track and monitor your site's activity (COMING SOON)",
     //   disabled: true,
     // },
-  ] as const;
+  ];
   return (
     <AdminLayout>
       <div className="mx-auto max-w-7xl space-y-4 p-8">
@@ -85,11 +92,14 @@ const MediaUploadAdminPage: FC<IProps> = ({ storeId }) => {
               </CardHeader>
               <CardContent></CardContent>
               <CardFooter className="mt-auto flex justify-end gap-2">
-                <Link href={service.homepage} target="_blank">
-                  <Button variant="outline">
-                    <ExternalLink />
-                  </Button>
-                </Link>{" "}
+                {service?.homepage && (
+                  <Link href={service.homepage} target="_blank">
+                    <Button variant="outline">
+                      <ExternalLink />
+                    </Button>{" "}
+                  </Link>
+                )}
+
                 <Link href={service.dashboard}>
                   <Button>Dashboard</Button>
                 </Link>

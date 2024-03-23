@@ -22,7 +22,7 @@ type Props = {
 //   : "";
 const baseUrl = env.NEXT_PUBLIC_URL;
 
-export const NewOrderEmailTemplate = ({ link }: Props) => {
+export const AdminNewOrderEmail = (props: Props) => {
   const previewText = `You made a new sale!`;
 
   return (
@@ -31,33 +31,36 @@ export const NewOrderEmailTemplate = ({ link }: Props) => {
       <Preview>{previewText}</Preview>
       <Tailwind>
         <Body className="bg-[#ffffff] p-8">
-          <Container className="border border-solid border-[#eaeaea] p-8">
-            <Img
-              src={`${baseUrl}/custom/logo.png`}
-              width="80"
-              height="80"
-              alt=" Logo"
-              className="mx-auto mt-8"
-            />
-            <div className="p-8">
-              <Heading className="text-center text-2xl">New Order</Heading>
-
-              <Text style={paragraph}>
-                It looks like you made a sale! Check out the new order!
-              </Text>
-
-              <Button style={button} href={link}>
-                View Order
-              </Button>
-            </div>
-          </Container>
+          <AdminNewOrderEmailBody {...props} />
         </Body>
       </Tailwind>
     </Html>
   );
 };
+export const AdminNewOrderEmailBody = (props: Props) => {
+  return (
+    <Container className="mt-8 border border-solid border-[#eaeaea] p-8">
+      <Img
+        src={`${baseUrl}/custom/logo.png`}
+        width="80"
+        height="80"
+        alt=" Logo"
+        className="mx-auto mt-8"
+      />
+      <div className="p-8">
+        <Heading className="text-center text-2xl">New Order</Heading>
 
-export default NewOrderEmailTemplate;
+        <Text style={paragraph}>
+          It looks like you made a sale! Check out the new order!
+        </Text>
+
+        <Button style={button} href={props.link}>
+          View Order
+        </Button>
+      </div>
+    </Container>
+  );
+};
 
 const paragraph = {
   fontSize: "16px",

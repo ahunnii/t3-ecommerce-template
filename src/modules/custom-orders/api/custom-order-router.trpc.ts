@@ -13,9 +13,9 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { emailService } from "~/services/email";
-import NewCustomOrderEmail from "~/services/email/email-templates/admin.custom-order";
-import NewCustomOrderCustomer from "~/services/email/email-templates/customer.custom-order";
-import CustomOrderNotifyCustomerEmail from "~/services/email/email-templates/customer.custom-order-notification";
+import { AdminCustomRequestNotificationEmail } from "~/services/email/email-templates/admin.custom-order-notify";
+import { CustomOrderAcceptEmail } from "~/services/email/email-templates/customer.custom-order-accept";
+import { CustomerCustomRequestNotificationEmail } from "~/services/email/email-templates/customer.custom-order-notify";
 import { customOrderAdminFormSchema } from "../schema";
 
 export const customRouter = createTRPCRouter({
@@ -128,7 +128,7 @@ export const customRouter = createTRPCRouter({
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
           subject: "New Custom Order Request",
           data: emailData,
-          template: NewCustomOrderEmail,
+          template: AdminCustomRequestNotificationEmail,
         });
 
         // Notify the customer that their request has been received
@@ -137,7 +137,7 @@ export const customRouter = createTRPCRouter({
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
           subject: "Thanks for your request!",
           data: emailData,
-          template: CustomOrderNotifyCustomerEmail,
+          template: CustomerCustomRequestNotificationEmail,
         });
 
         return customOrder;
@@ -394,15 +394,18 @@ export const customRouter = createTRPCRouter({
         });
 
         const data = {
+          name: customOrder?.store?.name ?? "",
+          customerName: customOrder?.name ?? "",
+          email: customOrder?.email ?? "",
+
           productLink: `${env.NEXT_PUBLIC_URL}/product/${customOrder?.product?.id}`,
+          invoiceId: customOrder?.id ?? "",
+
           product: customOrder?.product?.name ?? "",
           price: new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
           }).format(Number(customOrder?.product?.price ?? 0.0)),
-          customerName: customOrder?.name ?? "",
-          email: customOrder?.email ?? "",
-          name: customOrder?.store?.name ?? "",
 
           total: new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -410,7 +413,6 @@ export const customRouter = createTRPCRouter({
           }).format(Number(customOrder?.product?.price ?? 0.0)),
           dueDate: addWeeks(new Date(), 1).toDateString(),
           notes: customOrder?.product?.description ?? "",
-          invoiceId: customOrder?.id,
         };
 
         await emailService.sendEmail<typeof data>({
@@ -418,7 +420,7 @@ export const customRouter = createTRPCRouter({
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
           subject: "New Invoice from Trend Anomaly",
           data: data,
-          template: NewCustomOrderCustomer,
+          template: CustomOrderAcceptEmail,
         });
 
         if (input.setInvoiceSent) {

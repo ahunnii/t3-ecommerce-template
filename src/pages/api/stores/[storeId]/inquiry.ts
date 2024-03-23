@@ -5,7 +5,7 @@ import { storeTheme } from "~/data/config.custom";
 import type { ContactFormValues } from "~/modules/contact/types";
 
 import { emailService } from "~/services/email";
-import InquiryEmailTemplate from "~/services/email/email-templates/inquiry.core";
+import { AdminInquiryEmail } from "~/services/email/email-templates/admin.inquiry-notify";
 
 const sendInquiryHandler = async (
   req: NextApiRequest,
@@ -29,7 +29,7 @@ const sendInquiryHandler = async (
             to: storeTheme.brand.email,
             from: "Trend Anomaly <no-reply@trendanomaly.com>",
             subject: "New Inquiry from Trend Anomaly",
-            template: InquiryEmailTemplate,
+            template: AdminInquiryEmail,
             data: emailData,
           });
           return res.status(200).json(createCustomRequest);

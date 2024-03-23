@@ -6,8 +6,8 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { emailService } from "~/services/email";
 import {
   type CustomerReceiptEmailData,
-  CustomerReceiptTemplate,
-} from "../email-templates/customer.reciept";
+  CustomerReceiptEmail,
+} from "../email-templates/customer.receipt";
 
 export const emailServiceRouter = createTRPCRouter({
   sendReceiptEmail: protectedProcedure
@@ -60,7 +60,7 @@ export const emailServiceRouter = createTRPCRouter({
             to: order.email,
             from: "Trend Anomaly <no-reply@trendanomaly.com>",
             subject: "Order Receipt #TA33d3d from Trend Anomaly",
-            template: CustomerReceiptTemplate,
+            template: CustomerReceiptEmail,
             data: emailPayload,
           });
         return createCustomRequest;
