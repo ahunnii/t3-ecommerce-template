@@ -18,6 +18,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import CartShoppingBag from "~/modules/cart/components/cart-shopping-bag";
+import { CartSlidingShoppingBag } from "~/modules/cart/components/cart-sliding-shopping-bag";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 
@@ -102,7 +103,8 @@ const NavbarActions = ({ className }: { className?: string }) => {
         </DropdownMenu>
       )}
 
-      <CartShoppingBag btnClassName="border-white/20 border" />
+      {/* <CartShoppingBag btnClassName="border-white/20 border" /> */}
+      <CartSlidingShoppingBag btnClassName="border-white/20 border" />
     </div>
   );
 };

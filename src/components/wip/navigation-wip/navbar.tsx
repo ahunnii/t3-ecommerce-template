@@ -86,6 +86,11 @@ const Navbar = ({
             description:
               "Learn more about our privacy policy and how we handle data.",
           },
+          {
+            title: "Refund Policy",
+            href: "/policies/refund-policy",
+            description: "Learn more about our refund policy.",
+          },
         ],
       },
 

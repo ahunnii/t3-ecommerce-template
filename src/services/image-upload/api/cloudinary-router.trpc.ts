@@ -4,6 +4,7 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
+import axios from "axios";
 import { v2 as cloudinary } from "cloudinary";
 
 export const cloudinaryRouter = createTRPCRouter({
@@ -100,5 +101,22 @@ export const cloudinaryRouter = createTRPCRouter({
       // // );
       // const data = await response.json();
       return cloudinary.api.delete_resources([input.public_id]);
+    }),
+
+  uploadProductImage: protectedProcedure
+    .input(z.object({ files: z.instanceof(FormData), signature: z.string() }))
+    .mutation(async ({ input }) => {
+      input.files.append("api_key", env.CLOUDINARY_API_KEY!);
+      input.files.append("signature", input.signature);
+
+      const data = await fetch(
+        `https://api.cloudinary.com/v1_1/${env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: input.files,
+        }
+      ).then((r) => r.json());
+
+      return data;
     }),
 });

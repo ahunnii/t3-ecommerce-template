@@ -18,6 +18,7 @@ const NewProductPage: FC<IProps> = ({ storeId }) => {
   const { data: categories, isLoading } = api.categories.getCategories.useQuery(
     {
       storeId,
+      includeVariants: true,
     }
   );
 

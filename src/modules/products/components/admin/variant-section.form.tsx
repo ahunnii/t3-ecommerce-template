@@ -112,7 +112,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
 
   const currentAttributes: Attribute[] = useMemo(() => {
     return categories && categoryId
-      ? categories.filter((cat) => cat.id === categoryId)[0]!.attributes
+      ? categories.find((cat) => cat.id === categoryId)!.attributes
       : [];
   }, [categories, categoryId]);
 
@@ -125,7 +125,7 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
       sets: string[][],
       prefix: string[] = []
     ): string[][] {
-      if (!sets.length) {
+      if (!sets?.length) {
         return [prefix];
       }
 
@@ -141,14 +141,14 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
       return resultSet;
     }
 
-    const attributeValues = currentAttributes.map(splitValues);
+    const attributeValues = currentAttributes?.map(splitValues);
 
     const test = cartesianProduct(attributeValues);
 
     const generatedVariations = test.map((variation) => ({
       imageUrl: undefined,
       sku: "",
-      names: currentAttributes.map((attribute) => attribute.name).join(", "),
+      names: currentAttributes?.map((attribute) => attribute.name).join(", "),
       values: variation.join(", "),
       price: form.getValues("price"),
       quantity: form.getValues("quantity"),
@@ -194,12 +194,14 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
                 Choose a category first
               </p>
             ) : (
-              <div className="my-5 flex gap-5">
+              <div className="my-5 flex justify-around gap-5">
                 <Button
                   variant={"secondary"}
                   className="my-2"
                   type="button"
-                  onClick={() => replace(handleGenerateVariations())}
+                  onClick={() => {
+                    replace(handleGenerateVariations());
+                  }}
                 >
                   Generate Variations
                 </Button>
@@ -291,16 +293,41 @@ export const VariantProductFormSection = ({ form, categories }: Props) => {
               </div>
             )}
 
-            <AdvancedDataTableForm
-              columns={columns}
-              data={field.value as unknown as VariantColumn[]}
-              form={form}
-              searchKey="values"
-              formKey="variants"
-              ignoreColumns={["values", "actions", "imageUrl", "edit"]}
-              renderSelect={currentAttributes}
-              handleOnMediaDelete={handleOnMediaDelete}
-            />
+            {form.watch("categoryId") !== undefined &&
+              form.watch("variants").length === 0 && (
+                <p className="leading-7 text-primary [&:not(:first-child)]:mt-6">
+                  No variations have been created yet.
+                </p>
+              )}
+
+            {form.watch("categoryId") === undefined && (
+              <p className="leading-7 text-primary [&:not(:first-child)]:mt-6">
+                You need to select a category first.
+              </p>
+            )}
+
+            {(currentAttributes?.length === 0 || !currentAttributes) && (
+              <p className="leading-7 text-primary [&:not(:first-child)]:mt-6">
+                Your category needs to have some attributes first before
+                creating variations.
+              </p>
+            )}
+            {form.watch("variants").length > 0 &&
+              currentAttributes &&
+              currentAttributes?.length > 0 && (
+                <>
+                  <AdvancedDataTableForm
+                    columns={columns}
+                    data={field.value as unknown as VariantColumn[]}
+                    form={form}
+                    searchKey="values"
+                    formKey="variants"
+                    ignoreColumns={["values", "actions", "imageUrl", "edit"]}
+                    renderSelect={currentAttributes}
+                    handleOnMediaDelete={handleOnMediaDelete}
+                  />
+                </>
+              )}
 
             <AdjustVariationsDialog
               open={openPrice}
@@ -351,7 +378,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 
-import { uniqueId } from "lodash";
+import { set, uniqueId } from "lodash";
 import { Label } from "~/components/ui/label";
 
 export function AdjustVariationsDialog({

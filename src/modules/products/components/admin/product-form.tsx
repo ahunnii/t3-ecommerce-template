@@ -180,10 +180,7 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
   return (
     <>
       <Form {...form}>
-        <form
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          onChange={() => console.log(form.watch("images"))}
-        >
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
           <AdminFormHeader
             title={title}
             description={description}

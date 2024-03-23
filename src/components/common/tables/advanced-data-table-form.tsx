@@ -88,6 +88,7 @@ interface DataTableProps<
   handleOnMediaDelete?: (url: string) => void;
   data: TData[];
   searchKey: string;
+  forceUpdate?: () => void;
   filters?: FilterOption[];
   form: UseFormReturn<FData>;
   formKey: ArrayPath<FData>;
@@ -106,6 +107,7 @@ export function AdvancedDataTableForm<
   handleOnMediaDelete,
   searchKey,
   filters,
+  forceUpdate,
   form,
   formKey,
   ignoreColumns,

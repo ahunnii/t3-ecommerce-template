@@ -9,10 +9,11 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 
-import { CreditCard, DollarSign, Package } from "lucide-react";
+import { CreditCard, DollarSign, Info, Package } from "lucide-react";
 import { useRouter } from "next/router";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import AdminLayout from "~/components/layouts/admin-layout";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { api } from "~/utils/api";
 import { authenticateAdminOrOwner } from "~/utils/auth";
 
@@ -39,7 +40,7 @@ const NewGalleryImagePage: FC = () => {
         link={`/admin/${storeId}/services`}
       ></AdminFormHeader>
 
-      <section className="mx-auto w-full max-w-7xl p-8">
+      <section className="mx-auto w-full max-w-7xl space-y-4 p-8">
         <div className="grid  grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -101,13 +102,16 @@ const NewGalleryImagePage: FC = () => {
           </Card>
         </div>
 
-        <p>What does this mean?</p>
-        <p>
-          So for Cloudinary, usage is based on &apos;Credits&apos;. You get 25
-          credits per month while under the Free Tier. You need to stay within
-          25k monthly transformations, 25 GB of storage total, and 25 GB of
-          bandwidth per month.{" "}
-        </p>
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>What does this mean?</AlertTitle>
+          <AlertDescription>
+            So for Cloudinary, usage is based on &apos;Credits&apos;. You get 25
+            credits per month while under the Free Tier. You need to stay within
+            25k monthly transformations, 25 GB of storage total, and 25 GB of
+            bandwidth per month.{" "}
+          </AlertDescription>
+        </Alert>
       </section>
     </AdminLayout>
   );

@@ -146,11 +146,15 @@ export const ProductDetailsSection = ({
               <Select
                 disabled={loading}
                 onValueChange={(e) => {
-                  setOnCategoryOpen(true);
-                  setHandleOnClick(() => {
+                  if (form.watch("categoryId") !== undefined) {
+                    setOnCategoryOpen(true);
+                    setHandleOnClick(() => {
+                      field.onChange(e);
+                      form.setValue("variants", []);
+                    });
+                  } else {
                     field.onChange(e);
-                    form.setValue("variants", []);
-                  });
+                  }
                 }}
                 value={field.value}
                 defaultValue={field.value}

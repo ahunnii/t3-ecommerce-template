@@ -6,6 +6,7 @@ import { uniqueId } from "lodash";
 import { cn } from "~/utils/styles";
 import { CloudinaryImageManagementPanel } from "./cloudinary-image-management-panel";
 import { CloudinaryUpload } from "./cloudinary-upload";
+
 import { ImageUploadPreview } from "./image-upload-preview";
 
 type ClassNames = {
@@ -97,6 +98,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           buttonClassName={buttonClassName}
           isSimplifiedBtn={isSimplifiedBtn}
         />
+        {/* <CloudinaryUploadPanel
+          disabled={disabled}
+          onChange={onChange}
+          folder={folder}
+          maxFiles={maxFiles}
+          buttonClassName={buttonClassName}
+          isSimplifiedBtn={isSimplifiedBtn}
+        /> */}
 
         {selectPreviousImages && (
           <CloudinaryImageManagementPanel

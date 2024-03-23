@@ -1,4 +1,3 @@
-import { Address } from "@prisma/client";
 import { buffer } from "micro";
 import type { Stripe } from "stripe";
 import { env } from "~/env.mjs";
@@ -7,8 +6,6 @@ import { stripe } from "~/server/stripe/client";
 import type { CustomerShippingRate } from "~/types";
 import type { PaymentProcessor } from "../payment-service";
 import type { CheckoutSessionResponse, retrievePaymentResult } from "../types";
-import { getOrderInfo } from "../utils/get-order-info";
-import { formatSessionData } from "./format-stipe-data";
 
 const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
 
@@ -246,45 +243,6 @@ export const stripePaymentProcessor: PaymentProcessor<
             },
           });
 
-          // const orderDataFromSession = getOrderInfo({
-          //   orderData: {
-          //     shippingAddress: {
-          //       name: eventSession?.shipping_details?.name ?? "",
-          //       street: eventSession?.shipping_details?.address?.line1 ?? "",
-          //       additional: eventSession?.shipping_details?.address?.line2 ?? "",
-          //       city: eventSession?.shipping_details?.address?.city ?? "",
-          //       state: eventSession?.shipping_details?.address?.state ?? "",
-          //       postal_code:
-          //         eventSession?.shipping_details?.address?.postal_code ?? "",
-          //       country: eventSession?.shipping_details?.address?.country ?? "",
-          //     },
-          //   },
-          //   formattedData: formatSessionData(eventSession),
-          // });
-
-          // const checkoutSessionOrder = await updateOrder({
-          //   orderId: eventSession?.metadata?.orderId ?? "",
-          //   orderData: orderDataFromSession,
-          //   orderStatus: {
-          //     type: "ORDER_PLACED",
-          //     title: "Order placed",
-          //     description: `Total amount to be paid: $ ${(
-          //       formatSessionData(eventSession).totalDetails.total / 100
-          //     ).toFixed(2)}`,
-          //   },
-          //   isComplete: true,
-          // });
-
-          // if (!checkoutSessionOrder) {
-          //   data = {
-          //     status: "failed",
-          //     messages: [
-          //       "There was an issue with updating the order. Please try again later.",
-          //     ],
-          //   };
-          //   break;
-          // }
-
           if (!order) {
             data = {
               status: "failed",
@@ -343,9 +301,6 @@ export const stripePaymentProcessor: PaymentProcessor<
               }
             }
           });
-
-          console.log(`Order #${order?.id} has been created.`);
-          console.log(`Payment successful for session ID: ${eventSession.id}`);
           data = {
             status: "success",
             messages: [
@@ -355,116 +310,48 @@ export const stripePaymentProcessor: PaymentProcessor<
           };
           break;
 
-        // case "payment_intent.created":
-        //   const eventCreated = event.data.object as Stripe.PaymentIntent;
+        case "payment_intent.created":
+          const eventCreated = event.data.object as Stripe.PaymentIntent;
+          data = {
+            status: "success",
+            messages: [`Payment created for ${eventCreated.id}`],
+          };
+          break;
 
-        //   await updateOrder({
-        //     orderId: eventCreated?.metadata?.orderId ?? "",
-        //     orderData: {},
-        //     orderStatus: {
-        //       type: "PAYMENT_INITIATED",
-        //       title: "Payment initiated",
-        //       description: `Payment has been initiated for ${eventCreated.id}`,
-        //     },
-        //     isComplete: false,
-        //   });
+        case "payment_intent.processing":
+          const eventProcessing = event.data.object as Stripe.PaymentIntent;
+          data = {
+            status: "success",
+            messages: [`Payment processing for ${eventProcessing.id}`],
+          };
+          break;
 
-        //   console.log(`Payment created for ${eventCreated.id}`);
-        //   data = {
-        //     status: "success",
-        //     messages: [`Payment created for ${eventCreated.id}`],
-        //   };
-        //   break;
+        case "charge.succeeded":
+          const eventCharge = event.data.object as Stripe.Charge;
+          data = {
+            status: "success",
+            messages: [`Charge was successful for ${eventCharge.id}`],
+          };
+          break;
 
-        // case "payment_intent.processing":
-        //   const eventProcessing = event.data.object as Stripe.PaymentIntent;
+        case "payment_intent.succeeded":
+          const eventIntent = event.data.object as Stripe.PaymentIntent;
+          data = {
+            status: "success",
+            messages: [
+              `PaymentIntent was successful for ${eventIntent.id}`,
+              `PaymentIntent was successful for ${eventIntent.id}`,
+            ],
+          };
+          break;
 
-        //   await updateOrder({
-        //     orderId: eventProcessing?.metadata?.orderId ?? "",
-        //     orderData: {},
-        //     orderStatus: {
-        //       type: "PAYMENT_PENDING",
-        //       title: "Payment processing",
-        //       description: `Payment processing for ${eventProcessing.id}`,
-        //     },
-        //     isComplete: false,
-        //   });
-
-        //   console.log(`Payment processing for ${eventProcessing.id}`);
-        //   data = {
-        //     status: "success",
-        //     messages: [`Payment processing for ${eventProcessing.id}`],
-        //   };
-        //   break;
-
-        // case "charge.succeeded":
-        //   const eventCharge = event.data.object as Stripe.Charge;
-
-        //   await updateOrder({
-        //     orderId: eventCharge?.metadata?.orderId ?? "",
-        //     orderData: { paymentStatus: "PAID" },
-        //     orderStatus: {
-        //       type: "PAYMENT_SUCCESSFUL",
-        //       title: "Order payment was successful",
-        //       description: `Customer successfully paid $ ${(
-        //         eventCharge.amount / 100
-        //       ).toFixed(2)} for order #${eventCharge.metadata?.orderId}`,
-        //     },
-        //     isComplete: false,
-        //   });
-
-        //   console.log(`Charge was successful for ${eventCharge.id}`);
-        //   data = {
-        //     status: "success",
-        //     messages: [`Charge was successful for ${eventCharge.id}`],
-        //   };
-        //   break;
-
-        // case "payment_intent.succeeded":
-        //   const eventIntent = event.data.object as Stripe.PaymentIntent;
-
-        //   await updateOrder({
-        //     orderId: eventIntent?.metadata?.orderId ?? "",
-        //     orderData: {},
-        //     orderStatus: {
-        //       type: "PAYMENT_SUCCESSFUL",
-        //       title: "Payment successful",
-        //       description: `Total amount paid: $ ${(
-        //         eventIntent.amount / 100
-        //       ).toFixed(2)}`,
-        //     },
-        //     isComplete: false,
-        //   });
-        //   console.log(`PaymentIntent was successful for ${eventIntent.id}`);
-        //   data = {
-        //     status: "success",
-        //     messages: [
-        //       `PaymentIntent was successful for ${eventIntent.id}`,
-        //       `PaymentIntent was successful for ${eventIntent.id}`,
-        //     ],
-        //   };
-        //   break;
-
-        // case "payment_intent.payment_failed":
-        //   const eventFailed = event.data.object as Stripe.PaymentIntent;
-
-        //   await updateOrder({
-        //     orderId: eventFailed?.metadata?.orderId ?? "",
-        //     orderData: { paymentStatus: "FAILED" },
-        //     orderStatus: {
-        //       type: "PAYMENT_FAILED",
-        //       title: "Payment failed",
-        //       description: `Payment failed for ${eventFailed.id}`,
-        //     },
-        //     isComplete: false,
-        //   });
-
-        //   console.log(`Payment failed for ${eventFailed.id}`);
-        //   data = {
-        //     status: "failed",
-        //     messages: [`Payment failed for ${eventFailed.id}`],
-        //   };
-        //   break;
+        case "payment_intent.payment_failed":
+          const eventFailed = event.data.object as Stripe.PaymentIntent;
+          data = {
+            status: "failed",
+            messages: [`Payment failed for ${eventFailed.id}`],
+          };
+          break;
 
         default:
           // Unexpected event type
