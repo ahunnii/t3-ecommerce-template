@@ -42,7 +42,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
-  const labelCreated = data?.shippingLabel?.labelUrl;
+  const labelCreated = data?.fulfillmentStatus === "AWAITING_SHIPMENT";
 
   const deleteOrder = api.orders.deleteOrder.useMutation({
     onSuccess: () => {
@@ -143,7 +143,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <Send className="mr-2 h-4 w-4" /> Resend Receipt
           </DropdownMenuItem>
-          {data?.isPaid && (
+          {data?.paymentStatus === "PAID" && (
             <DropdownMenuItem onClick={() => shippingModal.onOpen(data.id)}>
               {labelCreated ? (
                 <Download className="mr-2 h-4 w-4" />
@@ -153,7 +153,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               {labelCreated ? "Download" : "Create"} label
             </DropdownMenuItem>
           )}
-          {data?.isPaid && labelCreated && (
+          {data?.paymentStatus === "PAID" && labelCreated && (
             <DropdownMenuItem
               onClick={() =>
                 updateShippingStatus.mutate({

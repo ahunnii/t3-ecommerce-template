@@ -9,7 +9,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import type { FulfillmentStatus, PaymentStatus } from "@prisma/client";
 import { CellAction } from "./cell-action";
 
-export type OrderColumn = {
+export type OrderHistoryColumns = {
   id: string;
   storeId: string;
   shippingAddress: { name: string | null } | null;
@@ -20,37 +20,40 @@ export type OrderColumn = {
   createdAt: Date;
 };
 
-export const columns: ColumnDef<OrderColumn>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+export const orderHistoryColumns: ColumnDef<OrderHistoryColumns>[] = [
+  // {
+  //   id: "select",
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: "id",
     header: "Order Id",
     cell: ({ row }) => {
       return (
-        <Link href={`/admin/${row.original.storeId}/orders/${row.original.id}`}>
+        <Link
+          href={`/admin/${row.original.storeId}/orders/${row.original.id}`}
+          target="_blank"
+        >
           <Button variant={"link"} className="mx-0 truncate px-0">
             {row.original.id}
           </Button>
@@ -68,10 +71,6 @@ export const columns: ColumnDef<OrderColumn>[] = [
     },
   },
 
-  {
-    accessorKey: "shippingAddress.name",
-    header: "Customer Name",
-  },
   {
     accessorKey: "paymentStatus",
     header: "Payment Status",
@@ -99,21 +98,6 @@ export const columns: ColumnDef<OrderColumn>[] = [
     cell: ({ row }) => {
       return (
         <Currency className="font-base" value={row.original.total / 100} />
-      );
-    },
-  },
-
-  {
-    accessorKey: "orderItems",
-    header: "Items",
-    cell: ({ row }) => {
-      return (
-        <span>
-          {row.original.orderItems.reduce(
-            (acc, current) => current.quantity + acc,
-            0
-          )}
-        </span>
       );
     },
   },

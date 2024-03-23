@@ -26,9 +26,7 @@ const OrdersPage: FC<IProps> = ({ storeId }) => {
   return (
     <AdminLayout>
       {isLoading && <AbsolutePageLoader />}
-
       {orders && <ShippingModal data={data ?? ""} />}
-
       {!isLoading && <OrderClient data={orders ?? []} />}
     </AdminLayout>
   );

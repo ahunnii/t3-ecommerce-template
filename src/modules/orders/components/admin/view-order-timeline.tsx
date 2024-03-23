@@ -33,7 +33,11 @@ export const ViewOrderTimeline = ({ timeline }: VierOrderTimelineProps) => {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && (!e.shiftKey || e.ctrlKey || e.metaKey)) {
+      if (
+        e.key === "Enter" &&
+        (!e.shiftKey || e.ctrlKey || e.metaKey) &&
+        document.activeElement === timelineRef?.current
+      ) {
         e.preventDefault();
         handleNewTimelineEntry();
       }
@@ -72,7 +76,11 @@ export const ViewOrderTimeline = ({ timeline }: VierOrderTimelineProps) => {
           ref={timelineRef}
           className="resize-none"
         />
-        <Button size={"icon"} onClick={handleNewTimelineEntry}>
+        <Button
+          size={"icon"}
+          onClick={handleNewTimelineEntry}
+          className="aspect-square size-5"
+        >
           <Send className="size-4" />
         </Button>
       </div>

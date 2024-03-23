@@ -1,58 +1,47 @@
+import { ViewSection } from "~/components/common/sections/view-section.admin";
+import type { OrderAddress } from "~/modules/orders/types";
 import { phoneFormatStringToNumber } from "~/utils/format-utils.wip";
 
 type ViewOrderDetailsProps = {
-  name?: string;
-  phone?: string;
-  address: {
-    id: string;
-    street: string;
-    additional: string | null;
-    city: string;
-    state: string;
-    postal_code: string;
-    country: string | null;
-    storeId: string | null;
-    orderId: string | null;
-  } | null;
+  shippingAddress: OrderAddress | null;
   email?: string;
+  phone?: string;
 };
 export const ViewOrderDetails = ({
-  name,
   phone,
-  address,
+  shippingAddress,
   email,
 }: ViewOrderDetailsProps) => {
   return (
-    <div className="w-full rounded-md border border-border bg-background/50 p-4">
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Details
-      </h3>
-
-      <div className="grid  grid-cols-4 items-start divide-x py-2 text-sm">
-        <div className="col-span-1  text-center">
+    <ViewSection
+      title="Customer Details"
+      description="Basic info of the customer"
+      // bodyClassName="mt-0"
+    >
+      <div className="flex w-full flex-col items-start space-y-4 divide-y  text-sm">
+        <div className="w-full  pt-4 text-left">
           <p className="text-muted-foreground">Name:</p>
-          <p>{name}</p>
+          <p>{shippingAddress?.name}</p>
         </div>
-        {/* <Separator orientation="vertical" /> */}
-        <div className="col-span-1  text-center">
+        <div className="w-full pt-4 text-left ">
           <p className="text-muted-foreground">Phone:</p>
           <p>{phoneFormatStringToNumber(phone ?? "")}</p>
-        </div>{" "}
-        {/* <Separator orientation="vertical" /> */}
-        {/* <Separator orientation="vertical" /> */}
-        <div className="col-span-1  text-center">
+        </div>
+        <div className="w-full  pt-4 text-left">
           <p className="text-muted-foreground">Email:</p>
           <p>{email}</p>
         </div>
-        <div className="col-span-1  text-center">
-          <p className="text-muted-foreground">Address:</p>
-          <p>{address?.street}</p>
-          <p>{address?.additional}</p>
+        <div className="w-full  pt-4 text-left">
+          <p className="text-muted-foreground">Shipping Address:</p>
+
+          <p>{shippingAddress?.street}</p>
+          <p>{shippingAddress?.additional}</p>
           <p>
-            {address?.city}, {address?.state} {address?.postal_code}
+            {shippingAddress?.city}, {shippingAddress?.state}{" "}
+            {shippingAddress?.postal_code}
           </p>
-        </div>{" "}
+        </div>
       </div>
-    </div>
+    </ViewSection>
   );
 };

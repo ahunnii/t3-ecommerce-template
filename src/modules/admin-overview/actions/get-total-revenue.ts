@@ -4,7 +4,7 @@ export const getTotalRevenue = async (storeId: string) => {
   const paidOrders = await prisma.order.findMany({
     where: {
       storeId,
-      isPaid: true,
+      paymentStatus: "PAID",
     },
     include: {
       orderItems: {

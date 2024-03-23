@@ -100,12 +100,37 @@ const useCheckout = () => {
     const variantIds = cartItems?.map((item) => item?.variant?.id ?? "0");
     const quantity = cartItems?.map((item) => item.quantity);
 
+    // Check if order is within free shipping threshold if store has free shipping
+
+    const checkIfOrderQualifiesForFreeShipping =
+      totalPrice >= (store?.minFreeShipping ?? 0);
+
+    const shippingThing = store?.hasFreeShipping
+      ? checkIfOrderQualifiesForFreeShipping
+        ? {
+            type: "FREE",
+            label: "Free Shipping",
+            cost: 0,
+          }
+        : {
+            type: "FLAT_RATE",
+            label:
+              "Once shipped, typically takes 5-7 business days before delivery.",
+            cost: store?.flatRateAmount,
+          }
+      : {
+          type: "FLAT_RATE",
+          label:
+            "Once shipped, typically takes 5-7 business days before delivery.",
+          cost: store?.flatRateAmount,
+        };
     const response = await axios.post(CHECKOUT_URL, {
       productIds,
       variantIds,
       quantity,
       shipping: calculateShippingCost,
       cartItems,
+      shippingObject: shippingThing,
     });
 
     window.location = response.data.url;

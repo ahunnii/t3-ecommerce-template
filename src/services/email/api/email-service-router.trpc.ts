@@ -22,6 +22,7 @@ export const emailServiceRouter = createTRPCRouter({
       const order = await ctx.prisma.order.findUnique({
         where: { id: input.orderId },
         include: {
+          shippingAddress: true,
           orderItems: {
             include: {
               product: true,
@@ -40,14 +41,14 @@ export const emailServiceRouter = createTRPCRouter({
       }
 
       const emailPayload: CustomerReceiptEmailData = {
-        name: order.name,
+        name: order?.shippingAddress?.name ?? "Customer",
         storeName: storeTheme.brand.name,
         email: order.email,
         orderId: order.id,
         orderItems: order.orderItems,
         subtotal: order.subtotal,
-        tax: order.taxes,
-        shipping: order.shippingCost,
+        tax: order.tax,
+        shipping: order.shipping,
         total: order.total,
         purchaseDate: order.createdAt.toDateString(),
         notes: "Thank you for your purchase",

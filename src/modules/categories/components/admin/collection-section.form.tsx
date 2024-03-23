@@ -48,6 +48,7 @@ export const CollectionSection = ({
                     return field.onChange(url);
                   }}
                   onRemove={() => form.setValue("imageUrl", "")}
+                  folder=""
                 />
               </FormControl>
               <FormDescription>

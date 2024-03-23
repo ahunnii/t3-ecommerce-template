@@ -502,6 +502,7 @@ export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
                             return field.onChange(url);
                           }}
                           onRemove={() => form.setValue("imageUrl", "")}
+                          folder=""
                         />
                       </FormControl>
                       <FormMessage />

@@ -1,14 +1,13 @@
-import { TimeLineEntryType } from "@prisma/client";
+import {
+  FulfillmentStatus,
+  PaymentStatus,
+  ShipmentStatus,
+  TimeLineEntryType,
+} from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
-import paymentService from "~/services/payment";
-import type { DetailedOrder } from "~/types";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const ordersRouter = createTRPCRouter({
   getOrderCount: protectedProcedure
@@ -23,162 +22,33 @@ export const ordersRouter = createTRPCRouter({
       return ctx.prisma.order.count({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          status: "PAID",
+          paymentStatus: "PAID",
+          NOT: [
+            { fulfillmentStatus: "FULFILLED" || "RESTOCKED" || "CANCELED" },
+          ],
         },
       });
     }),
 
-  getOrdersByUserId: protectedProcedure
-    .input(z.object({ storeId: z.string().optional(), userId: z.string() }))
-    .query(({ ctx, input }) => {
-      if (
-        ctx.session.user.role !== "ADMIN" ||
-        ctx.session.user.id !== input.userId
-      )
+  updateOrderNote: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        note: z.string(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to perform this action.",
         });
-
-      return ctx.prisma.order.findMany({
-        where: {
-          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          userId: input.userId,
-        },
-        include: {
-          orderItems: {
-            include: {
-              product: true,
-              variant: true,
-            },
-          },
-          shippingLabel: true,
-        },
-        orderBy: { createdAt: "desc" },
-      });
-    }),
-
-  getOrderByUserId: protectedProcedure
-    .input(z.object({ orderId: z.string().optional(), userId: z.string() }))
-    .query(({ ctx, input }) => {
-      if (
-        ctx.session.user.role !== "ADMIN" ||
-        ctx.session.user.id !== input.userId
-      )
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to perform this action.",
-        });
-
-      return ctx.prisma.order.findUnique({
-        where: {
-          userId: input.userId,
-          id: input.orderId,
-        },
-        include: {
-          orderItems: {
-            include: {
-              product: true,
-              variant: true,
-            },
-          },
-          shippingLabel: true,
+      return ctx.prisma.order.update({
+        where: { id: input.orderId },
+        data: {
+          note: input.note,
         },
       });
-    }),
-
-  getPublicOrder: publicProcedure
-    .input(z.object({ orderId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      // if (
-      //   ctx.session.user.role !== "ADMIN" ||
-      //   ctx.session.user.id !== input.userId
-      // )
-      //   throw new TRPCError({
-      //     code: "UNAUTHORIZED",
-      //     message: "You are not authorized to perform this action.",
-      //   });
-
-      const order = await ctx.prisma.order.findUnique({
-        where: {
-          id: input.orderId,
-        },
-        include: {
-          orderItems: {
-            include: {
-              product: {
-                include: {
-                  images: true,
-                },
-              },
-              variant: true,
-              discount: true,
-            },
-          },
-          shippingLabel: true,
-        },
-      });
-
-      const allowSensitiveData =
-        ctx.session!.user &&
-        (ctx.session!.user.role === "ADMIN" ||
-          ctx.session!.user.id === order?.userId);
-
-      if (allowSensitiveData) {
-        return order;
-      }
-
-      return {
-        orderItems: order?.orderItems,
-        whenPaid: order?.whenPaid,
-        subtotal: (order?.subtotal ?? 0) + (order?.total ?? 0),
-        shippingCost: order?.shippingCost,
-        whenShipped: order?.whenShipped,
-        total: order?.total,
-        shippingLabel: {
-          trackingUrl: order?.shippingLabel?.trackingUrl,
-        },
-      };
-    }),
-
-  getPayment: protectedProcedure
-    .input(z.object({ orderId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      // if (
-      //   ctx.session.user.role !== "ADMIN" ||
-      //   ctx.session.user.id !== input.userId
-      // )
-      //   throw new TRPCError({
-      //     code: "UNAUTHORIZED",
-      //     message: "You are not authorized to perform this action.",
-      //   });
-
-      const order = await ctx.prisma.order.findUnique({
-        where: {
-          id: input.orderId,
-        },
-        include: {
-          orderItems: {
-            include: {
-              variant: true,
-              product: true,
-            },
-          },
-          shippingLabel: true,
-        },
-      });
-
-      try {
-        const paymentDetails = await paymentService.retrievePayment(
-          order as DetailedOrder
-        );
-        return paymentDetails;
-      } catch (e) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Error fetching payment details",
-        });
-      }
     }),
 
   getAllPaidOrders: protectedProcedure
@@ -197,26 +67,128 @@ export const ordersRouter = createTRPCRouter({
       return ctx.prisma.order.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          NOT: [
-            {
-              status: "PENDING",
-            },
-          ],
+          paymentStatus: "PAID",
         },
         select: {
           storeId: true,
           id: true,
-          status: true,
-          name: true,
-          isShipped: true,
-          isPaid: true,
-          total: true,
-          createdAt: true,
-          shippingLabel: {
+          paymentStatus: true,
+          orderItems: {
             select: {
-              labelUrl: true,
+              id: true,
+              quantity: true,
             },
           },
+
+          fulfillmentStatus: true,
+          shippingAddress: {
+            select: {
+              name: true,
+            },
+          },
+          total: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
+  updateFulfillmentStatus: protectedProcedure
+    .input(
+      z.object({
+        fulfillmentId: z.string(),
+        status: z.nativeEnum(ShipmentStatus),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.fulfillment.update({
+        where: { id: input.fulfillmentId },
+        data: {
+          status: input.status,
+        },
+      });
+    }),
+
+  updateShippingStatus: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        fulfillmentStatus: z.nativeEnum(FulfillmentStatus),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      // const order = await ctx.prisma.order.findUnique({
+      //   where: { id: input.orderId },
+      //   select: {
+      //     fulfillments: true,
+      //     fulfillmentStatus: true,
+      //   },
+      // });
+
+      // if (!input.fulfillmentStatus) {
+      //   const fulfillments = await ctx.prisma.fulfillment.findMany({
+      //     where: {
+      //       orderId: input.orderId,
+      //       status: "LABEL_PRINTED",
+      //     },
+      //   });
+
+      // }
+
+      return ctx.prisma.order.update({
+        where: { id: input.orderId },
+        data: {
+          fulfillmentStatus: input.fulfillmentStatus,
+        },
+      });
+    }),
+
+  getCustomerOrderHistory: protectedProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+        customerId: z.string(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.order.findMany({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          userId: input.customerId,
+        },
+        select: {
+          storeId: true,
+          id: true,
+          paymentStatus: true,
+          orderItems: {
+            select: {
+              id: true,
+            },
+          },
+
+          fulfillmentStatus: true,
+          total: true,
+          createdAt: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -246,42 +218,24 @@ export const ordersRouter = createTRPCRouter({
       return ctx.prisma.order.findMany({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          ...input.searchParams,
+          // ...input.searchParams,
+          paymentStatus: input.searchParams?.isPaid ? "PAID" : undefined,
         },
         include: {
-          address: true,
+          shippingAddress: true,
+          billingAddress: true,
           orderItems: {
             include: {
               product: true,
               variant: true,
             },
           },
-          shippingLabel: true,
+          fulfillments: true,
+          refunds: true,
           timeline: true,
         },
         orderBy: {
           createdAt: "desc",
-        },
-      });
-    }),
-
-  getPaidOrders: protectedProcedure
-    .input(
-      z.object({
-        storeId: z.string().optional(),
-      })
-    )
-    .query(({ ctx, input }) => {
-      if (ctx.session.user.role !== "ADMIN")
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to perform this action.",
-        });
-
-      return ctx.prisma.order.count({
-        where: {
-          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
-          status: "PAID",
         },
       });
     }),
@@ -332,8 +286,10 @@ export const ordersRouter = createTRPCRouter({
           id: input.orderId,
         },
         include: {
-          shippingLabel: true,
-          address: true,
+          shippingAddress: true,
+          billingAddress: true,
+          fulfillments: true,
+          refunds: true,
           timeline: {
             orderBy: {
               createdAt: "desc",
@@ -345,7 +301,6 @@ export const ordersRouter = createTRPCRouter({
               product: {
                 include: {
                   variants: true,
-                  images: true,
                 },
               },
             },
@@ -354,18 +309,57 @@ export const ordersRouter = createTRPCRouter({
       });
     }),
 
+  getOrderFulfillmentInformation: protectedProcedure
+    .input(z.object({ orderId: z.string() }))
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        select: {
+          id: true,
+          shippingAddress: true,
+          billingAddress: true,
+          fulfillments: true,
+          orderItems: {
+            include: {
+              product: true,
+              variant: true,
+            },
+          },
+        },
+      });
+    }),
   createOrder: protectedProcedure
     .input(
       z.object({
         storeId: z.string(),
-        isPaid: z.boolean().optional(),
-        phone: z.string(),
-        address: z.object({
+        paymentStatus: z.nativeEnum(PaymentStatus),
+        fulfillmentStatus: z.nativeEnum(FulfillmentStatus),
+        phone: z.string().optional(),
+        email: z.string().optional(),
+        billingAddress: z.object({
+          name: z.string(),
           street: z.string(),
           additional: z.string().optional(),
           city: z.string(),
           state: z.string(),
-          postalCode: z.string(),
+          postal_code: z.string(),
+          country: z.string(),
+        }),
+        shippingAddress: z.object({
+          name: z.string(),
+          street: z.string(),
+          additional: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postal_code: z.string(),
           country: z.string(),
         }),
         orderItems: z.array(
@@ -375,7 +369,6 @@ export const ordersRouter = createTRPCRouter({
             quantity: z.number(),
           })
         ),
-        name: z.string(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -387,20 +380,12 @@ export const ordersRouter = createTRPCRouter({
 
       return ctx.prisma.order.create({
         data: {
-          storeId: input.storeId,
-          isPaid: input.isPaid,
-
-          phone: input.phone,
-          name: input.name,
-          address: {
-            create: {
-              street: input.address.street,
-              additional: input.address.additional,
-              city: input.address.city,
-              state: input.address.state,
-              postal_code: input.address.postalCode,
-              country: input.address.country,
-            },
+          ...input,
+          billingAddress: {
+            create: input.billingAddress,
+          },
+          shippingAddress: {
+            create: input.shippingAddress,
           },
           orderItems: {
             createMany: {
@@ -424,14 +409,26 @@ export const ordersRouter = createTRPCRouter({
       z.object({
         storeId: z.string(),
         orderId: z.string(),
-        isPaid: z.boolean().optional(),
+        paymentStatus: z.nativeEnum(PaymentStatus),
+        fulfillmentStatus: z.nativeEnum(FulfillmentStatus),
         phone: z.string(),
-        address: z.object({
+        email: z.string(),
+        billingAddress: z.object({
+          name: z.string(),
           street: z.string(),
           additional: z.string().optional(),
           city: z.string(),
           state: z.string(),
-          postalCode: z.string(),
+          postal_code: z.string(),
+          country: z.string(),
+        }),
+        shippingAddress: z.object({
+          name: z.string(),
+          street: z.string(),
+          additional: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          postal_code: z.string(),
           country: z.string(),
         }),
         orderItems: z.array(
@@ -442,7 +439,6 @@ export const ordersRouter = createTRPCRouter({
             quantity: z.number(),
           })
         ),
-        name: z.string(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -457,25 +453,17 @@ export const ordersRouter = createTRPCRouter({
           id: input.orderId,
         },
         data: {
-          isPaid: input.isPaid,
-          address: {
+          ...input,
+          billingAddress: {
             upsert: {
-              create: {
-                street: input.address.street,
-                additional: input.address.additional,
-                city: input.address.city,
-                state: input.address.state,
-                postal_code: input.address.postalCode,
-                country: input.address.country,
-              },
-              update: {
-                street: input.address.street,
-                additional: input.address.additional,
-                city: input.address.city,
-                state: input.address.state,
-                postal_code: input.address.postalCode,
-                country: input.address.country,
-              },
+              create: input.billingAddress,
+              update: input.billingAddress,
+            },
+          },
+          shippingAddress: {
+            upsert: {
+              create: input.shippingAddress,
+              update: input.shippingAddress,
             },
           },
           orderItems: {
@@ -497,8 +485,6 @@ export const ordersRouter = createTRPCRouter({
               };
             }),
           },
-          phone: input.phone,
-          name: input.name,
         },
       });
     }),
@@ -519,7 +505,7 @@ export const ordersRouter = createTRPCRouter({
 
       return ctx.prisma.order.update({
         where: { id: input.orderId },
-        data: { isShipped: input.isShipped },
+        data: { fulfillmentStatus: input.isShipped ? "FULFILLED" : undefined },
       });
     }),
   deleteOrder: protectedProcedure

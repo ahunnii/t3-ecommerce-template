@@ -14,7 +14,9 @@ type TCreateLineItemProps = {
 type TCreateCheckoutSessionProps<TLineItems, TShippingOptions> = {
   items: TLineItems;
   shippingOptions: TShippingOptions;
-  orderId: string;
+  order_id?: string;
+  user_id?: string;
+  store_id: string;
 };
 
 export interface PaymentProcessor<TLineItems, TShippingOptions> {
@@ -23,7 +25,8 @@ export interface PaymentProcessor<TLineItems, TShippingOptions> {
     T extends Prisma.OrderGetPayload<{
       include: {
         orderItems: true;
-        address: true;
+        shippingAddress: true;
+        billingAddress: true;
       };
     }>
   >(
@@ -77,7 +80,8 @@ export class PaymentService<TLineItems, TShippingOptions> {
     T extends Prisma.OrderGetPayload<{
       include: {
         orderItems: true;
-        address: true;
+        shippingAddress: true;
+        billingAddress: true;
       };
     }>
   >(order: T) {

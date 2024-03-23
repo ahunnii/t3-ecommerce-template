@@ -6,6 +6,7 @@ type Props = {
   title: string;
   description?: string;
   bodyClassName?: string;
+  titleClassName?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const ViewSection: FC<Props> = ({
@@ -14,6 +15,7 @@ export const ViewSection: FC<Props> = ({
   description,
   className,
   bodyClassName,
+  titleClassName,
   ...props
 }) => {
   return (
@@ -27,7 +29,8 @@ export const ViewSection: FC<Props> = ({
       <h3
         className={cn(
           "scroll-m-20 pb-4 text-2xl font-semibold tracking-tight",
-          description && "pb-1"
+          description && "pb-1",
+          titleClassName
         )}
       >
         {title}

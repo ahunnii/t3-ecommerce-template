@@ -240,6 +240,7 @@ export const GalleryForm: React.FC<GalleryImageFormProps> = ({
                           return field.onChange(url);
                         }}
                         onRemove={() => form.setValue("url", "")}
+                        folder=""
                       />
                       {/* </> */}
                     </FormControl>

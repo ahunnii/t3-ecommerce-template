@@ -23,3 +23,11 @@ export const packageFormSchema = z.object({
 export const rateFormSchema = z.object({
   rate_selection_id: z.string(),
 });
+
+export const itemsFormSchema = z.object({
+  orderItems: z.array(
+    z.object({
+      id: z.string(),
+    })
+  ),
+});

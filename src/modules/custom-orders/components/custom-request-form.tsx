@@ -187,6 +187,7 @@ export const CustomRequestForm = ({
                   onChange={(url) => {
                     return field.onChange([...field.value, { url }]);
                   }}
+                  folder="request-images"
                   onRemove={(url) =>
                     field.onChange([
                       ...field.value.filter((current) => current.url !== url),

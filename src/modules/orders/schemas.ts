@@ -1,6 +1,8 @@
+import { FulfillmentStatus, PaymentStatus } from "@prisma/client";
 import * as z from "zod";
 export const orderFormSchema = z.object({
-  isPaid: z.boolean(),
+  paymentStatus: z.nativeEnum(PaymentStatus),
+  fulfillmentStatus: z.nativeEnum(FulfillmentStatus),
   phone: z.string().min(9).max(12),
   street: z.string(),
   additional: z.string().optional(),

@@ -111,6 +111,7 @@ export const ContentSectionForm: FC<Props> = ({ form }) => {
                     }}
                     onRemove={() => form.setValue("content.heroImg", "")}
                     previewImages={false}
+                    folder=""
                   />
                 </>
               </FormControl>

@@ -1,6 +1,7 @@
 import type * as z from "zod";
 import type {
   addressFormSchema,
+  itemsFormSchema,
   packageFormSchema,
   rateFormSchema,
 } from "./schema";
@@ -8,6 +9,7 @@ import type {
 export type AddressFormValues = z.infer<typeof addressFormSchema>;
 export type PackageFormValues = z.infer<typeof packageFormSchema>;
 export type RateFormValues = z.infer<typeof rateFormSchema>;
+export type ItemFormValues = z.infer<typeof itemsFormSchema>;
 
 export type Package = {
   length: number;

@@ -107,7 +107,7 @@ export const shippingLabelRouter = createTRPCRouter({
           message: "You are not authorized to perform this action.",
         });
 
-      const label = await ctx.prisma.shippingLabel.findUnique({
+      const label = await ctx.prisma.fulfillment.findUnique({
         where: { id: input.labelId },
       });
 
@@ -141,12 +141,16 @@ export const shippingLabelRouter = createTRPCRouter({
     .input(
       z.object({
         rateId: z.string(),
-
         cost: z.string(),
         carrier: z.string(),
         timeEstimate: z.string(),
         expireAt: z.date().optional(),
         orderId: z.string(),
+        items: z.array(
+          z.object({
+            id: z.string(),
+          })
+        ),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -154,6 +158,16 @@ export const shippingLabelRouter = createTRPCRouter({
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to perform this action.",
+        });
+
+      const order = await ctx.prisma.order.findUnique({
+        where: { id: input.orderId },
+      });
+
+      if (!order)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Order not found.",
         });
 
       const shippingLabel = await shippoClient.transaction.create({
@@ -168,14 +182,18 @@ export const shippingLabelRouter = createTRPCRouter({
           message: "Error creating shipping label.",
         });
 
-      const dbEntry = await ctx.prisma.shippingLabel.create({
+      const dbEntry = await ctx.prisma.fulfillment.create({
         data: {
-          labelUrl: shippingLabel?.label_url,
+          items: {
+            connect: input.items,
+          },
           trackingNumber: shippingLabel?.tracking_number,
           trackingUrl: shippingLabel?.tracking_url_provider,
-          cost: input.cost,
+          labelUrl: shippingLabel?.label_url,
+          cost: Number(input.cost) ?? 0,
           carrier: input.carrier,
           timeEstimate: input.timeEstimate,
+          status: "LABEL_PURCHASED",
           expireAt: input.expireAt,
           order: {
             connect: {
@@ -185,11 +203,28 @@ export const shippingLabelRouter = createTRPCRouter({
         },
       });
 
-      const order = await ctx.prisma.order.update({
+      const checkIfAllItemsArePartOfAFulfillment =
+        await ctx.prisma.orderItem.count({
+          where: {
+            orderId: input.orderId,
+            fulfillmentId: null,
+          },
+        });
+
+      await ctx.prisma.order.update({
         where: { id: input.orderId },
         data: {
-          status: "SHIPPED",
-          whenShipped: new Date(),
+          timeline: {
+            create: {
+              description: `Shipping label purchased for order on ${new Date().toDateString()}`,
+              type: "SHIPPING",
+              title: "Shipping Label Purchased",
+            },
+          },
+          fulfillmentStatus:
+            checkIfAllItemsArePartOfAFulfillment === 0
+              ? "AWAITING_SHIPMENT"
+              : "PARTIAL",
         },
       });
 

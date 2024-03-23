@@ -1,7 +1,8 @@
 import type {
+  FulfillmentStatus,
   Order,
   OrderItem,
-  OrderStatus,
+  PaymentStatus,
   TimeLineEntryType,
 } from "@prisma/client";
 import type { NextApiRequest } from "next";
@@ -67,8 +68,8 @@ export type CheckoutOrderDetails = {
 };
 
 export type PaymentOrderData = {
-  isPaid?: boolean;
-  status?: OrderStatus;
+  paymentStatus?: PaymentStatus;
+  fulfillmentStatus?: FulfillmentStatus;
   name?: string;
   phone?: string;
   email?: string;
@@ -79,7 +80,8 @@ export type PaymentOrderData = {
   referenceId?: string;
   paymentId?: string;
 
-  address?: {
+  shippingAddress?: {
+    name?: string;
     street: string;
     additional?: string;
     city: string;
@@ -98,5 +100,5 @@ export type UpdateOrderProps = {
 
 export type THandleCheckoutProps = {
   req: NextApiRequest;
-  updateOrder: (props: UpdateOrderProps) => Promise<Order | null>;
+  // updateOrder: (props: UpdateOrderProps) => Promise<Order | null>;
 };

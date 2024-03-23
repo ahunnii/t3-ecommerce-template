@@ -284,6 +284,7 @@ export const BlogPostForm: React.FC<Props> = ({ initialData }) => {
                             return field.onChange(url);
                           }}
                           onRemove={() => form.setValue("featuredImg", "")}
+                          folder=""
                         />
                       </FormControl>
                       <FormMessage />

@@ -24,9 +24,17 @@ const refundHandler = async (req: NextApiRequest, res: NextApiResponse) => {
                 id: orderId,
               },
               data: {
-                isPaid: false,
-                isRefunded: true,
-                refundId: refund.id,
+                paymentStatus: "REFUNDED",
+                refunds: {
+                  createMany: {
+                    data: [
+                      {
+                        amount: refund.amount,
+                        reason: refund.reason ?? "requested_by_customer",
+                      },
+                    ],
+                  },
+                },
               },
             });
 

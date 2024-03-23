@@ -79,6 +79,15 @@ export type DetailedProductFull = Prisma.ProductGetPayload<{
       };
     };
     discounts: true;
+    store: {
+      select: {
+        id: true;
+        hasFlatRate: true;
+        flatRateAmount: true;
+        hasFreeShipping: true;
+        minFreeShipping: true;
+      };
+    };
   };
 }>;
 
@@ -108,14 +117,15 @@ export type Popup = {
 
 export type DetailedOrder = Prisma.OrderGetPayload<{
   include: {
-    address: true;
+    shippingAddress: true;
+    billingAddress: true;
     orderItems: {
       include: {
         variant: true;
         product: true;
       };
     };
-    shippingLabel: true;
+    fulfillments: true;
     timeline: true;
   };
 }>;

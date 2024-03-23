@@ -21,7 +21,8 @@ const metadata = {
 };
 type Order = Prisma.OrderGetPayload<{
   include: {
-    address: true;
+    billingAddress: true;
+    shippingAddress: true;
     orderItems: {
       include: {
         product: {
@@ -33,7 +34,7 @@ type Order = Prisma.OrderGetPayload<{
         discount: true;
       };
     };
-    shippingLabel: true;
+    fulfillments: true;
   };
 }>;
 
@@ -42,7 +43,13 @@ const OrderPage = ({ order, payment }: { order: Order; payment: unknown }) => {
 
   const config = useConfig();
 
-  console.log(payment);
+  const findDateOfFirstFulfillment = (order: Order) => {
+    const fulfillments = order.fulfillments;
+    if (fulfillments && fulfillments.length > 0) {
+      return fulfillments[0]?.createdAt.toDateString(); // Add null check using optional chaining.
+    }
+    return null;
+  };
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
@@ -67,7 +74,7 @@ const OrderPage = ({ order, payment }: { order: Order; payment: unknown }) => {
               <div className="flex">
                 <div className="flex flex-col">
                   <ViewSection title="Shipping" className="bg-fuchsia-50">
-                    {order?.whenShipped && (
+                    {findDateOfFirstFulfillment && (
                       <>
                         <p>
                           {order?.userId ? (
@@ -75,9 +82,7 @@ const OrderPage = ({ order, payment }: { order: Order; payment: unknown }) => {
                               Your order was shipped out on{" "}
                               <span className="font-bold">
                                 {" "}
-                                {new Date(
-                                  order?.whenShipped
-                                ).toDateString()}.{" "}
+                                {findDateOfFirstFulfillment(order)}.{" "}
                               </span>
                             </>
                           ) : (
@@ -95,19 +100,21 @@ const OrderPage = ({ order, payment }: { order: Order; payment: unknown }) => {
 
                   <ViewSection title="Details" className="bg-fuchsia-50">
                     <p className="font-semibold">Shipping Address</p>
-                    {order?.address && (
+                    {order?.shippingAddress && (
                       <p>
-                        {order?.name}
+                        {order?.shippingAddress?.name}
                         <br />
-                        {order?.address?.street}
+                        {order?.shippingAddress?.street}
                         <br />
-                        {order?.address?.additional && (
+                        {order?.shippingAddress?.additional && (
                           <>
-                            {order?.address?.additional} <br />
+                            {order?.shippingAddress?.additional} <br />
                           </>
                         )}
-                        {order?.address?.city}, {order?.address?.state}{" "}
-                        {order?.address?.postal_code} {order?.address?.country}
+                        {order?.shippingAddress?.city},{" "}
+                        {order?.shippingAddress?.state}{" "}
+                        {order?.shippingAddress?.postal_code}{" "}
+                        {order?.shippingAddress?.country}
                       </p>
                     )}
                   </ViewSection>
@@ -174,7 +181,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       id: ctx.params?.orderId as string,
     },
     include: {
-      address: true,
+      billingAddress: true,
+      shippingAddress: true,
       orderItems: {
         include: {
           product: {
@@ -186,7 +194,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
           discount: true,
         },
       },
-      shippingLabel: true,
+      fulfillments: true,
     },
   });
 
@@ -205,12 +213,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         order: JSON.parse(
           JSON.stringify(
             exclude(order, [
-              "shippingLabel",
-              "name",
+              "fulfillments",
+              "shippingAddress",
+              "billingAddress",
               "email",
               "phone",
-              "address",
-              "refundId",
+
               "userId",
             ])
           )

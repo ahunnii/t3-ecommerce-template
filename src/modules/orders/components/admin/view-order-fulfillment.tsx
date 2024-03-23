@@ -1,80 +1,143 @@
-import type { ShippingLabel } from "@prisma/client";
+import type { Fulfillment, FulfillmentStatus } from "@prisma/client";
 import { Download, Pencil } from "lucide-react";
-import Link from "next/link";
-import { InfoButton } from "~/components/common/buttons/info-button";
+
+import { ViewSection } from "~/components/common/sections/view-section.admin";
 import { Button } from "~/components/ui/button";
+import { Separator } from "~/components/ui/separator";
+import type { OrderAddress, OrderItem } from "~/modules/orders/types";
 import { useShippingModal } from "~/modules/shipping/hooks/use-shipping-modal";
+import { api } from "~/utils/api";
 
 type ViewOrderFulfillmentProps = {
-  shippingLabel: ShippingLabel | null;
-  isShipped: boolean;
+  fulfillments: Fulfillment[];
+  fulfillmentStatus: FulfillmentStatus;
 
+  shippingAddress: OrderAddress | null;
+  orderItems: OrderItem[];
+
+  createdAt: Date;
   id: string;
 };
 export const ViewOrderFulfillment = ({
-  shippingLabel,
+  fulfillments,
   id,
-  isShipped,
+  orderItems,
+  shippingAddress,
+  createdAt,
+  fulfillmentStatus,
 }: ViewOrderFulfillmentProps) => {
   const handleShippingLabel = () => {
     shippingModal.onOpen(id);
   };
 
+  const updateFulfillment = api.orders.updateFulfillmentStatus.useMutation();
+  const updateOrderShippingStatus =
+    api.orders.updateShippingStatus.useMutation();
+
   const shippingModal = useShippingModal();
 
-  const isReadyToShip = (shippingLabel?.labelUrl && !isShipped) ?? false;
-  const isNotReadyToShip = (!shippingLabel?.labelUrl && !isShipped) ?? false;
-  const shipStatus = isShipped
-    ? "Shipped"
-    : isReadyToShip
-    ? "Ready to Ship"
-    : isNotReadyToShip
-    ? "Not Ready to Ship"
-    : "No shipping label created";
+  const extraCompletionDays =
+    orderItems
+      ?.map((item) => item?.product?.estimatedCompletion)
+      .reduce((a, b) => a + b, 0) ?? 0;
+
+  const shipOutDate = new Date(
+    createdAt.setDate(createdAt.getDate() + 7 + extraCompletionDays)
+  ).toDateString();
+
+  const handleDownloadShippingLabel = ({
+    url,
+    fulfillmentId,
+  }: {
+    url: string;
+    fulfillmentId: string;
+  }) => {
+    updateFulfillment.mutate({
+      fulfillmentId,
+      status: "LABEL_PRINTED",
+    });
+
+    if (
+      fulfillments?.filter(
+        (fulfillment) => fulfillment.status === "LABEL_PRINTED"
+      ).length === fulfillments.length
+    )
+      updateOrderShippingStatus.mutate({
+        orderId: id,
+        fulfillmentStatus: "FULFILLED",
+      });
+    else
+      updateOrderShippingStatus.mutate({
+        orderId: id,
+        fulfillmentStatus: "PARTIAL",
+      });
+
+    window.open(`${url}`, "_blank");
+  };
 
   return (
-    <div className="w-full rounded-md border border-border bg-background/50 p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="scroll-m-20 text-2xl font-bold tracking-tight">
-          Fulfillment
-        </h3>
-        <div className="flex gap-2">
-          {shippingLabel?.labelUrl && (
-            <Button
-              onClick={() => {
-                window.open(shippingLabel.labelUrl!, "_blank");
-              }}
-              className="flex items-center gap-2"
-            >
-              <Download size={20} />
-              Download Shipping Label
-            </Button>
-          )}
-          {!shippingLabel?.labelUrl && (
-            <Button
-              onClick={handleShippingLabel}
-              className="flex items-center gap-2"
-            >
-              {" "}
-              <Pencil size={20} />
-              Get Shipping Label
-            </Button>
-          )}{" "}
-        </div>
+    <ViewSection
+      title="Fulfillment"
+      description={`Ship out by ${shipOutDate}`}
+      className="relative"
+    >
+      <Button
+        onClick={handleShippingLabel}
+        className="absolute right-4 top-4 flex items-center gap-2"
+      >
+        <Pencil size={20} />
+        {fulfillments?.length > 0
+          ? "Create another label"
+          : "Create shipping label"}
+      </Button>
+
+      <p>
+        Status: <span className="font-semibold">{fulfillmentStatus}</span>{" "}
+      </p>
+
+      <div className="w-full  pt-4 text-left">
+        <p className="text-muted-foreground">Ship To:</p>{" "}
+        <p>{shippingAddress?.name}</p>
+        <p>{shippingAddress?.street}</p>
+        <p>{shippingAddress?.additional}</p>
+        <p>
+          {shippingAddress?.city}, {shippingAddress?.state}{" "}
+          {shippingAddress?.postal_code}
+        </p>
       </div>
 
-      <p>
-        Status: <span className="font-semibold">{shipStatus}</span>{" "}
-      </p>
-      <p>
-        Shipping Label Created:{" "}
-        <span className="font-semibold">
-          {shippingLabel?.createdAt.toDateString() ??
-            "No shipping label created"}
-        </span>{" "}
-      </p>
+      {fulfillments?.length > 0 && <Separator className="my-4" />}
+      {fulfillments?.map((fulfillment, idx) => (
+        <ViewSection
+          key={fulfillment.id}
+          title={`Shipment ${idx + 1} Details`}
+          description="View the details of the shipment."
+          titleClassName="text-sm font-medium "
+          bodyClassName="flex items-center justify-between gap-4"
+        >
+          <div className="flex flex-col">
+            <p>Purchased on: {fulfillment.createdAt.toDateString()}</p>
+            <p>Carrier: {fulfillment.carrier}</p>
+            <p>Tracking Number: {fulfillment.trackingNumber}</p>
+            <p>Status: {fulfillment.status}</p>
+          </div>
 
-      <h4 className="mt-4 flex  items-center gap-2 text-lg font-bold">
+          <Button
+            onClick={() =>
+              handleDownloadShippingLabel({
+                url: `${fulfillment.labelUrl}`,
+                fulfillmentId: fulfillment.id,
+              })
+            }
+            className="flex items-center gap-2"
+          >
+            <Download size={20} />
+            {/* Download Shipping Label */}
+          </Button>
+        </ViewSection>
+      ))}
+
+      {/* <h4 className="mt-4 flex  items-center gap-2 text-lg font-bold">
         Useful Links{" "}
         <span className="font-normal">
           <InfoButton summary="The shipping service used is Shippo. You can modify more on shipping from within your Shippo account." />
@@ -126,7 +189,7 @@ export const ViewOrderFulfillment = ({
             Update available carriers
           </Button>
         </Link>
-      </div>
-    </div>
+      </div> */}
+    </ViewSection>
   );
 };

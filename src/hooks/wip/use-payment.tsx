@@ -21,7 +21,6 @@ export const usePayment = () => {
   const [paymentDetails, setPaymentDetails] =
     useState<retrievePaymentResult | null>(null);
   const fetchPaymentDetails = async (order: Order) => {
-    console.log(order.referenceId);
     setIsLoading(true);
     const results = await axios.post(
       `${env.NEXT_PUBLIC_API_URL}/payment/order-details`,

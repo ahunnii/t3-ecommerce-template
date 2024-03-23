@@ -15,6 +15,8 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
+import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { useShippingModal } from "../hooks/use-shipping-modal";
 import { packageFormSchema } from "../schema";
 import type { PackageFormValues } from "../types";
@@ -45,7 +47,11 @@ const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
     <Form {...form}>
       <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
         <div className="flex flex-col space-y-5 pt-4">
-          <div className="flex gap-3">
+          <EditSection
+            title="Length"
+            description="Length of the final package with the item(s) included."
+            bodyClassName="flex space-x-4"
+          >
             <FormField
               control={form.control}
               name="package_length"
@@ -54,7 +60,11 @@ const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
                   <FormLabel>Length (in)</FormLabel>
 
                   <FormControl>
-                    <Input {...field} type="number" min={0} />
+                    <AdvancedNumericInput
+                      field={field}
+                      min={0}
+                      appendSpan="in"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -68,7 +78,11 @@ const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
                   <FormLabel>Width (in)</FormLabel>
 
                   <FormControl>
-                    <Input {...field} type="number" min={0} />
+                    <AdvancedNumericInput
+                      field={field}
+                      min={0}
+                      appendSpan="in"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -82,14 +96,23 @@ const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
                   <FormLabel>Height (in)</FormLabel>
 
                   <FormControl>
-                    <Input {...field} type="number" min={0} />
+                    <AdvancedNumericInput
+                      field={field}
+                      min={0}
+                      appendSpan="in"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-          <div className="flex gap-3">
+          </EditSection>
+
+          <EditSection
+            title="Weight"
+            description="Weight of the final package with the item(s) included."
+            bodyClassName="flex space-x-4"
+          >
             <FormField
               control={form.control}
               name="package_weight_lbs"
@@ -98,7 +121,11 @@ const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
                   <FormLabel>Lbs</FormLabel>
 
                   <FormControl>
-                    <Input {...field} type="number" min={0} />
+                    <AdvancedNumericInput
+                      field={field}
+                      min={0}
+                      appendSpan="lbs"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,13 +139,17 @@ const PackageForm: FC<Props> = ({ initialData, successCallback }) => {
                   <FormLabel>Ozs</FormLabel>
 
                   <FormControl>
-                    <Input {...field} type="number" min={0} />
+                    <AdvancedNumericInput
+                      field={field}
+                      min={0}
+                      appendSpan="oz"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
+          </EditSection>
         </div>
 
         <div className="flex w-full items-center justify-end space-x-2 pt-6">

@@ -17,6 +17,7 @@ datasource db {
 
 model Address {
   id            String    @id @default(cuid())
+  name          String?
   street        String
   additional    String?
   city          String
@@ -25,10 +26,16 @@ model Address {
   country       String?
   storeId       String?         @unique
   store         Store?          @relation( fields: [storeId], references: [id], onDelete: Cascade) 
-  orderId       String?         @unique
-  order         Order?          @relation( fields: [orderId], references: [id], onDelete: Cascade) 
-  shippingLabelId String?       @unique
-  shippingLabel ShippingLabel?  @relation( fields: [shippingLabelId], references: [id], onDelete: Cascade)
+
+  billingOrderId       String?         @unique
+  billingOrder         Order?          @relation( "BillingAddressToOrder", fields: [billingOrderId], references: [id], onDelete: Cascade) 
+
+  shippingOrderId       String?         @unique
+  shippingOrder         Order?          @relation( "ShippingAddressToOrder", fields: [shippingOrderId], references: [id], onDelete: Cascade) 
+
+
+  // shippingLabelId String?       @unique
+  // shippingLabel ShippingLabel?  @relation( fields: [shippingLabelId], references: [id], onDelete: Cascade)
 
 }
 // Necessary for Next auth
@@ -217,6 +224,12 @@ enum ShippingOption {
 }
 
 
+enum InventoryPolicy {
+  CONTINUE
+  DENY
+}
+
+
 model Product {
   id          String          @id @default(cuid())
 
@@ -238,6 +251,8 @@ model Product {
 
 
   description         String    @db.Text
+  inventoryPolicy     InventoryPolicy @default(DENY)
+
 
 
   customOrder   CustomOrderRequest?
@@ -327,61 +342,186 @@ enum ProductType {
 }
 
 
+
+
+enum TimeLineEntryType {
+  ORDER_PLACED
+  ORDER_PAID
+  ORDER_SHIPPED
+  ORDER_COMPLETED
+  ORDER_CANCELLED
+  ORDER_REFUNDED
+  ORDER_RETURNED
+  ORDER_NOTE
+  ORDER_GENERIC
+  PAYMENT_FAILED
+  PAYMENT_SUCCESSFUL
+  PAYMENT_PENDING
+  PAYMENT_REFUNDED
+  PAYMENT_INITIATED
+  ORDER_PENDING
+  ORDER_SUCCESSFUL
+  SHIPPING 
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  AUTHORIZED
+  FAILED
+  REFUNDED
+  PARTIAL_REFUND
+  VOIDED
+  CANCELLED
+}
+
+enum FulfillmentStatus {
+  PENDING
+  AWAITING_SHIPMENT
+  FULFILLED
+  CANCELLED
+  RESTOCKED
+  PARTIAL
+}
+
+enum ShipmentStatus {
+  LABEL_PRINTED
+  LABEL_PURCHASED
+  ATTEMPTED_DELIVERY
+  READY_FOR_PICKUP
+  CONFIRMED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILURE
+}
+
+
+
+
+model Refund {
+  id              String        @id @default(cuid())
+  orderId         String        // Foreign Key to Order
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount          Float
+  reason          String
+  referenceLink   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([orderId])
+}
+
+model Fulfillment {
+  id              String        @id @default(cuid())
+  orderId         String        // Foreign Key to Order
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  items           OrderItem[]
+  status          ShipmentStatus
+  trackingNumber  String?
+  trackingUrl     String?
+  labelUrl        String?
+  carrier         String?
+  cost            Float?
+  timeEstimate    String?
+  expireAt        DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([orderId])
+
+}
+
+model TimeLineEntry {
+  id              String              @id @default(cuid())
+  title           String 
+  description     String?             @db.Text
+  type            TimeLineEntryType   @default(ORDER_GENERIC)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  order           Order?              @relation( fields: [orderId], references: [id])
+  orderId         String? 
+  @@index([orderId])
+}
+
 model Order {
-  id              String      @id @default(cuid())
-  storeId         String      // Foreign Key to Store
-  store           Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems      OrderItem[] // Relation to OrderItem model
-  timeline        TimeLineEntry[]
+  id                String          @id @default(cuid())
+  storeId           String
+  store             Store           @relation("StoreToOrder", fields: [storeId], references: [id])
 
-  status          OrderStatus @default(PENDING)
+  orderItems        OrderItem[]
+  timeline          TimeLineEntry[]
+  discounts         Discount[] @relation("OrderToDiscount")
 
-  isPaid          Boolean     @default(false)
-  isRefunded      Boolean     @default(false)
-  isShipped       Boolean     @default(false)
+  orderNumber         String      @default("")
+  authorizationCode   String      @default("")
 
-  whenPaid        DateTime?
-  total           Float       @default(0.00)
-  taxes           Float?       @default(0.00)
-  subtotal        Float       @default(0.00)
-  shippingCost    Float?       @default(0.00)
+  note                String?
+
+  paymentStatus     PaymentStatus     @default(PENDING)
+  fulfillmentStatus FulfillmentStatus @default(PENDING)
 
 
-  referenceId     String      @default("")
-  paymentId       String?
-  refundId        String? 
+  subtotal          Float       @default(0.00)
+  tax               Float       @default(0.00)
+  shipping          Float       @default(0.00)
+  total             Float       @default(0.00)
+  discount          Float       @default(0.00)
+  fee               Float       @default(0.00)
+
+  referenceLink       String      @default("")
+  referenceNumber     String      @default("")
+  referenceProvider   String      @default("")
+
+  receiptLink         String      @default("")
+
+  refunds             Refund[]
+
+  billingAddress      Address? @relation("BillingAddressToOrder")
+  shippingAddress     Address? @relation("ShippingAddressToOrder")
+
+  email               String      @default("")
+  phone               String      @default("")
 
 
-  name            String      @default("")
-  email           String      @default("")
-  phone           String      @default("")
-  address         Address?
-  // address         String      @default("")
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  fulfillments        Fulfillment[]
 
-  shippingLabel   ShippingLabel?
-  whenShipped     DateTime?
-
-
-  userId          String?
-  user            User?       @relation("UserToOrder", fields: [userId], references: [id])
+  userId              String?
+  user                User?       @relation("UserToOrder", fields: [userId], references: [id])
 
   @@index([storeId])
-
   @@index([userId])
 }
 
-enum OrderStatus {
-  NEW
-  ABANDONED
-  PENDING
-  PAID
-  SHIPPED
-  REFUNDED
-  PAYMENT_FAILED
+// Intermediary for a many-to-many relationship
+model OrderItem {
+  id        String     @id @default(cuid())
+  orderId   String // Foreign Key to Order
+  order     Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String // Foreign Key to Product
+  product   Product    @relation(fields: [productId], references: [id])
+  variantId String? // Foreign Key to Variant
+  variant   Variation? @relation(fields: [variantId], references: [id])
+  quantity  Int        @default(1)
+  price     Float?      @default(0.00)
+  discountId String? // Foreign Key to Discount
+  discount Discount? @relation(fields: [discountId], references: [id])
+
+  fulfillment Fulfillment? @relation(fields: [fulfillmentId], references: [id])
+  fulfillmentId String?
+
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+  @@index([discountId])
+  @@index([fulfillmentId])
 }
+
+
 
 
 
@@ -404,75 +544,10 @@ model BlogPost {
 
 
 
-model TimeLineEntry {
-  id              String      @id @default(cuid())
-  title           String
-  description     String? @db.Text
-  type            TimeLineEntryType @default(ORDER_GENERIC)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  order           Order?      @relation( fields: [orderId], references: [id])
-  orderId         String? 
-  @@index([orderId])
-}
-
-enum TimeLineEntryType {
-  ORDER_PLACED
-  ORDER_PAID
-  ORDER_SHIPPED
-  ORDER_COMPLETED
-  ORDER_CANCELLED
-  ORDER_REFUNDED
-  ORDER_RETURNED
-  ORDER_NOTE
-  ORDER_GENERIC
-  PAYMENT_FAILED
-  PAYMENT_SUCCESSFUL
-  PAYMENT_PENDING
-  PAYMENT_REFUNDED
-  PAYMENT_INITIATED
-  ORDER_PENDING
-  ORDER_SUCCESSFUL
-}
 
 
-model ShippingLabel {
-  id              String      @id @default(cuid())
-  labelUrl        String?  @db.Text 
-  trackingNumber  String?  @db.Text 
-  trackingUrl     String?  @db.Text
-  cost            String?      
-  carrier         String?
-  timeEstimate    String?
-  expireAt        DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  address         Address?
-
-  order           Order?      @relation( fields: [orderId], references: [id])
-  orderId         String?     @unique
-  @@index([orderId])
-}
-// Intermediary for a many-to-many relationship
-model OrderItem {
-  id        String     @id @default(cuid())
-  orderId   String // Foreign Key to Order
-  order     Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String // Foreign Key to Product
-  product   Product    @relation(fields: [productId], references: [id])
-  variantId String? // Foreign Key to Variant
-  variant   Variation? @relation(fields: [variantId], references: [id])
-  quantity  Int        @default(1)
-  price     Float?      @default(0.00)
-  discountId String? // Foreign Key to Discount
-  discount Discount? @relation(fields: [discountId], references: [id])
 
 
-  @@index([orderId])
-  @@index([productId])
-  @@index([variantId])
-  @@index([discountId])
-}
 
 
 model Image {
@@ -484,7 +559,7 @@ model Image {
   blog       BlogPost?  @relation(fields: [blogId], references: [id], onDelete: Cascade)
   customOrderId String?
   customOrder   CustomOrderRequest?  @relation(fields: [customOrderId], references: [id], onDelete: Cascade)
-  
+
 
   collection   Collection?
 
@@ -610,26 +685,13 @@ model Discount {
 
   products Product[] @relation("DiscountToProduct")
   collections Collection[] @relation("DiscountToCollection")
+  orders Order[]      @relation("OrderToDiscount")
   orderItems OrderItem[] 
 
   @@index([storeId])
 
 }
 
-// Store has three sales going on:  new sale -- 10% off all products,  clearance sale -- 20% off pokemon, extra $5 off all orders over $50
-
-// 25% off any item with code DOOKIE
-
-//Gengar is apart of the 10% off site wide, and the 20% off pokemon sale.
-
-//Page loads products and checks for any active sales, applies them to the products.
-
-
-
-
-
-
-// Percentage, Fixed off total order / per item (limited to entire site / specific products/ collections)
 
 enum DiscountValueType {
   PERCENTAGE

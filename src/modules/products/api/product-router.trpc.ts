@@ -66,6 +66,15 @@ export const productsRouter = createTRPCRouter({
           },
           variants: true,
           images: true,
+          store: {
+            select: {
+              id: true,
+              hasFlatRate: true,
+              flatRateAmount: true,
+              hasFreeShipping: true,
+              minFreeShipping: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -142,11 +151,7 @@ export const productsRouter = createTRPCRouter({
         where: {
           storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
           isFeatured: input.isFeatured ?? undefined,
-          status: input.includeCustom
-            ? undefined
-            : input.isArchived
-            ? "ARCHIVED"
-            : undefined,
+          status: input.isArchived ? "ARCHIVED" : "ACTIVE",
 
           collections: input.collectionId
             ? {
@@ -166,6 +171,7 @@ export const productsRouter = createTRPCRouter({
           images: true,
           variants: true,
           discounts: true,
+          store: true,
 
           category: {
             include: {

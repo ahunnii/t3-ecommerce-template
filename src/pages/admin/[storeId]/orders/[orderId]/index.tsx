@@ -23,6 +23,8 @@ import {
   ViewOrderSummary,
   ViewOrderTimeline,
 } from "~/modules/orders";
+import { ViewOrderNote } from "~/modules/orders/components/admin/view-order-note";
+import { ViewOrderStatus } from "~/modules/orders/components/admin/view-order-status";
 
 interface IProps {
   orderId: string;
@@ -43,7 +45,7 @@ const OrderPage: FC<IProps> = ({ orderId, storeId }) => {
           <>
             <AdminFormHeader
               title={`Order for ${
-                order?.name
+                order?.shippingAddress?.name ?? "Unknown Customer"
               } on ${order?.createdAt.toDateString()}`}
               description={"View details on this order at a glance"}
               contentName="Orders"
@@ -57,16 +59,21 @@ const OrderPage: FC<IProps> = ({ orderId, storeId }) => {
               </Link>
             </AdminFormHeader>
 
-            <AdminFormBody className="mx-auto flex w-full max-w-7xl gap-4 max-lg:flex-col">
+            <AdminFormBody className="mx-auto flex w-full max-w-7xl gap-4 space-y-0 max-lg:flex-col">
               <div className="flex w-full flex-col space-y-4 lg:w-8/12">
-                <ViewOrderDetails {...order} />
+                <ViewOrderStatus {...order} />
+                <ViewOrderFulfillment {...order} />
                 <ViewOrderSummary {...order} />
-                <ViewOrderPayment {...order} />
-                <ViewOrderFulfillment {...order} />{" "}
-                <ViewOrderCustomer {...order} />
-              </div>
-              <div className="flex w-full flex-col lg:w-4/12">
                 <ViewOrderTimeline {...order} />
+                <ViewOrderCustomer
+                  customerId={order?.userId}
+                  storeId={order?.storeId}
+                />
+              </div>
+              <div className="flex w-full flex-col space-y-4 lg:w-4/12">
+                <ViewOrderNote note={order?.note} />
+                <ViewOrderPayment {...order} />
+                <ViewOrderDetails {...order} />
               </div>
             </AdminFormBody>
           </>

@@ -8,12 +8,14 @@ import axios from "axios";
 
 import { ShippingType, type CartItem } from "~/types";
 
+import { env } from "~/env.mjs";
 import paymentService from "~/services/payment";
 
 const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const ctx = await createTRPCContext({ req, res });
 
-  const { productIds, quantity, cartItems, shipping } = req.body;
+  const { productIds, quantity, cartItems, shipping, shippingObject } =
+    req.body;
   const { storeId } = req.query;
 
   try {
@@ -26,10 +28,8 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(400).json({ error: "Product ids are required" });
           }
           const verifiedDBDataResponse = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/cartItems`,
-            {
-              cartItems,
-            }
+            `${env.NEXT_PUBLIC_API_URL}/cartItems`,
+            { cartItems }
           );
 
           if (verifiedDBDataResponse.status !== 200) {
@@ -45,61 +45,50 @@ const checkoutHandler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
 
           const shipping_options = paymentService.createShippingOptions([
-            (shipping as string) === "FREE"
-              ? {
-                  type: ShippingType.FREE,
-                  label: "Free Shipping",
-                  cost: 0,
-                }
-              : {
-                  type: ShippingType.FLAT_RATE,
-                  label: "[Fixed] Standard 5-7 days after product processing.",
-                  cost: shipping,
-                },
+            shippingObject as {
+              type: ShippingType;
+              cost: number;
+              label: string;
+            },
           ]);
 
           const currentUser = ctx?.session?.user;
 
-          const order = await ctx.prisma.order.create({
-            data: {
-              storeId: storeId as string,
-              isPaid: false,
-              userId: currentUser?.id ?? null,
-              shippingCost: Number(shipping * 100) ?? 0,
-              orderItems: {
-                create: verifiedDBData.map((product: CartItem) => {
-                  if (product.variant === null)
-                    return {
-                      product: {
-                        connect: {
-                          id: product.product.id,
-                        },
-                      },
-                      quantity: Number(product.quantity) ?? 1,
-                    };
+          // const order = null;
 
-                  return {
-                    product: {
-                      connect: {
-                        id: product.product.id,
-                      },
-                    },
-                    variant: {
-                      connect: {
-                        id: product.variant.id,
-                      },
-                    },
-                    quantity: Number(product.quantity) ?? 1,
-                  };
-                }),
-              },
-            },
-          });
+          // Create order if user is logged in. Helps to handle 'abandoned carts'
+          // if (currentUser) {
+          //   order = await ctx.prisma.order.create({
+          //     data: {
+          //       storeId: storeId as string,
+          //       paymentStatus: "PENDING",
+          //       userId: currentUser?.id ?? null,
+          //       shipping: Number(shipping * 100) ?? 0,
+          //       orderItems: {
+          //         create: verifiedDBData.map((product: CartItem) => {
+          //           if (product.variant === null)
+          //             return {
+          //               product: { connect: { id: product.product.id } },
+          //               quantity: Number(product.quantity) ?? 1,
+          //             };
+
+          //           return {
+          //             product: { connect: { id: product.product.id } },
+          //             variant: { connect: { id: product.variant.id } },
+          //             quantity: Number(product.quantity) ?? 1,
+          //           };
+          //         }),
+          //       },
+          //     },
+          //   });
+          // }
 
           const session = await paymentService.createCheckoutSession({
             items: line_items,
             shippingOptions: shipping_options,
-            orderId: order.id,
+            order_id: "",
+            user_id: currentUser?.id ?? "",
+            store_id: storeId as string,
           });
 
           return res.json(session);

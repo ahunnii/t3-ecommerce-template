@@ -19,10 +19,13 @@ import { api } from "~/utils/api";
 
 import { toastService } from "~/services/toast";
 
+import { Fulfillment } from "@prisma/client";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useShippingLabelStore } from "../store/use-shipping-label-store";
 import AddressForm from "./address-form";
+import ItemForm from "./items-form";
 import PackageForm from "./package-form";
 import RatesForm from "./rates-form";
 
@@ -36,6 +39,8 @@ export const ShippingModal = ({ data }: { data: string }) => {
     customerAddress: toAddress,
     parcel,
     clearAll,
+    items,
+    setItems,
   } = useShippingLabelStore((state) => state);
 
   const [tabValue, setTabValue] = useState<string>("customer_address");
@@ -53,7 +58,7 @@ export const ShippingModal = ({ data }: { data: string }) => {
     { enabled: shippingModal.isOpen }
   );
 
-  const getCurrentOrder = api.orders.getOrder.useQuery(
+  const getCurrentOrder = api.orders.getOrderFulfillmentInformation.useQuery(
     { orderId: data ?? "" },
     { enabled: shippingModal.isOpen }
   );
@@ -115,20 +120,32 @@ export const ShippingModal = ({ data }: { data: string }) => {
       cost: selectedRate!.amount,
       carrier: selectedRate!.provider,
       timeEstimate: selectedRate!.duration_terms,
+      items: items?.orderItems ?? [],
     });
   };
 
   const customerAddress = useMemo(() => {
     return {
-      name: toAddress?.name ?? getCurrentOrder?.data?.name ?? undefined,
-      street: toAddress?.street ?? getCurrentOrder?.data?.address?.street ?? "",
+      name:
+        toAddress?.name ??
+        getCurrentOrder?.data?.shippingAddress?.name ??
+        undefined,
+      street:
+        toAddress?.street ??
+        getCurrentOrder?.data?.shippingAddress?.street ??
+        "",
       additional:
         toAddress?.additional ??
-        getCurrentOrder?.data?.address?.additional ??
+        getCurrentOrder?.data?.shippingAddress?.additional ??
         "",
-      city: toAddress?.city ?? getCurrentOrder?.data?.address?.city ?? "",
-      state: toAddress?.state ?? getCurrentOrder?.data?.address?.state ?? "",
-      zip: toAddress?.zip ?? getCurrentOrder?.data?.address?.postal_code ?? "",
+      city:
+        toAddress?.city ?? getCurrentOrder?.data?.shippingAddress?.city ?? "",
+      state:
+        toAddress?.state ?? getCurrentOrder?.data?.shippingAddress?.state ?? "",
+      zip:
+        toAddress?.zip ??
+        getCurrentOrder?.data?.shippingAddress?.postal_code ??
+        "",
     };
   }, [toAddress, getCurrentOrder?.data]);
 
@@ -153,59 +170,56 @@ export const ShippingModal = ({ data }: { data: string }) => {
 
   return (
     <Modal
-      title={
-        getCurrentOrder?.data?.shippingLabel?.labelUrl
-          ? "Download Shipping Label"
-          : "Create Shipping Label"
-      }
-      description="Add a new store to manage products and categories."
+      title={"Create Shipping Label"}
+      description="Create a shipping label for this order."
       isOpen={shippingModal.isOpen}
       onClose={handleOnClose}
+      className="w-full max-w-3xl"
     >
       <div className="space-y-4 py-2 pb-4">
-        {(label ?? getCurrentOrder?.data?.shippingLabel?.labelUrl) && (
+        {(label ??
+          (getCurrentOrder?.data?.fulfillments &&
+            getCurrentOrder?.data?.fulfillments?.length > 0)) && (
           <div>
             {label && (
-              <Label>
+              <p className="pb-4">
                 Successful! Your account has been charged{" "}
                 <strong>${selectedRate?.amount}</strong>
-              </Label>
+              </p>
             )}
 
-            <Link
-              href={
-                label?.label_url ??
-                (getCurrentOrder?.data?.shippingLabel?.labelUrl as string)
-              }
-              target="_blank"
-              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
-            >
-              Click to download the label
-            </Link>
-
-            <Button
-              onClick={() =>
-                onCopy(
-                  label?.tracking_url_provider ??
-                    (getCurrentOrder?.data?.shippingLabel
-                      ?.trackingNumber as string)
+            {getCurrentOrder?.data?.fulfillments &&
+              getCurrentOrder?.data?.fulfillments?.length > 0 &&
+              getCurrentOrder?.data?.fulfillments?.map(
+                (fulfillment: Fulfillment) => (
+                  <div key={fulfillment.id} className="flex flex-col gap-4">
+                    <Link
+                      href={
+                        label?.label_url ?? (fulfillment.labelUrl as string)
+                      }
+                      target="_blank"
+                      className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
+                    >
+                      Click to download / print the label
+                    </Link>
+                  </div>
                 )
-              }
-            >
-              Click here to copy the tracking number url
-            </Button>
+              )}
           </div>
         )}
-        {!label && !getCurrentOrder?.data?.shippingLabel?.labelUrl && (
+        {!label && getCurrentOrder?.data?.fulfillments?.length === 0 && (
           <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
             <TabsList className="w-full">
               <TabsTrigger value="customer_address">Customer</TabsTrigger>{" "}
               <TabsTrigger value="business_address" disabled={!toAddress}>
                 Business
               </TabsTrigger>
+              <TabsTrigger value="items" disabled={!toAddress || !fromAddress}>
+                Items
+              </TabsTrigger>
               <TabsTrigger
                 value="package"
-                disabled={!toAddress || !fromAddress}
+                disabled={!toAddress || !fromAddress || !items}
               >
                 Package
               </TabsTrigger>
@@ -224,7 +238,6 @@ export const ShippingModal = ({ data }: { data: string }) => {
                 Review
               </TabsTrigger>
             </TabsList>
-
             <TabsContent value="customer_address">
               {customerAddress && getCurrentOrder?.isFetched && (
                 <AddressForm
@@ -241,9 +254,28 @@ export const ShippingModal = ({ data }: { data: string }) => {
                 <AddressForm
                   successCallback={(data) => {
                     setBusinessAddress(data);
-                    setTabValue("package");
+                    setTabValue("items");
                   }}
                   initialData={businessAddress ?? null}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="items">
+              {getCurrentOrder?.isFetched && (
+                <ItemForm
+                  successCallback={(data) => {
+                    toastService.success("Items added to shipment");
+                    setItems(data);
+                    setTabValue("package");
+                  }}
+                  errorCallback={(error: unknown) =>
+                    toastService.error(
+                      "There was an issue adding the items to the shipment.",
+                      error
+                    )
+                  }
+                  initialData={items ?? null}
+                  orderItems={getCurrentOrder?.data?.orderItems ?? []}
                 />
               )}
             </TabsContent>
@@ -260,7 +292,6 @@ export const ShippingModal = ({ data }: { data: string }) => {
                 initialData={parcel ?? null}
               />
             </TabsContent>
-
             <TabsContent value="rates">
               {getAvailableRates?.isLoading && <p>Getting rates ...</p>}
               {getAvailableRates?.isFetched && (
@@ -281,59 +312,111 @@ export const ShippingModal = ({ data }: { data: string }) => {
               )}
             </TabsContent>
             <TabsContent value="review">
-              <div className="flex flex-col gap-4 text-left">
-                {fromAddress && (
-                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                    <h3 className={"font-semibold "}>From: </h3>
-                    <p>{fromAddress.name}</p>
-                    <p>{fromAddress.street}</p>
-                    <p>{fromAddress.additional}</p>
-                    <p>
-                      {fromAddress.city}, {fromAddress.state} {fromAddress.zip}
-                    </p>
+              {" "}
+              <div className="flex flex-col gap-4">
+                <div className="flex w-full items-center justify-around  space-x-4">
+                  {fromAddress && (
+                    <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                      <h3 className={"font-semibold "}>From: </h3>
+                      <p>{fromAddress.name}</p>
+                      <p>{fromAddress.street}</p>
+                      <p>{fromAddress.additional}</p>
+                      <p>
+                        {fromAddress.city}, {fromAddress.state}{" "}
+                        {fromAddress.zip}
+                      </p>
+                    </div>
+                  )}
+
+                  {toAddress && (
+                    <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                      <h3 className={"font-semibold "}>To: </h3>
+                      <p>{toAddress.name}</p>
+                      <p>{toAddress.street}</p>
+                      <p>{toAddress.additional}</p>
+                      <p>
+                        {toAddress.city}, {toAddress.state} {toAddress.zip}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex space-x-4 text-left">
+                  <div className="flex w-1/2 flex-col space-y-4">
+                    {parcel && (
+                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                        <h3 className={"font-semibold "}>Package: </h3>
+                        <p>
+                          {parcel.package_length} x {parcel.package_width} x{" "}
+                          {parcel.package_height} in
+                        </p>
+
+                        <p>
+                          {parcel.package_weight_lbs} lbs{" "}
+                          {parcel.package_weight_oz} oz
+                        </p>
+                      </div>
+                    )}
+
+                    {selectedRate && (
+                      <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
+                        <h3 className="font-bold">Rate: </h3>
+                        <p>Cost: ${selectedRate.amount}</p>
+
+                        <p>
+                          {selectedRate.provider} --{" "}
+                          {selectedRate.servicelevel?.name}
+                        </p>
+                        <p>{selectedRate.duration_terms}</p>
+                      </div>
+                    )}
                   </div>
-                )}
 
-                {toAddress && (
-                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                    <h3 className={"font-semibold "}>To: </h3>
-                    <p>{toAddress.name}</p>
-                    <p>{toAddress.street}</p>
-                    <p>{toAddress.additional}</p>
-                    <p>
-                      {toAddress.city}, {toAddress.state} {toAddress.zip}
-                    </p>
-                  </div>
-                )}
+                  {items && (
+                    <div className="justify-left  items-left flex w-1/2 flex-col space-y-4 rounded-lg border p-4">
+                      <h3 className={"font-semibold "}>
+                        Items included in fulfillment:{" "}
+                      </h3>
+                      {items?.orderItems?.map((item) => {
+                        const foundOrderItem =
+                          getCurrentOrder?.data?.orderItems?.find(
+                            (orderItem) => orderItem.id === item.id
+                          );
+                        if (!foundOrderItem) {
+                          return null;
+                        }
+                        return (
+                          <div
+                            key={item.id}
+                            className="flex  items-center gap-2"
+                          >
+                            <div className="relative h-14 w-14 rounded-md shadow">
+                              <Image
+                                src={
+                                  foundOrderItem?.product?.featuredImage ??
+                                  "/placeholder-image.webp"
+                                }
+                                fill
+                                sizes={"100vw"}
+                                className="rounded-md object-cover"
+                                alt=""
+                              />
+                            </div>
 
-                {parcel && (
-                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                    <h3 className={"font-semibold "}>Package: </h3>
-                    <p>
-                      {parcel.package_length} x {parcel.package_width} x{" "}
-                      {parcel.package_height} in
-                    </p>
-
-                    <p>
-                      {parcel.package_weight_lbs} lbs {parcel.package_weight_oz}{" "}
-                      oz
-                    </p>
-                  </div>
-                )}
-
-                {selectedRate && (
-                  <div className="justify-left  items-left flex w-full flex-col rounded-lg border p-4">
-                    <h3 className="font-bold">Rate: </h3>
-                    <p>Cost: ${selectedRate.amount}</p>
-
-                    <p>
-                      {selectedRate.provider} --{" "}
-                      {selectedRate.servicelevel?.name}
-                    </p>
-                    <p>{selectedRate.duration_terms}</p>
-                  </div>
-                )}
-
+                            <div className="div">
+                              <p>
+                                {foundOrderItem.product.name}
+                                {foundOrderItem?.variant
+                                  ? ` -- ${foundOrderItem.variant?.values}`
+                                  : ""}
+                              </p>
+                              <p>X {foundOrderItem.quantity}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>{" "}
                 <div className="flex w-full items-center justify-end space-x-2 pt-6">
                   <Button
                     variant={"outline"}

@@ -23,7 +23,7 @@ export type ProductColumn = {
   status: ProductStatus;
   variants: {
     id: string;
-    name: string;
+    names: string;
     price: number;
   }[];
 

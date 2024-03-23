@@ -2,7 +2,7 @@ import { prisma } from "~/server/db";
 
 export const getUserOrdersServerSide = async (userId: string) => {
   const orders = await prisma.order.findMany({
-    where: { userId, isPaid: true },
+    where: { userId, paymentStatus: "PAID" },
   });
 
   const formattedOrders = orders.map((order) => {

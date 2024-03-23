@@ -25,13 +25,15 @@ const paymentDetailsHandler = async (
       userId,
     },
     include: {
+      shippingAddress: true,
+      billingAddress: true,
       orderItems: {
         include: {
           variant: true,
           product: true,
         },
       },
-      shippingLabel: true,
+      fulfillments: true,
     },
   });
 

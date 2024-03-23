@@ -201,6 +201,7 @@ export const BillboardForm: React.FC<Props> = ({ initialData }) => {
                         disabled={isLoading}
                         onChange={(url) => field.onChange(url)}
                         onRemove={() => field.onChange("")}
+                        folder=""
                       />
                     </Form.FormControl>
                     <Form.FormMessage />

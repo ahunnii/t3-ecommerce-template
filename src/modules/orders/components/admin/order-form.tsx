@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type Prisma } from "@prisma/client";
+import { PaymentStatus } from "@prisma/client";
 
 import { useRouter as useNavigationRouter } from "next/navigation";
 import { useRouter } from "next/router";
@@ -27,26 +27,12 @@ import { phoneFormatStringToNumber } from "~/utils/format-utils.wip";
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { orderFormSchema } from "../../schemas";
-import type { OrderFormValues } from "../../types";
+import type { Order, OrderFormValues } from "../../types";
 import { CustomerDetailsSection } from "./customer-details.form-section";
 import { OrderItemsSection } from "./order-items.form-section";
 
 interface OrderFormProps {
-  initialData: Prisma.OrderGetPayload<{
-    include: {
-      address: true;
-      orderItems: {
-        include: {
-          variant: true;
-          product: {
-            include: {
-              variants: true;
-            };
-          };
-        };
-      };
-    };
-  }>;
+  initialData: Order | null;
 }
 
 export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
@@ -73,15 +59,16 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderFormSchema),
     defaultValues: {
-      isPaid: initialData?.isPaid ?? false,
+      paymentStatus: initialData?.paymentStatus ?? "PENDING",
+      fulfillmentStatus: initialData?.fulfillmentStatus ?? "PENDING",
       phone: phoneFormatStringToNumber(initialData?.phone ?? ""),
-      street: initialData?.address?.street ?? "",
-      additional: initialData?.address?.additional ?? "",
-      city: initialData?.address?.city ?? "",
-      state: initialData?.address?.state ?? "",
-      zip: initialData?.address?.postal_code ?? "",
-      country: initialData?.address?.country ?? "US",
-      name: initialData?.name ?? "",
+      street: initialData?.shippingAddress?.street ?? "",
+      additional: initialData?.shippingAddress?.additional ?? "",
+      city: initialData?.shippingAddress?.city ?? "",
+      state: initialData?.shippingAddress?.state ?? "",
+      zip: initialData?.shippingAddress?.postal_code ?? "",
+      country: initialData?.shippingAddress?.country ?? "US",
+      name: initialData?.shippingAddress?.name ?? "",
       orderItems: initialData?.orderItems ?? [],
       email: initialData?.email ?? "",
     },
@@ -134,33 +121,55 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
       updateOrder.mutate({
         storeId,
         orderId,
-        isPaid: data.isPaid,
+        paymentStatus: data.paymentStatus,
+        email: data.email,
+        fulfillmentStatus: data.fulfillmentStatus,
         phone: data.phone,
-        address: {
+        shippingAddress: {
+          name: data.name,
           street: data.street,
           additional: data.additional,
           city: data.city,
           state: data.state,
-          postalCode: data.zip,
+          postal_code: data.zip,
+          country: data.country,
+        },
+        billingAddress: {
+          name: data.name,
+          street: data.street,
+          additional: data.additional,
+          city: data.city,
+          state: data.state,
+          postal_code: data.zip,
           country: data.country,
         },
         orderItems: data.orderItems,
-        name: data.name,
       });
     } else {
       createOrder.mutate({
         storeId,
-        isPaid: data.isPaid,
+        email: data.email,
+        paymentStatus: data.paymentStatus,
+        fulfillmentStatus: data.fulfillmentStatus,
         phone: data.phone,
-        address: {
+        shippingAddress: {
+          name: data.name,
           street: data.street,
           additional: data.additional,
           city: data.city,
           state: data.state,
-          postalCode: data.zip,
+          postal_code: data.zip,
           country: data.country,
         },
-        name: data.name,
+        billingAddress: {
+          name: data.name,
+          street: data.street,
+          additional: data.additional,
+          city: data.city,
+          state: data.state,
+          postal_code: data.zip,
+          country: data.country,
+        },
         orderItems: data.orderItems,
       });
     }
@@ -197,15 +206,17 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
             <FormField
               control={form.control}
-              name="isPaid"
+              name="paymentStatus"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       disabled={loading}
                       placeholder="Is Order Paid"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+                      checked={field.value === PaymentStatus.PAID}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked ? "PAID" : "PENDING")
+                      }
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
