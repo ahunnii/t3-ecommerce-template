@@ -3,6 +3,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 import useCart from "~/modules/cart/hooks/use-cart";
+import paymentService from "~/services/payment";
 
 import { toastService } from "~/services/toast";
 import { api } from "~/utils/api";
@@ -85,7 +86,17 @@ const useCheckout = () => {
   const checkIfCheckoutWasSuccessful = useCallback(() => {
     const searchParams = new URLSearchParams(window.location.search);
 
-    if (searchParams.get("orderId")) {
+    // void paymentService
+    //   .retrieveSession(searchParams.get("session_id") ?? "")
+    //   .then((res) => {
+    //     console.log(JSON.parse(res?.messages[1] ?? "{}"));
+    //     if (res?.status === "success") {
+    //       toastService.success(`Payment completed. Thanks for shopping with us !`);
+    //       removeAll();
+    //     }
+    //   });
+
+    if (searchParams.get("session_id")) {
       // showSuccess("Payment completed.");
       removeAll();
     }

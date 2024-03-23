@@ -14,24 +14,23 @@ import * as React from "react";
 import { storeTheme } from "~/data/config.custom";
 import { env } from "~/env.mjs";
 
-interface NewCustomOrderEmailProps {
+type CustomOrderNotifyCustomerEmailProps = {
   firstName: string;
-  orderLink: string;
-}
+};
 
 // const baseUrl = process.env.VERCEL_URL
 //   ? `https://${process.env.VERCEL_URL}`
 //   : env.NEXT_PUBLIC_URL;
+
 const baseUrl = "https://trend-anomaly.up.railway.app" ?? env.NEXT_PUBLIC_URL;
 
 const config = storeTheme;
-export const NewCustomOrderEmail = ({
+export const CustomOrderNotifyCustomerEmail = ({
   firstName,
-  orderLink,
-}: NewCustomOrderEmailProps) => (
+}: CustomOrderNotifyCustomerEmailProps) => (
   <Html>
     <Head />
-    <Preview>You have a new custom order request from {firstName}</Preview>
+    <Preview>Thanks for your request! </Preview>
     <Tailwind>
       <Body className="p-8">
         <Container className="border border-solid border-[#eaeaea] p-8">
@@ -45,16 +44,16 @@ export const NewCustomOrderEmail = ({
           />
           <div className="p-8">
             <Heading className="text-center text-2xl">
-              New Custom Order Request
+              Thanks for your request!
             </Heading>
 
             <Text style={paragraph}>
-              It looks like you got a new custom order request from {firstName}.
-              Check it out!
+              We have received your custom order request, {firstName}. We will
+              be in touch with you as soon as possible.
             </Text>
 
-            <Button style={button} href={orderLink}>
-              View Order Request
+            <Button style={button} href={`${baseUrl}/collections/all-products`}>
+              Check out the store
             </Button>
           </div>
         </Container>
@@ -63,7 +62,7 @@ export const NewCustomOrderEmail = ({
   </Html>
 );
 
-export default NewCustomOrderEmail;
+export default CustomOrderNotifyCustomerEmail;
 
 const logo = {
   margin: "0 auto",

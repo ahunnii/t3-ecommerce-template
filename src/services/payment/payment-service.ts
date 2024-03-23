@@ -43,6 +43,8 @@ export interface PaymentProcessor<TLineItems, TShippingOptions> {
   createShippingOptions(
     shippingOptions: CustomerShippingRate[]
   ): TShippingOptions;
+
+  retrieveSession(session_id: string): Promise<CheckoutSessionResponse>;
 }
 
 export class PaymentService<TLineItems, TShippingOptions> {
@@ -74,6 +76,11 @@ export class PaymentService<TLineItems, TShippingOptions> {
   }
   async processPayment(order: Order) {
     await this.paymentProcessor.processPayment(order);
+  }
+
+  async retrieveSession(session_id: string) {
+    const session = await this.paymentProcessor.retrieveSession(session_id);
+    return session;
   }
 
   async retrievePayment<

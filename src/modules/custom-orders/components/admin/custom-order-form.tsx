@@ -24,6 +24,7 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 
+import { Mail } from "lucide-react";
 import { AdminFormBody } from "~/components/common/admin/admin-form-body";
 import { AdminFormHeader } from "~/components/common/admin/admin-form-header";
 import { AdvancedNumericInput } from "~/components/common/inputs/advanced-numeric-input";
@@ -65,6 +66,7 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
     defaultValues: {
       name: initialData?.name ?? "",
       email: initialData?.email ?? "",
+      invoiceSent: initialData?.invoiceSent ?? false,
       description: initialData?.description ?? "N/A",
       notes: initialData?.notes ?? "",
       productDescription: initialData?.product?.description ?? "",
@@ -86,7 +88,14 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
     void apiContext.products.invalidate();
   };
   const updateCustomOrder = api.customOrder.updateCustomRequest.useMutation({
-    onSuccess: defaultSuccess,
+    onSuccess: (data) => {
+      defaultSuccess();
+      if (data?.id && data?.status === "ACCEPTED" && !data?.invoiceSent)
+        emailCustomerInvoice.mutate({
+          customOrderId: data.id,
+          setInvoiceSent: true,
+        });
+    },
     onError: (error: unknown) =>
       toastService.error(
         "Something went wrong updating your custom order.",
@@ -183,9 +192,47 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
               />
             )}
 
-            <Button disabled={loading} className="ml-auto" type="submit">
+            <div className="flex w-full space-x-2">
+              {initialData && form.watch("invoiceSent") && (
+                <Button
+                  disabled={loading}
+                  className="ml-4 flex gap-2"
+                  variant="outline"
+                  type="submit"
+                  onClick={() => {
+                    emailCustomerInvoice.mutate({
+                      customOrderId: customOrderId,
+                    });
+                  }}
+                >
+                  <Mail />
+                  Resend Invoice
+                </Button>
+              )}
+              <Button
+                disabled={loading}
+                className="ml-auto"
+                type="submit"
+                variant={action === "Create" ? "secondary" : "default"}
+              >
+                {action}
+              </Button>
+
+              {action === "Create" && (
+                <Button
+                  disabled={loading}
+                  className="ml-4"
+                  type="submit"
+                  onClick={() => setSendToClient(true)}
+                >
+                  Create and email invoice to customer
+                </Button>
+              )}
+            </div>
+
+            {/* <Button disabled={loading} className="ml-auto" type="submit">
               {action}
-            </Button>
+            </Button> */}
           </AdminFormHeader>
 
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
@@ -444,27 +491,6 @@ export const CustomOrderForm: React.FC<Props> = ({ initialData }) => {
               </EditSection>
             </section>
           </AdminFormBody>
-
-          <div className="w-full">
-            <Button
-              disabled={loading}
-              className="ml-auto"
-              type="submit"
-              variant={action === "Create" ? "secondary" : "default"}
-            >
-              {action}
-            </Button>
-            {action === "Create" && (
-              <Button
-                disabled={loading}
-                className="ml-4"
-                type="submit"
-                onClick={() => setSendToClient(true)}
-              >
-                Create and email invoice to customer
-              </Button>
-            )}
-          </div>
         </form>
       </Form.Form>
     </>

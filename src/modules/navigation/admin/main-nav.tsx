@@ -24,9 +24,10 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
     searchParams: { isShipped: false },
   });
 
-  const { data: customOrders } = api.customOrder.getCustomRequests.useQuery({
-    storeId,
-  });
+  const { data: customOrders } =
+    api.customOrder.getPendingCustomRequests.useQuery({
+      storeId,
+    });
 
   const encodedStoreId = encodeURIComponent(storeId);
 
@@ -113,7 +114,7 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
           {route.label === "Orders" && <Badge>{orders?.length ?? 0}</Badge>}
 
           {route.label === "Custom Requests" && (
-            <Badge>{customOrders?.length ?? 0}</Badge>
+            <Badge>{customOrders ?? 0}</Badge>
           )}
         </Link>
       ))}

@@ -1,8 +1,11 @@
+import axios from "axios";
 import { buffer } from "micro";
 import type { Stripe } from "stripe";
+import { storeTheme } from "~/data/config.custom";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe/client";
+import { emailService } from "~/services/email";
 import type { CustomerShippingRate } from "~/types";
 import type { PaymentProcessor } from "../payment-service";
 import type { CheckoutSessionResponse, retrievePaymentResult } from "../types";
@@ -83,7 +86,7 @@ export const stripePaymentProcessor: PaymentProcessor<
           message: `Please note that things made to order takes additional processing time before shipping. Check estimated delivery dates of products to see when to expect your item(s).`,
         },
       },
-      success_url: `${env.NEXT_PUBLIC_URL}/cart/success`,
+      success_url: `${env.NEXT_PUBLIC_URL}/cart/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.NEXT_PUBLIC_URL}/cart?canceled=1`,
 
       metadata: { order_id: order_id ?? "", user_id: user_id ?? "", store_id },
@@ -186,11 +189,7 @@ export const stripePaymentProcessor: PaymentProcessor<
           const order = await prisma.order.create({
             data: {
               store: { connect: { id: checkoutSession?.metadata!.store_id } },
-              user: {
-                connect: {
-                  id: checkoutSession?.metadata!.user_id ?? undefined,
-                },
-              },
+
               orderItems: { createMany: { data: stripeOrderItems } },
               receiptLink: receiptLink,
               timeline: {
@@ -253,6 +252,19 @@ export const stripePaymentProcessor: PaymentProcessor<
             break;
           }
 
+          if (checkoutSession?.metadata?.user_id) {
+            await prisma.user.update({
+              where: { id: checkoutSession?.metadata.user_id },
+              data: {
+                orders: {
+                  connect: {
+                    id: order.id,
+                  },
+                },
+              },
+            });
+          }
+
           order.orderItems.map(async (orderItem) => {
             if (!orderItem.variantId) {
               await prisma.product
@@ -301,6 +313,14 @@ export const stripePaymentProcessor: PaymentProcessor<
               }
             }
           });
+
+          const emailData = {
+            link: `${env.NEXT_PUBLIC_URL}/admin/${env.NEXT_PUBLIC_STORE_ID}/orders/${order.id}`,
+          };
+
+          // Email the admin
+          await axios.post(`${env.NEXT_PUBLIC_API_URL}/new-order`, emailData);
+
           data = {
             status: "success",
             messages: [
@@ -372,6 +392,23 @@ export const stripePaymentProcessor: PaymentProcessor<
     // TODO: Process payment
   },
 
+  retrieveSession: async (session_id) => {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(session_id);
+
+      // const customer = await stripe.customers.retrieve();
+
+      return {
+        messages: ["Session retrieved successfully", JSON.stringify(session)],
+        status: "success",
+      };
+    } catch (e) {
+      return {
+        messages: ["Session not found", JSON.stringify(e)],
+        status: "failed",
+      };
+    }
+  },
   retrievePayment: async (order) => {
     const paymentIntentId = order.referenceNumber ?? null;
 

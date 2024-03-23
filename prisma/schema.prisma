@@ -310,25 +310,26 @@ enum CustomOrderType {
   HOODIE
 }
 model CustomOrderRequest {
-  id          String          @id @default(cuid())
-  storeId     String    // Foreign Key to Store 
-  store       Store    @relation("StoreToCustomOrderRequest", fields: [storeId], references: [id]) 
-  type        CustomOrderType @default(SHIRT)       // Type of product being requested
-  email       String
-  name        String
-  description String @db.Text
-  notes       String? @db.Text
-  images      Image[]     // Assuming you're storing image URLs or keys
-  status      CustomOrderStatus @default(PENDING)       // ["pending", "accepted", "rejected"]
-  price       Float?       // Price set by the admin upon acceptance
-  invoiceId   String?      // Invoice ID for the custom order
-
-  productId   String?   @unique
-  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
-
-
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id            String          @id @default(cuid())
+  storeId       String    // Foreign Key to Store 
+  store         Store    @relation("StoreToCustomOrderRequest", fields: [storeId], references: [id]) 
+  type          CustomOrderType @default(SHIRT)       // Type of product being requested
+  email         String
+  name          String
+  description   String @db.Text
+  notes         String? @db.Text
+  images        Image[]     // Assuming you're storing image URLs or keys
+  status        CustomOrderStatus @default(PENDING)       // ["pending", "accepted", "rejected"]
+  price         Float?       // Price set by the admin upon acceptance
+  invoiceId     String?      // Invoice ID for the custom order
+  invoiceSent   Boolean      @default(false) // Whether the invoice has been sent
+  
+  productId     String?   @unique
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   @@index([storeId])
 

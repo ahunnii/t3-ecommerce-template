@@ -12,6 +12,7 @@ export const customRequestFormSchema = z.object({
 export const customOrderAdminFormSchema = z.object({
   email: z.string().email(),
   name: z.string(),
+  invoiceSent: z.boolean().optional(),
   description: z.string(),
   productDescription: z.string(),
   notes: z.string().optional(),

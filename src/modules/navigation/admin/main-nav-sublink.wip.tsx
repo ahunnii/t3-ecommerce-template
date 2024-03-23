@@ -47,9 +47,10 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
     storeId,
   });
   const checkActivePath = useActivePath();
-  const { data: customOrders } = api.customOrder.getCustomRequests.useQuery({
-    storeId,
-  });
+  const { data: customOrders } =
+    api.customOrder.getPendingCustomRequests.useQuery({
+      storeId,
+    });
 
   const encodedStoreId = encodeURIComponent(storeId);
 
@@ -168,7 +169,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
             {route.label === "Orders" && <Badge>{orders ?? 0}</Badge>}
 
             {route.label === "Custom Requests" && (
-              <Badge>{customOrders?.length ?? 0}</Badge>
+              <Badge>{customOrders ?? 0}</Badge>
             )}
             {route.active ||
               (route.subRoutes &&

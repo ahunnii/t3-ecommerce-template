@@ -15,9 +15,27 @@ import {
 import { emailService } from "~/services/email";
 import NewCustomOrderEmail from "~/services/email/email-templates/admin.custom-order";
 import NewCustomOrderCustomer from "~/services/email/email-templates/customer.custom-order";
+import CustomOrderNotifyCustomerEmail from "~/services/email/email-templates/customer.custom-order-notification";
 import { customOrderAdminFormSchema } from "../schema";
 
 export const customRouter = createTRPCRouter({
+  getPendingCustomRequests: protectedProcedure
+    .input(z.object({ storeId: z.string().optional() }))
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.customOrderRequest.count({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          status: "PENDING",
+        },
+      });
+    }),
+
   getCustomRequests: protectedProcedure
     .input(z.object({ storeId: z.string().optional() }))
     .query(({ ctx, input }) => {
@@ -104,6 +122,7 @@ export const customRouter = createTRPCRouter({
           orderLink: `${env.NEXT_PUBLIC_URL}/admin/${env.NEXT_PUBLIC_STORE_ID}/custom-orders/${customOrder.id}`,
         };
 
+        // Notify the admin of the new custom order request
         await emailService.sendEmail<typeof emailData>({
           to: storeTheme.brand.email,
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
@@ -112,9 +131,23 @@ export const customRouter = createTRPCRouter({
           template: NewCustomOrderEmail,
         });
 
+        // Notify the customer that their request has been received
+        await emailService.sendEmail<typeof emailData>({
+          to: input.email,
+          from: "Trend Anomaly <no-reply@trendanomaly.com>",
+          subject: "Thanks for your request!",
+          data: emailData,
+          template: CustomOrderNotifyCustomerEmail,
+        });
+
         return customOrder;
       } catch (e) {
         console.log(e);
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An error occurred while creating the custom order.",
+        });
       }
     }),
 
@@ -332,7 +365,12 @@ export const customRouter = createTRPCRouter({
     }),
 
   emailCustomerInvoice: protectedProcedure
-    .input(z.object({ customOrderId: z.string() }))
+    .input(
+      z.object({
+        customOrderId: z.string(),
+        setInvoiceSent: z.boolean().optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       if (ctx.session.user.role !== "ADMIN")
         throw new TRPCError({
@@ -374,6 +412,7 @@ export const customRouter = createTRPCRouter({
           notes: customOrder?.product?.description ?? "",
           invoiceId: customOrder?.id,
         };
+
         await emailService.sendEmail<typeof data>({
           to: customOrder!.email,
           from: "Trend Anomaly <no-reply@trendanomaly.com>",
@@ -381,6 +420,17 @@ export const customRouter = createTRPCRouter({
           data: data,
           template: NewCustomOrderCustomer,
         });
+
+        if (input.setInvoiceSent) {
+          await ctx.prisma.customOrderRequest.update({
+            where: {
+              id: input.customOrderId,
+            },
+            data: {
+              invoiceSent: true,
+            },
+          });
+        }
 
         return {
           status: 200,
