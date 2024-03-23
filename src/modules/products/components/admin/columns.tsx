@@ -80,6 +80,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
         row.original.variants?.length > 0
           ? row.original.variants.map((v) => v.price)
           : [row.original.price];
+
       const minPrice = Math.min(...prices);
 
       const formatted = new Intl.NumberFormat("en-US", {
@@ -89,7 +90,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
 
       return (
         <div>
-          {formatted} {prices?.length > 0 && "+"}
+          {formatted} {[...new Set(prices)]?.length > 1 && "+"}
         </div>
       );
     },

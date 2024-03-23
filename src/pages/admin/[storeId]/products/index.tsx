@@ -17,6 +17,7 @@ interface IProps {
 const ProductsPage: FC<IProps> = ({ storeId }) => {
   const { data: products, isLoading } = api.products.getAllProducts.useQuery({
     storeId,
+    isAdmin: true,
   });
 
   return (
