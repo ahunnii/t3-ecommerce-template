@@ -9,7 +9,11 @@ import type { orderFormSchema } from "./schemas";
 export type OrderItem = Prisma.OrderItemGetPayload<{
   include: {
     variant: true;
-    product: true;
+    product: {
+      include: {
+        variants: true;
+      };
+    };
   };
 }>;
 
