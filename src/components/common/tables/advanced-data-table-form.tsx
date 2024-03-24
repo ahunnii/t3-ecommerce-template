@@ -1,4 +1,5 @@
 "use client";
+import _debounce from "lodash/debounce";
 
 import {
   flexRender,
@@ -39,6 +40,7 @@ import { DataTableToolbar } from "./advanced-data-table-toolbar";
 import { uniqueId } from "lodash";
 import { Trash, type LucideIcon } from "lucide-react";
 import {
+  ControllerRenderProps,
   useFieldArray,
   type ArrayPath,
   type FieldValues,
@@ -150,6 +152,22 @@ export function AdvancedDataTableForm<
     control: form.control,
     name: formKey,
   });
+
+  const debounceFn = React.useCallback(
+    _debounce(
+      (data: unknown, onChange: (data: unknown) => void) =>
+        handleInputChangeDebounce(data, onChange),
+      1000
+    ),
+    []
+  );
+
+  const handleInputChangeDebounce = (
+    data: unknown,
+    onChange: (data: unknown) => void
+  ) => {
+    onChange(data);
+  };
 
   return (
     <div className="w-full space-y-4">
@@ -348,7 +366,19 @@ export function AdvancedDataTableForm<
                                     <>
                                       {cell.column.id === "price" && (
                                         <AdvancedNumericInput
-                                          field={field}
+                                          field={
+                                            {
+                                              ...field,
+                                              // onChange: (data: unknown) =>
+                                              //   debounceFn(
+                                              //     data,
+                                              //     field.onChange
+                                              //   ),
+                                            } as ControllerRenderProps<
+                                              FData,
+                                              Path<FData>
+                                            >
+                                          }
                                           prependSpan="$"
                                         />
                                       )}

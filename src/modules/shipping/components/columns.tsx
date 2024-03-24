@@ -51,20 +51,27 @@ export const shippingClient: ColumnDef<ShippingColumn>[] = [
   {
     accessorKey: "tracking_number",
     header: "Tracking Number",
+    cell: ({ row }) => {
+      return (
+        <Link href={row.original.tracking_url_provider}>
+          {" "}
+          <Button
+            variant={"link"}
+            className="mx-0 truncate px-0"
+          >{`${row.original.tracking_number}`}</Button>
+        </Link>
+      );
+    },
   },
   {
     accessorKey: "tracking_status",
     header: "Tracking Status",
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
+    // filterFn: (row, id, value) => {
+    //   return value.includes(row.getValue(id));
+    // },
     cell: ({ row }) => {
-      return <p className="">{`${row.original.status.toString()}`}</p>;
+      return <p className="">{`${row.original.tracking_status.toString()}`}</p>;
     },
-  },
-  {
-    accessorKey: "tracking_url_provider",
-    header: "Tracking URL Provider",
   },
 
   {

@@ -53,11 +53,17 @@ export const AlertModal: React.FC<AlertModalProps> = ({
           <Button
             disabled={loading}
             variant="outline"
+            type="button"
             onClick={() => setIsOpen(false)}
           >
             Cancel
           </Button>
-          <Button disabled={loading} variant="destructive" onClick={onConfirm}>
+          <Button
+            disabled={loading}
+            variant="destructive"
+            onClick={onConfirm}
+            type="button"
+          >
             Continue
           </Button>
         </div>
@@ -66,6 +72,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
         <Button
           disabled={loading}
           variant="destructive"
+          type="button"
           size="sm"
           onClick={() => setIsOpen(true)}
         >

@@ -17,6 +17,7 @@ export type OrderHistoryColumns = {
   paymentStatus: PaymentStatus;
   fulfillmentStatus: FulfillmentStatus;
   total: number;
+  email: string;
   createdAt: Date;
 };
 

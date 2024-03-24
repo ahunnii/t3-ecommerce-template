@@ -204,33 +204,35 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData }) => {
             </Button>
           </AdminFormHeader>
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
-            <FormField
-              control={form.control}
-              name="paymentStatus"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      disabled={loading}
-                      placeholder="Is Order Paid"
-                      checked={field.value === PaymentStatus.PAID}
-                      onCheckedChange={(checked) =>
-                        field.onChange(checked ? "PAID" : "PENDING")
-                      }
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Order Paid?</FormLabel>
-                    <FormDescription>
-                      This marks that the customer successfully paid for the
-                      order and awaiting shipment.
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />{" "}
-            <CustomerDetailsSection form={form} loading={loading} />
-            <OrderItemsSection form={form} loading={loading} />
+            <div className="flex flex-col space-y-4">
+              <FormField
+                control={form.control}
+                name="paymentStatus"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        disabled={loading}
+                        placeholder="Is Order Paid"
+                        checked={field.value === PaymentStatus.PAID}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked ? "PAID" : "PENDING")
+                        }
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Order Paid?</FormLabel>
+                      <FormDescription>
+                        This marks that the customer successfully paid for the
+                        order and awaiting shipment.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />{" "}
+              <CustomerDetailsSection form={form} loading={loading} />
+              <OrderItemsSection form={form} loading={loading} />
+            </div>
           </AdminFormBody>
         </form>
       </Form>

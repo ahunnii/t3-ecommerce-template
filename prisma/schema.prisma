@@ -430,8 +430,10 @@ model Fulfillment {
   updatedAt       DateTime      @updatedAt
 
   @@index([orderId])
-
 }
+
+
+
 
 model TimeLineEntry {
   id              String              @id @default(cuid())
@@ -445,6 +447,14 @@ model TimeLineEntry {
   @@index([orderId])
 }
 
+
+enum OrderType {
+  ONLINE
+  IN_STORE
+  PHONE
+  CUSTOM
+  DRAFT
+}
 model Order {
   id                String          @id @default(cuid())
   storeId           String

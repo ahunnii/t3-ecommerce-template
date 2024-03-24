@@ -28,6 +28,7 @@ import {
 
 import { CheckIcon, ChevronsUpDown } from "lucide-react";
 import { FormattedNumericInput } from "~/components/common/inputs/formatted-numeric-input";
+import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { Button } from "~/components/ui/button";
 import { states } from "~/utils/shipping";
 import { cn } from "~/utils/styles";
@@ -40,84 +41,86 @@ type Props = {
 
 export const CustomerDetailsSection: FC<Props> = ({ form, loading }) => {
   return (
-    <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
-      <div className="w-full">
-        <FormLabel>Customer Info</FormLabel>{" "}
-        <FormDescription>
-          Edit the customer&apos;s shipping information.
-        </FormDescription>
-      </div>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="col-span-3">
-              <FormLabel className="text-sm font-normal text-muted-foreground">
-                Full Name
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Your customer's name"
-                  {...field}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel className="text-sm font-normal text-muted-foreground">
-                Email
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g. test@test.com"
-                  {...field}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel className="text-sm font-normal text-muted-foreground">
-                Phone
-              </FormLabel>
-              <FormControl>
-                <FormattedNumericInput
-                  {...field}
-                  type="tel"
-                  allowEmptyFormatting
-                  format="+1 (###) ###-####"
-                  mask="_"
-                  onChange={(e) => {
-                    e.preventDefault();
-                  }}
-                  onValueChange={(value) => {
-                    field.onChange(`${value.floatValue}`);
-                  }}
-                  required
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+    <>
+      <EditSection
+        title="Customer Info"
+        description="Edit the customer's shipping information."
+      >
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem className="col-span-3">
+                <FormLabel className="text-sm font-normal text-muted-foreground">
+                  Full Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Your customer's name"
+                    {...field}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel className="text-sm font-normal text-muted-foreground">
+                  Email
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. test@test.com"
+                    {...field}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel className="text-sm font-normal text-muted-foreground">
+                  Phone
+                </FormLabel>
+                <FormControl>
+                  <FormattedNumericInput
+                    {...field}
+                    type="tel"
+                    allowEmptyFormatting
+                    format="+1 (###) ###-####"
+                    mask="_"
+                    onChange={(e) => {
+                      e.preventDefault();
+                    }}
+                    onValueChange={(value) => {
+                      field.onChange(`${value.floatValue}`);
+                    }}
+                    required
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </EditSection>
 
-      <div className="w-full space-y-8 rounded-md border border-border bg-background/50 p-4">
+      <EditSection
+        title="Shipping Address"
+        description="Address used in fulfillment"
+      >
         <FormLabel>Address</FormLabel>{" "}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <FormField
@@ -256,7 +259,7 @@ export const CustomerDetailsSection: FC<Props> = ({ form, loading }) => {
             )}
           />{" "}
         </div>
-      </div>
-    </div>
+      </EditSection>
+    </>
   );
 };

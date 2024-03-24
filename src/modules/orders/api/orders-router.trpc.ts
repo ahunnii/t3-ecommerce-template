@@ -30,6 +30,34 @@ export const ordersRouter = createTRPCRouter({
       });
     }),
 
+  getMonthlyOrderCount: protectedProcedure
+    .input(z.object({ storeId: z.string().optional() }))
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      const date = new Date();
+      const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+      const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+      return ctx.prisma.order.count({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          paymentStatus: "PAID",
+          // NOT: [
+          //   { fulfillmentStatus: "FULFILLED" || "RESTOCKED" || "CANCELED" },
+          // ],
+          createdAt: {
+            gte: firstDay,
+            lte: lastDay,
+          },
+        },
+      });
+    }),
+
   updateOrderNote: protectedProcedure
     .input(
       z.object({
@@ -71,6 +99,7 @@ export const ordersRouter = createTRPCRouter({
         },
         select: {
           storeId: true,
+          email: true,
           id: true,
           paymentStatus: true,
           orderItems: {
@@ -87,6 +116,50 @@ export const ordersRouter = createTRPCRouter({
             },
           },
           total: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
+  getAllPendingOrders: protectedProcedure
+    .input(
+      z.object({
+        storeId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+
+      return ctx.prisma.order.findMany({
+        where: {
+          storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
+          paymentStatus: "PAID",
+          NOT: [
+            {
+              fulfillmentStatus: "FULFILLED" || "RESTOCKED" || "CANCELED",
+            },
+          ],
+        },
+        select: {
+          storeId: true,
+          email: true,
+          id: true,
+          paymentStatus: true,
+          total: true,
+          fulfillmentStatus: true,
+          shippingAddress: {
+            select: {
+              name: true,
+            },
+          },
+
           createdAt: true,
         },
         orderBy: {

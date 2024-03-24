@@ -67,13 +67,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     },
   });
 
-  const sendReceiptEmail = api.emailService.sendReceiptEmail.useMutation({
-    onSuccess: () => {
-      toastService.success("Receipt email sent successfully");
-    },
-    onError: (error) =>
-      toastService.error("Failed to send receipt email", error),
-  });
+  // const sendReceiptEmail = api.emailService.sendReceiptEmail.useMutation({
+  //   onSuccess: () => {
+  //     toastService.success("Receipt email sent successfully");
+  //   },
+  //   onError: (error) =>
+  //     toastService.error("Failed to send receipt email", error),
+  // });
 
   const onConfirm = () => {
     deleteOrder.mutate({
@@ -138,12 +138,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             onClick={() => sendReceiptEmail.mutate({ orderId: data.id })}
           >
             <Send className="mr-2 h-4 w-4" /> Resend Receipt
-          </DropdownMenuItem>
-          {data?.paymentStatus === "PAID" && (
+          </DropdownMenuItem> */}
+          {/* {data?.paymentStatus === "PAID" && (
             <DropdownMenuItem onClick={() => shippingModal.onOpen(data.id)}>
               {labelCreated ? (
                 <Download className="mr-2 h-4 w-4" />
@@ -165,7 +165,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               <CheckSquareIcon className="mr-2 h-4 w-4" />
               Mark as shipped
             </DropdownMenuItem>
-          )}
+          )} */}
           <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>

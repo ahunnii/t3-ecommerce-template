@@ -26,18 +26,18 @@ export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
           description="Manage orders for your store"
         />
 
-        <Link href={`/admin/${storeId}/orders/new`}>
+        {/* <Link href={`/admin/${storeId}/orders/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Button>
-        </Link>
+        </Link> */}
       </div>
       <Separator />
       <AdvancedDataTable
-        searchKey="name"
+        searchKey="email"
         columns={columns}
         data={data}
-        filters={[statuses]}
+        filters={statuses}
       />
     </div>
   );

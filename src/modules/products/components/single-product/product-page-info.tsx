@@ -100,6 +100,7 @@ const ProductPageInfo: React.FC<InfoProps> = (props) => {
 
           <ProductDiscountLabel
             discountDescription={discount?.discount?.description}
+            code={discount?.discount?.code}
           />
         </div>
       </div>

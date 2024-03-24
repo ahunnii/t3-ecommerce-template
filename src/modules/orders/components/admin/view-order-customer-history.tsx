@@ -32,7 +32,7 @@ export const ViewOrderCustomerHistory = ({
           searchKey="name"
           columns={orderHistoryColumns}
           data={getCustomerOrders?.data as OrderHistoryColumns[]}
-          filters={[statuses]}
+          filters={statuses}
         />
       )}
     </ViewSection>

@@ -32,27 +32,80 @@ export type FilterOption = {
   }[];
 };
 
-export const statuses = {
-  column: "status",
-  title: "Status",
-  filters: [
-    {
-      value: "PENDING",
-      label: "Pending",
-      icon: HelpCircleIcon,
-    },
-    {
-      value: "PAID",
-      label: "Paid",
-      icon: CircleIcon,
-    },
-    {
-      value: "SHIPPED",
-      label: "Shipped",
-      icon: TimerIcon,
-    },
-  ],
-};
+export const statuses = [
+  {
+    column: "paymentStatus",
+    title: "Payment Status",
+    filters: [
+      {
+        value: "PENDING",
+        label: "Pending",
+        icon: HelpCircleIcon,
+      },
+      {
+        value: "PAID",
+        label: "Paid",
+        icon: HelpCircleIcon,
+      },
+      {
+        value: "REFUNDED",
+        label: "Refunded",
+        icon: CircleIcon,
+      },
+      {
+        value: "PARTIAL_REFUND",
+        label: "Partial Refund",
+        icon: TimerIcon,
+      },
+      {
+        value: "VOIDED",
+        label: "Voided",
+        icon: TimerIcon,
+      },
+      {
+        value: "FAILED",
+        label: "Failed",
+        icon: HelpCircleIcon,
+      },
+    ],
+  },
+  {
+    column: "fulfillmentStatus",
+    title: "Fulfillment Status",
+    filters: [
+      {
+        value: "PENDING",
+        label: "Pending",
+        icon: HelpCircleIcon,
+      },
+      {
+        value: "PARTIAL",
+        label: "Partial",
+        icon: CircleIcon,
+      },
+      {
+        value: "FULFILLED",
+        label: "Fulfilled",
+        icon: TimerIcon,
+      },
+      {
+        value: "RESTOCK",
+        label: "Restock",
+        icon: TimerIcon,
+      },
+      {
+        value: "AWAITING_SHIPMENT",
+        label: "Awaiting Shipment",
+        icon: TimerIcon,
+      },
+      {
+        value: "CANCELLED",
+        label: "Cancelled",
+        icon: TimerIcon,
+      },
+    ],
+  },
+];
 
 export const priorities = [
   {
