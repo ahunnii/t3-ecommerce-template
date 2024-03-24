@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { Store } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { SEO } from "~/components/common/seo-head";

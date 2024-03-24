@@ -36,7 +36,7 @@ export const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
   const routes: Route[] = [
     {
       href: `/admin/${encodedStoreId}`,
-      label: "Overview",
+      label: "Dashboard",
       active: asPath === `/admin/${encodedStoreId}`,
     },
 

@@ -59,7 +59,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
   const routes: Route[] = [
     {
       href: `/admin/${encodedStoreId}`,
-      label: "Overview",
+      label: "Dashboard",
       active: checkActivePath(`/admin/${encodedStoreId}`),
       Icon: Home,
     },

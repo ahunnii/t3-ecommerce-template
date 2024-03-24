@@ -63,6 +63,7 @@ export default function StoreSwitcher({
           size="sm"
           role="combobox"
           aria-expanded={open}
+          disabled={true}
           aria-label="Select a store"
           className={cn("w-full justify-between", className)}
         >
