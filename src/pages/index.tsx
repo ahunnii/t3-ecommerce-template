@@ -47,7 +47,11 @@ const HomePage = () => {
         <TaProductGrid products={getAllProducts.data ?? []} />
 
         <Link href="/collections/all-products">
-          <Button className="w-full md:hidden" variant={"outline"} size={"lg"}>
+          <Button
+            className="my-2 w-full md:hidden"
+            variant={"outline"}
+            size={"lg"}
+          >
             Shop Products
           </Button>
         </Link>
@@ -71,19 +75,18 @@ const HomePage = () => {
           Collections
         </h2>
 
-        <Container>
-          <div className="mx-auto mb-8 flex w-full max-w-7xl flex-col gap-4 max-md:space-y-4 md:flex-row">
-            {categoryCards.map((card, idx) => (
-              <Link
-                key={idx}
-                href={card.link}
-                className="relative overflow-hidden max-md:w-11/12 md:w-1/3"
-              >
-                <CategoryCard {...card} className="rounded-md" />
-              </Link>
-            ))}
-          </div>
-        </Container>
+        <div className="mx-auto mb-8 flex w-full max-w-7xl flex-col  gap-4 md:flex-row">
+          {categoryCards.map((card, idx) => (
+            <Link
+              key={idx}
+              href={card.link}
+              className="relative w-full overflow-hidden md:w-1/3"
+            >
+              <CategoryCard {...card} className="w-full md:rounded-md" />
+            </Link>
+          ))}
+        </div>
+
         <InsideTrendAnomaly />
       </StorefrontLayout>
     </>

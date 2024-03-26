@@ -30,11 +30,13 @@ interface ProductCard
   data: DetailedProductFull;
   discounts: Discount[];
   className?: string;
+  imageClassName?: string;
 }
 
 export const TaProductCard: React.FC<ProductCard> = ({
   data,
   className,
+  imageClassName,
   discounts,
   variant = "default",
   size = "default",
@@ -91,6 +93,7 @@ export const TaProductCard: React.FC<ProductCard> = ({
     >
       <ProductCardImage
         size={size}
+        className={cn(imageClassName)}
         primaryContentUrl={primaryContentUrl}
         secondaryContentUrl={secondaryContentUrl}
       >
@@ -121,14 +124,14 @@ export const TaProductCard: React.FC<ProductCard> = ({
         <>
           {data?.variants?.length > 0 ? (
             <Button
-              className="w-full bg-purple-700 hover:bg-purple-500"
+              className="w-full bg-purple-700 hover:bg-purple-500 max-md:hidden"
               onClick={goToProduct}
             >
               View Product
             </Button>
           ) : (
             <Button
-              className="w-full bg-purple-700 hover:bg-purple-500"
+              className="w-full bg-purple-700 hover:bg-purple-500  max-md:hidden"
               onClick={onAddToCart}
             >
               Add to Cart

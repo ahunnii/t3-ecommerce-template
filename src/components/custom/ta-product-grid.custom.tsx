@@ -45,7 +45,7 @@ export const TaProductGrid = ({
   if (products.length === 0) return null;
 
   return (
-    <div className=" w-full md:h-screen">
+    <div className=" w-full py-2 md:h-screen">
       <LayoutGrid cards={cards} />
     </div>
   );

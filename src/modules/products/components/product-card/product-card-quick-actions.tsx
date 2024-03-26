@@ -21,7 +21,7 @@ export const ProductCardQuickActions = forwardRef<
   return (
     <div
       className={cn(
-        "absolute bottom-5 z-50 w-full px-6 opacity-0 transition group-hover:opacity-100",
+        "absolute bottom-5 z-[45] w-full px-6 opacity-0 transition group-hover:opacity-100",
         className
       )}
       ref={ref}

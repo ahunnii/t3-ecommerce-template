@@ -2,23 +2,39 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import Link from "next/link";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 
-import { cn } from "~/utils/styles";
-
 import { Instagram, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { api } from "~/utils/api";
+import { cn } from "~/utils/styles";
 import type { SiteLinks } from "./navbar";
 
 export function MobileNav({ links }: { links: SiteLinks[] }) {
   const [open, setOpen] = useState(false);
   const { data: sessionData } = useSession();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+  const getStore = api.store.getStore.useQuery({}, { enabled: false });
+
+  useEffect(() => {
+    setIsMounted(true);
+    void getStore.refetch();
+  }, []);
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -61,7 +77,7 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
 
       <SheetContent
         side="left"
-        className="flex h-svh flex-col border-zinc-950 bg-zinc-950 text-secondary"
+        className="flex h-svh w-5/6 flex-col border-zinc-950 bg-zinc-950 text-secondary"
       >
         {/* <Link href="/" className="flex items-center">
           <p className="sr-only text-xl font-bold">
@@ -139,7 +155,7 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
           )}
           {sessionData && (
             <>
-              <Button
+              {/* <Button
                 variant="ghost"
                 className="relative  w-fit gap-2 "
                 onClick={() => router.push("/account")}
@@ -155,15 +171,76 @@ export function MobileNav({ links }: { links: SiteLinks[] }) {
                 </Avatar>
 
                 {sessionData?.user?.name}
-              </Button>
+              </Button> */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative  w-fit gap-2">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage
+                        src={sessionData?.user?.image ?? ""}
+                        alt={`@${sessionData?.user?.name}`}
+                      />
+                      <AvatarFallback>
+                        <User />
+                      </AvatarFallback>
+                    </Avatar>
 
-              <Button
+                    {sessionData?.user?.name}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-56 border border-purple-500 bg-zinc-950 text-white"
+                  align="start"
+                  forceMount
+                >
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium leading-none">
+                          {sessionData?.user?.name}
+                        </p>
+                      </div>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {sessionData?.user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => router.push("/account")}
+                    className="hover:bg-purple-500 hover:text-white focus:bg-purple-500 focus:text-white"
+                  >
+                    Profile
+                  </DropdownMenuItem>
+                  {sessionData?.user?.id === getStore?.data?.userId ||
+                  sessionData?.user?.role === "ADMIN" ? (
+                    <>
+                      <DropdownMenuItem
+                        asChild
+                        className="hover:bg-purple-500 hover:text-white focus:bg-purple-500 focus:text-white"
+                      >
+                        <Link href="/admin" target="_blank">
+                          Admin{" "}
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  ) : null}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => void signOut()}
+                    className="hover:bg-purple-500 hover:text-white focus:bg-purple-500 focus:text-white"
+                  >
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* <Button
                 className="border:bg-purple-500 w-full border-purple-700 bg-transparent hover:bg-purple-500 hover:text-white"
                 onClick={() => void signOut()}
                 variant={"outline"}
               >
                 Sign out{" "}
-              </Button>
+              </Button> */}
             </>
           )}
           <Link

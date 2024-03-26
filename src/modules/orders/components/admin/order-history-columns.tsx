@@ -16,6 +16,7 @@ export type OrderHistoryColumns = {
   orderItems: { id: string; quantity: number }[];
   paymentStatus: PaymentStatus;
   fulfillmentStatus: FulfillmentStatus;
+  estimatedCompletion: number;
   total: number;
   email: string;
   createdAt: Date;
@@ -55,7 +56,7 @@ export const orderHistoryColumns: ColumnDef<OrderHistoryColumns>[] = [
           href={`/admin/${row.original.storeId}/orders/${row.original.id}`}
           target="_blank"
         >
-          <Button variant={"link"} className="mx-0 truncate px-0">
+          <Button variant={"link"} className="mx-0  truncate px-0 text-xs">
             {row.original.id}
           </Button>
         </Link>

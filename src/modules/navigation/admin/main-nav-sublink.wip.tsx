@@ -151,10 +151,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
   ];
 
   return (
-    <nav
-      className={cn("flex items-center space-x-4 lg:space-x-6", className)}
-      {...props}
-    >
+    <nav className={cn("flex items-center ", className)} {...props}>
       {routes.map((route) => (
         <Fragment key={uniqueId()}>
           <Link

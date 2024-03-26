@@ -25,7 +25,7 @@ const Navbar = ({ stores }: { stores: Store[] }) => {
                 {stores?.length > 0 && <StoreSwitcher items={stores} />}
               </div>
               <div className="flex-1 overflow-auto py-2">
-                <MainNavSublink className="grid items-start px-4 text-sm font-medium lg:space-x-0" />
+                <MainNavSublink className="grid items-start space-x-0 px-4 text-sm font-medium" />
               </div>
             </div>
           </SheetContent>

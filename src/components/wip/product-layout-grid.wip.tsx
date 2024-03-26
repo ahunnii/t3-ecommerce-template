@@ -10,11 +10,16 @@ import { DirectionAwareHover } from "./direction-aware-card.wip";
 // import { useRouter } from "next/navigation";
 import { type MouseEventHandler } from "react";
 
+import { uniqueId } from "lodash";
 import IconButton from "~/components/common/buttons/icon-button";
+import { useMediaQuery } from "~/hooks/use-media-query";
 import useCart from "~/modules/cart/hooks/use-cart";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import type { DetailedProductFull } from "~/types";
+import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
+import { TaProductCard } from "../custom/ta-product-card.custom";
+import ProductCard from "./product-card/ta-product-card.wip";
 
 type Card = {
   id: number;
@@ -33,39 +38,43 @@ export const LayoutGrid = ({
 }) => {
   const [selected] = useState<Card | null>(null);
   const [lastSelected] = useState<Card | null>(null);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
+  const { data: sales } = api.discounts.getActiveSiteSales.useQuery({});
   // const handleClick = (card: Card) => {
   //   setLastSelected(selected);
   //   setSelected(card);
   // };
 
   return (
-    <div
-      className={cn(
-        "mx-auto grid h-full w-full max-w-7xl grid-cols-2  gap-4 py-10 md:grid-cols-3 ",
-        className
-      )}
-    >
-      {cards.map((card, i) => (
-        <div key={i} className={cn(card.className, "")}>
-          <motion.div
-            // onClick={() => handleClick(card)}
-            className={cn(
-              card.className,
-              "relative overflow-hidden",
-              selected?.id === card.id
-                ? "absolute inset-0 z-50 m-auto flex h-1/2 w-full cursor-pointer flex-col flex-wrap items-center justify-center rounded-lg md:w-1/2"
-                : lastSelected?.id === card.id
-                ? "z-40 h-full w-full rounded-xl bg-white"
-                : "h-full w-full rounded-xl bg-white"
-            )}
-            layout
-          >
-            <SelectedProduct selected={card} />
-          </motion.div>
-        </div>
-      ))}
-      {/* <motion.div
+    <>
+      {isDesktop ? (
+        <div
+          className={cn(
+            "mx-auto grid h-full w-full max-w-7xl grid-cols-2  gap-4 py-10 md:grid-cols-3 ",
+            className
+          )}
+        >
+          {cards.map((card, i) => (
+            <div key={i} className={cn(card.className, "")}>
+              <motion.div
+                // onClick={() => handleClick(card)}
+                className={cn(
+                  card.className,
+                  "relative overflow-hidden",
+                  selected?.id === card.id
+                    ? "absolute inset-0 z-[45] m-auto flex h-1/2 w-full cursor-pointer flex-col flex-wrap items-center justify-center rounded-lg md:w-1/2"
+                    : lastSelected?.id === card.id
+                    ? "z-40 h-full w-full rounded-xl bg-white"
+                    : "h-full w-full rounded-xl bg-white"
+                )}
+                layout
+              >
+                <SelectedProduct selected={card} />
+              </motion.div>
+            </div>
+          ))}
+          {/* <motion.div
         onClick={handleOutsideClick}
         className={cn(
           "absolute left-0 top-0 z-10 h-full w-full bg-black opacity-0",
@@ -73,7 +82,21 @@ export const LayoutGrid = ({
         )}
         animate={{ opacity: selected?.id ? 0.3 : 0 }}
       /> */}
-    </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          {cards.map((card, i) => (
+            <TaProductCard
+              data={card?.product}
+              size={"square"}
+              imageClassName="h-auto w-full"
+              key={uniqueId()}
+              discounts={[...(sales ?? []), ...card?.product?.discounts] ?? []}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
@@ -179,7 +202,7 @@ const SelectedProduct = ({ selected }: { selected: Card }) => {
       imageUrl={imageUrl}
       Additional={Actions}
       imageOnLoad={() => setLoaded(true)}
-      className={"relative h-full w-full md:h-full md:w-full"}
+      className={"relative z-[45] h-full w-full md:h-full md:w-full"}
       imageClassName={cn(
         "absolute inset-0 h-full w-full object-cover object-top transition duration-200",
         loaded ? "blur-none" : "blur-md"
@@ -207,7 +230,7 @@ const ProductCardQuickActions = ({
   productId: string;
 }) => {
   return (
-    <div className="flex w-full justify-center gap-x-6 ">
+    <div className="z-[45] flex w-full justify-center gap-x-6">
       {actions.map((action, index) => (
         <Fragment key={index}>
           {action?.renderIf && (

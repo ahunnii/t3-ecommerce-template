@@ -34,7 +34,7 @@ export const OrderClient: React.FC<OrderClientProps> = ({ data }) => {
       </div>
       <Separator />
       <AdvancedDataTable
-        searchKey="email"
+        searchKey="name"
         columns={columns}
         data={data}
         filters={statuses}

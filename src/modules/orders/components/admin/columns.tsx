@@ -17,6 +17,7 @@ export type OrderColumn = {
   orderItems: { id: string; quantity: number }[];
   paymentStatus: PaymentStatus;
   fulfillmentStatus: FulfillmentStatus;
+  estimatedCompletion: number;
   total: number;
   createdAt: Date;
 };
@@ -47,18 +48,44 @@ export const columns: ColumnDef<OrderColumn>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "Order Id",
+    accessorKey: "name",
+    accessorFn: (row) => row.shippingAddress?.name ?? "",
+    header: "Name",
+    filterFn: (row, id, value) => {
+      const name: string = row.getValue(id);
+      return name.includes(value as string);
+    },
     cell: ({ row }) => {
       return (
-        <Link href={`/admin/${row.original.storeId}/orders/${row.original.id}`}>
-          <Button variant={"link"} className="mx-0 truncate px-0">
-            {row.original.id}
-          </Button>
-        </Link>
+        <div className="flex flex-col">
+          <Link
+            href={`/admin/${row.original.storeId}/orders/${row.original.id}`}
+          >
+            <Button variant={"link"} className="mx-0 truncate px-0">
+              {row.original.shippingAddress?.name}
+            </Button>
+          </Link>
+          <span className="text-xs text-muted-foreground">
+            #{row.original.id}
+          </span>
+        </div>
       );
     },
   },
+
+  // {
+  //   accessorKey: "id",
+  //   header: "Order Id",
+  //   cell: ({ row }) => {
+  //     return (
+  //       <Link href={`/admin/${row.original.storeId}/orders/${row.original.id}`}>
+  //         <Button variant={"link"} className="mx-0 truncate px-0">
+  //           {row.original.id}
+  //         </Button>
+  //       </Link>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "createdAt",
     header: "Date added",
@@ -69,14 +96,10 @@ export const columns: ColumnDef<OrderColumn>[] = [
     },
   },
 
-  {
-    accessorKey: "shippingAddress.name",
-    header: " Name",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
+  // {
+  //   accessorKey: "email",
+  //   header: "Email",
+  // },
   {
     accessorKey: "paymentStatus",
     header: "Payment Status",

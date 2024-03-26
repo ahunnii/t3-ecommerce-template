@@ -21,14 +21,16 @@ export const ProductCardDescription = forwardRef<
   return (
     <div
       className={cn(
-        "flex h-full w-60 flex-col items-center justify-center text-center",
+        "flex h-full w-full flex-col items-center justify-center text-center md:w-60",
         className
       )}
       onClick={handleOnClick}
       ref={ref}
       {...props}
     >
-      <p className="text-lg font-semibold text-white">{name}</p>
+      <p className="relative flex w-full  text-balance  text-base font-semibold text-white md:text-lg">
+        {name}
+      </p>
       <p className="text-sm text-gray-500">{subheader}</p>
 
       {children}

@@ -59,7 +59,7 @@ const DashboardPage: FC<DashboardPageProps> = ({
           </div>
           <Separator />
           <>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
@@ -95,8 +95,8 @@ const DashboardPage: FC<DashboardPageProps> = ({
               </Card>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-4">
+            <div className="grid  grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-full md:col-span-4">
                 <CardHeader>
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
@@ -105,7 +105,7 @@ const DashboardPage: FC<DashboardPageProps> = ({
                 </CardContent>
               </Card>
 
-              <Card className="col-span-3">
+              <Card className="col-span-full md:col-span-3">
                 <CardHeader>
                   <CardTitle>New Sales</CardTitle>
                   <CardDescription>

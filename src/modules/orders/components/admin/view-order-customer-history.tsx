@@ -29,10 +29,10 @@ export const ViewOrderCustomerHistory = ({
     <ViewSection title="Order History" description="Check out past orders">
       {getCustomerOrders?.data && (
         <AdvancedDataTable
-          searchKey="name"
+          searchKey="id"
           columns={orderHistoryColumns}
           data={getCustomerOrders?.data as OrderHistoryColumns[]}
-          filters={statuses}
+          // filters={statuses}
         />
       )}
     </ViewSection>

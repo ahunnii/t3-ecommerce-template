@@ -45,7 +45,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
       <div className="fixed grid h-svh w-full overflow-hidden  bg-slate-100/50 lg:grid-cols-[280px_1fr]">
         <div className="fixed inset-0 z-10 hidden h-full translate-x-0 transform overflow-auto border-r bg-gray-100/40 transition-transform duration-200 ease-in-out dark:bg-gray-800/40 lg:static lg:z-auto lg:block lg:translate-x-0">
           <div className="flex h-full max-h-svh flex-col gap-2">
-            <div className="flex h-[60px] items-center border-b px-6">
+            <div className="flex h-[60px] items-center border-b bg-background/75 px-6">
               {getAllStores?.data && (
                 <StoreSwitcher items={getAllStores.data} />
               )}
@@ -74,7 +74,7 @@ const AdminLayout = ({ children, metadata }: IProps) => {
           </div>
         </div>
         <main className="flex h-svh flex-col overflow-y-auto">
-          <div className=" sticky top-0 z-20 flex items-center gap-4 bg-white ">
+          <div className="sticky top-0 z-20 flex items-center gap-4 bg-white ">
             <Navbar stores={getAllStores.data ?? []} />
           </div>
           <div className="flex h-full flex-col bg-gray-50/25 dark:bg-slate-900">
