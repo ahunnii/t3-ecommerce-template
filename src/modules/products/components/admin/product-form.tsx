@@ -170,6 +170,25 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
     }
   };
 
+  const onSubmitWithPublish = (data: ProductFormValues) => {
+    if (initialData) {
+      updateProduct.mutate({
+        ...data,
+        weight: Number(data.weight_oz) + Number(data.weight_lb) * 16,
+        storeId,
+        productId,
+        status: ProductStatus.ACTIVE,
+      });
+    } else {
+      createProduct.mutate({
+        ...data,
+        weight: Number(data.weight_oz) + Number(data.weight_lb) * 16,
+        storeId,
+        status: ProductStatus.ACTIVE,
+      });
+    }
+  };
+
   const onDelete = () => deleteProduct.mutate({ productId });
 
   const loading =
@@ -196,10 +215,24 @@ export const ProductForm: React.FC<Props> = ({ initialData, categories }) => {
                 asChild={true}
               />
             )}
-
-            <Button disabled={loading} className="ml-auto" type="submit">
+            <Button
+              disabled={loading}
+              className="ml-auto"
+              type="submit"
+              variant={"outline"}
+            >
               {action}
-            </Button>
+            </Button>{" "}
+            {form.watch("status") !== "CUSTOM" && (
+              <Button
+                disabled={loading}
+                className="ml-auto"
+                type="button"
+                onClick={() => onSubmitWithPublish(form.getValues())}
+              >
+                {action} and Publish
+              </Button>
+            )}
           </AdminFormHeader>
 
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
