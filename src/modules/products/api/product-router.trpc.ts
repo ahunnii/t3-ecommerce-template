@@ -225,6 +225,21 @@ export const productsRouter = createTRPCRouter({
               active: true,
             },
           },
+          reviews: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+              images: true,
+            },
+          },
           variants: true,
           category: {
             include: {

@@ -7,6 +7,7 @@ import { Button } from "~/components/ui/button";
 
 import type { CategoryProductsColumn } from "../../types";
 
+import { AdminPreviewInStoreButton } from "~/components/common/admin/admin-preview-in-store-button";
 import {
   Tooltip,
   TooltipContent,

@@ -21,11 +21,11 @@ export const categoriesColumns: ColumnDef<CategoryColumn>[] = [
           </Button>
         </Link>
 
-        {row.original.collection?.id && (
+        {/* {row.original.collection?.id && (
           <AdminPreviewInStoreButton
             url={`/collections/${row.original.collection?.id}`}
           />
-        )}
+        )} */}
       </div>
     ),
   },

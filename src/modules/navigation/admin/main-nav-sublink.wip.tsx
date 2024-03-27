@@ -72,7 +72,7 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
       subRoutes: [
         {
           href: `/admin/${encodedStoreId}/shipping`,
-          label: `Shipping Labels`,
+          label: `Shipments`,
           active: checkActivePath(`/admin/${encodedStoreId}/shipping`),
         },
       ],

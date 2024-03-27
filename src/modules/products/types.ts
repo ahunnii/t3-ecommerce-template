@@ -25,6 +25,18 @@ export type DetailedProductFull = Prisma.ProductGetPayload<{
       };
     };
     discounts: true;
+    reviews: {
+      include: {
+        user: {
+          select: {
+            id: true;
+            name: true;
+            image: true;
+          };
+        };
+        images: true;
+      };
+    };
     store: {
       select: {
         id: true;

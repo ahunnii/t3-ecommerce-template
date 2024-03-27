@@ -44,15 +44,15 @@ import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
-import { collectionFormSchema } from "../../schema";
 import type { CollectionFormValues } from "../../types";
+import { collectionFormSchema } from "../schema";
 
 type Props = {
   initialData: DetailedCollection | null;
   products: Product[];
 };
 
-export const CollectionForm: React.FC<Props> = ({ initialData, products }) => {
+export const ReviewForm: React.FC<Props> = ({ initialData, products }) => {
   const params = useRouter();
   const router = useNavigationRouter();
   const apiContext = api.useContext();

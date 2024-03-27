@@ -79,6 +79,7 @@ model User {
   role          Role      @default(USER)
   orders        Order[]   @relation("UserToOrder")
   cart Cart[] @relation("UserToCart")
+  reviews Review[]
 }
 
 model VerificationToken {
@@ -287,16 +288,36 @@ model Product {
   
   shippingCost Float? @default(0)
 
-
-
-
-
   discounts Discount[] @relation("DiscountToProduct")
+
+  reviews Review[]
 
   @@index([storeId])
   @@index([categoryId])
   @@index([slug])
 }
+
+
+
+model Review {
+  id          String      @id @default(cuid())
+  productId   String      // Foreign Key to Product
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Float
+  title       String
+  content     String      @db.Text
+  images      Image[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([productId, userId])
+
+  @@index([productId])
+  @@index([userId])
+}
+
 
 enum CustomOrderStatus {
   PENDING
@@ -574,6 +595,9 @@ model Image {
 
   collection   Collection?
 
+  reviewId     String?
+  review       Review?  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
   url       String // URL of the image
   alt       String?
   caption   String?
@@ -585,6 +609,7 @@ model Image {
   @@index([customOrderId])
   
   @@index([blogId])
+  @@index([reviewId])
 }
 
 model GalleryImage {

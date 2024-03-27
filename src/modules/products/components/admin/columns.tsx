@@ -6,6 +6,7 @@ import type { ProductStatus } from "@prisma/client";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
+import { AdminPreviewInStoreButton } from "~/components/common/admin/admin-preview-in-store-button";
 import { Button } from "~/components/ui/button";
 import { CellAction } from "./cell-action";
 

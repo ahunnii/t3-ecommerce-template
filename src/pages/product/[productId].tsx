@@ -15,16 +15,26 @@ import { api } from "~/utils/api";
 
 import type { DetailedProductFull } from "~/types";
 
+import { Star, User } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
+import { CreateReviewDialog } from "~/modules/reviews/components/create-review-dialog";
+import { ReviewTemplate } from "~/modules/reviews/components/review-template";
+import { cn } from "~/utils/styles";
 
 type ProductPageProps = { prevUrl: string; name: string };
 
 const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
   const params = useParams();
+
+  const { data: session } = useSession();
 
   const { data: sales } = api.discounts.getActiveSiteSales.useQuery({});
 
@@ -112,6 +122,25 @@ const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
               </div>
             </div>
             <Separator className="my-10 bg-zinc-400" />
+
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={cn("text-3xl font-bold ")}>Reviews</h3>
+              <CreateReviewDialog
+                productId={product?.id}
+                reviews={product?.reviews ?? []}
+              />
+            </div>
+
+            {product?.reviews?.map((review) => (
+              <ReviewTemplate {...review} key={review.id} />
+            ))}
+
+            {!product?.reviews?.length && (
+              <p>No reviews yet. Be the first one and write a review!</p>
+            )}
+
+            <Separator className="my-10 bg-zinc-400" />
+
             {suggested && (
               <RelatedItemsList
                 title="You may also like"
@@ -129,7 +158,7 @@ const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { productId } = context.params!;
 
-  const product = await prisma.product.findFirst({
+  const product = await prisma.product.findUnique({
     where: {
       id: productId as string,
     },

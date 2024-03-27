@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import dynamic from "next/dynamic";
 import React, { useEffect, useMemo, useState } from "react";
 
+import { Star } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Separator } from "~/components/ui/separator";
 import useCart from "~/modules/cart/hooks/use-cart";
@@ -84,11 +85,18 @@ const ProductPageInfo: React.FC<InfoProps> = (props) => {
     if (variant) handleSearch(variant.id);
   }, [variant]);
 
+  const averageRating = useMemo(() => {
+    return (
+      props.data.reviews.reduce((acc, review) => acc + review.rating, 0) /
+      props.data.reviews.length
+    );
+  }, [props.data.reviews]);
+
   return (
     <div>
       <h1 className={cn("text-3xl font-bold", textStyles)}>
         {props?.data.name}
-      </h1>
+      </h1>{" "}
       <div className="mt-3 flex items-end justify-between">
         <div className={cn("text-2xl ", textStyles)}>
           <ProductPrice
@@ -103,6 +111,26 @@ const ProductPageInfo: React.FC<InfoProps> = (props) => {
             code={discount?.discount?.code}
           />
         </div>
+      </div>
+      <Separator className="my-4 bg-zinc-900/20" />
+      <div className="flex items-center gap-1">
+        <Star className={cn("size-4 fill-fuchsia-500")} />
+        <Star
+          className={cn("size-4", averageRating >= 2 && "fill-fuchsia-500")}
+        />
+        <Star
+          className={cn("size-4", averageRating >= 3 && "fill-fuchsia-500")}
+        />
+        <Star
+          className={cn("size-4", averageRating >= 4 && "fill-fuchsia-500")}
+        />
+        <Star
+          className={cn("size-4", averageRating >= 5 && "fill-fuchsia-500")}
+        />
+        <span>
+          {" "}
+          {props?.data.reviews.length > 0 ? averageRating : "No reviews yet"}
+        </span>
       </div>
       <Separator className="my-4 bg-zinc-900/20" />
       <div className="flex flex-col gap-y-6">
@@ -121,7 +149,6 @@ const ProductPageInfo: React.FC<InfoProps> = (props) => {
           props?.data?.variants?.length > 0 ? variant === null : false
         }
       />
-
       <div className={cn("mt-10 gap-x-3 space-y-4", textStyles)}>
         <LazyProductDescription description={props?.data?.description} />
         <ProductMaterialsSection materials={props?.data?.materials} />

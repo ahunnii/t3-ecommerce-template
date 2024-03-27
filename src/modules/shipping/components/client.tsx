@@ -11,11 +11,10 @@ interface OrderClientProps {
 }
 
 export const ShippingClient: React.FC<OrderClientProps> = ({ data }) => {
-  console.log(data);
   return (
     <div className="mx-auto max-w-7xl space-y-4 p-8 ">
       <Heading
-        title={`Shipping Labels (${data.length})`}
+        title={`Shipments (${data.length})`}
         description="View past shipping orders from your store"
       />
       <Separator />

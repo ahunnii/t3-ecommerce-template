@@ -65,10 +65,10 @@ export function CloudinaryImageManagementPanel({
   useEffect(() => {
     if (open) {
       // void getProductImages.refetch();
-      if (!fetchFlag) {
-        void getProductImages.refetch();
-        setFetchFlag(true);
-      }
+      // if (!fetchFlag) {
+      void getProductImages.refetch();
+      // setFetchFlag(true);
+      // }
       setImageUrls([]);
     }
   }, [open, fetchFlag]);

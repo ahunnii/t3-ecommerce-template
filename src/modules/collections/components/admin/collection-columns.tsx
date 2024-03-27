@@ -31,7 +31,7 @@ export const collectionColumns: ColumnDef<CollectionColumn>[] = [
           </Button>
         </Link>
 
-        <AdminPreviewInStoreButton url={`/collections/${row.original.id}`} />
+        {/* <AdminPreviewInStoreButton url={`/collections/${row.original.id}`} /> */}
       </div>
     ),
   },
