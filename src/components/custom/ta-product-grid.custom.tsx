@@ -1,5 +1,5 @@
 import { LayoutGrid } from "~/components/wip/product-layout-grid.wip";
-import type { DetailedProductFull } from "~/types";
+import { DetailedProductFull } from "~/modules/products/types";
 
 import { randomNoRepeats } from "~/utils/random";
 

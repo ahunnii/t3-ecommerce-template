@@ -1,6 +1,5 @@
 import { create } from "zustand";
-
-import type { DetailedProductFull } from "~/types";
+import { DetailedProductFull } from "../types";
 
 interface PreviewModalStore {
   isOpen: boolean;

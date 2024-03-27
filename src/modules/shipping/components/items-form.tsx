@@ -68,13 +68,16 @@ const ItemForm: FC<Props> = ({ initialData, orderItems, successCallback }) => {
                   <>
                     <Button
                       onClick={() => setItemsOpen(true)}
+                      disabled={orderItems.length === 0}
                       type="button"
                       className="flex w-full items-center justify-between gap-2  "
                       variant="outline"
                     >
                       <span className="flex items-center gap-2">
-                        <Search className="text-grey-50 size-5 " /> Select items
-                        to include in shipment...
+                        <Search className="text-grey-50 size-5 " />{" "}
+                        {orderItems.length > 0
+                          ? "Select items to include in shipment..."
+                          : "All required order items are already part of a shipment"}
                       </span>
                     </Button>
                     <CommandAdvancedDialog
@@ -219,18 +222,19 @@ const ItemForm: FC<Props> = ({ initialData, orderItems, successCallback }) => {
               </FormItem>
             )}
           />
-
-          <Button
-            type="button"
-            onClick={() =>
-              form.setValue(
-                "orderItems",
-                orderItems.map((item) => ({ id: item.id }))
-              )
-            }
-          >
-            Or select items from the order...
-          </Button>
+          {orderItems.length !== 0 && (
+            <Button
+              type="button"
+              onClick={() =>
+                form.setValue(
+                  "orderItems",
+                  orderItems.map((item) => ({ id: item.id }))
+                )
+              }
+            >
+              Or select all items from the order...
+            </Button>
+          )}
         </EditSection>
 
         <div className="flex w-full items-center justify-end space-x-2 pt-6">

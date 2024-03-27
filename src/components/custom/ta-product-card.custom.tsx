@@ -21,7 +21,8 @@ import {
 import { useSession } from "next-auth/react";
 import { Button } from "~/components/ui/button";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
-import type { DetailedProductFull } from "~/types";
+
+import { DetailedProductFull } from "~/modules/products/types";
 import { cn } from "~/utils/styles";
 
 interface ProductCard

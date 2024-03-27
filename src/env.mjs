@@ -79,6 +79,10 @@ export const env = createEnv({
     NEXT_PUBLIC_AXIOM_DATASET: z.string().optional(),
     REDIS_URL: z.string().url().optional(),
     REDIS_TOKEN: z.string().optional(),
+
+    HYGRAPH_API_KEY: z.string(),
+    HYGRAPH_CONTENT_API_URL: z.string(),
+    HYGRAPH_API_URL: z.string(),
   },
 
   /**
@@ -186,6 +190,10 @@ export const env = createEnv({
     NEXT_PUBLIC_AXIOM_DATASET: process.env.NEXT_PUBLIC_AXIOM_DATASET,
     REDIS_URL: process.env.REDIS_URL,
     REDIS_TOKEN: process.env.REDIS_TOKEN,
+
+    HYGRAPH_API_KEY: process.env.HYGRAPH_API_KEY,
+    HYGRAPH_CONTENT_API_URL: process.env.HYGRAPH_CONTENT_API_URL,
+    HYGRAPH_API_URL: process.env.HYGRAPH_API_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

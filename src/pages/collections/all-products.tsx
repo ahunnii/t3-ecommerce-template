@@ -21,8 +21,7 @@ import { cn } from "~/utils/styles";
 
 import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
 import { TaProductCard } from "~/components/custom/ta-product-card.custom";
-
-import type { DetailedProductFull } from "~/types";
+import { DetailedProductFull } from "~/modules/products/types";
 
 const metadata = {
   title: "All Products | Trend Anomaly",
@@ -81,10 +80,10 @@ const AllProductsPage = () => {
             {products?.length === 0 && <NoResults />}
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {products?.map((item: DetailedProductFull) => (
+              {products?.map((item) => (
                 <TaProductCard
                   key={item.id}
-                  data={item}
+                  data={item as DetailedProductFull}
                   variant={"default"}
                   size={"default"}
                   discounts={[...(sales ?? []), ...item?.discounts] ?? []}

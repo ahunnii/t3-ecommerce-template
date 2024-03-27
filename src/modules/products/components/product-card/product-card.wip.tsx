@@ -17,10 +17,11 @@ import {
   ProductCardWrapper,
   type productCardVariants,
 } from "~/modules/products/components/product-card/product-card-wrapper";
-import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
-import type { DetailedProductFull } from "~/types";
+
 import { cn } from "~/utils/styles";
 import { Button } from "../../../../components/ui/button";
+import usePreviewModal from "../../hooks/use-preview-modal";
+import { DetailedProductFull } from "../../types";
 import { ProductCardPrice } from "./product-card-price";
 import { ProductCardSaleBadge } from "./product-card-sale-badge";
 

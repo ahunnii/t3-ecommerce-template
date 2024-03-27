@@ -20,10 +20,11 @@ import { Button } from "~/components/ui/button";
 
 import * as z from "zod";
 
-import type { DetailedProductFull } from "~/types";
+import type { DetailedProductFull } from "~/modules/products/types";
 import { cn } from "~/utils/styles";
 
 import type { ProductVariant } from "../types";
+import { VariantButtonSelect } from "./variant-buttons";
 import { VariantSearchSelect } from "./variant-search-select";
 
 const infoVariants = cva("", {
@@ -132,7 +133,7 @@ const VariantSelector: FC<IProps> = ({
                     control={form.control}
                     render={({ field: formField }) => (
                       <>
-                        <VariantSearchSelect
+                        <VariantButtonSelect
                           form={form}
                           formField={formField}
                           attributes={product.category.attributes[

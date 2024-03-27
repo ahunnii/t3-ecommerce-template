@@ -15,7 +15,8 @@ import IconButton from "~/components/common/buttons/icon-button";
 import { useMediaQuery } from "~/hooks/use-media-query";
 import useCart from "~/modules/cart/hooks/use-cart";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
-import type { DetailedProductFull } from "~/types";
+
+import { DetailedProductFull } from "~/modules/products/types";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
 import { TaProductCard } from "../custom/ta-product-card.custom";

@@ -12,6 +12,7 @@ import { blogPostRouter } from "~/modules/blog-posts/api/blog-posts-router.trpc"
 import { galleryRouter } from "~/modules/gallery/api/gallery-router.trpc";
 import { productsRouter } from "~/modules/products/api/product-router.trpc";
 
+import { contentRouter } from "~/modules/content/api/content-router.trpc";
 import { customRouter } from "~/modules/custom-orders/api/custom-order-router.trpc";
 import { discountRouter } from "~/modules/discounts/api/discount-router.trpc";
 import { reviewRouter } from "~/modules/reviews/api/review-router.trpc";
@@ -44,6 +45,7 @@ export const appRouter = createTRPCRouter({
   discounts: discountRouter,
 
   reviews: reviewRouter,
+  content: contentRouter,
 });
 
 // export type definition of API

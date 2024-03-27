@@ -177,37 +177,25 @@ export const ShippingModal = ({ data }: { data: string }) => {
       className="w-full max-w-3xl"
     >
       <div className="space-y-4 py-2 pb-4">
-        {(label ??
-          (getCurrentOrder?.data?.fulfillments &&
-            getCurrentOrder?.data?.fulfillments?.length > 0)) && (
-          <div>
-            {label && (
-              <p className="pb-4">
-                Successful! Your account has been charged{" "}
-                <strong>${selectedRate?.amount}</strong>
-              </p>
-            )}
+        {label && (
+          <>
+            <p className="pb-4">
+              Successful! Your account has been charged{" "}
+              <strong>${selectedRate?.amount}</strong>
+            </p>
 
-            {getCurrentOrder?.data?.fulfillments &&
-              getCurrentOrder?.data?.fulfillments?.length > 0 &&
-              getCurrentOrder?.data?.fulfillments?.map(
-                (fulfillment: Fulfillment) => (
-                  <div key={fulfillment.id} className="flex flex-col gap-4">
-                    <Link
-                      href={
-                        label?.label_url ?? (fulfillment.labelUrl as string)
-                      }
-                      target="_blank"
-                      className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
-                    >
-                      Click to download / print the label
-                    </Link>
-                  </div>
-                )
-              )}
-          </div>
+            <div className="flex flex-col gap-4">
+              <Link
+                href={label?.label_url}
+                target="_blank"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 "
+              >
+                Click to download / print the label
+              </Link>
+            </div>
+          </>
         )}
-        {!label && getCurrentOrder?.data?.fulfillments?.length === 0 && (
+        {!label && (
           <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
             <TabsList className="w-full">
               <TabsTrigger value="customer_address">Customer</TabsTrigger>{" "}
@@ -376,6 +364,9 @@ export const ShippingModal = ({ data }: { data: string }) => {
                       <h3 className={"font-semibold "}>
                         Items included in fulfillment:{" "}
                       </h3>
+
+                      {items?.orderItems.length === 0 &&
+                        "No order items included in order."}
                       {items?.orderItems?.map((item) => {
                         const foundOrderItem =
                           getCurrentOrder?.data?.orderItems?.find(

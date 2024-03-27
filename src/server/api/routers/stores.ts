@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { gql, GraphQLClient } from "graphql-request";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import {
@@ -6,6 +7,18 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { hygraphClient } from "~/server/hygraph/client";
+
+const hygraph = new GraphQLClient(
+  "https://us-east-1-shared-usea1-02.cdn.hygraph.com/content/clu7v2u9q0euu07w7ppzikbsr/master"
+);
+
+type AboutPageResponse = {
+  abouts: {
+    id: string;
+    content: string;
+  }[];
+};
 
 export const storeRouter = createTRPCRouter({
   getAllStores: protectedProcedure.query(({ ctx }) => {
@@ -250,5 +263,53 @@ export const storeRouter = createTRPCRouter({
       return ctx.prisma.store.delete({
         where: { id: input.storeId },
       });
+    }),
+
+  getAboutPageData: publicProcedure.query(async ({ ctx }) => {
+    const cmsResponse = await hygraph.request(
+      `
+            {
+                abouts {
+                        id
+                        content
+                }
+            }
+        `
+    );
+
+    const aboutContent = (cmsResponse as AboutPageResponse)?.abouts?.[0];
+    return aboutContent;
+  }),
+
+  updateAboutPageData: protectedProcedure
+    .input(z.object({ content: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
+
+      const updateAbout = gql`
+        mutation updateAbout($content: String) {
+          updateAbout(data: { content: $content }, where: { slug: "about" }) {
+            id
+            content
+          }
+          publishAbout(where: { slug: "about" }) {
+            content
+          }
+        }
+      `;
+
+      const cmsResponse = await hygraphClient.request(updateAbout, {
+        content: input.content,
+      });
+
+      console.log(cmsResponse);
+
+      // const aboutContent = (cmsResponse as AboutPageResponse)?.abouts?.[0];
+      return cmsResponse;
     }),
 });

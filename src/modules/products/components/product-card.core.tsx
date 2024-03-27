@@ -9,8 +9,9 @@ import Currency from "~/components/common/currency";
 import useCart from "~/modules/cart/hooks/use-cart";
 import usePreviewModal from "~/modules/products/hooks/use-preview-modal";
 import { useConfig } from "~/providers/style-config-provider";
-import type { DetailedProductFull } from "~/types";
+
 import { cn } from "~/utils/styles";
+import { DetailedProductFull } from "../types";
 
 interface ProductCard {
   data: DetailedProductFull;

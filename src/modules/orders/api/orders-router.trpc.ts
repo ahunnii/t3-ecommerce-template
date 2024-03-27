@@ -101,6 +101,7 @@ export const ordersRouter = createTRPCRouter({
           storeId: true,
           email: true,
           id: true,
+
           paymentStatus: true,
           orderItems: {
             select: {
@@ -401,6 +402,9 @@ export const ordersRouter = createTRPCRouter({
           billingAddress: true,
           fulfillments: true,
           orderItems: {
+            where: {
+              fulfillmentId: null,
+            },
             include: {
               product: {
                 include: {

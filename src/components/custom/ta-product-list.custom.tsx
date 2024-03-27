@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { FC } from "react";
 import Container from "~/components/common/layout/container";
 
-import type { DetailedProductFull } from "~/types";
+import type { DetailedProductFull } from "~/modules/products/types";
 
 interface ProductListProps {
   items: DetailedProductFull[];

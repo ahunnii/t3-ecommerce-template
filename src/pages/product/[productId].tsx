@@ -13,8 +13,6 @@ import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
-import type { DetailedProductFull } from "~/types";
-
 import { Star, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -25,6 +23,7 @@ import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
+import { DetailedProductFull } from "~/modules/products/types";
 import { CreateReviewDialog } from "~/modules/reviews/components/create-review-dialog";
 import { ReviewTemplate } from "~/modules/reviews/components/review-template";
 import { cn } from "~/utils/styles";
@@ -33,8 +32,6 @@ type ProductPageProps = { prevUrl: string; name: string };
 
 const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
   const params = useParams();
-
-  const { data: session } = useSession();
 
   const { data: sales } = api.discounts.getActiveSiteSales.useQuery({});
 

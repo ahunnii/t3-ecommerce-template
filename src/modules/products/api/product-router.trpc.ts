@@ -43,6 +43,19 @@ export const productsRouter = createTRPCRouter({
           isFeatured: input.isFeatured ?? undefined,
         },
         include: {
+          reviews: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+              images: true,
+            },
+          },
+
           collections: {
             include: {
               discounts: {
@@ -177,6 +190,21 @@ export const productsRouter = createTRPCRouter({
           variants: true,
           discounts: true,
           store: true,
+          reviews: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+              images: true,
+            },
+          },
 
           category: {
             include: {

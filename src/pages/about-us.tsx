@@ -11,7 +11,9 @@ const metadata = {
 };
 const AboutUsPage = () => {
   const config = useConfig();
-  const { data: aboutContent, isLoading } = api.store.getAboutPage.useQuery({});
+  const { data: aboutContent, isLoading } = api.content.getPage.useQuery({
+    slug: "about",
+  });
 
   return (
     <StorefrontLayout {...config.layout} metadata={metadata}>
@@ -21,15 +23,15 @@ const AboutUsPage = () => {
 
       {!isLoading && (
         <>
-          {aboutContent?.content?.aboutPage === "" ||
-          aboutContent?.content?.aboutPage === null ||
-          aboutContent?.content?.aboutPage?.length === 0 ? (
+          {aboutContent?.page?.content === "" ||
+          aboutContent?.page?.content === null ||
+          aboutContent?.page?.content?.length === 0 ? (
             <div className={cn("", "")}>
               <p>No description provided.</p>
             </div>
           ) : (
             <div className={cn("py-4", config.layout.p)}>
-              {parse(aboutContent?.content?.aboutPage ?? "")}
+              {parse(aboutContent?.page?.content ?? "")}
             </div>
           )}
         </>
@@ -37,5 +39,12 @@ const AboutUsPage = () => {
     </StorefrontLayout>
   );
 };
+
+// export const getServerSideProps = async () => {
+//   const aboutContent = await fetch("");
+//   return {
+//     props: {},
+//   };
+// };
 
 export default AboutUsPage;

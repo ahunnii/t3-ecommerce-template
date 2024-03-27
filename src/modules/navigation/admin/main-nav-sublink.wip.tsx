@@ -110,18 +110,26 @@ export const MainNavSublink: FC<MainNavProps> = ({ className, ...props }) => {
       active: checkActivePath(`/admin/${encodedStoreId}/custom-orders`),
       Icon: Boxes,
     },
+
     {
-      href: `/admin/${encodedStoreId}/blog-posts`,
-      label: "Blog Posts",
-      active: checkActivePath(`/admin/${encodedStoreId}/blog-posts`),
-      Icon: StickyNote,
-    },
-    {
-      href: `/admin/${encodedStoreId}/gallery`,
-      label: "Gallery",
-      active: checkActivePath(`/admin/${encodedStoreId}/gallery`),
+      href: `/admin/${encodedStoreId}/content`,
+      label: "Content",
+      active: checkActivePath(`/admin/${encodedStoreId}/content`),
       Icon: Image,
+      subRoutes: [
+        {
+          href: `/admin/${encodedStoreId}/blog-posts`,
+          label: "Blog Posts",
+          active: checkActivePath(`/admin/${encodedStoreId}/blog-posts`),
+        },
+        {
+          href: `/admin/${encodedStoreId}/gallery`,
+          label: "Gallery",
+          active: checkActivePath(`/admin/${encodedStoreId}/gallery`),
+        },
+      ],
     },
+
     {
       href: `/admin/${encodedStoreId}/services`,
       label: "Services",

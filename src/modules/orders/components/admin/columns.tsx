@@ -17,7 +17,6 @@ export type OrderColumn = {
   orderItems: { id: string; quantity: number }[];
   paymentStatus: PaymentStatus;
   fulfillmentStatus: FulfillmentStatus;
-  estimatedCompletion: number;
   total: number;
   createdAt: Date;
 };

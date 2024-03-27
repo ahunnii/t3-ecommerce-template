@@ -19,6 +19,7 @@ import { storeTheme } from "~/data/config.custom";
 import { CategoryCard } from "~/modules/categories/components/category-card";
 
 import { type contentSwitchWrapperVariants } from "~/components/utility/content-switch-wrapper";
+import { DetailedProductFull } from "~/modules/products/types";
 
 const metadata = {
   title: "Trend Anomaly",
@@ -44,7 +45,9 @@ const HomePage = () => {
           <TaHero />
         </div>
 
-        <TaProductGrid products={getAllProducts.data ?? []} />
+        <TaProductGrid
+          products={(getAllProducts.data as DetailedProductFull[]) ?? []}
+        />
 
         <Link href="/collections/all-products">
           <Button
@@ -61,7 +64,7 @@ const HomePage = () => {
             {getAllProducts.data?.slice(0, 3).map((product, idx) => (
               <TaProductCard
                 key={product.id + idx}
-                data={product}
+                data={product as DetailedProductFull}
                 className="h-full"
                 variant="marquee"
                 size="square"

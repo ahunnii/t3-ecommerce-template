@@ -1,4 +1,4 @@
-import type { DetailedProductFull } from "~/types";
+import type { DetailedProductFull } from "~/modules/products/types";
 
 export function extractQueryString(query: string) {
   // Split the query string into individual key-value pairs

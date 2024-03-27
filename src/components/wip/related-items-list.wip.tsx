@@ -2,7 +2,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { FC } from "react";
 import NoResults from "~/components/common/no-results";
 import { TaProductCard } from "~/components/custom/ta-product-card.custom";
-import type { DetailedProductFull } from "~/types";
+import { DetailedProductFull } from "~/modules/products/types";
+
 import { cn } from "~/utils/styles";
 
 interface ProductListProps extends VariantProps<typeof infoVariants> {

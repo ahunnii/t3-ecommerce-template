@@ -39,13 +39,13 @@ import { EditSection } from "~/components/common/sections/edit-section.admin";
 import { CommandAdvancedDialog } from "~/components/ui/command-advanced";
 import { Textarea } from "~/components/ui/textarea";
 import { env } from "~/env.mjs";
+import { collectionFormSchema } from "~/modules/collections/schema";
+import { CollectionFormValues } from "~/modules/collections/types";
 import ImageUpload from "~/services/image-upload/components/image-upload";
 import { toastService } from "~/services/toast";
 import type { DetailedCollection } from "~/types";
 import { api } from "~/utils/api";
 import { cn } from "~/utils/styles";
-import type { CollectionFormValues } from "../../types";
-import { collectionFormSchema } from "../schema";
 
 type Props = {
   initialData: DetailedCollection | null;
