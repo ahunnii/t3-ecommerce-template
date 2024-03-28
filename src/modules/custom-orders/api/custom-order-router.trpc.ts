@@ -206,6 +206,7 @@ export const customRouter = createTRPCRouter({
             update: {
               price: input.price ?? 0.0,
               description: input.productDescription,
+              featuredImage: "/placeholder-image.webp",
             },
             create: {
               price: input.price ?? 0.0,
@@ -214,6 +215,7 @@ export const customRouter = createTRPCRouter({
               categoryId: category?.id ?? "",
               storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
               description: input.notes ?? input.description,
+              featuredImage: "/placeholder-image.webp",
             },
           });
 
@@ -300,6 +302,7 @@ export const customRouter = createTRPCRouter({
           update: {
             price: input.price,
             description: input.productDescription,
+            featuredImage: "/placeholder-image.webp",
           },
           create: {
             price: input.price,
@@ -308,6 +311,7 @@ export const customRouter = createTRPCRouter({
             categoryId: category?.id ?? "",
             storeId: input.storeId ?? env.NEXT_PUBLIC_STORE_ID,
             description: input.notes ?? input.description,
+            featuredImage: "/placeholder-image.webp",
           },
         });
 

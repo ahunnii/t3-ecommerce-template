@@ -45,9 +45,7 @@ const HomePage = () => {
           <TaHero />
         </div>
 
-        <TaProductGrid
-          products={(getAllProducts.data as DetailedProductFull[]) ?? []}
-        />
+        <TaProductGrid products={getAllProducts.data ?? []} />
 
         <Link href="/collections/all-products">
           <Button
@@ -64,7 +62,7 @@ const HomePage = () => {
             {getAllProducts.data?.slice(0, 3).map((product, idx) => (
               <TaProductCard
                 key={product.id + idx}
-                data={product as DetailedProductFull}
+                data={product}
                 className="h-full"
                 variant="marquee"
                 size="square"

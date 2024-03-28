@@ -44,11 +44,11 @@ export const ContentClient: React.FC<Props> = ({ data }) => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        {/* <Link href={`/admin/${storeId}/content/new`}>
+        <Link href={`/admin/${storeId}/content/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Button>
-        </Link> */}
+        </Link>
       </div>
       <Separator />
       <AdvancedDataTable

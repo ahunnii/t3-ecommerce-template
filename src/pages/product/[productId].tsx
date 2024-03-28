@@ -13,17 +13,13 @@ import StorefrontLayout from "~/components/layouts/storefront-layout";
 
 import { api } from "~/utils/api";
 
-import { Star, User } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { AbsolutePageLoader } from "~/components/common/absolute-page-loader";
 import { TaBreadCrumbs } from "~/components/custom/ta-breadcrumbs.custom";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
+
 import { Separator } from "~/components/ui/separator";
 import { RelatedItemsList } from "~/components/wip/related-items-list.wip";
 import { storeTheme } from "~/data/config.custom";
-import { DetailedProductFull } from "~/modules/products/types";
+import type { DetailedProductFull } from "~/modules/products/types";
 import { CreateReviewDialog } from "~/modules/reviews/components/create-review-dialog";
 import { ReviewTemplate } from "~/modules/reviews/components/review-template";
 import { cn } from "~/utils/styles";
@@ -37,7 +33,6 @@ const SingleProductPage: FC<ProductPageProps> = ({ prevUrl, name }) => {
 
   const { data: product, isLoading } = api.products.getProduct.useQuery({
     productId: params?.productId as string,
-    status: "ACTIVE",
   });
 
   const { data: collection } = api.collections.getCollection.useQuery({

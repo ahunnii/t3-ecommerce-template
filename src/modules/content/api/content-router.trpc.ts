@@ -8,6 +8,8 @@ import {
 } from "~/server/api/trpc";
 import { hygraphClient, hygraphClientPublic } from "~/server/hygraph/client";
 import {
+  createSinglePage,
+  deleteSinglePage,
   getPage,
   getPages,
   updatePage as updateSinglePage,
@@ -47,6 +49,43 @@ export const contentRouter = createTRPCRouter({
         content: input.content,
         slug: input.slug,
         title: input.title,
+      });
+
+      return cmsResponse as BasicGraphQLPage;
+    }),
+
+  createPage: protectedProcedure
+    .input(
+      z.object({ content: z.string(), slug: z.string(), title: z.string() })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
+
+      const cmsResponse = await hygraphClient.request(createSinglePage, {
+        content: input.content,
+        slug: input.slug,
+        title: input.title,
+      });
+
+      return cmsResponse as BasicGraphQLPage;
+    }),
+
+  deletePage: protectedProcedure
+    .input(z.object({ slug: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "ADMIN") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
+      const cmsResponse = await hygraphClient.request(deleteSinglePage, {
+        slug: input.slug,
       });
 
       return cmsResponse as BasicGraphQLPage;

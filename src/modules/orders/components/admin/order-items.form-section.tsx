@@ -34,7 +34,7 @@ type Props = {
 };
 
 export const OrderItemsSection: FC<Props> = ({ form, loading }) => {
-  const { fields, remove } = useFieldArray({
+  const { fields, remove, append } = useFieldArray({
     control: form.control,
     name: "orderItems",
   });

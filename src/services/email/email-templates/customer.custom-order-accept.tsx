@@ -62,7 +62,7 @@ export const CustomOrderAcceptEmailBody = (
         <Heading className="text-left text-lg font-medium text-[#666666]">
           Invoice from {props.name}
         </Heading>
-        <Text className="text-left text-4xl font-semibold">$30.00</Text>
+        <Text className="text-left text-4xl font-semibold">${props.total}</Text>
         <Text className="text-left text-lg font-medium text-[#666666]">
           Due {new Date().toDateString()}
         </Text>

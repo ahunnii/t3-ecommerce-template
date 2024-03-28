@@ -83,7 +83,7 @@ const AllProductsPage = () => {
               {products?.map((item) => (
                 <TaProductCard
                   key={item.id}
-                  data={item as DetailedProductFull}
+                  data={item}
                   variant={"default"}
                   size={"default"}
                   discounts={[...(sales ?? []), ...item?.discounts] ?? []}

@@ -43,8 +43,9 @@ export const AboutPageForm: React.FC<Props> = ({ initialData }) => {
   const router = useNavigationRouter();
   const apiContext = api.useContext();
 
-  const { storeId } = params.query as {
+  const { storeId, contentSlug } = params.query as {
     storeId: string;
+    contentSlug: string;
   };
 
   const [open, setOpen] = useState(false);
@@ -65,10 +66,10 @@ export const AboutPageForm: React.FC<Props> = ({ initialData }) => {
     },
   });
 
-  const updateAboutPage = api.content.updatePage.useMutation({
+  const updateSinglePage = api.content.updatePage.useMutation({
     onSuccess: () => {
       toastService.success(toastMessage);
-      router.push(`/admin/${storeId}/content `);
+      router.push(`/admin/${storeId}/content`);
     },
     onError: (error) =>
       toastService.error("Something went wrong with updating the page.", error),
@@ -78,13 +79,50 @@ export const AboutPageForm: React.FC<Props> = ({ initialData }) => {
     },
   });
 
+  const createSinglePage = api.content.createPage.useMutation({
+    onSuccess: () => {
+      toastService.success(toastMessage);
+      router.push(`/admin/${storeId}/content`);
+    },
+    onError: (error) =>
+      toastService.error("Something went wrong with updating the page.", error),
+
+    onSettled: () => {
+      void apiContext.content.invalidate();
+    },
+  });
+
+  const deleteSinglePage = api.content.deletePage.useMutation({
+    onSuccess: () => {
+      toastService.success("Page was successfully deleted");
+      router.push(`/admin/${storeId}/content`);
+    },
+    onError: (error) =>
+      toastService.error("Something went wrong with deleting the page.", error),
+
+    onSettled: () => {
+      void apiContext.content.invalidate();
+    },
+  });
+
+  const onDelete = () => deleteSinglePage.mutate({ slug: contentSlug });
+
   const onSubmit = (data: AboutPageFormValues) => {
-    updateAboutPage.mutate({
-      ...data,
-    });
+    if (initialData) {
+      updateSinglePage.mutate({
+        ...data,
+      });
+    } else {
+      createSinglePage.mutate({
+        ...data,
+      });
+    }
   };
 
-  const loading = updateAboutPage.isLoading;
+  const loading =
+    updateSinglePage.isLoading ||
+    createSinglePage.isLoading ||
+    deleteSinglePage.isLoading;
 
   return (
     <>
@@ -103,8 +141,18 @@ export const AboutPageForm: React.FC<Props> = ({ initialData }) => {
             contentName="Content"
             link={`/admin/${storeId}/content`}
           >
+            {initialData && (
+              <AlertModal
+                isOpen={open}
+                setIsOpen={setOpen}
+                onConfirm={onDelete}
+                loading={loading}
+                asChild={true}
+              />
+            )}
+
             <Button disabled={loading} className="ml-auto" type="submit">
-              Update
+              {action}
             </Button>
           </AdminFormHeader>
           <AdminFormBody className="mx-auto max-w-7xl space-y-0 lg:flex-col xl:flex-row">
@@ -127,6 +175,23 @@ export const AboutPageForm: React.FC<Props> = ({ initialData }) => {
                     </FormItem>
                   )}
                 />
+
+                {!initialData && (
+                  <FormField
+                    control={form.control}
+                    name="slug"
+                    render={({ field }) => (
+                      <FormItem className="col-span-full">
+                        <FormLabel>Slug</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Slug" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
                 <FormField
                   control={form.control}
                   name="content"

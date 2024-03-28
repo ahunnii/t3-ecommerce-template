@@ -1,11 +1,11 @@
 import axios from "axios";
 import { buffer } from "micro";
 import type { Stripe } from "stripe";
-import { storeTheme } from "~/data/config.custom";
+
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe/client";
-import { emailService } from "~/services/email";
+
 import type { CustomerShippingRate } from "~/types";
 import type { PaymentProcessor } from "../payment-service";
 import type { CheckoutSessionResponse, retrievePaymentResult } from "../types";

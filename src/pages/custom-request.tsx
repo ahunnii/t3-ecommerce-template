@@ -48,11 +48,12 @@ const CustomRequestPage = () => {
           <div className="justify-left mx-auto flex w-full flex-col gap-y-3 max-md:p-4 md:max-w-3xl ">
             <>
               <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Custom Request
+                Embroidery Custom Request
               </h1>
               <p className="leading-7 ">
-                Have a custom request? We&apos;d love to hear from you! Please
-                fill out the form below.
+                Have a special embroidery request? We&apos;d love to hear from
+                you! Please fill out the form below and we will get back to you
+                as soon as we can!
               </p>
               <CustomRequestForm
                 onSubmit={createCustomRequest}

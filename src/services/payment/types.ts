@@ -1,6 +1,5 @@
 import type {
   FulfillmentStatus,
-  Order,
   OrderItem,
   PaymentStatus,
   TimeLineEntryType,

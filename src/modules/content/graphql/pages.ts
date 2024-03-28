@@ -45,3 +45,30 @@ export const getPages = gql`
     }
   }
 `;
+
+export const createSinglePage = gql`
+  mutation createPage($content: String, $slug: String, $title: String) {
+    createPage(data: { content: $content, title: $title, slug: $slug }) {
+      id
+      title
+      content
+      slug
+      updatedAt
+    }
+    publishPage(where: { slug: $slug }) {
+      id
+      title
+      content
+      slug
+      updatedAt
+    }
+  }
+`;
+
+export const deleteSinglePage = gql`
+  mutation deletePage($slug: String) {
+    deletePage(where: { slug: $slug }) {
+      id
+    }
+  }
+`;
